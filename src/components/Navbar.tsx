@@ -1,11 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, Shield } from "lucide-react";
+import { Menu, X, ChevronDown, Shield, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { User } from "@supabase/supabase-js";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -119,8 +143,27 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button variant="ghost" size="sm">Log In</Button>
-            <Button variant="vault" size="sm">Join Vault</Button>
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            ) : user ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  {user.email}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                  Log In
+                </Button>
+                <Button variant="vault" size="sm" onClick={() => navigate("/auth")}>
+                  Join Vault
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -176,8 +219,23 @@ const Navbar = () => {
                   </div>
                 ))}
                 <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
-                  <Button variant="ghost" className="justify-center">Log In</Button>
-                  <Button variant="vault">Join Vault</Button>
+                  {user ? (
+                    <>
+                      <p className="text-sm text-muted-foreground px-4">{user.email}</p>
+                      <Button variant="ghost" className="justify-center" onClick={handleSignOut}>
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                        Log In
+                      </Button>
+                      <Button variant="vault" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                        Join Vault
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>
