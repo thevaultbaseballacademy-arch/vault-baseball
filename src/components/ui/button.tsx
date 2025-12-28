@@ -9,14 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-border bg-transparent text-foreground hover:bg-secondary hover:border-primary/50",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-secondary hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-gradient-to-r from-primary to-orange-600 text-primary-foreground font-bold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:scale-105 transition-all duration-300",
-        heroOutline: "border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground/10 hover:border-foreground/40 transition-all duration-300",
+        hero: "bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:scale-105 transition-all duration-300",
+        heroOutline: "border-2 border-primary/30 bg-transparent text-foreground hover:bg-primary/5 hover:border-primary/50 transition-all duration-300",
+        vault: "bg-gradient-to-r from-zinc-800 to-zinc-900 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300",
+        vaultOutline: "border-2 border-zinc-400 bg-transparent text-foreground hover:bg-zinc-100 hover:border-zinc-500 transition-all duration-300",
+        metallic: "bg-gradient-to-r from-zinc-400 via-zinc-300 to-zinc-400 text-zinc-900 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",
