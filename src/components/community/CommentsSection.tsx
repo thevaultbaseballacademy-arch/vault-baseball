@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Trash2, Send, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import MentionInput from "./MentionInput";
+import MentionText from "./MentionText";
 
 interface Comment {
   id: string;
@@ -159,7 +160,9 @@ const CommentsSection = ({ postId, currentUserId, onCommentsCountChange }: Comme
                       {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                     </span>
                   </div>
-                  <p className="text-sm text-foreground mt-1">{comment.content}</p>
+                  <div className="text-sm text-foreground mt-1">
+                    <MentionText content={comment.content} />
+                  </div>
                 </div>
               </div>
               {comment.user_id === currentUserId && (
@@ -179,12 +182,15 @@ const CommentsSection = ({ postId, currentUserId, onCommentsCountChange }: Comme
 
       {/* New Comment Form */}
       <form onSubmit={handleSubmit} className="flex gap-2">
-        <Input
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
-          className="flex-1"
-        />
+        <div className="flex-1">
+          <MentionInput
+            value={newComment}
+            onChange={setNewComment}
+            placeholder="Write a comment... Use @ to mention"
+            minHeight="40px"
+            className="min-h-[40px]"
+          />
+        </div>
         <Button type="submit" size="icon" disabled={submitting || !newComment.trim()}>
           {submitting ? (
             <Loader2 className="w-4 h-4 animate-spin" />
