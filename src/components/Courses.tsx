@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Clock, PlayCircle, Star, Zap, Target, Dumbbell, Wind, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import courseHitting from "@/assets/course-hitting.jpg";
 import coursePitching from "@/assets/course-pitching.jpg";
 import courseFielding from "@/assets/course-fielding.jpg";
@@ -175,9 +176,11 @@ const Courses = () => {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <Button variant="outline" size="lg">
-            View All Training Systems
-          </Button>
+          <Link to="/courses">
+            <Button variant="outline" size="lg">
+              View All Training Systems
+            </Button>
+          </Link>
         </motion.div>
       </div>
     </section>

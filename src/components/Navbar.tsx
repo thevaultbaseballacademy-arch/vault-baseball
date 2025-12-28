@@ -62,6 +62,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
+    { name: "Courses", href: "/courses" },
     { 
       name: "Programs", 
       href: "#programs",
@@ -74,13 +75,13 @@ const Navbar = () => {
     },
     { 
       name: "Training Systems", 
-      href: "#systems",
+      href: "/courses",
       dropdown: [
-        { name: "Velocity System", href: "#velocity" },
-        { name: "Strength & Conditioning", href: "#strength" },
-        { name: "Speed & Agility", href: "#speed" },
-        { name: "Throwing & Arm Care", href: "#throwing" },
-        { name: "Mindset & Psychology", href: "#mindset" },
+        { name: "Velocity System", href: "/courses" },
+        { name: "Strength & Conditioning", href: "/courses" },
+        { name: "Speed & Agility", href: "/courses" },
+        { name: "Throwing & Arm Care", href: "/courses" },
+        { name: "Mindset & Psychology", href: "/courses" },
       ]
     },
     { 
@@ -88,7 +89,7 @@ const Navbar = () => {
       href: "#products",
       dropdown: [
         { name: "PDF Programs", href: "#pdfs" },
-        { name: "Online Courses", href: "#courses" },
+        { name: "Online Courses", href: "/courses" },
         { name: "Books", href: "#books" },
       ]
     },
