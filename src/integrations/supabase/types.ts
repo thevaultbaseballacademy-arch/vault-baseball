@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      athlete_checkins: {
+        Row: {
+          checkin_date: string
+          created_at: string
+          energy_level: number | null
+          id: string
+          mood: number | null
+          notes: string | null
+          sleep_hours: number | null
+          sleep_quality: number | null
+          soreness_level: number | null
+          stress_level: number | null
+          training_completed: boolean | null
+          training_duration_minutes: number | null
+          training_intensity: number | null
+          training_type: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checkin_date?: string
+          created_at?: string
+          energy_level?: number | null
+          id?: string
+          mood?: number | null
+          notes?: string | null
+          sleep_hours?: number | null
+          sleep_quality?: number | null
+          soreness_level?: number | null
+          stress_level?: number | null
+          training_completed?: boolean | null
+          training_duration_minutes?: number | null
+          training_intensity?: number | null
+          training_type?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checkin_date?: string
+          created_at?: string
+          energy_level?: number | null
+          id?: string
+          mood?: number | null
+          notes?: string | null
+          sleep_hours?: number | null
+          sleep_quality?: number | null
+          soreness_level?: number | null
+          stress_level?: number | null
+          training_completed?: boolean | null
+          training_duration_minutes?: number | null
+          training_intensity?: number | null
+          training_type?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coaching_sessions: {
         Row: {
           coach_name: string
