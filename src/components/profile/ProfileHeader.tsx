@@ -3,10 +3,11 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Copy, Check, Calendar, Mail, MapPin, GraduationCap, Target } from "lucide-react";
+import { Share2, Copy, Check, Calendar, Mail, GraduationCap, Target } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import EditProfileForm from "./EditProfileForm";
+import ProfileImageUpload from "./ProfileImageUpload";
 
 interface Profile {
   user_id: string;
@@ -17,6 +18,8 @@ interface Profile {
   position?: string | null;
   graduation_year?: number | null;
   target_schools?: string[] | null;
+  avatar_url?: string | null;
+  cover_url?: string | null;
 }
 
 interface ProfileHeaderProps {
@@ -63,15 +66,54 @@ const ProfileHeader = ({ profile, isOwnProfile, onProfileUpdated }: ProfileHeade
     >
       <Card className="border-border bg-card overflow-hidden">
         {/* Banner */}
-        <div className="h-32 bg-gradient-to-r from-primary/30 via-primary/20 to-primary/10" />
+        <div className="h-32 md:h-40 relative group">
+          {currentProfile.cover_url ? (
+            <img 
+              src={currentProfile.cover_url} 
+              alt="Cover" 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-primary/30 via-primary/20 to-primary/10" />
+          )}
+          {isOwnProfile && (
+            <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <ProfileImageUpload
+                userId={currentProfile.user_id}
+                type="cover"
+                currentUrl={currentProfile.cover_url}
+                onUpload={(url) => handleProfileUpdated({ ...currentProfile, cover_url: url })}
+              />
+            </div>
+          )}
+        </div>
         
         <CardContent className="relative pt-0 pb-6">
           {/* Avatar */}
-          <div className="absolute -top-12 left-6">
-            <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center border-4 border-card shadow-lg">
-              <span className="text-primary-foreground font-bold text-2xl">
-                {initials}
-              </span>
+          <div className="absolute -top-12 left-6 group">
+            <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center border-4 border-card shadow-lg overflow-hidden relative">
+              {currentProfile.avatar_url ? (
+                <img 
+                  src={currentProfile.avatar_url} 
+                  alt={currentProfile.display_name || 'Profile'} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-primary-foreground font-bold text-2xl">
+                  {initials}
+                </span>
+              )}
+              {isOwnProfile && (
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <ProfileImageUpload
+                    userId={currentProfile.user_id}
+                    type="avatar"
+                    currentUrl={currentProfile.avatar_url}
+                    onUpload={(url) => handleProfileUpdated({ ...currentProfile, avatar_url: url })}
+                    className="[&>button]:bg-transparent [&>button]:border-0 [&>button]:text-white [&>button]:p-0 [&>button]:h-auto"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
