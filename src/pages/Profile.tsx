@@ -8,9 +8,10 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ProfilePosts from "@/components/profile/ProfilePosts";
 import HighlightVideos from "@/components/profile/HighlightVideos";
+import AthleticStats from "@/components/profile/AthleticStats";
 import RecruitingAssistant from "@/components/profile/RecruitingAssistant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, FileText, GraduationCap, Video, Loader2, Bot } from "lucide-react";
+import { Trophy, FileText, GraduationCap, Video, Loader2, Bot, Award } from "lucide-react";
 
 interface Profile {
   user_id: string;
@@ -23,6 +24,15 @@ interface Profile {
   target_schools?: string[] | null;
   avatar_url?: string | null;
   cover_url?: string | null;
+  height_inches?: number | null;
+  weight_lbs?: number | null;
+  throwing_arm?: string | null;
+  batting_side?: string | null;
+  sixty_yard_dash?: number | null;
+  twitter_url?: string | null;
+  instagram_url?: string | null;
+  youtube_url?: string | null;
+  hudl_url?: string | null;
 }
 
 const Profile = () => {
@@ -120,9 +130,13 @@ const Profile = () => {
 
           {/* Content Tabs */}
           <Tabs defaultValue="stats" className="mt-8">
-            <TabsList className="grid w-full grid-cols-5 bg-card border border-border">
+            <TabsList className="grid w-full grid-cols-6 bg-card border border-border">
               <TabsTrigger value="stats" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
+                <span className="hidden sm:inline">Training</span>
+              </TabsTrigger>
+              <TabsTrigger value="athletic" className="flex items-center gap-2">
+                <Award className="w-4 h-4" />
                 <span className="hidden sm:inline">Stats</span>
               </TabsTrigger>
               <TabsTrigger value="videos" className="flex items-center gap-2">
@@ -149,26 +163,20 @@ const Profile = () => {
               <ProfileStats userId={userId!} />
             </TabsContent>
 
+            <TabsContent value="athletic" className="mt-6">
+              <AthleticStats userId={userId!} isOwnProfile={isOwnProfile} />
+            </TabsContent>
+
             <TabsContent value="videos" className="mt-6">
-              <HighlightVideos 
-                userId={userId!} 
-                isOwnProfile={isOwnProfile}
-              />
+              <HighlightVideos userId={userId!} isOwnProfile={isOwnProfile} />
             </TabsContent>
 
             <TabsContent value="posts" className="mt-6">
-              <ProfilePosts 
-                userId={userId!} 
-                currentUserId={currentUser?.id}
-              />
+              <ProfilePosts userId={userId!} currentUserId={currentUser?.id} />
             </TabsContent>
 
             <TabsContent value="recruiting" className="mt-6">
-              <ProfilePosts 
-                userId={userId!} 
-                currentUserId={currentUser?.id}
-                filterType="recruiting"
-              />
+              <ProfilePosts userId={userId!} currentUserId={currentUser?.id} filterType="recruiting" />
             </TabsContent>
 
             {isOwnProfile && (
