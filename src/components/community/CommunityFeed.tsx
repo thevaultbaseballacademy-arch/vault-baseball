@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import PostCard from "./PostCard";
 import { Loader2 } from "lucide-react";
+import { createNotification, getActorName } from "@/lib/notifications";
 
 interface Post {
   id: string;
@@ -124,6 +125,20 @@ const CommunityFeed = ({ currentUserId, filter }: CommunityFeedProps) => {
         await supabase
           .from('community_likes')
           .insert({ post_id: postId, user_id: currentUserId });
+
+        // Send notification to post owner
+        const post = posts.find(p => p.id === postId);
+        if (post && post.user_id !== currentUserId) {
+          const actorName = await getActorName(currentUserId);
+          await createNotification({
+            userId: post.user_id,
+            type: 'like',
+            title: `${actorName} liked your post`,
+            message: post.content.slice(0, 100) + (post.content.length > 100 ? '...' : ''),
+            postId,
+            actorId: currentUserId
+          });
+        }
       }
 
       // Update local state

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import vaultLogo from "@/assets/vault-logo.png";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -163,11 +164,12 @@ const Navbar = () => {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
               <>
+                <NotificationBell userId={user.id} />
                 {isAdmin && (
                   <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
                     Admin
