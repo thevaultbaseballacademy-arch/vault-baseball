@@ -15,6 +15,10 @@ interface Profile {
   display_name: string;
   email: string;
   created_at: string;
+  bio?: string | null;
+  position?: string | null;
+  graduation_year?: number | null;
+  target_schools?: string[] | null;
 }
 
 const Profile = () => {
@@ -107,6 +111,7 @@ const Profile = () => {
             profile={profile} 
             isOwnProfile={isOwnProfile}
             currentUserId={currentUser?.id}
+            onProfileUpdated={setProfile}
           />
 
           {/* Content Tabs */}

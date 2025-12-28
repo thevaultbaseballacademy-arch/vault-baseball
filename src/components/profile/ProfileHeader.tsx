@@ -3,28 +3,35 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Copy, Check, Calendar, Mail } from "lucide-react";
+import { Share2, Copy, Check, Calendar, Mail, MapPin, GraduationCap, Target } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import EditProfileForm from "./EditProfileForm";
 
 interface Profile {
   user_id: string;
   display_name: string;
   email: string;
   created_at: string;
+  bio?: string | null;
+  position?: string | null;
+  graduation_year?: number | null;
+  target_schools?: string[] | null;
 }
 
 interface ProfileHeaderProps {
   profile: Profile;
   isOwnProfile: boolean;
   currentUserId?: string;
+  onProfileUpdated?: (profile: Profile) => void;
 }
 
-const ProfileHeader = ({ profile, isOwnProfile }: ProfileHeaderProps) => {
+const ProfileHeader = ({ profile, isOwnProfile, onProfileUpdated }: ProfileHeaderProps) => {
   const [copied, setCopied] = useState(false);
+  const [currentProfile, setCurrentProfile] = useState(profile);
 
   const shareProfile = async () => {
-    const profileUrl = `${window.location.origin}/profile/${profile.user_id}`;
+    const profileUrl = `${window.location.origin}/profile/${currentProfile.user_id}`;
     
     try {
       await navigator.clipboard.writeText(profileUrl);
@@ -36,7 +43,12 @@ const ProfileHeader = ({ profile, isOwnProfile }: ProfileHeaderProps) => {
     }
   };
 
-  const initials = profile.display_name
+  const handleProfileUpdated = (updatedProfile: Profile) => {
+    setCurrentProfile(updatedProfile);
+    onProfileUpdated?.(updatedProfile);
+  };
+
+  const initials = currentProfile.display_name
     ?.split(' ')
     .map(n => n[0])
     .join('')
@@ -63,8 +75,14 @@ const ProfileHeader = ({ profile, isOwnProfile }: ProfileHeaderProps) => {
             </div>
           </div>
 
-          {/* Share Button */}
-          <div className="flex justify-end pt-2">
+          {/* Action Buttons */}
+          <div className="flex justify-end pt-2 gap-2">
+            {isOwnProfile && (
+              <EditProfileForm 
+                profile={currentProfile} 
+                onProfileUpdated={handleProfileUpdated}
+              />
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -89,25 +107,61 @@ const ProfileHeader = ({ profile, isOwnProfile }: ProfileHeaderProps) => {
           <div className="mt-8">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="font-display text-3xl text-foreground">
-                {profile.display_name || 'Athlete'}
+                {currentProfile.display_name || 'Athlete'}
               </h1>
+              {currentProfile.position && (
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/30">
+                  {currentProfile.position}
+                </Badge>
+              )}
               {isOwnProfile && (
-                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                <Badge variant="outline" className="text-muted-foreground">
                   Your Profile
                 </Badge>
               )}
             </div>
 
+            {/* Bio */}
+            {currentProfile.bio && (
+              <p className="mt-4 text-foreground/80 max-w-2xl">
+                {currentProfile.bio}
+              </p>
+            )}
+
+            {/* Meta Info */}
             <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
+              {currentProfile.graduation_year && (
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Class of {currentProfile.graduation_year}</span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                <span>{profile.email}</span>
+                <span>{currentProfile.email}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                <span>Joined {format(new Date(profile.created_at), 'MMMM yyyy')}</span>
+                <span>Joined {format(new Date(currentProfile.created_at), 'MMMM yyyy')}</span>
               </div>
             </div>
+
+            {/* Target Schools */}
+            {currentProfile.target_schools && currentProfile.target_schools.length > 0 && (
+              <div className="mt-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <Target className="w-4 h-4" />
+                  <span>Target Schools</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {currentProfile.target_schools.map(school => (
+                    <Badge key={school} variant="outline" className="bg-muted/50">
+                      {school}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Quick Share for Recruiting */}
@@ -118,7 +172,7 @@ const ProfileHeader = ({ profile, isOwnProfile }: ProfileHeaderProps) => {
               </p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 px-3 py-2 bg-background rounded text-xs text-foreground truncate">
-                  {`${window.location.origin}/profile/${profile.user_id}`}
+                  {`${window.location.origin}/profile/${currentProfile.user_id}`}
                 </code>
                 <Button size="sm" variant="secondary" onClick={shareProfile}>
                   <Copy className="w-4 h-4" />
