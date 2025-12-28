@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Image, Video, Send, X, Loader2 } from "lucide-react";
 import MentionInput from "./MentionInput";
+import { createNotification, getActorName, extractMentions, getMentionedUserIds } from "@/lib/notifications";
 
 interface CreatePostFormProps {
   userId: string;
@@ -71,16 +72,36 @@ const CreatePostForm = ({ userId, onPostCreated }: CreatePostFormProps) => {
       }
 
       // Create post
-      const { error } = await supabase
+      const { data: postData, error } = await supabase
         .from('community_posts')
         .insert({
           user_id: userId,
           content: content.trim(),
           post_type: postType,
           media_url: mediaUrl
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Send mention notifications
+      const mentions = extractMentions(content);
+      if (mentions.length > 0) {
+        const mentionedUserIds = await getMentionedUserIds(mentions);
+        const actorName = await getActorName(userId);
+        
+        for (const mentionedUserId of mentionedUserIds) {
+          await createNotification({
+            userId: mentionedUserId,
+            type: 'mention',
+            title: `${actorName} mentioned you`,
+            message: content.slice(0, 100) + (content.length > 100 ? '...' : ''),
+            postId: postData.id,
+            actorId: userId
+          });
+        }
+      }
 
       toast.success("Post shared with the community!");
       setContent("");

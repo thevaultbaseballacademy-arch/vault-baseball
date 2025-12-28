@@ -6,6 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import MentionInput from "./MentionInput";
 import MentionText from "./MentionText";
+import { createNotification, getActorName, extractMentions, getMentionedUserIds } from "@/lib/notifications";
 
 interface Comment {
   id: string;
@@ -17,11 +18,12 @@ interface Comment {
 
 interface CommentsSectionProps {
   postId: string;
+  postOwnerId: string;
   currentUserId: string;
   onCommentsCountChange: (count: number) => void;
 }
 
-const CommentsSection = ({ postId, currentUserId, onCommentsCountChange }: CommentsSectionProps) => {
+const CommentsSection = ({ postId, postOwnerId, currentUserId, onCommentsCountChange }: CommentsSectionProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
@@ -97,9 +99,42 @@ const CommentsSection = ({ postId, currentUserId, onCommentsCountChange }: Comme
         .eq('user_id', currentUserId)
         .single();
 
+      const actorName = profile?.display_name || 'Someone';
+
+      // Notify post owner about the comment
+      if (postOwnerId !== currentUserId) {
+        await createNotification({
+          userId: postOwnerId,
+          type: 'comment',
+          title: `${actorName} commented on your post`,
+          message: newComment.slice(0, 100) + (newComment.length > 100 ? '...' : ''),
+          postId,
+          actorId: currentUserId
+        });
+      }
+
+      // Notify mentioned users
+      const mentions = extractMentions(newComment);
+      if (mentions.length > 0) {
+        const mentionedUserIds = await getMentionedUserIds(mentions);
+        
+        for (const mentionedUserId of mentionedUserIds) {
+          if (mentionedUserId !== currentUserId) {
+            await createNotification({
+              userId: mentionedUserId,
+              type: 'mention',
+              title: `${actorName} mentioned you in a comment`,
+              message: newComment.slice(0, 100) + (newComment.length > 100 ? '...' : ''),
+              postId,
+              actorId: currentUserId
+            });
+          }
+        }
+      }
+
       const newCommentWithAuthor: Comment = {
         ...data,
-        author_name: profile?.display_name || 'Anonymous'
+        author_name: actorName
       };
 
       setComments(prev => [...prev, newCommentWithAuthor]);
