@@ -15,8 +15,6 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import {
   BarChart,
   Bar,
@@ -242,6 +240,12 @@ export function WeeklySummaryReport() {
     
     setExporting(true);
     try {
+      // Dynamic imports to avoid build issues
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas')
+      ]);
+      
       const reportElement = reportRef.current;
       
       // Create canvas from the report element
