@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -59,20 +60,22 @@ const PostCard = ({ post, currentUserId, onLikeToggle, onDelete }: PostCardProps
     <Card className="border-border bg-card overflow-hidden">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+          <Link to={`/profile/${post.user_id}`} className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
               <span className="text-primary font-semibold text-sm">
                 {post.author_name?.charAt(0).toUpperCase() || 'A'}
               </span>
             </div>
             <div>
-              <p className="font-medium text-foreground">{post.author_name || 'Anonymous'}</p>
+              <p className="font-medium text-foreground group-hover:text-primary transition-colors">
+                {post.author_name || 'Anonymous'}
+              </p>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Clock className="w-3 h-3" />
                 {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               </div>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className={`${typeConfig.color} text-xs`}>
               <TypeIcon className="w-3 h-3 mr-1" />

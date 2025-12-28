@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import CoachDashboard from "./pages/CoachDashboard";
 import Admin from "./pages/Admin";
 import Community from "./pages/Community";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/coach" element={<CoachDashboard />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/profile/:userId" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
