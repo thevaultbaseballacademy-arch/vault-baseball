@@ -7,8 +7,9 @@ import Footer from "@/components/Footer";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ProfilePosts from "@/components/profile/ProfilePosts";
+import HighlightVideos from "@/components/profile/HighlightVideos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, FileText, GraduationCap, Loader2 } from "lucide-react";
+import { Trophy, FileText, GraduationCap, Video, Loader2 } from "lucide-react";
 
 interface Profile {
   user_id: string;
@@ -118,10 +119,14 @@ const Profile = () => {
 
           {/* Content Tabs */}
           <Tabs defaultValue="stats" className="mt-8">
-            <TabsList className="grid w-full grid-cols-3 bg-card border border-border">
+            <TabsList className="grid w-full grid-cols-4 bg-card border border-border">
               <TabsTrigger value="stats" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
                 <span className="hidden sm:inline">Stats</span>
+              </TabsTrigger>
+              <TabsTrigger value="videos" className="flex items-center gap-2">
+                <Video className="w-4 h-4" />
+                <span className="hidden sm:inline">Highlights</span>
               </TabsTrigger>
               <TabsTrigger value="posts" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
@@ -135,6 +140,13 @@ const Profile = () => {
 
             <TabsContent value="stats" className="mt-6">
               <ProfileStats userId={userId!} />
+            </TabsContent>
+
+            <TabsContent value="videos" className="mt-6">
+              <HighlightVideos 
+                userId={userId!} 
+                isOwnProfile={isOwnProfile}
+              />
             </TabsContent>
 
             <TabsContent value="posts" className="mt-6">
