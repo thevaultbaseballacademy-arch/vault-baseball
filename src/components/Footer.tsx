@@ -1,4 +1,5 @@
-import { Instagram, Twitter, Youtube, Mail, Shield } from "lucide-react";
+import { Instagram, Twitter, Youtube, Mail } from "lucide-react";
+import vaultLogo from "@/assets/vault-logo.png";
 
 const Footer = () => {
   const footerLinks = {
@@ -34,19 +35,12 @@ const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center relative overflow-hidden">
-                <Shield className="w-5 h-5 text-primary-foreground" />
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-display text-2xl leading-none text-foreground tracking-wider">
-                  VAULT
-                </span>
-                <span className="text-[10px] font-medium text-muted-foreground tracking-[0.2em] uppercase">
-                  Baseball
-                </span>
-              </div>
+            <div className="mb-6">
+              <img 
+                src={vaultLogo} 
+                alt="The Vault Baseball Academy" 
+                className="h-16 w-auto"
+              />
             </div>
             <p className="text-muted-foreground mb-6 max-w-sm text-sm leading-relaxed">
               Develop elite baseball athletes through data-driven performance systems. 
