@@ -11,20 +11,43 @@ const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isCoach, setIsCoach] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        checkCoachRole(session.user.id);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        setTimeout(() => checkCoachRole(session.user.id), 0);
+      } else {
+        setIsCoach(false);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkCoachRole = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'coach')
+        .maybeSingle();
+      setIsCoach(!!data);
+    } catch (error) {
+      console.error('Error checking coach role:', error);
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -147,6 +170,11 @@ const Navbar = () => {
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
               <>
+                {isCoach && (
+                  <Button variant="ghost" size="sm" onClick={() => navigate("/coach")}>
+                    Coach
+                  </Button>
+                )}
                 <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
                   Dashboard
                 </Button>
@@ -230,6 +258,11 @@ const Navbar = () => {
                 <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
                   {user ? (
                     <>
+                      {isCoach && (
+                        <Button variant="ghost" className="justify-center" onClick={() => { navigate("/coach"); setIsOpen(false); }}>
+                          Coach
+                        </Button>
+                      )}
                       <Button variant="ghost" className="justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
                         Dashboard
                       </Button>
