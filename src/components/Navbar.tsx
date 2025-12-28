@@ -1,14 +1,45 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ChevronDown, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const navLinks = [
-    { name: "Courses", href: "#courses" },
-    { name: "Pricing", href: "#pricing" },
+    { name: "Home", href: "/" },
+    { 
+      name: "Programs", 
+      href: "#programs",
+      dropdown: [
+        { name: "Youth Programs", href: "#youth" },
+        { name: "High School", href: "#highschool" },
+        { name: "College", href: "#college" },
+        { name: "Pro Development", href: "#pro" },
+      ]
+    },
+    { 
+      name: "Training Systems", 
+      href: "#systems",
+      dropdown: [
+        { name: "Velocity System", href: "#velocity" },
+        { name: "Strength & Conditioning", href: "#strength" },
+        { name: "Speed & Agility", href: "#speed" },
+        { name: "Throwing & Arm Care", href: "#throwing" },
+        { name: "Mindset & Psychology", href: "#mindset" },
+      ]
+    },
+    { 
+      name: "Digital Products", 
+      href: "#products",
+      dropdown: [
+        { name: "PDF Programs", href: "#pdfs" },
+        { name: "Online Courses", href: "#courses" },
+        { name: "Books", href: "#books" },
+      ]
+    },
+    { name: "Vault App", href: "#app", badge: "Coming Soon" },
     { name: "About", href: "#about" },
     { name: "Contact", href: "#contact" },
   ];
@@ -18,42 +49,83 @@ const Navbar = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50"
+      className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border"
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-display text-xl">DB</span>
+          <a href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center relative overflow-hidden">
+              <Shield className="w-5 h-5 text-primary-foreground" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
             </div>
-            <span className="font-display text-2xl text-foreground hidden sm:block">
-              DIAMOND<span className="text-primary">BASEBALL</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="font-display text-2xl leading-none text-foreground tracking-wider">
+                VAULT
+              </span>
+              <span className="text-[10px] font-medium text-muted-foreground tracking-[0.2em] uppercase">
+                Baseball
+              </span>
+            </div>
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
-              <a
+              <div
                 key={link.name}
-                href={link.href}
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+                className="relative"
+                onMouseEnter={() => link.dropdown && setActiveDropdown(link.name)}
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                {link.name}
-              </a>
+                <a
+                  href={link.href}
+                  className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
+                >
+                  {link.name}
+                  {link.badge && (
+                    <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold bg-primary/10 text-primary rounded-full">
+                      {link.badge}
+                    </span>
+                  )}
+                  {link.dropdown && <ChevronDown className="w-4 h-4 ml-1" />}
+                </a>
+                
+                {/* Dropdown */}
+                <AnimatePresence>
+                  {link.dropdown && activeDropdown === link.name && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-1 w-56 bg-card rounded-xl shadow-lg border border-border overflow-hidden"
+                    >
+                      {link.dropdown.map((item) => (
+                        <a
+                          key={item.name}
+                          href={item.href}
+                          className="block px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                        >
+                          {item.name}
+                        </a>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             ))}
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-4">
-            <Button variant="ghost">Log In</Button>
-            <Button variant="default">Start Training</Button>
+          <div className="hidden lg:flex items-center gap-3">
+            <Button variant="ghost" size="sm">Log In</Button>
+            <Button variant="vault" size="sm">Join Vault</Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-foreground"
+            className="lg:hidden p-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -61,31 +133,56 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu */}
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden py-4 border-t border-border"
-          >
-            <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.name}
-                </a>
-              ))}
-              <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                <Button variant="ghost" className="justify-start">Log In</Button>
-                <Button variant="default">Start Training</Button>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden py-4 border-t border-border overflow-hidden"
+            >
+              <div className="flex flex-col gap-1">
+                {navLinks.map((link) => (
+                  <div key={link.name}>
+                    <a
+                      href={link.href}
+                      className="flex items-center justify-between px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors rounded-lg font-medium"
+                      onClick={() => !link.dropdown && setIsOpen(false)}
+                    >
+                      <span className="flex items-center gap-2">
+                        {link.name}
+                        {link.badge && (
+                          <span className="px-2 py-0.5 text-[10px] font-semibold bg-primary/10 text-primary rounded-full">
+                            {link.badge}
+                          </span>
+                        )}
+                      </span>
+                      {link.dropdown && <ChevronDown className="w-4 h-4" />}
+                    </a>
+                    {link.dropdown && (
+                      <div className="ml-4 border-l border-border">
+                        {link.dropdown.map((item) => (
+                          <a
+                            key={item.name}
+                            href={item.href}
+                            className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {item.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
+                  <Button variant="ghost" className="justify-center">Log In</Button>
+                  <Button variant="vault">Join Vault</Button>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.nav>
   );

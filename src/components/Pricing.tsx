@@ -5,48 +5,48 @@ import { Button } from "@/components/ui/button";
 const plans = [
   {
     id: 1,
-    name: "Single Course",
-    description: "Perfect for focusing on one skill",
-    price: 149,
-    period: "one-time",
+    name: "Basic",
+    description: "For athletes just getting started",
+    price: 29,
+    period: "/month",
     features: [
-      "Access to one course of your choice",
-      "Lifetime access to content",
-      "Downloadable resources",
+      "Access to 2 training systems",
+      "Weekly programming updates",
+      "Basic metrics tracking",
       "Community forum access",
-      "Certificate of completion",
+      "Email support",
     ],
     popular: false,
   },
   {
     id: 2,
-    name: "All-Access Pass",
-    description: "Complete training for serious players",
-    price: 39,
+    name: "Performance",
+    description: "For serious athletes ready to compete",
+    price: 59,
     period: "/month",
     features: [
-      "Unlimited access to all courses",
-      "New content added monthly",
-      "Live Q&A sessions with coaches",
-      "Personalized training plans",
-      "Video swing analysis (monthly)",
-      "Priority community support",
+      "Access to all 5 training systems",
+      "Personalized programming",
+      "Advanced metrics dashboard",
+      "Video analysis (2x/month)",
+      "Coach feedback & notes",
+      "Priority support",
     ],
     popular: true,
   },
   {
     id: 3,
-    name: "Team License",
-    description: "Perfect for coaches and organizations",
-    price: 299,
+    name: "Elite",
+    description: "For athletes pursuing the next level",
+    price: 149,
     period: "/month",
     features: [
-      "Up to 25 player accounts",
-      "All-Access benefits for each player",
-      "Team progress dashboard",
-      "Custom training programs",
-      "Dedicated coach support",
-      "Bulk discount for larger teams",
+      "Everything in Performance",
+      "1-on-1 virtual coaching sessions",
+      "Custom program design",
+      "Unlimited video analysis",
+      "College recruiting guidance",
+      "Direct coach messaging",
     ],
     popular: false,
   },
@@ -54,7 +54,7 @@ const plans = [
 
 const Pricing = () => {
   return (
-    <section id="pricing" className="py-24 bg-background relative">
+    <section id="pricing" className="py-24 bg-secondary/30 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -62,14 +62,14 @@ const Pricing = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="text-primary text-sm font-medium uppercase tracking-widest mb-4 block">
-            Pricing Plans
+          <span className="text-accent text-sm font-medium uppercase tracking-widest mb-4 block">
+            Membership Tiers
           </span>
           <h2 className="text-4xl md:text-6xl font-display text-foreground mb-4">
-            INVEST IN YOUR GAME
+            CHOOSE YOUR PATH
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Choose the plan that fits your training goals. All plans include our satisfaction guarantee.
+            Select the membership that matches your training goals and commitment level.
           </p>
         </motion.div>
 
@@ -83,13 +83,13 @@ const Pricing = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className={`relative bg-card border rounded-2xl p-8 ${
                 plan.popular
-                  ? "border-primary shadow-lg shadow-primary/20 scale-105"
+                  ? "border-foreground shadow-xl scale-105"
                   : "border-border"
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="px-4 py-1 rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+                  <span className="px-4 py-1 rounded-full bg-foreground text-background text-sm font-semibold">
                     Most Popular
                   </span>
                 </div>
@@ -107,8 +107,8 @@ const Pricing = () => {
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-primary" />
+                    <div className="w-5 h-5 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-foreground" />
                     </div>
                     <span className="text-foreground text-sm">{feature}</span>
                   </li>
@@ -116,7 +116,7 @@ const Pricing = () => {
               </ul>
 
               <Button
-                variant={plan.popular ? "hero" : "outline"}
+                variant={plan.popular ? "vault" : "outline"}
                 size="lg"
                 className="w-full"
               >
@@ -125,6 +125,20 @@ const Pricing = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Coach Membership */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12 max-w-3xl mx-auto text-center p-8 rounded-2xl border border-border bg-card"
+        >
+          <h3 className="font-display text-2xl text-foreground mb-2">Coach & Team Memberships</h3>
+          <p className="text-muted-foreground mb-4">
+            Program templates, licensing rights, drill libraries, and education modules for coaches and organizations.
+          </p>
+          <Button variant="outline">Contact for Pricing</Button>
+        </motion.div>
       </div>
     </section>
   );
