@@ -13,6 +13,7 @@ import CoachDashboard from "./pages/CoachDashboard";
 import Admin from "./pages/Admin";
 import Community from "./pages/Community";
 import Profile from "./pages/Profile";
+import Courses from "./pages/Courses";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/community" element={<Community />} />
           <Route path="/profile/:userId" element={<Profile />} />
+          <Route path="/courses" element={<Courses />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
