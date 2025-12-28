@@ -8,8 +8,9 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ProfilePosts from "@/components/profile/ProfilePosts";
 import HighlightVideos from "@/components/profile/HighlightVideos";
+import RecruitingAssistant from "@/components/profile/RecruitingAssistant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, FileText, GraduationCap, Video, Loader2 } from "lucide-react";
+import { Trophy, FileText, GraduationCap, Video, Loader2, Bot } from "lucide-react";
 
 interface Profile {
   user_id: string;
@@ -119,7 +120,7 @@ const Profile = () => {
 
           {/* Content Tabs */}
           <Tabs defaultValue="stats" className="mt-8">
-            <TabsList className="grid w-full grid-cols-4 bg-card border border-border">
+            <TabsList className="grid w-full grid-cols-5 bg-card border border-border">
               <TabsTrigger value="stats" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
                 <span className="hidden sm:inline">Stats</span>
@@ -136,6 +137,12 @@ const Profile = () => {
                 <GraduationCap className="w-4 h-4" />
                 <span className="hidden sm:inline">Recruiting</span>
               </TabsTrigger>
+              {isOwnProfile && (
+                <TabsTrigger value="assistant" className="flex items-center gap-2">
+                  <Bot className="w-4 h-4" />
+                  <span className="hidden sm:inline">AI Coach</span>
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="stats" className="mt-6">
@@ -163,6 +170,19 @@ const Profile = () => {
                 filterType="recruiting"
               />
             </TabsContent>
+
+            {isOwnProfile && (
+              <TabsContent value="assistant" className="mt-6">
+                <RecruitingAssistant 
+                  athleteContext={{
+                    name: profile.display_name || undefined,
+                    position: profile.position || undefined,
+                    graduationYear: profile.graduation_year || undefined,
+                    targetSchools: profile.target_schools || undefined,
+                  }}
+                />
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </main>
