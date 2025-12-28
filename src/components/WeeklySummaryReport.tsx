@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, TrendingDown, Minus, Users, Activity, 
-  Moon, Brain, Battery, AlertTriangle, Calendar, X, FileText
+  Moon, Brain, Battery, AlertTriangle, Calendar, FileText, Download, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,9 @@ import {
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import {
   BarChart,
   Bar,
@@ -66,14 +69,15 @@ interface AthleteWeeklyData {
   trend: 'up' | 'down' | 'stable';
 }
 
-const COLORS = ['hsl(var(--accent))', 'hsl(220 70% 50%)', 'hsl(var(--muted))'];
-
 export function WeeklySummaryReport() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [athleteData, setAthleteData] = useState<AthleteWeeklyData[]>([]);
   const [dailyData, setDailyData] = useState<any[]>([]);
+  const reportRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const fetchWeeklyData = async () => {
     setLoading(true);
@@ -233,6 +237,73 @@ export function WeeklySummaryReport() {
     }
   }, [open]);
 
+  const exportToPDF = async () => {
+    if (!reportRef.current || !stats) return;
+    
+    setExporting(true);
+    try {
+      const reportElement = reportRef.current;
+      
+      // Create canvas from the report element
+      const canvas = await html2canvas(reportElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      
+      // Add title
+      pdf.setFontSize(20);
+      pdf.text('Weekly Summary Report', pdfWidth / 2, 15, { align: 'center' });
+      pdf.setFontSize(10);
+      pdf.text(`Generated: ${new Date().toLocaleDateString()}`, pdfWidth / 2, 22, { align: 'center' });
+      
+      // Add the captured image
+      const imgY = 30;
+      const scaledHeight = imgHeight * ratio * 0.9;
+      
+      if (scaledHeight > pdfHeight - imgY - 10) {
+        // Content is too tall, scale down more
+        const adjustedRatio = (pdfHeight - imgY - 10) / imgHeight;
+        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * adjustedRatio, imgHeight * adjustedRatio);
+      } else {
+        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio * 0.9, scaledHeight);
+      }
+      
+      // Save the PDF
+      const dateStr = new Date().toISOString().split('T')[0];
+      pdf.save(`weekly-report-${dateStr}.pdf`);
+      
+      toast({
+        title: 'PDF Exported',
+        description: 'Weekly report has been downloaded.',
+      });
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast({
+        title: 'Export Failed',
+        description: 'Unable to generate PDF. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
       case 'up':
@@ -259,11 +330,27 @@ export function WeeklySummaryReport() {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle className="text-2xl font-display flex items-center gap-2">
             <Calendar className="h-6 w-6 text-accent" />
             Weekly Summary Report
           </DialogTitle>
+          {stats && !loading && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={exportToPDF}
+              disabled={exporting}
+              className="gap-2"
+            >
+              {exporting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Export PDF
+            </Button>
+          )}
         </DialogHeader>
 
         {loading ? (
@@ -272,9 +359,10 @@ export function WeeklySummaryReport() {
           </div>
         ) : stats ? (
           <motion.div
+            ref={reportRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-6"
+            className="space-y-6 bg-background p-4 -m-4"
           >
             {/* Overview Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
