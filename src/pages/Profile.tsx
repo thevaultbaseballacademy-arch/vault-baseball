@@ -19,6 +19,8 @@ interface Profile {
   position?: string | null;
   graduation_year?: number | null;
   target_schools?: string[] | null;
+  avatar_url?: string | null;
+  cover_url?: string | null;
 }
 
 const Profile = () => {
