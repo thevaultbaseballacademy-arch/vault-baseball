@@ -12,6 +12,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { CoachAlerts } from "@/components/CoachAlerts";
 import { useCoachAlerts } from "@/hooks/useCoachAlerts";
+import { WeeklySummaryReport } from "@/components/WeeklySummaryReport";
 import {
   LineChart,
   Line,
@@ -252,6 +253,7 @@ const CoachDashboard = () => {
                 <p className="text-muted-foreground">Monitor your athletes' progress</p>
               </div>
               <div className="flex items-center gap-3">
+                <WeeklySummaryReport />
                 <CoachAlerts
                   alerts={alerts}
                   unreadCount={unreadCount}
