@@ -71,6 +71,42 @@ export type Database = {
         }
         Relationships: []
       }
+      athletic_stats: {
+        Row: {
+          created_at: string
+          id: string
+          season: string | null
+          stat_name: string
+          stat_type: string
+          stat_value: string
+          updated_at: string
+          user_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          season?: string | null
+          stat_name: string
+          stat_type: string
+          stat_value: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          season?: string | null
+          stat_name?: string
+          stat_type?: string
+          stat_value?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       coach_alerts: {
         Row: {
           alert_type: string
@@ -317,45 +353,72 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          batting_side: string | null
           bio: string | null
           cover_url: string | null
           created_at: string
           display_name: string | null
           email: string | null
           graduation_year: number | null
+          height_inches: number | null
+          hudl_url: string | null
           id: string
+          instagram_url: string | null
           position: string | null
+          sixty_yard_dash: number | null
           target_schools: string[] | null
+          throwing_arm: string | null
+          twitter_url: string | null
           updated_at: string
           user_id: string
+          weight_lbs: number | null
+          youtube_url: string | null
         }
         Insert: {
           avatar_url?: string | null
+          batting_side?: string | null
           bio?: string | null
           cover_url?: string | null
           created_at?: string
           display_name?: string | null
           email?: string | null
           graduation_year?: number | null
+          height_inches?: number | null
+          hudl_url?: string | null
           id?: string
+          instagram_url?: string | null
           position?: string | null
+          sixty_yard_dash?: number | null
           target_schools?: string[] | null
+          throwing_arm?: string | null
+          twitter_url?: string | null
           updated_at?: string
           user_id: string
+          weight_lbs?: number | null
+          youtube_url?: string | null
         }
         Update: {
           avatar_url?: string | null
+          batting_side?: string | null
           bio?: string | null
           cover_url?: string | null
           created_at?: string
           display_name?: string | null
           email?: string | null
           graduation_year?: number | null
+          height_inches?: number | null
+          hudl_url?: string | null
           id?: string
+          instagram_url?: string | null
           position?: string | null
+          sixty_yard_dash?: number | null
           target_schools?: string[] | null
+          throwing_arm?: string | null
+          twitter_url?: string | null
           updated_at?: string
           user_id?: string
+          weight_lbs?: number | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
