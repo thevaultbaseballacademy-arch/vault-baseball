@@ -147,6 +147,9 @@ const Navbar = () => {
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
               <>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/schedule")}>
+                  Schedule
+                </Button>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/account")}>
                   Account
                 </Button>
@@ -221,6 +224,9 @@ const Navbar = () => {
                 <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
                   {user ? (
                     <>
+                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/schedule"); setIsOpen(false); }}>
+                        Schedule
+                      </Button>
                       <Button variant="ghost" className="justify-center" onClick={() => { navigate("/account"); setIsOpen(false); }}>
                         Account
                       </Button>
