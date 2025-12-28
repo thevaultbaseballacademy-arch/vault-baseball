@@ -181,6 +181,9 @@ const Navbar = () => {
                 <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
                   Dashboard
                 </Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>
+                  Community
+                </Button>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/checkin")}>
                   Check-in
                 </Button>
@@ -273,6 +276,9 @@ const Navbar = () => {
                       )}
                       <Button variant="ghost" className="justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
                         Dashboard
+                      </Button>
+                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/community"); setIsOpen(false); }}>
+                        Community
                       </Button>
                       <Button variant="ghost" className="justify-center" onClick={() => { navigate("/checkin"); setIsOpen(false); }}>
                         Check-in
