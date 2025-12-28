@@ -12,6 +12,7 @@ const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isCoach, setIsCoach] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,33 +20,36 @@ const Navbar = () => {
       setUser(session?.user ?? null);
       setLoading(false);
       if (session?.user) {
-        checkCoachRole(session.user.id);
+        checkUserRoles(session.user.id);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        setTimeout(() => checkCoachRole(session.user.id), 0);
+        setTimeout(() => checkUserRoles(session.user.id), 0);
       } else {
         setIsCoach(false);
+        setIsAdmin(false);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkCoachRole = async (userId: string) => {
+  const checkUserRoles = async (userId: string) => {
     try {
       const { data } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'coach')
-        .maybeSingle();
-      setIsCoach(!!data);
+        .eq('user_id', userId);
+      
+      if (data) {
+        setIsCoach(data.some(r => r.role === 'coach'));
+        setIsAdmin(data.some(r => r.role === 'admin'));
+      }
     } catch (error) {
-      console.error('Error checking coach role:', error);
+      console.error('Error checking user roles:', error);
     }
   };
 
@@ -170,6 +174,11 @@ const Navbar = () => {
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
               <>
+                {isAdmin && (
+                  <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
+                    Admin
+                  </Button>
+                )}
                 {isCoach && (
                   <Button variant="ghost" size="sm" onClick={() => navigate("/coach")}>
                     Coach
@@ -258,6 +267,11 @@ const Navbar = () => {
                 <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
                   {user ? (
                     <>
+                      {isAdmin && (
+                        <Button variant="ghost" className="justify-center" onClick={() => { navigate("/admin"); setIsOpen(false); }}>
+                          Admin
+                        </Button>
+                      )}
                       {isCoach && (
                         <Button variant="ghost" className="justify-center" onClick={() => { navigate("/coach"); setIsOpen(false); }}>
                           Coach

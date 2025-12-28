@@ -10,6 +10,7 @@ import Schedule from "./pages/Schedule";
 import Checkin from "./pages/Checkin";
 import Dashboard from "./pages/Dashboard";
 import CoachDashboard from "./pages/CoachDashboard";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/checkin" element={<Checkin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/coach" element={<CoachDashboard />} />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
