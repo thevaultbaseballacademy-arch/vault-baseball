@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { CoachAlerts } from "@/components/CoachAlerts";
+import { useCoachAlerts } from "@/hooks/useCoachAlerts";
 import {
   LineChart,
   Line,
@@ -48,11 +50,20 @@ const CoachDashboard = () => {
   const [isCoach, setIsCoach] = useState(false);
   const [athletes, setAthletes] = useState<AthleteProfile[]>([]);
   const [checkins, setCheckins] = useState<CheckinData[]>([]);
-  const [selectedAthlete, setSelectedAthlete] = useState<string | null>(null);
   const [expandedAthlete, setExpandedAthlete] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const {
+    alerts,
+    unreadCount,
+    generateAlerts,
+    markAsRead,
+    markAllAsRead,
+    deleteAlert,
+    fetchAlerts
+  } = useCoachAlerts(user?.id || null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -96,6 +107,13 @@ const CoachDashboard = () => {
       setLoading(false);
     }
   };
+
+  // Generate alerts when data is loaded
+  useEffect(() => {
+    if (isCoach && user?.id && athletes.length > 0) {
+      generateAlerts();
+    }
+  }, [isCoach, user?.id, athletes.length, generateAlerts]);
 
   const fetchAthletes = async () => {
     try {
@@ -233,15 +251,28 @@ const CoachDashboard = () => {
                 </h1>
                 <p className="text-muted-foreground">Monitor your athletes' progress</p>
               </div>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search athletes..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full md:w-64"
+              <div className="flex items-center gap-3">
+                <CoachAlerts
+                  alerts={alerts}
+                  unreadCount={unreadCount}
+                  onMarkAsRead={markAsRead}
+                  onMarkAllAsRead={markAllAsRead}
+                  onDelete={deleteAlert}
+                  onRefresh={() => {
+                    generateAlerts();
+                    fetchAlerts();
+                  }}
                 />
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search athletes..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full md:w-64"
+                  />
+                </div>
               </div>
             </div>
 
