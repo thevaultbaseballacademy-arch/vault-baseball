@@ -147,9 +147,9 @@ const Navbar = () => {
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
               <>
-                <span className="text-sm text-muted-foreground">
-                  {user.email}
-                </span>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/account")}>
+                  Account
+                </Button>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   Sign Out
                 </Button>
@@ -221,7 +221,9 @@ const Navbar = () => {
                 <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
                   {user ? (
                     <>
-                      <p className="text-sm text-muted-foreground px-4">{user.email}</p>
+                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/account"); setIsOpen(false); }}>
+                        Account
+                      </Button>
                       <Button variant="ghost" className="justify-center" onClick={handleSignOut}>
                         Sign Out
                       </Button>
