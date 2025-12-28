@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Trash2, Trophy, Video, GraduationCap, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import CommentsSection from "./CommentsSection";
+import MentionText from "./MentionText";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -105,7 +106,7 @@ const PostCard = ({ post, currentUserId, onLikeToggle, onDelete }: PostCardProps
       </CardHeader>
 
       <CardContent className="pb-3">
-        <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+        <MentionText content={post.content} />
         
         {post.media_url && (
           <div className="mt-4 rounded-lg overflow-hidden bg-muted">

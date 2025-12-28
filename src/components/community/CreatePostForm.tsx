@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Image, Video, Send, X, Loader2 } from "lucide-react";
+import MentionInput from "./MentionInput";
 
 interface CreatePostFormProps {
   userId: string;
@@ -107,11 +107,10 @@ const CreatePostForm = ({ userId, onPostCreated }: CreatePostFormProps) => {
           </div>
           
           <div className="flex-1 space-y-4">
-            <Textarea
-              placeholder="Share your progress, game highlights, or recruiting updates..."
+            <MentionInput
+              placeholder="Share your progress, game highlights, or recruiting updates... Use @ to mention teammates"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[100px] resize-none border-border bg-background"
+              onChange={setContent}
             />
 
             {/* Media Preview */}
