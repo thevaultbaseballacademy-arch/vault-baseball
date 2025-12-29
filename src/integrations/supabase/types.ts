@@ -592,6 +592,45 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_broadcasts: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          message: string
+          notified_count: number | null
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          message: string
+          notified_count?: number | null
+          scheduled_at: string
+          sent_at?: string | null
+          status?: string
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          message?: string
+          notified_count?: number | null
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
