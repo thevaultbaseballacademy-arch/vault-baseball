@@ -3,7 +3,6 @@ import Hero from "@/components/Hero";
 import Courses from "@/components/Courses";
 import Testimonials from "@/components/Testimonials";
 import Pricing from "@/components/Pricing";
-import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -14,7 +13,6 @@ const Index = () => {
       <Courses />
       <Testimonials />
       <Pricing />
-      <CTA />
       <Footer />
     </main>
   );
