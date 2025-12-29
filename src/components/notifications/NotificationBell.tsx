@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bell, Heart, MessageCircle, AtSign, Check, Trash2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Bell, Heart, MessageCircle, AtSign, Check, Trash2, BookOpen, Users, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface Notification {
@@ -24,28 +25,26 @@ interface Notification {
   created_at: string;
 }
 
-type NotificationType = 'like' | 'comment' | 'mention';
-
 interface NotificationBellProps {
   userId: string;
 }
 
-const typeIcons: Record<string, typeof Heart> = {
-  like: Heart,
-  comment: MessageCircle,
-  mention: AtSign
-};
-
-const typeColors: Record<string, string> = {
-  like: "text-red-400",
-  comment: "text-blue-400",
-  mention: "text-purple-400"
+const typeConfig: Record<string, { icon: typeof Heart; color: string; bg: string }> = {
+  like: { icon: Heart, color: "text-red-500", bg: "bg-red-500/10" },
+  comment: { icon: MessageCircle, color: "text-blue-500", bg: "bg-blue-500/10" },
+  mention: { icon: AtSign, color: "text-purple-500", bg: "bg-purple-500/10" },
+  course_update: { icon: BookOpen, color: "text-green-500", bg: "bg-green-500/10" },
+  coach_message: { icon: Users, color: "text-orange-500", bg: "bg-orange-500/10" },
+  community_like: { icon: Heart, color: "text-red-500", bg: "bg-red-500/10" },
+  community_comment: { icon: MessageCircle, color: "text-blue-500", bg: "bg-blue-500/10" },
+  community_mention: { icon: AtSign, color: "text-purple-500", bg: "bg-purple-500/10" },
 };
 
 const NotificationBell = ({ userId }: NotificationBellProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
+  const [actorProfiles, setActorProfiles] = useState<Record<string, { display_name: string | null; avatar_url: string | null }>>({});
   const navigate = useNavigate();
 
   const fetchNotifications = async () => {
@@ -54,7 +53,7 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(10);
 
     if (error) {
       console.error("Error fetching notifications:", error);
@@ -63,6 +62,23 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
 
     setNotifications(data || []);
     setUnreadCount(data?.filter(n => !n.is_read).length || 0);
+
+    // Fetch actor profiles
+    const actorIds = [...new Set((data || []).map((n) => n.actor_id))];
+    if (actorIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, avatar_url")
+        .in("user_id", actorIds);
+
+      if (profiles) {
+        const profileMap: Record<string, { display_name: string | null; avatar_url: string | null }> = {};
+        profiles.forEach((p) => {
+          profileMap[p.user_id] = { display_name: p.display_name, avatar_url: p.avatar_url };
+        });
+        setActorProfiles(profileMap);
+      }
+    }
   };
 
   useEffect(() => {
@@ -81,7 +97,7 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
         },
         (payload) => {
           const newNotification = payload.new as Notification;
-          setNotifications(prev => [newNotification, ...prev.slice(0, 19)]);
+          setNotifications(prev => [newNotification, ...prev.slice(0, 9)]);
           setUnreadCount(prev => prev + 1);
         }
       )
@@ -135,8 +151,15 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
       markAsRead(notification.id);
     }
     
+    // Navigate based on notification type
     if (notification.post_id) {
       navigate('/community');
+    } else if (notification.type === "course_update") {
+      navigate("/courses");
+    } else if (notification.type === "coach_message") {
+      navigate("/dashboard");
+    } else if (notification.actor_id && notification.actor_id !== userId) {
+      navigate(`/profile/${notification.actor_id}`);
     }
     
     setOpen(false);
@@ -172,7 +195,7 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
           )}
         </div>
 
-        <ScrollArea className="h-[300px]">
+        <ScrollArea className="h-[320px]">
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
@@ -181,27 +204,38 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
           ) : (
             <div className="divide-y divide-border">
               {notifications.map(notification => {
-                const Icon = typeIcons[notification.type];
+                const config = typeConfig[notification.type] || typeConfig.like;
+                const Icon = config.icon;
+                const actorProfile = actorProfiles[notification.actor_id];
+
                 return (
                   <div
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`p-4 cursor-pointer hover:bg-muted/50 transition-colors group ${
+                    className={`p-3 cursor-pointer hover:bg-muted/50 transition-colors group ${
                       !notification.is_read ? 'bg-primary/5' : ''
                     }`}
                   >
                     <div className="flex gap-3">
-                      <div className={`mt-0.5 ${typeColors[notification.type]}`}>
-                        <Icon className="w-5 h-5" />
+                      <div className="relative">
+                        <Avatar className="w-9 h-9">
+                          <AvatarImage src={actorProfile?.avatar_url || undefined} />
+                          <AvatarFallback className={config.bg}>
+                            <Icon className={`w-4 h-4 ${config.color}`} />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ${config.bg} flex items-center justify-center border-2 border-popover`}>
+                          <Icon className={`w-2.5 h-2.5 ${config.color}`} />
+                        </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">
-                          {notification.title}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                        <p className="text-sm text-foreground line-clamp-2">
+                          <span className="font-medium">
+                            {actorProfile?.display_name || "Someone"}
+                          </span>{" "}
                           {notification.message}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                         </p>
                       </div>
@@ -225,6 +259,20 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
             </div>
           )}
         </ScrollArea>
+
+        <div className="p-3 border-t border-border">
+          <Button
+            variant="ghost"
+            className="w-full justify-center gap-2 text-sm"
+            onClick={() => {
+              navigate("/notifications");
+              setOpen(false);
+            }}
+          >
+            View all notifications
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );
