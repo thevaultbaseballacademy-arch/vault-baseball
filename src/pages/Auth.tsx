@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Shield, Mail, Lock, User, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+const authSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().min(2, "Name must be at least 2 characters").optional(),
+});
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,11 +22,44 @@ const Auth = () => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        const from = (location.state as any)?.from?.pathname || "/";
+        navigate(from, { replace: true });
+      }
+    });
+  }, [navigate, location]);
+
+  const validateForm = () => {
+    try {
+      authSchema.parse({ email, password, name: isLogin ? undefined : name });
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: typeof errors = {};
+        error.errors.forEach((err) => {
+          const field = err.path[0] as keyof typeof errors;
+          fieldErrors[field] = err.message;
+        });
+        setErrors(fieldErrors);
+      }
+      return false;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+    
     setLoading(true);
 
     try {
@@ -33,7 +73,8 @@ const Auth = () => {
           title: "Welcome back!",
           description: "You have been signed in successfully.",
         });
-        navigate("/");
+        const from = (location.state as any)?.from?.pathname || "/";
+        navigate(from, { replace: true });
       } else {
         const redirectUrl = `${window.location.origin}/`;
         const { error } = await supabase.auth.signUp({
@@ -57,6 +98,10 @@ const Auth = () => {
       let message = error.message || "An error occurred";
       if (error.message?.includes("User already registered")) {
         message = "This email is already registered. Please sign in instead.";
+      } else if (error.message?.includes("Invalid login credentials")) {
+        message = "Invalid email or password. Please try again.";
+      } else if (error.message?.includes("Email not confirmed")) {
+        message = "Please confirm your email before signing in.";
       }
       toast({
         title: "Error",
