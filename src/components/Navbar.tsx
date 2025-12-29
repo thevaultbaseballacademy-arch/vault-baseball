@@ -184,6 +184,9 @@ const Navbar = () => {
                 <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
                   Dashboard
                 </Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/my-programs")}>
+                  My Programs
+                </Button>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>
                   Community
                 </Button>
@@ -279,6 +282,9 @@ const Navbar = () => {
                       )}
                       <Button variant="ghost" className="justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
                         Dashboard
+                      </Button>
+                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/my-programs"); setIsOpen(false); }}>
+                        My Programs
                       </Button>
                       <Button variant="ghost" className="justify-center" onClick={() => { navigate("/community"); setIsOpen(false); }}>
                         Community
