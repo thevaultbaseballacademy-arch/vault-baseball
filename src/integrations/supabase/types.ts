@@ -378,6 +378,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          coach_messages: boolean
+          community_comments: boolean
+          community_likes: boolean
+          community_mentions: boolean
+          course_updates: boolean
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coach_messages?: boolean
+          community_comments?: boolean
+          community_likes?: boolean
+          community_mentions?: boolean
+          course_updates?: boolean
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coach_messages?: boolean
+          community_comments?: boolean
+          community_likes?: boolean
+          community_mentions?: boolean
+          course_updates?: boolean
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           actor_id: string
@@ -491,6 +527,33 @@ export type Database = {
           user_id?: string
           weight_lbs?: number | null
           youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

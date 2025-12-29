@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 type SubscriptionTier = "basic" | "performance" | "elite" | null;
 
@@ -29,6 +30,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>(null);
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize push notifications when user is logged in
+  usePushNotifications(user?.id);
 
   const checkSubscription = async (accessToken: string) => {
     try {

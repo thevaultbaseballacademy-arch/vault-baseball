@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NotificationSettings from "@/components/notifications/NotificationSettings";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -246,6 +247,9 @@ const Account = () => {
                 </div>
               )}
             </div>
+
+            {/* Notification Settings */}
+            <NotificationSettings userId={user?.id} />
           </motion.div>
         </div>
       </main>
