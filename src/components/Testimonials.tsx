@@ -1,5 +1,11 @@
 import { motion } from "framer-motion";
 import { Star, Quote, TrendingUp } from "lucide-react";
+import testimonialJake from "@/assets/testimonial-jake.jpg";
+import testimonialRyan from "@/assets/testimonial-ryan.jpg";
+import testimonialMike from "@/assets/testimonial-mike.jpg";
+import testimonialDylan from "@/assets/testimonial-dylan.jpg";
+import testimonialMarcus from "@/assets/testimonial-marcus.jpg";
+import testimonialSarah from "@/assets/testimonial-sarah.jpg";
 
 const testimonials = [
   {
@@ -8,7 +14,7 @@ const testimonials = [
     role: "D1 Commit, University of Texas",
     content: "After 8 weeks on the Velocity System, my exit velo went from 82 to 91 mph. The structured approach to training made it easy to stay consistent and see real progress.",
     rating: 5,
-    avatar: "JM",
+    image: testimonialJake,
     metric: "+9 MPH Exit Velo",
   },
   {
@@ -17,7 +23,7 @@ const testimonials = [
     role: "Junior, Westview High School",
     content: "My pop time dropped from 2.08 to 1.93 using the Speed & Agility program. I got my first college showcase invite last month.",
     rating: 5,
-    avatar: "RC",
+    image: testimonialRyan,
     metric: "1.93s Pop Time",
   },
   {
@@ -26,7 +32,7 @@ const testimonials = [
     role: "Head Coach, Texas Thunder 16U",
     content: "We implemented Vault across our entire organization. The dashboard makes tracking 20+ athletes manageable, and parents love seeing the progress data.",
     rating: 5,
-    avatar: "MP",
+    image: testimonialMike,
     metric: "22 Athletes",
   },
   {
@@ -35,7 +41,7 @@ const testimonials = [
     role: "Sophomore, St. Thomas Academy",
     content: "The throwing program helped me add 7 mph to my fastball while actually reducing arm soreness. The arm care routines are a game changer.",
     rating: 5,
-    avatar: "DB",
+    image: testimonialDylan,
     metric: "+7 MPH Velo",
   },
   {
@@ -44,7 +50,7 @@ const testimonials = [
     role: "JUCO Transfer, Blinn College",
     content: "Coming off an injury, the Strength & Conditioning program got me back stronger than before. Squatted 315 for the first time last week.",
     rating: 5,
-    avatar: "MW",
+    image: testimonialMarcus,
     metric: "315 lb Squat",
   },
   {
@@ -53,7 +59,7 @@ const testimonials = [
     role: "Hitting Instructor, Houston Area",
     content: "I use Vault programming with all my private lesson clients. The video analysis tools help me show kids exactly what we are working on.",
     rating: 5,
-    avatar: "ST",
+    image: testimonialSarah,
     metric: "40+ Students",
   },
 ];
@@ -114,9 +120,11 @@ const Testimonials = () => {
               </p>
 
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground font-display text-sm">
-                  {testimonial.avatar}
-                </div>
+                <img 
+                  src={testimonial.image} 
+                  alt={testimonial.name}
+                  className="w-11 h-11 rounded-full object-cover"
+                />
                 <div>
                   <p className="font-semibold text-foreground text-sm">{testimonial.name}</p>
                   <p className="text-xs text-muted-foreground">{testimonial.role}</p>
