@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Clock, CheckCircle, Users, ArrowLeft, BookOpen, 
-  PlayCircle, Lock, ChevronDown, ChevronUp
+  PlayCircle, Lock, ChevronDown, ChevronUp, Play
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -26,8 +26,16 @@ import {
 } from "@/hooks/useCourseEnrollment";
 import { allCourses } from "./Courses";
 import { useToast } from "@/hooks/use-toast";
+import VideoPlayer from "@/components/courses/VideoPlayer";
 
-// Generate mock lessons for each module
+// Sample video URLs for demonstration (would come from database in production)
+const sampleVideos = [
+  "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "https://www.youtube.com/watch?v=9bZkp7q19f0",
+  "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+];
+
+// Generate mock lessons for each module with video URLs
 const generateModuleLessons = (moduleIndex: number, lessonsPerModule: number) => {
   const lessonTitles = [
     "Introduction & Overview",
@@ -44,6 +52,8 @@ const generateModuleLessons = (moduleIndex: number, lessonsPerModule: number) =>
     index: i,
     title: lessonTitles[i % lessonTitles.length],
     duration: `${Math.floor(Math.random() * 15) + 5} min`,
+    videoUrl: sampleVideos[(moduleIndex + i) % sampleVideos.length],
+    hasVideo: true,
   }));
 };
 
@@ -53,6 +63,7 @@ const CourseDetailPage = () => {
   const { toast } = useToast();
   const [userId, setUserId] = useState<string | undefined>();
   const [openModules, setOpenModules] = useState<number[]>([0]);
+  const [activeLesson, setActiveLesson] = useState<{ moduleIndex: number; lessonIndex: number } | null>(null);
   
   const { data: enrollments = [] } = useCourseEnrollments(userId);
   const { data: progressData = [] } = useCourseProgress(userId, courseId || "");
@@ -304,6 +315,81 @@ const CourseDetailPage = () => {
           </div>
         </section>
 
+        {/* Video Player Section */}
+        {activeLesson && isEnrolled && (
+          <section className="container mx-auto px-4 mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card rounded-2xl border border-border p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Week {activeLesson.moduleIndex + 1} • Lesson {activeLesson.lessonIndex + 1}
+                  </p>
+                  <h3 className="text-xl font-display text-foreground">
+                    {modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.title}
+                  </h3>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setActiveLesson(null)}
+                >
+                  Close
+                </Button>
+              </div>
+              <VideoPlayer
+                videoUrl={modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.videoUrl || ""}
+                title={modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.title || ""}
+              />
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={activeLesson.lessonIndex === 0 && activeLesson.moduleIndex === 0}
+                  onClick={() => {
+                    if (activeLesson.lessonIndex > 0) {
+                      setActiveLesson({ ...activeLesson, lessonIndex: activeLesson.lessonIndex - 1 });
+                    } else if (activeLesson.moduleIndex > 0) {
+                      const prevModuleLessons = modules[activeLesson.moduleIndex - 1].lessons.length;
+                      setActiveLesson({ moduleIndex: activeLesson.moduleIndex - 1, lessonIndex: prevModuleLessons - 1 });
+                    }
+                  }}
+                >
+                  Previous Lesson
+                </Button>
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    checked={isLessonCompleted(activeLesson.moduleIndex, activeLesson.lessonIndex)}
+                    onCheckedChange={() => handleToggleLesson(activeLesson.moduleIndex, activeLesson.lessonIndex)}
+                  />
+                  <span className="text-sm text-muted-foreground">Mark as complete</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={
+                    activeLesson.moduleIndex === modules.length - 1 && 
+                    activeLesson.lessonIndex === modules[activeLesson.moduleIndex].lessons.length - 1
+                  }
+                  onClick={() => {
+                    const currentModule = modules[activeLesson.moduleIndex];
+                    if (activeLesson.lessonIndex < currentModule.lessons.length - 1) {
+                      setActiveLesson({ ...activeLesson, lessonIndex: activeLesson.lessonIndex + 1 });
+                    } else if (activeLesson.moduleIndex < modules.length - 1) {
+                      setActiveLesson({ moduleIndex: activeLesson.moduleIndex + 1, lessonIndex: 0 });
+                    }
+                  }}
+                >
+                  Next Lesson
+                </Button>
+              </div>
+            </motion.div>
+          </section>
+        )}
+
         {/* Course Content */}
         <section className="container mx-auto px-4">
           <motion.div
@@ -360,16 +446,23 @@ const CourseDetailPage = () => {
                         <div className="border-t border-border">
                           {module.lessons.map((lesson) => {
                             const completed = isLessonCompleted(module.index, lesson.index);
+                            const isActive = activeLesson?.moduleIndex === module.index && activeLesson?.lessonIndex === lesson.index;
                             
                             return (
                               <div 
                                 key={lesson.index}
-                                className="flex items-center gap-4 p-4 hover:bg-secondary/30 transition-colors border-b border-border last:border-0"
+                                className={`flex items-center gap-4 p-4 hover:bg-secondary/30 transition-colors border-b border-border last:border-0 cursor-pointer ${isActive ? 'bg-primary/10' : ''}`}
+                                onClick={() => {
+                                  if (isEnrolled && lesson.hasVideo) {
+                                    setActiveLesson({ moduleIndex: module.index, lessonIndex: lesson.index });
+                                  }
+                                }}
                               >
                                 {isEnrolled ? (
                                   <Checkbox
                                     checked={completed}
                                     onCheckedChange={() => handleToggleLesson(module.index, lesson.index)}
+                                    onClick={(e) => e.stopPropagation()}
                                     className="data-[state=checked]:bg-primary"
                                   />
                                 ) : (
@@ -380,6 +473,11 @@ const CourseDetailPage = () => {
                                     {lesson.title}
                                   </p>
                                 </div>
+                                {lesson.hasVideo && isEnrolled && (
+                                  <div className={`w-7 h-7 rounded-full flex items-center justify-center ${isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                                    <Play className="w-3 h-3 ml-0.5" fill="currentColor" />
+                                  </div>
+                                )}
                                 <span className="text-xs text-muted-foreground">{lesson.duration}</span>
                               </div>
                             );
