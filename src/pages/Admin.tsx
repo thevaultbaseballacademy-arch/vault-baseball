@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check
+  Search, Plus, X, Check, BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BroadcastPanel from "@/components/admin/BroadcastPanel";
+import NotificationAnalytics from "@/components/admin/NotificationAnalytics";
 
 interface Profile {
   user_id: string;
@@ -275,9 +276,10 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsList className="grid w-full max-w-lg grid-cols-3">
                 <TabsTrigger value="users">User Management</TabsTrigger>
                 <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
               </TabsList>
 
               <TabsContent value="users" className="mt-6 space-y-6">
@@ -373,6 +375,10 @@ const Admin = () => {
 
               <TabsContent value="broadcast" className="mt-6">
                 <BroadcastPanel userCount={profiles.length} />
+              </TabsContent>
+
+              <TabsContent value="analytics" className="mt-6">
+                <NotificationAnalytics />
               </TabsContent>
             </Tabs>
           </motion.div>
