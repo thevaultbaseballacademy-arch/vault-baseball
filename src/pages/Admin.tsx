@@ -5,11 +5,13 @@ import {
   Search, Plus, X, Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import BroadcastPanel from "@/components/admin/BroadcastPanel";
 
 interface Profile {
   user_id: string;
@@ -33,6 +35,7 @@ const Admin = () => {
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("users");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -225,23 +228,11 @@ const Admin = () => {
             className="space-y-6"
           >
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-display text-foreground mb-1">
-                  ADMIN PANEL
-                </h1>
-                <p className="text-muted-foreground">Manage user roles and permissions</p>
-              </div>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full md:w-64"
-                />
-              </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-display text-foreground mb-1">
+                ADMIN PANEL
+              </h1>
+              <p className="text-muted-foreground">Manage users, roles, and send notifications</p>
             </div>
 
             {/* Stats */}
@@ -282,82 +273,108 @@ const Admin = () => {
               </div>
             </div>
 
-            {/* Users List */}
-            <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              <div className="p-4 border-b border-border">
-                <h2 className="text-lg font-display text-foreground">User Management</h2>
-              </div>
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full max-w-md grid-cols-2">
+                <TabsTrigger value="users">User Management</TabsTrigger>
+                <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
+              </TabsList>
 
-              {filteredProfiles.length === 0 ? (
-                <div className="p-8 text-center">
-                  <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">No users found</p>
+              <TabsContent value="users" className="mt-6 space-y-6">
+                {/* Search */}
+                <div className="relative max-w-md">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full"
+                  />
                 </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {filteredProfiles.map((profile) => {
-                    const roles = getUserRoles(profile.user_id);
-                    
-                    return (
-                      <div 
-                        key={profile.user_id}
-                        className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                            <span className="text-sm font-medium text-accent">
-                              {profile.display_name?.charAt(0).toUpperCase() || '?'}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {profile.display_name || 'Unknown'}
-                            </p>
-                            <p className="text-sm text-muted-foreground">{profile.email}</p>
-                          </div>
-                        </div>
 
-                        <div className="flex flex-wrap gap-2">
-                          {ROLES.map((role) => {
-                            const active = hasRole(profile.user_id, role);
-                            const isUpdating = updatingRole === `${profile.user_id}-${role}`;
-                            const Icon = getRoleIcon(role);
-                            
-                            return (
-                              <button
-                                key={role}
-                                onClick={() => toggleRole(profile.user_id, role)}
-                                disabled={isUpdating}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${getRoleColor(role, active)} ${active ? 'border' : 'border-transparent'}`}
-                              >
-                                {isUpdating ? (
-                                  <Loader2 className="w-3 h-3 animate-spin" />
-                                ) : active ? (
-                                  <Check className="w-3 h-3" />
-                                ) : (
-                                  <Plus className="w-3 h-3" />
-                                )}
-                                <span className="capitalize">{role}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
+                {/* Users List */}
+                <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                  <div className="p-4 border-b border-border">
+                    <h2 className="text-lg font-display text-foreground">Users ({filteredProfiles.length})</h2>
+                  </div>
+
+                  {filteredProfiles.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                      <p className="text-muted-foreground">No users found</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-border max-h-[500px] overflow-y-auto">
+                      {filteredProfiles.map((profile) => {
+                        const roles = getUserRoles(profile.user_id);
+                        
+                        return (
+                          <div 
+                            key={profile.user_id}
+                            className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                                <span className="text-sm font-medium text-accent">
+                                  {profile.display_name?.charAt(0).toUpperCase() || '?'}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-foreground">
+                                  {profile.display_name || 'Unknown'}
+                                </p>
+                                <p className="text-sm text-muted-foreground">{profile.email}</p>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                              {ROLES.map((role) => {
+                                const active = hasRole(profile.user_id, role);
+                                const isUpdating = updatingRole === `${profile.user_id}-${role}`;
+                                const Icon = getRoleIcon(role);
+                                
+                                return (
+                                  <button
+                                    key={role}
+                                    onClick={() => toggleRole(profile.user_id, role)}
+                                    disabled={isUpdating}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${getRoleColor(role, active)} ${active ? 'border' : 'border-transparent'}`}
+                                  >
+                                    {isUpdating ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : active ? (
+                                      <Check className="w-3 h-3" />
+                                    ) : (
+                                      <Plus className="w-3 h-3" />
+                                    )}
+                                    <span className="capitalize">{role}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* Help Text */}
-            <div className="bg-secondary/50 rounded-xl p-4 text-sm text-muted-foreground">
-              <p className="font-medium text-foreground mb-2">Role Permissions:</p>
-              <ul className="space-y-1">
-                <li><span className="text-red-600 font-medium">Admin</span> — Full access to manage users and roles</li>
-                <li><span className="text-blue-600 font-medium">Coach</span> — View all athletes' check-ins and progress</li>
-                <li><span className="text-green-600 font-medium">Athlete</span> — Standard user access (for tagging purposes)</li>
-              </ul>
-            </div>
+                {/* Help Text */}
+                <div className="bg-secondary/50 rounded-xl p-4 text-sm text-muted-foreground">
+                  <p className="font-medium text-foreground mb-2">Role Permissions:</p>
+                  <ul className="space-y-1">
+                    <li><span className="text-red-600 font-medium">Admin</span> — Full access to manage users and roles</li>
+                    <li><span className="text-blue-600 font-medium">Coach</span> — View all athletes' check-ins and progress</li>
+                    <li><span className="text-green-600 font-medium">Athlete</span> — Standard user access (for tagging purposes)</li>
+                  </ul>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="broadcast" className="mt-6">
+                <BroadcastPanel userCount={profiles.length} />
+              </TabsContent>
+            </Tabs>
           </motion.div>
         </div>
       </main>
