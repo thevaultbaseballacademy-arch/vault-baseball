@@ -104,12 +104,33 @@ serve(async (req) => {
     }));
 
     // Insert notifications (ignore duplicates)
-    const { error: insertError } = await supabaseClient
+    const { data: insertedNotifications, error: insertError } = await supabaseClient
       .from("notifications")
-      .insert(notificationsToInsert);
+      .insert(notificationsToInsert)
+      .select("id, user_id");
 
     if (insertError) {
       logStep("Error inserting notifications", insertError);
+    }
+
+    // Track delivered analytics events
+    if (insertedNotifications && insertedNotifications.length > 0) {
+      const analyticsEvents = insertedNotifications.map((notification: any) => ({
+        notification_id: notification.id,
+        user_id: notification.user_id,
+        event_type: "delivered",
+        metadata: { type: payload.type }
+      }));
+
+      const { error: analyticsError } = await supabaseClient
+        .from("notification_analytics")
+        .insert(analyticsEvents);
+
+      if (analyticsError) {
+        logStep("Error tracking analytics", analyticsError);
+      } else {
+        logStep("Tracked delivery events", { count: analyticsEvents.length });
+      }
     }
 
     // Return success with token info for native push sending

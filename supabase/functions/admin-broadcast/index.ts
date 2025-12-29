@@ -119,14 +119,31 @@ serve(async (req) => {
 
     for (let i = 0; i < notifications.length; i += batchSize) {
       const batch = notifications.slice(i, i + batchSize);
-      const { error: insertError } = await supabaseClient
+      const { data: insertedBatch, error: insertError } = await supabaseClient
         .from("notifications")
-        .insert(batch);
+        .insert(batch)
+        .select("id, user_id");
 
       if (insertError) {
         logStep("Error inserting batch", { error: insertError, batchStart: i });
-      } else {
-        insertedCount += batch.length;
+      } else if (insertedBatch) {
+        insertedCount += insertedBatch.length;
+        
+        // Track delivered analytics events
+        const analyticsEvents = insertedBatch.map((notification: any) => ({
+          notification_id: notification.id,
+          user_id: notification.user_id,
+          event_type: "delivered",
+          metadata: { type: payload.type, broadcast: true }
+        }));
+
+        const { error: analyticsError } = await supabaseClient
+          .from("notification_analytics")
+          .insert(analyticsEvents);
+
+        if (analyticsError) {
+          logStep("Error tracking analytics", analyticsError);
+        }
       }
     }
 

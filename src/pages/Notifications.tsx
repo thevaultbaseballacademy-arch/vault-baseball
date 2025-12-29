@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { trackNotificationOpened, trackNotificationClicked, trackNotificationDismissed } from "@/lib/notificationAnalytics";
 
 interface Notification {
   id: string;
@@ -146,14 +147,6 @@ const Notifications = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
   };
 
-  const deleteNotification = async (notificationId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    await supabase.from("notifications").delete().eq("id", notificationId);
-
-    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
-  };
-
   const clearAll = async () => {
     if (!userId) return;
     
@@ -161,21 +154,46 @@ const Notifications = () => {
     setNotifications([]);
   };
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = async (notification: Notification) => {
     if (!notification.is_read) {
       markAsRead(notification.id);
+      // Track opened event
+      if (userId) {
+        trackNotificationOpened(notification.id, userId);
+      }
     }
 
-    // Navigate based on notification type
+    // Determine destination and track click
+    let destination = '/';
     if (notification.post_id) {
-      navigate("/community");
+      destination = '/community';
     } else if (notification.type === "course_update") {
-      navigate("/courses");
+      destination = '/courses';
     } else if (notification.type === "coach_message") {
-      navigate("/dashboard");
+      destination = '/dashboard';
     } else if (notification.actor_id && notification.actor_id !== userId) {
-      navigate(`/profile/${notification.actor_id}`);
+      destination = `/profile/${notification.actor_id}`;
     }
+
+    // Track click with destination
+    if (userId) {
+      trackNotificationClicked(notification.id, userId, destination);
+    }
+
+    navigate(destination);
+  };
+
+  const deleteNotification = async (notificationId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    // Track dismissal before deletion
+    if (userId) {
+      trackNotificationDismissed(notificationId, userId);
+    }
+
+    await supabase.from("notifications").delete().eq("id", notificationId);
+
+    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
   };
 
   const filteredNotifications = notifications.filter((n) => {

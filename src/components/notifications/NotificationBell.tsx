@@ -12,6 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bell, Heart, MessageCircle, AtSign, Check, Trash2, BookOpen, Users, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { trackNotificationOpened, trackNotificationClicked, trackNotificationDismissed } from "@/lib/notificationAnalytics";
 
 interface Notification {
   id: string;
@@ -134,6 +135,9 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
   const deleteNotification = async (notificationId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     
+    // Track dismissal before deletion
+    trackNotificationDismissed(notificationId, userId);
+    
     await supabase
       .from('notifications')
       .delete()
@@ -146,22 +150,29 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
     }
   };
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = async (notification: Notification) => {
     if (!notification.is_read) {
       markAsRead(notification.id);
+      // Track opened event
+      trackNotificationOpened(notification.id, userId);
     }
     
-    // Navigate based on notification type
+    // Determine destination and track click
+    let destination = '/';
     if (notification.post_id) {
-      navigate('/community');
+      destination = '/community';
     } else if (notification.type === "course_update") {
-      navigate("/courses");
+      destination = "/courses";
     } else if (notification.type === "coach_message") {
-      navigate("/dashboard");
+      destination = "/dashboard";
     } else if (notification.actor_id && notification.actor_id !== userId) {
-      navigate(`/profile/${notification.actor_id}`);
+      destination = `/profile/${notification.actor_id}`;
     }
     
+    // Track click with destination
+    trackNotificationClicked(notification.id, userId, destination);
+    
+    navigate(destination);
     setOpen(false);
   };
 
