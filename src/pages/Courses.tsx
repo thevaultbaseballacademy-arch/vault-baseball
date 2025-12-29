@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Clock, PlayCircle, Star, Zap, Target, Dumbbell, Wind, Brain, CheckCircle, Lock, Users, Calendar, Shield, Crosshair, TrendingUp, Sparkles } from "lucide-react";
+import { Clock, PlayCircle, Star, Zap, Target, Dumbbell, Wind, Brain, CheckCircle, Lock, Users, Calendar, Shield, Crosshair, TrendingUp, Sparkles, BookOpen, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { supabase } from "@/integrations/supabase/client";
+import { useCourseEnrollments, useEnrollInCourse } from "@/hooks/useCourseEnrollment";
+import { Link } from "react-router-dom";
 import courseHitting from "@/assets/course-hitting.jpg";
 import coursePitching from "@/assets/course-pitching.jpg";
 import courseFielding from "@/assets/course-fielding.jpg";
 
-const allCourses = [
+export const allCourses = [
   // PITCHING PROGRAMS
   {
-    id: 1,
+    id: "pitching-velocity-8week",
     title: "8-Week Pitching Velocity Program",
     description: "Develop safe, effective throwing mechanics, increase functional strength, improve arm-speed patterns, and build confidence on the mound. Learn sequencing, posture, timing, and intent.",
     image: coursePitching,
@@ -35,7 +39,7 @@ const allCourses = [
     students: 1240,
   },
   {
-    id: 2,
+    id: "elite-pitching-12week",
     title: "Elite 12-Week Pitching Velocity",
     description: "Advanced arm speed + mechanics system for high-performance athletes seeking major velocity increases, improved command, advanced biomechanics, and rotational power.",
     image: coursePitching,
@@ -60,7 +64,7 @@ const allCourses = [
 
   // CATCHING PROGRAMS
   {
-    id: 3,
+    id: "youth-catcher-8week",
     title: "Youth Catcher Development",
     description: "Build foundational receiving, blocking, footwork, and throwing movements for ages 9-13. Learn proper body position, glove angles, soft hands, and safe throwing mechanics.",
     image: courseFielding,
@@ -83,7 +87,7 @@ const allCourses = [
     students: 654,
   },
   {
-    id: 4,
+    id: "elite-catcher-12week",
     title: "Elite Catcher Development",
     description: "12-week receiving, blocking, and pop-time system for competitive athletes. Develop advanced receiving, throwing mechanics, footwork patterns, and professional-level durability.",
     image: courseFielding,
@@ -108,7 +112,7 @@ const allCourses = [
 
   // VERTICAL JUMP / SPEED PROGRAMS
   {
-    id: 5,
+    id: "youth-vertical-6week",
     title: "Youth Vertical Jump Program",
     description: "6-week age-appropriate plyometric training for ages 9-13. Develop explosive power, landing mechanics, and confidence with safe, progressive overload.",
     image: courseHitting,
@@ -131,7 +135,7 @@ const allCourses = [
     students: 560,
   },
   {
-    id: 6,
+    id: "elite-vertical-12week",
     title: "Elite Vertical Jump Program",
     description: "12-week explosive power system engineered to maximize vertical output through plyometric progressions, strength phases, and movement efficiency training.",
     image: courseHitting,
@@ -156,7 +160,7 @@ const allCourses = [
 
   // STRENGTH & CONDITIONING
   {
-    id: 7,
+    id: "strength-conditioning-12week",
     title: "Vault Strength & Conditioning",
     description: "12-week baseball performance program focusing on explosive movement, rotational power, acceleration, deceleration control, and full body stability for the complete athlete.",
     image: coursePitching,
@@ -181,7 +185,7 @@ const allCourses = [
 
   // MINDSET PROGRAMS
   {
-    id: 8,
+    id: "elite-mindset-10week",
     title: "Elite Athlete Mindset Program",
     description: "10-week championship mental performance system building confidence, resilience, emotional control, focus, discipline, and competitive consistency through performance psychology.",
     image: courseHitting,
@@ -204,7 +208,7 @@ const allCourses = [
     students: 980,
   },
   {
-    id: 9,
+    id: "winning-mindset-10week",
     title: "Winning Athlete Mindset",
     description: "10-week mental performance training system to improve confidence, focus, resilience, discipline, leadership, and on-field consistency. Think, act, and perform like elite competitors.",
     image: courseHitting,
@@ -230,6 +234,7 @@ const allCourses = [
 
 const categories = [
   { id: "all", name: "All Programs" },
+  { id: "enrolled", name: "My Programs" },
   { id: "pitching", name: "Pitching" },
   { id: "catching", name: "Catching" },
   { id: "speed", name: "Speed & Power" },
@@ -237,7 +242,17 @@ const categories = [
   { id: "mindset", name: "Mindset" },
 ];
 
-const CourseCard = ({ course, index }: { course: typeof allCourses[0]; index: number }) => {
+interface CourseCardProps {
+  course: typeof allCourses[0];
+  index: number;
+  isEnrolled: boolean;
+  enrollment?: { id: string; progress_percent: number; status: string } | null;
+  onEnroll: () => void;
+  isEnrolling: boolean;
+  isLoggedIn: boolean;
+}
+
+const CourseCard = ({ course, index, isEnrolled, enrollment, onEnroll, isEnrolling, isLoggedIn }: CourseCardProps) => {
   const Icon = course.icon;
   const [expanded, setExpanded] = useState(false);
   
@@ -248,6 +263,15 @@ const CourseCard = ({ course, index }: { course: typeof allCourses[0]; index: nu
       transition={{ duration: 0.5, delay: index * 0.05 }}
       className="group relative bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/30 transition-all duration-500 hover:shadow-xl"
     >
+      {/* Enrolled Badge */}
+      {isEnrolled && (
+        <div className="absolute top-0 right-0 z-10">
+          <div className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-bl-lg">
+            {enrollment?.status === "completed" ? "Completed" : "Enrolled"}
+          </div>
+        </div>
+      )}
+
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img
@@ -277,6 +301,17 @@ const CourseCard = ({ course, index }: { course: typeof allCourses[0]; index: nu
 
       {/* Content */}
       <div className="p-6">
+        {/* Progress Bar for Enrolled */}
+        {isEnrolled && enrollment && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-muted-foreground">Progress</span>
+              <span className="font-medium text-primary">{enrollment.progress_percent}%</span>
+            </div>
+            <Progress value={enrollment.progress_percent} className="h-2" />
+          </div>
+        )}
+
         <div className="flex items-center gap-4 mb-3 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
@@ -335,9 +370,30 @@ const CourseCard = ({ course, index }: { course: typeof allCourses[0]; index: nu
         </button>
 
         <div className="flex gap-2">
-          <Button variant="default" className="flex-1">
-            Enroll Now
-          </Button>
+          {!isLoggedIn ? (
+            <Button variant="outline" className="flex-1" asChild>
+              <Link to="/auth">
+                <LogIn className="w-4 h-4 mr-2" />
+                Sign in to Enroll
+              </Link>
+            </Button>
+          ) : isEnrolled ? (
+            <Button variant="default" className="flex-1" asChild>
+              <Link to={`/course/${course.id}`}>
+                <BookOpen className="w-4 h-4 mr-2" />
+                Continue Training
+              </Link>
+            </Button>
+          ) : (
+            <Button 
+              variant="default" 
+              className="flex-1"
+              onClick={onEnroll}
+              disabled={isEnrolling}
+            >
+              {isEnrolling ? "Enrolling..." : "Enroll Now"}
+            </Button>
+          )}
           <Button variant="outline" size="icon">
             <PlayCircle className="w-4 h-4" />
           </Button>
@@ -349,10 +405,33 @@ const CourseCard = ({ course, index }: { course: typeof allCourses[0]; index: nu
 
 const CoursesPage = () => {
   const [activeCategory, setActiveCategory] = useState("all");
+  const [userId, setUserId] = useState<string | undefined>();
+  
+  const { data: enrollments = [] } = useCourseEnrollments(userId);
+  const enrollMutation = useEnrollInCourse();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id);
+    });
+  }, []);
+
+  const getEnrollment = (courseId: string) => {
+    return enrollments.find(e => e.course_id === courseId);
+  };
+
+  const handleEnroll = (courseId: string) => {
+    if (!userId) return;
+    enrollMutation.mutate({ userId, courseId });
+  };
 
   const filteredCourses = activeCategory === "all" 
     ? allCourses 
+    : activeCategory === "enrolled"
+    ? allCourses.filter(course => enrollments.some(e => e.course_id === course.id))
     : allCourses.filter(course => course.category === activeCategory);
+
+  const enrolledCount = enrollments.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -385,10 +464,12 @@ const CoursesPage = () => {
                 <Users className="w-4 h-4 text-primary" />
                 <span>{allCourses.reduce((sum, c) => sum + c.students, 0).toLocaleString()}+ Athletes</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Star className="w-4 h-4 text-primary" />
-                <span>4.9 Average Rating</span>
-              </div>
+              {userId && enrolledCount > 0 && (
+                <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                  <BookOpen className="w-4 h-4" />
+                  <span>{enrolledCount} Enrolled</span>
+                </div>
+              )}
             </div>
           </motion.div>
         </section>
@@ -402,8 +483,14 @@ const CoursesPage = () => {
                 variant={activeCategory === category.id ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveCategory(category.id)}
+                className="relative"
               >
                 {category.name}
+                {category.id === "enrolled" && enrolledCount > 0 && (
+                  <span className="ml-1.5 bg-primary-foreground text-primary text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {enrolledCount}
+                  </span>
+                )}
               </Button>
             ))}
           </div>
@@ -412,14 +499,34 @@ const CoursesPage = () => {
         {/* Courses Grid */}
         <section className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course, index) => (
-              <CourseCard key={course.id} course={course} index={index} />
-            ))}
+            {filteredCourses.map((course, index) => {
+              const enrollment = getEnrollment(course.id);
+              return (
+                <CourseCard 
+                  key={course.id} 
+                  course={course} 
+                  index={index}
+                  isEnrolled={!!enrollment}
+                  enrollment={enrollment}
+                  onEnroll={() => handleEnroll(course.id)}
+                  isEnrolling={enrollMutation.isPending}
+                  isLoggedIn={!!userId}
+                />
+              );
+            })}
           </div>
 
           {filteredCourses.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-muted-foreground">No programs found in this category.</p>
+              {activeCategory === "enrolled" ? (
+                <div>
+                  <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">You haven't enrolled in any programs yet.</p>
+                  <Button onClick={() => setActiveCategory("all")}>Browse Programs</Button>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">No programs found in this category.</p>
+              )}
             </div>
           )}
         </section>
