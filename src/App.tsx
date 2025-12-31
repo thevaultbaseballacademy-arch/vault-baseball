@@ -10,6 +10,7 @@ import Account from "./pages/Account";
 import Schedule from "./pages/Schedule";
 import Checkin from "./pages/Checkin";
 import Dashboard from "./pages/Dashboard";
+import VaultDashboard from "./pages/VaultDashboard";
 import CoachDashboard from "./pages/CoachDashboard";
 import Admin from "./pages/Admin";
 import Community from "./pages/Community";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/checkin" element={<Checkin />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/vault" element={<VaultDashboard />} />
             <Route path="/coach" element={<CoachDashboard />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/community" element={<Community />} />
