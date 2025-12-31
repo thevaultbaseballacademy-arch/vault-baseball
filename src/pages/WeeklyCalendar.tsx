@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   ArrowLeft, 
   Zap, 
@@ -22,7 +23,9 @@ import {
   Calendar,
   Dumbbell,
   Wind,
-  Shield
+  Shield,
+  Loader2,
+  UserCheck
 } from "lucide-react";
 import {
   Position,
@@ -32,6 +35,13 @@ import {
   phases,
   getScheduleForSettings
 } from "@/lib/calendarSchedules";
+
+interface AssignedSchedule {
+  id: string;
+  name: string;
+  description: string | null;
+  schedule_data: DaySchedule[];
+}
 
 const emphasisConfig = {
   velocity: { 
@@ -81,11 +91,67 @@ const WeeklyCalendar = () => {
   const [position, setPosition] = useState<Position>("utility");
   const [phase, setPhase] = useState<TrainingPhase>("off-season");
   const [viewMode, setViewMode] = useState<"week" | "day">("week");
+  const [assignedSchedules, setAssignedSchedules] = useState<AssignedSchedule[]>([]);
+  const [selectedAssignedSchedule, setSelectedAssignedSchedule] = useState<string | null>(null);
+  const [loadingAssigned, setLoadingAssigned] = useState(true);
 
-  // Get customized schedule based on position and phase
+  // Fetch assigned schedules for the current user
+  useEffect(() => {
+    const fetchAssignedSchedules = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setLoadingAssigned(false);
+          return;
+        }
+
+        // Get active assignments for this user
+        const { data: assignments, error: assignmentsError } = await supabase
+          .from("schedule_assignments")
+          .select("schedule_id")
+          .eq("athlete_user_id", user.id)
+          .eq("is_active", true);
+
+        if (assignmentsError) throw assignmentsError;
+
+        if (assignments && assignments.length > 0) {
+          const scheduleIds = assignments.map(a => a.schedule_id);
+          
+          // Fetch the actual schedules
+          const { data: schedules, error: schedulesError } = await supabase
+            .from("custom_training_schedules")
+            .select("id, name, description, schedule_data")
+            .in("id", scheduleIds);
+
+          if (schedulesError) throw schedulesError;
+
+          const formattedSchedules = (schedules || []).map(s => ({
+            ...s,
+            schedule_data: s.schedule_data as unknown as DaySchedule[],
+          }));
+
+          setAssignedSchedules(formattedSchedules);
+        }
+      } catch (error) {
+        console.error("Error fetching assigned schedules:", error);
+      } finally {
+        setLoadingAssigned(false);
+      }
+    };
+
+    fetchAssignedSchedules();
+  }, []);
+
+  // Get customized schedule based on position and phase OR use assigned schedule
   const weeklySchedule = useMemo(() => {
+    if (selectedAssignedSchedule) {
+      const assigned = assignedSchedules.find(s => s.id === selectedAssignedSchedule);
+      if (assigned && assigned.schedule_data) {
+        return assigned.schedule_data;
+      }
+    }
     return getScheduleForSettings(position, phase);
-  }, [position, phase]);
+  }, [position, phase, selectedAssignedSchedule, assignedSchedules]);
 
   const [selectedDay, setSelectedDay] = useState<DaySchedule>(weeklySchedule[0]);
 
@@ -170,81 +236,97 @@ const WeeklyCalendar = () => {
           </div>
         </div>
 
-        {/* Customization Panel */}
-        <Card className="mb-8 border-primary/20 bg-primary/5">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Settings2 className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Customize Your Schedule</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid sm:grid-cols-2 gap-6">
-              {/* Position Selector */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  Position
-                </label>
-                <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select position" />
+        {/* Assigned Schedules Banner */}
+        {!loadingAssigned && assignedSchedules.length > 0 && (
+          <Card className="mb-8 border-accent/30 bg-accent/5">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <UserCheck className="h-5 w-5 text-accent" />
+                  <div>
+                    <p className="font-medium text-foreground">Coach-Assigned Schedule Available</p>
+                    <p className="text-sm text-muted-foreground">Your coach has assigned you a custom training program</p>
+                  </div>
+                </div>
+                <Select 
+                  value={selectedAssignedSchedule || "custom"} 
+                  onValueChange={(v) => setSelectedAssignedSchedule(v === "custom" ? null : v)}
+                >
+                  <SelectTrigger className="w-64">
+                    <SelectValue placeholder="Select schedule" />
                   </SelectTrigger>
                   <SelectContent>
-                    {positions.map((pos) => (
-                      <SelectItem key={pos.value} value={pos.value}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{pos.label}</span>
-                          <span className="text-xs text-muted-foreground">{pos.description}</span>
-                        </div>
-                      </SelectItem>
+                    <SelectItem value="custom">Custom (Position/Phase)</SelectItem>
+                    {assignedSchedules.map(s => (
+                      <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
-                  {positions.find(p => p.value === position)?.description}
-                </p>
               </div>
+            </CardContent>
+          </Card>
+        )}
 
-              {/* Phase Selector */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  Training Phase
-                </label>
-                <Select value={phase} onValueChange={(v) => setPhase(v as TrainingPhase)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select phase" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {phases.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{p.label}</span>
-                          <span className="text-xs text-muted-foreground">{p.description}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  {phases.find(p => p.value === phase)?.description}
-                </p>
+        {/* Customization Panel - Only show when using custom schedule */}
+        {!selectedAssignedSchedule && (
+          <Card className="mb-8 border-primary/20 bg-primary/5">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Settings2 className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Customize Your Schedule</CardTitle>
               </div>
-            </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid sm:grid-cols-2 gap-6">
+                {/* Position Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    Position
+                  </label>
+                  <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select position" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {positions.map((pos) => (
+                        <SelectItem key={pos.value} value={pos.value}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{pos.label}</span>
+                            <span className="text-xs text-muted-foreground">{pos.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* Current Settings Summary */}
-            <div className="mt-4 pt-4 border-t flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-muted-foreground">Current:</span>
-              <Badge variant="secondary" className="font-medium">
-                {positions.find(p => p.value === position)?.label}
-              </Badge>
-              <Badge variant="outline" className="font-medium">
-                {phases.find(p => p.value === phase)?.label}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+                {/* Phase Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    Training Phase
+                  </label>
+                  <Select value={phase} onValueChange={(v) => setPhase(v as TrainingPhase)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select phase" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {phases.map((p) => (
+                        <SelectItem key={p.value} value={p.value}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{p.label}</span>
+                            <span className="text-xs text-muted-foreground">{p.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Weekly Distribution Summary */}
         <Card className="mb-8">

@@ -5,6 +5,7 @@ import {
   ChevronDown, ChevronUp, Search, Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,7 @@ import Footer from "@/components/Footer";
 import { CoachAlerts } from "@/components/CoachAlerts";
 import { useCoachAlerts } from "@/hooks/useCoachAlerts";
 import { WeeklySummaryReport } from "@/components/WeeklySummaryReport";
+import { CoachScheduleManager } from "@/components/coach/CoachScheduleManager";
 import {
   LineChart,
   Line,
@@ -278,39 +280,47 @@ const CoachDashboard = () => {
               </div>
             </div>
 
-            {/* Overview Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-card border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-4 h-4 text-accent" />
-                  <span className="text-sm text-muted-foreground">Total Athletes</span>
+            {/* Tabs for Athletes vs Schedules */}
+            <Tabs defaultValue="athletes" className="space-y-6">
+              <TabsList className="grid w-full max-w-md grid-cols-2">
+                <TabsTrigger value="athletes">Athletes</TabsTrigger>
+                <TabsTrigger value="schedules">Training Schedules</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="athletes" className="space-y-6">
+                {/* Overview Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-card border border-border rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Users className="w-4 h-4 text-accent" />
+                      <span className="text-sm text-muted-foreground">Total Athletes</span>
+                    </div>
+                    <p className="text-2xl font-display text-foreground">{athletes.length}</p>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Activity className="w-4 h-4 text-accent" />
+                      <span className="text-sm text-muted-foreground">Active (14d)</span>
+                    </div>
+                    <p className="text-2xl font-display text-foreground">{athletesWithRecentActivity.length}</p>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className="w-4 h-4 text-accent" />
+                      <span className="text-sm text-muted-foreground">Check-ins (14d)</span>
+                    </div>
+                    <p className="text-2xl font-display text-foreground">{checkins.length}</p>
+                  </div>
+                  <div className="bg-card border border-border rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="w-4 h-4 text-accent" />
+                      <span className="text-sm text-muted-foreground">Training Sessions</span>
+                    </div>
+                    <p className="text-2xl font-display text-foreground">
+                      {checkins.filter(c => c.training_completed).length}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-2xl font-display text-foreground">{athletes.length}</p>
-              </div>
-              <div className="bg-card border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Activity className="w-4 h-4 text-accent" />
-                  <span className="text-sm text-muted-foreground">Active (14d)</span>
-                </div>
-                <p className="text-2xl font-display text-foreground">{athletesWithRecentActivity.length}</p>
-              </div>
-              <div className="bg-card border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-accent" />
-                  <span className="text-sm text-muted-foreground">Check-ins (14d)</span>
-                </div>
-                <p className="text-2xl font-display text-foreground">{checkins.length}</p>
-              </div>
-              <div className="bg-card border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-accent" />
-                  <span className="text-sm text-muted-foreground">Training Sessions</span>
-                </div>
-                <p className="text-2xl font-display text-foreground">
-                  {checkins.filter(c => c.training_completed).length}
-                </p>
-              </div>
-            </div>
 
             {/* Athletes List */}
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
@@ -490,6 +500,12 @@ const CoachDashboard = () => {
                 </div>
               )}
             </div>
+              </TabsContent>
+
+              <TabsContent value="schedules">
+                <CoachScheduleManager />
+              </TabsContent>
+            </Tabs>
           </motion.div>
         </div>
       </main>

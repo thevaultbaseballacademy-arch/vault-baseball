@@ -363,6 +363,42 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_training_schedules: {
+        Row: {
+          coach_user_id: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          position: string | null
+          schedule_data: Json
+          training_phase: string | null
+          updated_at: string
+        }
+        Insert: {
+          coach_user_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          position?: string | null
+          schedule_data?: Json
+          training_phase?: string | null
+          updated_at?: string
+        }
+        Update: {
+          coach_user_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          position?: string | null
+          schedule_data?: Json
+          training_phase?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       highlight_videos: {
         Row: {
           created_at: string
@@ -612,6 +648,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      schedule_assignments: {
+        Row: {
+          assigned_by: string
+          athlete_user_id: string
+          created_at: string
+          end_date: string | null
+          id: string
+          is_active: boolean
+          schedule_id: string
+          start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_by: string
+          athlete_user_id: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          schedule_id: string
+          start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_by?: string
+          athlete_user_id?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          schedule_id?: string
+          start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_assignments_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "custom_training_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       scheduled_broadcasts: {
         Row: {
