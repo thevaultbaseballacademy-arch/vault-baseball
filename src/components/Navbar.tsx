@@ -87,10 +87,10 @@ const Navbar = () => {
     },
     { 
       name: "Pathways", 
-      href: "#pathways",
+      href: "/pathway/youth",
       dropdown: [
-        { name: "Youth (Ages 8-12)", href: "#youth" },
-        { name: "Academy (Ages 13-18)", href: "#academy" },
+        { name: "Youth (Ages 8-12)", href: "/pathway/youth" },
+        { name: "Academy (Ages 13-18)", href: "/pathway/academy" },
       ]
     },
     { name: "About", href: "#about" },
