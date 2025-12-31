@@ -906,6 +906,7 @@ export type Database = {
       user_certifications: {
         Row: {
           attempt_id: string | null
+          certificate_number: string | null
           certification_type: Database["public"]["Enums"]["certification_type"]
           created_at: string
           expires_at: string
@@ -919,6 +920,7 @@ export type Database = {
         }
         Insert: {
           attempt_id?: string | null
+          certificate_number?: string | null
           certification_type: Database["public"]["Enums"]["certification_type"]
           created_at?: string
           expires_at: string
@@ -932,6 +934,7 @@ export type Database = {
         }
         Update: {
           attempt_id?: string | null
+          certificate_number?: string | null
           certification_type?: Database["public"]["Enums"]["certification_type"]
           created_at?: string
           expires_at?: string
@@ -971,6 +974,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_certificate_number: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

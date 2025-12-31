@@ -9,6 +9,7 @@ import { format } from "date-fns";
 interface CertificateGeneratorProps {
   coachName: string;
   certificationType: CertificationType;
+  certificateNumber: string;
   score: number;
   issuedAt: string;
   expiresAt: string;
@@ -17,6 +18,7 @@ interface CertificateGeneratorProps {
 export const CertificateGenerator = ({
   coachName,
   certificationType,
+  certificateNumber,
   score,
   issuedAt,
   expiresAt,
@@ -158,10 +160,13 @@ export const CertificateGenerator = ({
       doc.text("VAULT Baseball Academy", pageWidth / 2, 191, { align: "center" });
 
       // Certificate ID (bottom)
+      doc.setFontSize(8);
+      doc.setTextColor(120, 120, 120);
+      doc.text(`Certificate ID: ${certificateNumber}`, pageWidth / 2, pageHeight - 18, { align: "center" });
+      
       doc.setFontSize(7);
-      doc.setTextColor(100, 100, 100);
-      const certId = `VAULT-${certificationType.toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
-      doc.text(`Certificate ID: ${certId}`, pageWidth / 2, pageHeight - 15, { align: "center" });
+      doc.setTextColor(80, 80, 80);
+      doc.text("Verify at: vaultbaseball.com/verify", pageWidth / 2, pageHeight - 13, { align: "center" });
 
       // Save
       const fileName = `VAULT_${certificationType}_Certificate_${coachName.replace(/\s+/g, '_')}.pdf`;

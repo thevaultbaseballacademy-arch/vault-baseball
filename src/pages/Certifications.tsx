@@ -192,13 +192,16 @@ const CertificationCard = ({
                 </div>
                 <Progress value={userCert.score} className="h-2" />
               </div>
-              <CertificateGenerator
-                coachName={coachName}
-                certificationType={definition.certification_type}
-                score={userCert.score}
-                issuedAt={userCert.issued_at}
-                expiresAt={userCert.expires_at}
-              />
+              {userCert.certificate_number && (
+                <CertificateGenerator
+                  coachName={coachName}
+                  certificationType={definition.certification_type}
+                  certificateNumber={userCert.certificate_number}
+                  score={userCert.score}
+                  issuedAt={userCert.issued_at}
+                  expiresAt={userCert.expires_at}
+                />
+              )}
             </div>
           )}
 

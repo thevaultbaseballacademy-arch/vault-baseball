@@ -56,6 +56,22 @@ const Footer = () => {
             </div>
 
             <div>
+              <h4 className="font-display text-sm text-foreground mb-3">COACHES</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/certifications" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Certifications
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/verify" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Verify Certificate
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
               <h4 className="font-display text-sm text-foreground mb-3">CONNECT</h4>
               <div className="flex gap-2">
                 <a
