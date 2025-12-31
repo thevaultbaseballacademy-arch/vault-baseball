@@ -1025,7 +1025,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_exam_answer: {
+        Args: { question_id: string; selected_answer: number }
+        Returns: boolean
+      }
       generate_certificate_number: { Args: never; Returns: string }
+      get_exam_questions: {
+        Args: {
+          cert_type: Database["public"]["Enums"]["certification_type"]
+          question_limit?: number
+        }
+        Returns: {
+          display_order: number
+          id: string
+          is_scenario: boolean
+          options: Json
+          question_text: string
+          section: string
+        }[]
+      }
       get_public_profile: {
         Args: { target_user_id: string }
         Returns: {
@@ -1044,6 +1062,14 @@ export type Database = {
           graduation_year: number
           player_position: string
           user_id: string
+        }[]
+      }
+      get_question_explanation: {
+        Args: { question_id: string }
+        Returns: {
+          correct_answer_index: number
+          explanation: string
+          is_correct: boolean
         }[]
       }
       has_role: {
