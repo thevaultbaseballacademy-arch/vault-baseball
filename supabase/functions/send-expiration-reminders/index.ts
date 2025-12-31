@@ -204,6 +204,53 @@ serve(async (req) => {
   try {
     logStep("Starting expiration reminder check");
 
+    // Security: Validate request comes from authorized source
+    const authHeader = req.headers.get("Authorization");
+    const cronSecret = Deno.env.get("CRON_SECRET");
+    
+    // Allow if valid cron secret OR valid admin JWT
+    let isAuthorized = false;
+    
+    if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+      logStep("Authorized via cron secret");
+      isAuthorized = true;
+    } else if (authHeader?.startsWith("Bearer ")) {
+      // Check if it's a valid admin user
+      const supabaseAuth = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      );
+      const token = authHeader.replace("Bearer ", "");
+      const { data: userData } = await supabaseAuth.auth.getUser(token);
+      
+      if (userData?.user) {
+        const supabaseService = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+          { auth: { persistSession: false } }
+        );
+        const { data: roleData } = await supabaseService
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userData.user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        
+        if (roleData) {
+          logStep("Authorized via admin JWT", { userId: userData.user.id });
+          isAuthorized = true;
+        }
+      }
+    }
+    
+    if (!isAuthorized) {
+      logStep("Unauthorized access attempt");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
