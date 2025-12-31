@@ -182,7 +182,7 @@ export const useStartExamAttempt = () => {
   });
 };
 
-// Grade exam using secure RPC function
+// Grade exam using secure edge function
 export const useSubmitExam = () => {
   const queryClient = useQueryClient();
 
@@ -207,99 +207,43 @@ export const useSubmitExam = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Grade each answer using secure RPC
-      let correct = 0;
-      const gradePromises = questions.map(async (q) => {
-        if (answers[q.id] !== undefined) {
-          const { data: isCorrect } = await supabase.rpc('check_exam_answer', {
-            question_id: q.id,
-            selected_answer: answers[q.id]
-          });
-          return isCorrect === true;
-        }
-        return false;
+      const questionIds = questions.map(q => q.id);
+
+      // Call edge function for secure grading
+      const { data, error } = await supabase.functions.invoke('process-exam-submission', {
+        body: {
+          attemptId,
+          answers,
+          questionIds,
+          certType,
+          passingScore,
+          validityMonths,
+          certificationName,
+        },
       });
 
-      const results = await Promise.all(gradePromises);
-      correct = results.filter(Boolean).length;
-
-      const score = Math.round((correct / questions.length) * 100);
-      const passed = score >= passingScore;
-
-      // Update attempt
-      const { error: attemptError } = await supabase
-        .from('certification_attempts')
-        .update({
-          completed_at: new Date().toISOString(),
-          answers,
-          score,
-          passed,
-        })
-        .eq('id', attemptId);
-
-      if (attemptError) throw attemptError;
-
-      let expiresAt: string | undefined;
-
-      // If passed, create/update certification
-      if (passed) {
-        const expiryDate = new Date();
-        expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
-        expiresAt = expiryDate.toISOString();
-
-        const { error: certError } = await supabase
-          .from('user_certifications')
-          .upsert({
-            user_id: user.id,
-            certification_type: certType,
-            status: 'active',
-            issued_at: new Date().toISOString(),
-            expires_at: expiresAt,
-            score,
-            attempt_id: attemptId,
-          }, {
-            onConflict: 'user_id,certification_type',
-          });
-
-        if (certError) throw certError;
+      if (error) {
+        console.error('Exam submission error:', error);
+        throw new Error(error.message || 'Failed to submit exam');
       }
 
-      // Get user profile for email
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('display_name, email')
-        .eq('user_id', user.id)
-        .single();
-
-      const coachName = profile?.display_name || profile?.email?.split('@')[0] || 'Coach';
-      const email = user.email || profile?.email;
-
-      // Send email notification (non-blocking)
-      if (email) {
-        supabase.functions.invoke('send-certification-email', {
-          body: {
-            email,
-            coachName,
-            certificationName,
-            passed,
-            score,
-            passingScore,
-            expiresAt,
-          },
-        }).then(({ error }) => {
-          if (error) {
-            console.error('Failed to send certification email:', error);
-          } else {
-            console.log('Certification email sent successfully');
-          }
-        });
+      if (data?.error) {
+        throw new Error(data.error);
       }
 
-      return { score, passed, correct, total: questions.length };
+      return { 
+        score: data.score, 
+        passed: data.passed, 
+        correct: data.correct, 
+        total: data.total,
+        certificateNumber: data.certificateNumber,
+      };
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['user-certifications'] });
       queryClient.invalidateQueries({ queryKey: ['certification-attempts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-certifications'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-exam-attempts'] });
       
       if (result.passed) {
         toast.success(`Congratulations! You passed with ${result.score}%! Check your email.`);
@@ -307,7 +251,7 @@ export const useSubmitExam = () => {
         toast.error(`Score: ${result.score}%. Keep studying and try again!`);
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'Failed to submit exam');
     },
   });
@@ -334,7 +278,7 @@ export const useBulkImportQuestions = () => {
       queryClient.invalidateQueries({ queryKey: ['certification-questions'] });
       toast.success(`Imported ${data.length} questions successfully`);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'Failed to import questions');
     },
   });
