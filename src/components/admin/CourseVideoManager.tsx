@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Video, Save, Trash2, ExternalLink, ChevronDown, ChevronRight, CheckCircle, Circle, Search } from "lucide-react";
+import { Video, Save, Trash2, ExternalLink, ChevronDown, ChevronRight, CheckCircle, Circle, Search, Upload, FileSpreadsheet, X, AlertCircle, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { allCourses } from "@/pages/Courses";
 import { courseContent } from "@/lib/courseData";
-import { useCourseVideos, useUpsertCourseVideo, useDeleteCourseVideo } from "@/hooks/useCourseVideos";
+import { useCourseVideos, useUpsertCourseVideo, useDeleteCourseVideo, useBulkImportVideos, BulkVideoEntry } from "@/hooks/useCourseVideos";
+import { toast } from "sonner";
 
 interface LessonVideoFormProps {
   courseId: string;
@@ -127,13 +130,30 @@ const CourseVideoManager = () => {
   const [selectedCourse, setSelectedCourse] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [bulkImportOpen, setBulkImportOpen] = useState(false);
+  const [bulkImportText, setBulkImportText] = useState("");
+  const [parsedEntries, setParsedEntries] = useState<BulkVideoEntry[]>([]);
+  const [parseErrors, setParseErrors] = useState<string[]>([]);
   
   const { data: videos = [], isLoading } = useCourseVideos(selectedCourse || undefined);
+  const bulkImportMutation = useBulkImportVideos();
 
   const videoMap = new Map(videos.map(v => [v.lesson_id, v]));
 
   const selectedCourseData = selectedCourse ? courseContent[selectedCourse] : null;
   const selectedCourseInfo = allCourses.find(c => c.id === selectedCourse);
+
+  // Build lesson lookup map for the selected course
+  const lessonLookup = useMemo(() => {
+    if (!selectedCourseData || !selectedCourse) return new Map<string, { moduleId: string }>();
+    const map = new Map<string, { moduleId: string }>();
+    selectedCourseData.modules.forEach(module => {
+      module.lessons.forEach(lesson => {
+        map.set(lesson.id, { moduleId: module.id });
+      });
+    });
+    return map;
+  }, [selectedCourseData, selectedCourse]);
 
   const toggleModule = (moduleId: string) => {
     const newExpanded = new Set(expandedModules);
@@ -153,6 +173,83 @@ const CourseVideoManager = () => {
 
   const collapseAll = () => {
     setExpandedModules(new Set());
+  };
+
+  // Parse bulk import text
+  const parseBulkImport = (text: string) => {
+    const lines = text.trim().split('\n').filter(line => line.trim());
+    const entries: BulkVideoEntry[] = [];
+    const errors: string[] = [];
+
+    lines.forEach((line, index) => {
+      // Support both tab and comma separated
+      const parts = line.includes('\t') ? line.split('\t') : line.split(',');
+      
+      if (parts.length < 2) {
+        errors.push(`Line ${index + 1}: Expected at least 2 columns (lesson_id, video_url)`);
+        return;
+      }
+
+      const lessonId = parts[0].trim();
+      const videoUrl = parts[1].trim();
+      const platform = parts[2]?.trim() || 'youtube';
+
+      if (!lessonId || !videoUrl) {
+        errors.push(`Line ${index + 1}: Missing lesson ID or video URL`);
+        return;
+      }
+
+      // Validate URL format
+      if (!videoUrl.startsWith('http://') && !videoUrl.startsWith('https://')) {
+        errors.push(`Line ${index + 1}: Invalid URL format for "${lessonId}"`);
+        return;
+      }
+
+      // Look up module info if we have a selected course
+      const lessonInfo = lessonLookup.get(lessonId);
+      
+      entries.push({
+        lesson_id: lessonId,
+        video_url: videoUrl,
+        video_platform: platform,
+        course_id: selectedCourse || undefined,
+        module_id: lessonInfo?.moduleId,
+      });
+    });
+
+    setParsedEntries(entries);
+    setParseErrors(errors);
+  };
+
+  const handleBulkImport = async () => {
+    if (parsedEntries.length === 0) {
+      toast.error("No valid entries to import");
+      return;
+    }
+
+    await bulkImportMutation.mutateAsync(parsedEntries);
+    setBulkImportOpen(false);
+    setBulkImportText("");
+    setParsedEntries([]);
+    setParseErrors([]);
+  };
+
+  const generateTemplate = () => {
+    if (!selectedCourseData) return "";
+    
+    const lines: string[] = [];
+    selectedCourseData.modules.forEach(module => {
+      module.lessons.forEach(lesson => {
+        lines.push(`${lesson.id}\thttps://youtube.com/watch?v=YOUR_VIDEO_ID`);
+      });
+    });
+    return lines.join('\n');
+  };
+
+  const copyTemplate = () => {
+    const template = generateTemplate();
+    navigator.clipboard.writeText(template);
+    toast.success("Template copied to clipboard");
   };
 
   // Filter courses by search
@@ -180,6 +277,120 @@ const CourseVideoManager = () => {
         </div>
 
         <div className="flex gap-2">
+          <Dialog open={bulkImportOpen} onOpenChange={setBulkImportOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Upload className="w-4 h-4" />
+                Bulk Import
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <FileSpreadsheet className="w-5 h-5" />
+                  Bulk Import Videos
+                </DialogTitle>
+                <DialogDescription>
+                  Paste tab or comma-separated data with columns: lesson_id, video_url, platform (optional)
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                {selectedCourse && selectedCourseData && (
+                  <div className="bg-muted/50 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium">Import for: {selectedCourseInfo?.title}</p>
+                      <Button variant="ghost" size="sm" onClick={copyTemplate} className="gap-1 h-7">
+                        <Copy className="w-3 h-3" />
+                        Copy Template
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {totalLessons} lessons available • Template includes all lesson IDs
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Paste your data:</label>
+                  <Textarea
+                    placeholder={`lesson_id\tvideo_url\tplatform
+ah-1-1\thttps://youtube.com/watch?v=abc123\tyoutube
+ah-1-2\thttps://vimeo.com/123456\tvimeo`}
+                    value={bulkImportText}
+                    onChange={(e) => {
+                      setBulkImportText(e.target.value);
+                      parseBulkImport(e.target.value);
+                    }}
+                    className="font-mono text-sm min-h-[200px]"
+                  />
+                </div>
+
+                {parseErrors.length > 0 && (
+                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                    <p className="text-sm font-medium text-destructive flex items-center gap-2 mb-2">
+                      <AlertCircle className="w-4 h-4" />
+                      {parseErrors.length} parsing error(s)
+                    </p>
+                    <ul className="text-xs text-destructive space-y-1 max-h-24 overflow-y-auto">
+                      {parseErrors.map((error, i) => (
+                        <li key={i}>{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {parsedEntries.length > 0 && (
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                    <p className="text-sm font-medium text-green-600 flex items-center gap-2 mb-2">
+                      <CheckCircle className="w-4 h-4" />
+                      {parsedEntries.length} valid entries ready to import
+                    </p>
+                    <div className="max-h-32 overflow-y-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="text-muted-foreground">
+                            <th className="text-left py-1">Lesson ID</th>
+                            <th className="text-left py-1">Video URL</th>
+                            <th className="text-left py-1">Platform</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {parsedEntries.slice(0, 10).map((entry, i) => (
+                            <tr key={i} className="border-t border-border/50">
+                              <td className="py-1 font-mono">{entry.lesson_id}</td>
+                              <td className="py-1 truncate max-w-[200px]">{entry.video_url}</td>
+                              <td className="py-1">{entry.video_platform}</td>
+                            </tr>
+                          ))}
+                          {parsedEntries.length > 10 && (
+                            <tr>
+                              <td colSpan={3} className="py-1 text-muted-foreground">
+                                ...and {parsedEntries.length - 10} more
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setBulkImportOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleBulkImport} 
+                  disabled={parsedEntries.length === 0 || bulkImportMutation.isPending}
+                >
+                  {bulkImportMutation.isPending ? "Importing..." : `Import ${parsedEntries.length} Videos`}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input

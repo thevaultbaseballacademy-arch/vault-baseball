@@ -127,3 +127,87 @@ export const useDeleteCourseVideo = () => {
     },
   });
 };
+
+export interface BulkVideoEntry {
+  lesson_id: string;
+  video_url: string;
+  course_id?: string;
+  module_id?: string;
+  video_platform?: string;
+}
+
+export const useBulkImportVideos = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (entries: BulkVideoEntry[]) => {
+      const results = { success: 0, failed: 0, errors: [] as string[] };
+      
+      for (const entry of entries) {
+        try {
+          // Check if video already exists
+          const { data: existing } = await supabase
+            .from("course_videos")
+            .select("id")
+            .eq("lesson_id", entry.lesson_id)
+            .maybeSingle();
+          
+          if (existing) {
+            // Update existing
+            const { error } = await supabase
+              .from("course_videos")
+              .update({
+                video_url: entry.video_url,
+                video_platform: entry.video_platform || "youtube",
+              })
+              .eq("lesson_id", entry.lesson_id);
+            
+            if (error) {
+              results.failed++;
+              results.errors.push(`${entry.lesson_id}: ${error.message}`);
+            } else {
+              results.success++;
+            }
+          } else {
+            // Insert new
+            const { error } = await supabase
+              .from("course_videos")
+              .insert({
+                course_id: entry.course_id || "",
+                module_id: entry.module_id || "",
+                lesson_id: entry.lesson_id,
+                video_url: entry.video_url,
+                video_platform: entry.video_platform || "youtube",
+              });
+            
+            if (error) {
+              results.failed++;
+              results.errors.push(`${entry.lesson_id}: ${error.message}`);
+            } else {
+              results.success++;
+            }
+          }
+        } catch (err: any) {
+          results.failed++;
+          results.errors.push(`${entry.lesson_id}: ${err.message}`);
+        }
+      }
+      
+      return results;
+    },
+    onSuccess: (results) => {
+      queryClient.invalidateQueries({ queryKey: ["course-videos"] });
+      queryClient.invalidateQueries({ queryKey: ["course-video"] });
+      
+      if (results.failed === 0) {
+        toast.success(`Successfully imported ${results.success} videos`);
+      } else {
+        toast.warning(`Imported ${results.success} videos, ${results.failed} failed`);
+      }
+    },
+    onError: (error) => {
+      console.error("Error bulk importing videos:", error);
+      toast.error("Failed to import videos");
+    },
+  });
+};
