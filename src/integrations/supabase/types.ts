@@ -1030,6 +1030,54 @@ export type Database = {
         Returns: boolean
       }
       generate_certificate_number: { Args: never; Returns: string }
+      get_assigned_athlete_profiles: {
+        Args: { coach_id: string }
+        Returns: {
+          avatar_url: string
+          batting_side: string
+          bio: string
+          cover_url: string
+          created_at: string
+          display_name: string
+          graduation_year: number
+          height_inches: number
+          hudl_url: string
+          instagram_url: string
+          player_position: string
+          sixty_yard_dash: number
+          target_schools: string[]
+          throwing_arm: string
+          twitter_url: string
+          updated_at: string
+          user_id: string
+          weight_lbs: number
+          youtube_url: string
+        }[]
+      }
+      get_athlete_profile_for_coach: {
+        Args: { athlete_id: string; coach_id: string }
+        Returns: {
+          avatar_url: string
+          batting_side: string
+          bio: string
+          cover_url: string
+          created_at: string
+          display_name: string
+          graduation_year: number
+          height_inches: number
+          hudl_url: string
+          instagram_url: string
+          player_position: string
+          sixty_yard_dash: number
+          target_schools: string[]
+          throwing_arm: string
+          twitter_url: string
+          updated_at: string
+          user_id: string
+          weight_lbs: number
+          youtube_url: string
+        }[]
+      }
       get_exam_questions: {
         Args: {
           cert_type: Database["public"]["Enums"]["certification_type"]
