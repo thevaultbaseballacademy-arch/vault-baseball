@@ -9,6 +9,7 @@ export interface CourseVideo {
   lesson_id: string;
   video_url: string;
   video_platform: string;
+  is_preview: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -48,6 +49,28 @@ export const useVideoForLesson = (lessonId: string) => {
   });
 };
 
+// Fetch preview videos for a course (available to non-enrolled users)
+export const usePreviewVideos = (courseId?: string) => {
+  return useQuery({
+    queryKey: ["preview-videos", courseId],
+    queryFn: async () => {
+      let query = supabase
+        .from("course_videos")
+        .select("*")
+        .eq("is_preview", true);
+      
+      if (courseId) {
+        query = query.eq("course_id", courseId);
+      }
+      
+      const { data, error } = await query.order("created_at", { ascending: true });
+      
+      if (error) throw error;
+      return data as CourseVideo[];
+    },
+  });
+};
+
 export const useUpsertCourseVideo = () => {
   const queryClient = useQueryClient();
   
@@ -58,6 +81,7 @@ export const useUpsertCourseVideo = () => {
       lesson_id: string;
       video_url: string;
       video_platform?: string;
+      is_preview?: boolean;
     }) => {
       // Check if video already exists for this lesson
       const { data: existing } = await supabase
@@ -73,6 +97,7 @@ export const useUpsertCourseVideo = () => {
           .update({
             video_url: video.video_url,
             video_platform: video.video_platform || "youtube",
+            is_preview: video.is_preview ?? false,
           })
           .eq("lesson_id", video.lesson_id);
         
@@ -87,6 +112,7 @@ export const useUpsertCourseVideo = () => {
             lesson_id: video.lesson_id,
             video_url: video.video_url,
             video_platform: video.video_platform || "youtube",
+            is_preview: video.is_preview ?? false,
           });
         
         if (error) throw error;
