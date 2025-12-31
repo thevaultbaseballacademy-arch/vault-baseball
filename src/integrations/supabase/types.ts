@@ -912,6 +912,8 @@ export type Database = {
           expiration_reminder_sent: boolean | null
           expiration_reminder_sent_at: string | null
           expires_at: string
+          final_warning_sent: boolean | null
+          final_warning_sent_at: string | null
           id: string
           issued_at: string
           score: number
@@ -928,6 +930,8 @@ export type Database = {
           expiration_reminder_sent?: boolean | null
           expiration_reminder_sent_at?: string | null
           expires_at: string
+          final_warning_sent?: boolean | null
+          final_warning_sent_at?: string | null
           id?: string
           issued_at?: string
           score: number
@@ -944,6 +948,8 @@ export type Database = {
           expiration_reminder_sent?: boolean | null
           expiration_reminder_sent_at?: string | null
           expires_at?: string
+          final_warning_sent?: boolean | null
+          final_warning_sent_at?: string | null
           id?: string
           issued_at?: string
           score?: number
