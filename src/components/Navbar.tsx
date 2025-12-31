@@ -171,9 +171,14 @@ const Navbar = () => {
                   </Button>
                 )}
                 {isCoach && (
-                  <Button variant="ghost" size="sm" onClick={() => navigate("/coach")}>
-                    Coach
-                  </Button>
+                  <>
+                    <Button variant="ghost" size="sm" onClick={() => navigate("/coach")}>
+                      Coach
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => navigate("/certifications")}>
+                      Certifications
+                    </Button>
+                  </>
                 )}
                 <Button variant="ghost" size="sm" onClick={() => navigate("/vault")}>
                   VAULT™
@@ -268,9 +273,14 @@ const Navbar = () => {
                         </Button>
                       )}
                       {isCoach && (
-                        <Button variant="ghost" className="justify-center" onClick={() => { navigate("/coach"); setIsOpen(false); }}>
-                          Coach
-                        </Button>
+                        <>
+                          <Button variant="ghost" className="justify-center" onClick={() => { navigate("/coach"); setIsOpen(false); }}>
+                            Coach
+                          </Button>
+                          <Button variant="ghost" className="justify-center" onClick={() => { navigate("/certifications"); setIsOpen(false); }}>
+                            Certifications
+                          </Button>
+                        </>
                       )}
                       <Button variant="ghost" className="justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
                         Dashboard
