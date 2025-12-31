@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format, addWeeks } from "date-fns";
+import { createNotification, getActorName } from "@/lib/notifications";
 
 interface Athlete {
   user_id: string;
@@ -136,6 +137,16 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
         if (error) throw error;
 
         setAssignments(prev => [...prev, data]);
+
+        // Send notification to the athlete
+        const coachName = await getActorName(userData.user.id);
+        await createNotification({
+          userId: athleteId,
+          type: 'coach_message' as any,
+          title: "New Training Schedule Assigned",
+          message: `${coachName} assigned you a new training schedule: "${scheduleName}"${startDate && endDate ? ` (${format(startDate, "MMM d")} - ${format(endDate, "MMM d, yyyy")})` : ""}`,
+          actorId: userData.user.id,
+        });
       }
 
       toast({
