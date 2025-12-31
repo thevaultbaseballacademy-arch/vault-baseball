@@ -771,6 +771,8 @@ export type Database = {
           avatar_url: string | null
           batting_side: string | null
           bio: string | null
+          bio_privacy: string
+          contact_privacy: string
           cover_url: string | null
           created_at: string
           display_name: string | null
@@ -780,6 +782,7 @@ export type Database = {
           hudl_url: string | null
           id: string
           instagram_url: string | null
+          physical_stats_privacy: string
           position: string | null
           sixty_yard_dash: number | null
           target_schools: string[] | null
@@ -794,6 +797,8 @@ export type Database = {
           avatar_url?: string | null
           batting_side?: string | null
           bio?: string | null
+          bio_privacy?: string
+          contact_privacy?: string
           cover_url?: string | null
           created_at?: string
           display_name?: string | null
@@ -803,6 +808,7 @@ export type Database = {
           hudl_url?: string | null
           id?: string
           instagram_url?: string | null
+          physical_stats_privacy?: string
           position?: string | null
           sixty_yard_dash?: number | null
           target_schools?: string[] | null
@@ -817,6 +823,8 @@ export type Database = {
           avatar_url?: string | null
           batting_side?: string | null
           bio?: string | null
+          bio_privacy?: string
+          contact_privacy?: string
           cover_url?: string | null
           created_at?: string
           display_name?: string | null
@@ -826,6 +834,7 @@ export type Database = {
           hudl_url?: string | null
           id?: string
           instagram_url?: string | null
+          physical_stats_privacy?: string
           position?: string | null
           sixty_yard_dash?: number | null
           target_schools?: string[] | null
