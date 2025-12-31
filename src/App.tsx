@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import YouthPathway from "./pages/YouthPathway";
 import AcademyPathway from "./pages/AcademyPathway";
 import LongevityDashboard from "./pages/LongevityDashboard";
+import WeeklyCalendar from "./pages/WeeklyCalendar";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/pathway/youth" element={<YouthPathway />} />
             <Route path="/pathway/academy" element={<AcademyPathway />} />
             <Route path="/longevity" element={<LongevityDashboard />} />
+            <Route path="/calendar" element={<WeeklyCalendar />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

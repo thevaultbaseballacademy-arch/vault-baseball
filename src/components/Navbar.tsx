@@ -81,8 +81,8 @@ const Navbar = () => {
         { name: "Velocity System", href: "/courses" },
         { name: "Athleticism Program", href: "/courses" },
         { name: "Utility Development", href: "/courses" },
-        { name: "Longevity & Arm Care", href: "/courses" },
-        { name: "Transfer Training", href: "/courses" },
+        { name: "Longevity Dashboard", href: "/longevity" },
+        { name: "Weekly Calendar", href: "/calendar" },
       ]
     },
     { 
