@@ -1063,6 +1063,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      verify_certificate_public: {
+        Args: { cert_number: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "coach" | "athlete"
