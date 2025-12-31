@@ -108,6 +108,7 @@ const CertificationExam = () => {
       answers,
       questions,
       certType,
+      certificationName: definition.name,
       passingScore: definition.passing_score,
       validityMonths: definition.validity_months,
     });
