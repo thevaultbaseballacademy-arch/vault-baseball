@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2
+  Search, Plus, X, Check, BarChart3, Link2, Video
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import BroadcastPanel from "@/components/admin/BroadcastPanel";
 import NotificationAnalytics from "@/components/admin/NotificationAnalytics";
 import CoachAthleteAssignments from "@/components/admin/CoachAthleteAssignments";
+import CourseVideoManager from "@/components/admin/CourseVideoManager";
 
 interface Profile {
   user_id: string;
@@ -277,9 +278,10 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-2xl grid-cols-4">
+              <TabsList className="grid w-full max-w-3xl grid-cols-5">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
+                <TabsTrigger value="videos">Videos</TabsTrigger>
                 <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
               </TabsList>
@@ -377,6 +379,10 @@ const Admin = () => {
 
               <TabsContent value="assignments" className="mt-6">
                 <CoachAthleteAssignments />
+              </TabsContent>
+
+              <TabsContent value="videos" className="mt-6">
+                <CourseVideoManager />
               </TabsContent>
 
               <TabsContent value="broadcast" className="mt-6">

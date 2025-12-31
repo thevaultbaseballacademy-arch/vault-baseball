@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Clock, CheckCircle, Users, ArrowLeft, BookOpen, 
-  PlayCircle, Lock, ChevronDown, ChevronUp, Play
+  PlayCircle, Lock, ChevronDown, ChevronUp, Play, Video
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -24,38 +24,11 @@ import {
   useUpdateProgress,
   useUpdateEnrollmentProgress
 } from "@/hooks/useCourseEnrollment";
+import { useCourseVideos } from "@/hooks/useCourseVideos";
 import { allCourses } from "./Courses";
+import { courseContent } from "@/lib/courseData";
 import { useToast } from "@/hooks/use-toast";
 import VideoPlayer from "@/components/courses/VideoPlayer";
-
-// Sample video URLs for demonstration (would come from database in production)
-const sampleVideos = [
-  "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  "https://www.youtube.com/watch?v=9bZkp7q19f0",
-  "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
-];
-
-// Generate mock lessons for each module with video URLs
-const generateModuleLessons = (moduleIndex: number, lessonsPerModule: number) => {
-  const lessonTitles = [
-    "Introduction & Overview",
-    "Core Concepts",
-    "Drill Breakdown",
-    "Technique Focus",
-    "Practice Session",
-    "Progress Check",
-    "Advanced Techniques",
-    "Recovery & Rest",
-  ];
-  
-  return Array.from({ length: lessonsPerModule }, (_, i) => ({
-    index: i,
-    title: lessonTitles[i % lessonTitles.length],
-    duration: `${Math.floor(Math.random() * 15) + 5} min`,
-    videoUrl: sampleVideos[(moduleIndex + i) % sampleVideos.length],
-    hasVideo: true,
-  }));
-};
 
 const CourseDetailPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -67,9 +40,17 @@ const CourseDetailPage = () => {
   
   const { data: enrollments = [] } = useCourseEnrollments(userId);
   const { data: progressData = [] } = useCourseProgress(userId, courseId || "");
+  const { data: dbVideos = [] } = useCourseVideos(courseId || undefined);
   const enrollMutation = useEnrollInCourse();
   const updateProgressMutation = useUpdateProgress();
   const updateEnrollmentMutation = useUpdateEnrollmentProgress();
+
+  // Create a map of lesson IDs to video URLs from database
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    dbVideos.forEach(v => map.set(v.lesson_id, v.video_url));
+    return map;
+  }, [dbVideos]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -78,19 +59,68 @@ const CourseDetailPage = () => {
   }, []);
 
   const course = allCourses.find(c => c.id === courseId);
+  const staticCourseContent = courseId ? courseContent[courseId] : undefined;
   const enrollment = enrollments.find(e => e.course_id === courseId);
   const isEnrolled = !!enrollment;
 
-  // Generate module structure
+  // Generate module structure from courseData.ts or fallback to generic structure
   const modules = useMemo(() => {
     if (!course) return [];
+    
+    // Use static course content if available
+    if (staticCourseContent) {
+      return staticCourseContent.modules.map((module, moduleIndex) => ({
+        index: moduleIndex,
+        title: module.title,
+        description: module.description,
+        lessons: module.lessons.map((lesson, lessonIndex) => {
+          // Check for database video URL first, then fall back to static
+          const dbVideoUrl = videoUrlMap.get(lesson.id);
+          const videoUrl = dbVideoUrl || lesson.videoUrl || "";
+          return {
+            index: lessonIndex,
+            id: lesson.id,
+            title: lesson.title,
+            description: lesson.description,
+            duration: lesson.duration,
+            videoUrl,
+            hasVideo: !!videoUrl,
+            isFree: lesson.isFree,
+          };
+        }),
+      }));
+    }
+    
+    // Fallback: generate generic structure
+    const lessonTitles = [
+      "Introduction & Overview",
+      "Core Concepts",
+      "Drill Breakdown",
+      "Technique Focus",
+      "Practice Session",
+      "Progress Check",
+    ];
+    
     const lessonsPerModule = Math.ceil(course.lessons / course.modules);
-    return Array.from({ length: course.modules }, (_, i) => ({
-      index: i,
-      title: `Week ${i + 1}`,
-      lessons: generateModuleLessons(i, Math.min(lessonsPerModule, course.lessons - i * lessonsPerModule)),
+    return Array.from({ length: course.modules }, (_, moduleIndex) => ({
+      index: moduleIndex,
+      title: `Week ${moduleIndex + 1}`,
+      description: "",
+      lessons: Array.from(
+        { length: Math.min(lessonsPerModule, course.lessons - moduleIndex * lessonsPerModule) },
+        (_, lessonIndex) => ({
+          index: lessonIndex,
+          id: `${courseId}-${moduleIndex}-${lessonIndex}`,
+          title: lessonTitles[lessonIndex % lessonTitles.length],
+          description: "",
+          duration: "10 min",
+          videoUrl: "",
+          hasVideo: false,
+          isFree: lessonIndex === 0,
+        })
+      ),
     }));
-  }, [course]);
+  }, [course, staticCourseContent, courseId, videoUrlMap]);
 
   // Calculate progress
   const completedLessons = progressData.filter(p => p.completed).length;
@@ -340,10 +370,20 @@ const CourseDetailPage = () => {
                   Close
                 </Button>
               </div>
-              <VideoPlayer
-                videoUrl={modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.videoUrl || ""}
-                title={modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.title || ""}
-              />
+              {modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.videoUrl ? (
+                <VideoPlayer
+                  videoUrl={modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.videoUrl || ""}
+                  title={modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.title || ""}
+                />
+              ) : (
+                <div className="aspect-video bg-secondary rounded-xl flex flex-col items-center justify-center">
+                  <Video className="w-16 h-16 text-muted-foreground/30 mb-4" />
+                  <p className="text-muted-foreground font-medium">Video Coming Soon</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">
+                    {modules[activeLesson.moduleIndex]?.lessons[activeLesson.lessonIndex]?.description}
+                  </p>
+                </div>
+              )}
               <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                 <Button
                   variant="outline"
