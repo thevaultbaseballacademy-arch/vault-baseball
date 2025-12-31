@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3
+  Search, Plus, X, Check, BarChart3, Link2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +13,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BroadcastPanel from "@/components/admin/BroadcastPanel";
 import NotificationAnalytics from "@/components/admin/NotificationAnalytics";
+import CoachAthleteAssignments from "@/components/admin/CoachAthleteAssignments";
 
 interface Profile {
   user_id: string;
@@ -276,8 +277,9 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-lg grid-cols-3">
-                <TabsTrigger value="users">User Management</TabsTrigger>
+              <TabsList className="grid w-full max-w-2xl grid-cols-4">
+                <TabsTrigger value="users">Users</TabsTrigger>
+                <TabsTrigger value="assignments">Assignments</TabsTrigger>
                 <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
               </TabsList>
@@ -371,6 +373,10 @@ const Admin = () => {
                     <li><span className="text-green-600 font-medium">Athlete</span> — Standard user access (for tagging purposes)</li>
                   </ul>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="assignments" className="mt-6">
+                <CoachAthleteAssignments />
               </TabsContent>
 
               <TabsContent value="broadcast" className="mt-6">
