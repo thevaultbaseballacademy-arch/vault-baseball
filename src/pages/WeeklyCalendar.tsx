@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ArrowLeft, 
   Zap, 
@@ -16,27 +17,21 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Settings2,
+  User,
+  Calendar,
   Dumbbell,
   Wind,
   Shield
 } from "lucide-react";
-
-interface TrainingBlock {
-  id: string;
-  name: string;
-  duration: string;
-  emphasis: "velocity" | "athleticism" | "skill" | "recovery" | "mental";
-  description: string;
-  intensity: "high" | "moderate" | "low";
-}
-
-interface DaySchedule {
-  day: string;
-  shortDay: string;
-  primary: "velocity" | "athleticism" | "skill" | "recovery";
-  theme: string;
-  blocks: TrainingBlock[];
-}
+import {
+  Position,
+  TrainingPhase,
+  DaySchedule,
+  positions,
+  phases,
+  getScheduleForSettings
+} from "@/lib/calendarSchedules";
 
 const emphasisConfig = {
   velocity: { 
@@ -81,97 +76,28 @@ const emphasisConfig = {
   },
 };
 
-const weeklySchedule: DaySchedule[] = [
-  {
-    day: "Monday",
-    shortDay: "Mon",
-    primary: "velocity",
-    theme: "Max Intent Day",
-    blocks: [
-      { id: "m1", name: "Dynamic Warm-up", duration: "15 min", emphasis: "athleticism", description: "Movement prep & activation", intensity: "moderate" },
-      { id: "m2", name: "Throwing Program", duration: "30 min", emphasis: "velocity", description: "High-intent throws, building to max effort", intensity: "high" },
-      { id: "m3", name: "Hitting - Exit Velo Focus", duration: "45 min", emphasis: "velocity", description: "Overload/underload, intent swings", intensity: "high" },
-      { id: "m4", name: "Arm Care", duration: "15 min", emphasis: "recovery", description: "Band work, shoulder stability", intensity: "low" },
-    ]
-  },
-  {
-    day: "Tuesday",
-    shortDay: "Tue",
-    primary: "athleticism",
-    theme: "Speed & Power Day",
-    blocks: [
-      { id: "t1", name: "Sprint Mechanics", duration: "20 min", emphasis: "athleticism", description: "Acceleration, top speed work", intensity: "high" },
-      { id: "t2", name: "Plyometrics", duration: "25 min", emphasis: "athleticism", description: "Jump training, reactive power", intensity: "high" },
-      { id: "t3", name: "Skill Work - Defense", duration: "30 min", emphasis: "skill", description: "Footwork, transfers, throws", intensity: "moderate" },
-      { id: "t4", name: "Mobility Flow", duration: "15 min", emphasis: "recovery", description: "Hip, t-spine, ankle mobility", intensity: "low" },
-    ]
-  },
-  {
-    day: "Wednesday",
-    shortDay: "Wed",
-    primary: "skill",
-    theme: "Game Transfer Day",
-    blocks: [
-      { id: "w1", name: "Movement Prep", duration: "15 min", emphasis: "athleticism", description: "Light activation", intensity: "low" },
-      { id: "w2", name: "Live At-Bats", duration: "45 min", emphasis: "skill", description: "Competitive reps, game situations", intensity: "moderate" },
-      { id: "w3", name: "Situational Defense", duration: "30 min", emphasis: "skill", description: "Game-speed scenarios", intensity: "moderate" },
-      { id: "w4", name: "Mental Performance", duration: "20 min", emphasis: "mental", description: "Visualization, focus training", intensity: "low" },
-    ]
-  },
-  {
-    day: "Thursday",
-    shortDay: "Thu",
-    primary: "velocity",
-    theme: "Power Development Day",
-    blocks: [
-      { id: "th1", name: "Explosive Warm-up", duration: "15 min", emphasis: "athleticism", description: "CNS activation", intensity: "moderate" },
-      { id: "th2", name: "Weighted Balls", duration: "30 min", emphasis: "velocity", description: "Velocity development protocol", intensity: "high" },
-      { id: "th3", name: "Bat Speed Training", duration: "30 min", emphasis: "velocity", description: "Overload swings, speed work", intensity: "high" },
-      { id: "th4", name: "Strength Training", duration: "45 min", emphasis: "athleticism", description: "Lower body power focus", intensity: "high" },
-    ]
-  },
-  {
-    day: "Friday",
-    shortDay: "Fri",
-    primary: "skill",
-    theme: "Competition Prep Day",
-    blocks: [
-      { id: "f1", name: "Game Prep Warm-up", duration: "20 min", emphasis: "athleticism", description: "Pre-competition routine", intensity: "moderate" },
-      { id: "f2", name: "BP - Quality Reps", duration: "30 min", emphasis: "skill", description: "Approach work, situational hitting", intensity: "moderate" },
-      { id: "f3", name: "Defensive Review", duration: "25 min", emphasis: "skill", description: "Game plan execution", intensity: "moderate" },
-      { id: "f4", name: "Pre-Game Mental", duration: "15 min", emphasis: "mental", description: "Focus routine, breathing", intensity: "low" },
-    ]
-  },
-  {
-    day: "Saturday",
-    shortDay: "Sat",
-    primary: "skill",
-    theme: "Game Day",
-    blocks: [
-      { id: "s1", name: "Early Work", duration: "20 min", emphasis: "skill", description: "Individual skill refinement", intensity: "low" },
-      { id: "s2", name: "Team BP/Infield", duration: "30 min", emphasis: "skill", description: "Pre-game preparation", intensity: "moderate" },
-      { id: "s3", name: "Competition", duration: "180 min", emphasis: "skill", description: "Game performance", intensity: "high" },
-      { id: "s4", name: "Post-Game Recovery", duration: "20 min", emphasis: "recovery", description: "Cool down, arm care", intensity: "low" },
-    ]
-  },
-  {
-    day: "Sunday",
-    shortDay: "Sun",
-    primary: "recovery",
-    theme: "Active Recovery Day",
-    blocks: [
-      { id: "su1", name: "Light Movement", duration: "20 min", emphasis: "recovery", description: "Walk, light jog, dynamic stretch", intensity: "low" },
-      { id: "su2", name: "Mobility Session", duration: "30 min", emphasis: "recovery", description: "Full body mobility flow", intensity: "low" },
-      { id: "su3", name: "Mental Reset", duration: "20 min", emphasis: "mental", description: "Journaling, visualization", intensity: "low" },
-      { id: "su4", name: "Optional Skill", duration: "30 min", emphasis: "skill", description: "Light catch, tee work (optional)", intensity: "low" },
-    ]
-  },
-];
-
 const WeeklyCalendar = () => {
   const navigate = useNavigate();
-  const [selectedDay, setSelectedDay] = useState<DaySchedule>(weeklySchedule[0]);
+  const [position, setPosition] = useState<Position>("utility");
+  const [phase, setPhase] = useState<TrainingPhase>("off-season");
   const [viewMode, setViewMode] = useState<"week" | "day">("week");
+
+  // Get customized schedule based on position and phase
+  const weeklySchedule = useMemo(() => {
+    return getScheduleForSettings(position, phase);
+  }, [position, phase]);
+
+  const [selectedDay, setSelectedDay] = useState<DaySchedule>(weeklySchedule[0]);
+
+  // Update selected day when schedule changes
+  useMemo(() => {
+    const dayIndex = weeklySchedule.findIndex(d => d.day === selectedDay.day);
+    if (dayIndex >= 0) {
+      setSelectedDay(weeklySchedule[dayIndex]);
+    } else {
+      setSelectedDay(weeklySchedule[0]);
+    }
+  }, [weeklySchedule]);
 
   const getIntensityBadge = (intensity: "high" | "moderate" | "low") => {
     switch (intensity) {
@@ -185,20 +111,24 @@ const WeeklyCalendar = () => {
   };
 
   // Calculate weekly distribution
-  const weeklyDistribution = {
-    velocity: 0,
-    athleticism: 0,
-    skill: 0,
-    recovery: 0,
-    mental: 0,
-  };
-
-  weeklySchedule.forEach(day => {
-    day.blocks.forEach(block => {
-      const duration = parseInt(block.duration);
-      weeklyDistribution[block.emphasis] += duration;
+  const weeklyDistribution = useMemo(() => {
+    const dist = {
+      velocity: 0,
+      athleticism: 0,
+      skill: 0,
+      recovery: 0,
+      mental: 0,
+    };
+    
+    weeklySchedule.forEach(day => {
+      day.blocks.forEach(block => {
+        const duration = parseInt(block.duration);
+        dist[block.emphasis] += duration;
+      });
     });
-  });
+    
+    return dist;
+  }, [weeklySchedule]);
 
   const totalMinutes = Object.values(weeklyDistribution).reduce((a, b) => a + b, 0);
 
@@ -239,6 +169,82 @@ const WeeklyCalendar = () => {
             </Tabs>
           </div>
         </div>
+
+        {/* Customization Panel */}
+        <Card className="mb-8 border-primary/20 bg-primary/5">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Customize Your Schedule</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid sm:grid-cols-2 gap-6">
+              {/* Position Selector */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  Position
+                </label>
+                <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select position" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {positions.map((pos) => (
+                      <SelectItem key={pos.value} value={pos.value}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{pos.label}</span>
+                          <span className="text-xs text-muted-foreground">{pos.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {positions.find(p => p.value === position)?.description}
+                </p>
+              </div>
+
+              {/* Phase Selector */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  Training Phase
+                </label>
+                <Select value={phase} onValueChange={(v) => setPhase(v as TrainingPhase)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select phase" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {phases.map((p) => (
+                      <SelectItem key={p.value} value={p.value}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{p.label}</span>
+                          <span className="text-xs text-muted-foreground">{p.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {phases.find(p => p.value === phase)?.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Current Settings Summary */}
+            <div className="mt-4 pt-4 border-t flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground">Current:</span>
+              <Badge variant="secondary" className="font-medium">
+                {positions.find(p => p.value === position)?.label}
+              </Badge>
+              <Badge variant="outline" className="font-medium">
+                {phases.find(p => p.value === phase)?.label}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Weekly Distribution Summary */}
         <Card className="mb-8">
