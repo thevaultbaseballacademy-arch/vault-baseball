@@ -1110,6 +1110,10 @@ export type Database = {
           section: string
         }[]
       }
+      get_profile_with_privacy: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       get_public_profile: {
         Args: { target_user_id: string }
         Returns: {

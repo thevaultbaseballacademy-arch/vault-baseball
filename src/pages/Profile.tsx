@@ -12,30 +12,9 @@ import AthleticStats from "@/components/profile/AthleticStats";
 import RecruitingAssistant from "@/components/profile/RecruitingAssistant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, FileText, GraduationCap, Video, Loader2, Bot, Award } from "lucide-react";
+import type { Profile } from "@/types/profile";
 
-interface Profile {
-  user_id: string;
-  display_name: string;
-  email: string;
-  created_at: string;
-  bio?: string | null;
-  position?: string | null;
-  graduation_year?: number | null;
-  target_schools?: string[] | null;
-  avatar_url?: string | null;
-  cover_url?: string | null;
-  height_inches?: number | null;
-  weight_lbs?: number | null;
-  throwing_arm?: string | null;
-  batting_side?: string | null;
-  sixty_yard_dash?: number | null;
-  twitter_url?: string | null;
-  instagram_url?: string | null;
-  youtube_url?: string | null;
-  hudl_url?: string | null;
-}
-
-const Profile = () => {
+const ProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -55,27 +34,51 @@ const Profile = () => {
         return;
       }
 
-      // Fetch profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
+      const isOwn = session?.user?.id === userId;
 
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        setError("Failed to load profile");
-        setLoading(false);
-        return;
+      // For own profile, fetch directly; for others, use privacy-aware function
+      if (isOwn) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          setError("Failed to load profile");
+          setLoading(false);
+          return;
+        }
+
+        if (!profileData) {
+          setError("Profile not found");
+          setLoading(false);
+          return;
+        }
+
+        setProfile(profileData as Profile);
+      } else {
+        // Use privacy-aware function for other users' profiles
+        const { data: profileData, error: profileError } = await supabase
+          .rpc('get_profile_with_privacy', { target_user_id: userId });
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          setError("Failed to load profile");
+          setLoading(false);
+          return;
+        }
+
+        if (!profileData) {
+          setError("Profile not found");
+          setLoading(false);
+          return;
+        }
+
+        setProfile(profileData as unknown as Profile);
       }
 
-      if (!profileData) {
-        setError("Profile not found");
-        setLoading(false);
-        return;
-      }
-
-      setProfile(profileData);
       setLoading(false);
     };
 
@@ -200,4 +203,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfilePage;
