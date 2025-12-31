@@ -87,21 +87,37 @@ const CertificationQuestionManager = () => {
   const saveQuestionMutation = useMutation({
     mutationFn: async (question: Partial<Question> & { id?: string }) => {
       const { id, ...data } = question;
-      const payload = {
-        ...data,
-        options: JSON.stringify(data.options),
-      };
-
+      
       if (id) {
         const { error } = await supabase
           .from('certification_questions')
-          .update(payload)
+          .update({
+            certification_type: data.certification_type,
+            section: data.section,
+            question_text: data.question_text,
+            options: JSON.stringify(data.options),
+            correct_answer_index: data.correct_answer_index,
+            explanation: data.explanation,
+            is_scenario: data.is_scenario,
+            display_order: data.display_order,
+            is_active: data.is_active,
+          })
           .eq('id', id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('certification_questions')
-          .insert(payload);
+          .insert({
+            certification_type: data.certification_type!,
+            section: data.section!,
+            question_text: data.question_text!,
+            options: JSON.stringify(data.options),
+            correct_answer_index: data.correct_answer_index!,
+            explanation: data.explanation,
+            is_scenario: data.is_scenario,
+            display_order: data.display_order,
+            is_active: data.is_active,
+          });
         if (error) throw error;
       }
     },
