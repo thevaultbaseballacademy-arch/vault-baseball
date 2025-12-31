@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Users, Check, X, Loader2, Calendar } from "lucide-react";
+import { Users, Check, X, Loader2, Calendar, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { format, addWeeks } from "date-fns";
 
 interface Athlete {
   user_id: string;
@@ -15,6 +18,8 @@ interface Assignment {
   id: string;
   athlete_user_id: string;
   is_active: boolean;
+  start_date: string | null;
+  end_date: string | null;
 }
 
 interface ScheduleAssignmentProps {
@@ -23,11 +28,22 @@ interface ScheduleAssignmentProps {
   onClose: () => void;
 }
 
+const PRESET_DURATIONS = [
+  { label: "2 Weeks", weeks: 2 },
+  { label: "4 Weeks", weeks: 4 },
+  { label: "6 Weeks", weeks: 6 },
+  { label: "8 Weeks", weeks: 8 },
+  { label: "12 Weeks", weeks: 12 },
+];
+
 export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: ScheduleAssignmentProps) {
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
+  const [selectedAthlete, setSelectedAthlete] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(addWeeks(new Date(), 4));
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,7 +63,7 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
       // Fetch current assignments for this schedule
       const { data: assignmentsData, error: assignmentsError } = await supabase
         .from("schedule_assignments")
-        .select("id, athlete_user_id, is_active")
+        .select("id, athlete_user_id, is_active, start_date, end_date")
         .eq("schedule_id", scheduleId);
 
       if (assignmentsError) throw assignmentsError;
@@ -66,8 +82,18 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
     }
   };
 
+  const getAssignment = (userId: string) => {
+    return assignments.find(a => a.athlete_user_id === userId && a.is_active);
+  };
+
   const isAssigned = (userId: string) => {
-    return assignments.some(a => a.athlete_user_id === userId && a.is_active);
+    return !!getAssignment(userId);
+  };
+
+  const applyPresetDuration = (weeks: number) => {
+    if (startDate) {
+      setEndDate(addWeeks(startDate, weeks));
+    }
   };
 
   const toggleAssignment = async (athleteId: string) => {
@@ -93,7 +119,7 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
             : a
         ));
       } else {
-        // Create new assignment
+        // Create new assignment with date range
         const { data, error } = await supabase
           .from("schedule_assignments")
           .insert({
@@ -101,6 +127,8 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
             athlete_user_id: athleteId,
             assigned_by: userData.user.id,
             is_active: true,
+            start_date: startDate ? format(startDate, "yyyy-MM-dd") : null,
+            end_date: endDate ? format(endDate, "yyyy-MM-dd") : null,
           })
           .select()
           .single();
@@ -114,8 +142,10 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
         title: isAssigned(athleteId) ? "Unassigned" : "Assigned",
         description: isAssigned(athleteId) 
           ? "Schedule removed from athlete"
-          : "Schedule assigned to athlete",
+          : `Schedule assigned${startDate && endDate ? ` (${format(startDate, "MMM d")} - ${format(endDate, "MMM d, yyyy")})` : ""}`,
       });
+      
+      setSelectedAthlete(null);
     } catch (error) {
       console.error("Error toggling assignment:", error);
       toast({
@@ -125,6 +155,77 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
       });
     } finally {
       setSaving(null);
+    }
+  };
+
+  const updateAssignmentDates = async (assignmentId: string) => {
+    setSaving(assignmentId);
+    try {
+      const { error } = await supabase
+        .from("schedule_assignments")
+        .update({
+          start_date: startDate ? format(startDate, "yyyy-MM-dd") : null,
+          end_date: endDate ? format(endDate, "yyyy-MM-dd") : null,
+        })
+        .eq("id", assignmentId);
+
+      if (error) throw error;
+
+      setAssignments(prev => prev.map(a => 
+        a.id === assignmentId 
+          ? { 
+              ...a, 
+              start_date: startDate ? format(startDate, "yyyy-MM-dd") : null,
+              end_date: endDate ? format(endDate, "yyyy-MM-dd") : null,
+            } 
+          : a
+      ));
+
+      toast({
+        title: "Updated",
+        description: `Date range updated to ${format(startDate!, "MMM d")} - ${format(endDate!, "MMM d, yyyy")}`,
+      });
+      
+      setSelectedAthlete(null);
+    } catch (error) {
+      console.error("Error updating dates:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update date range",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const handleAthleteClick = (athlete: Athlete) => {
+    const assignment = getAssignment(athlete.user_id);
+    
+    if (assignment) {
+      // If already assigned, toggle selection for date editing
+      if (selectedAthlete === athlete.user_id) {
+        setSelectedAthlete(null);
+      } else {
+        setSelectedAthlete(athlete.user_id);
+        // Load existing dates
+        if (assignment.start_date) {
+          setStartDate(new Date(assignment.start_date));
+        }
+        if (assignment.end_date) {
+          setEndDate(new Date(assignment.end_date));
+        }
+      }
+    } else {
+      // If not assigned, select for new assignment
+      if (selectedAthlete === athlete.user_id) {
+        setSelectedAthlete(null);
+      } else {
+        setSelectedAthlete(athlete.user_id);
+        // Reset to default dates
+        setStartDate(new Date());
+        setEndDate(addWeeks(new Date(), 4));
+      }
     }
   };
 
@@ -152,6 +253,135 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
         </Button>
       </div>
 
+      {/* Date Range Selector (shown when athlete is selected) */}
+      {selectedAthlete && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="bg-secondary/50 rounded-xl p-4 border border-border"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarRange className="w-4 h-4 text-accent" />
+            <span className="text-sm font-medium text-foreground">Training Period</span>
+          </div>
+
+          {/* Preset Durations */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {PRESET_DURATIONS.map(preset => (
+              <Button
+                key={preset.weeks}
+                variant="outline"
+                size="sm"
+                onClick={() => applyPresetDuration(preset.weeks)}
+                className="text-xs"
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Date Pickers */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Start Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, "MMM d, yyyy") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarPicker
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(date) => {
+                      setStartDate(date);
+                      if (date && endDate && date > endDate) {
+                        setEndDate(addWeeks(date, 4));
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">End Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, "MMM d, yyyy") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarPicker
+                    mode="single"
+                    selected={endDate}
+                    onSelect={setEndDate}
+                    disabled={(date) => startDate ? date < startDate : false}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            {isAssigned(selectedAthlete) ? (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    const assignment = getAssignment(selectedAthlete);
+                    if (assignment) updateAssignmentDates(assignment.id);
+                  }}
+                  disabled={saving === selectedAthlete}
+                  className="flex-1"
+                >
+                  {saving === selectedAthlete ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : null}
+                  Update Dates
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => toggleAssignment(selectedAthlete)}
+                  disabled={saving === selectedAthlete}
+                >
+                  Unassign
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => toggleAssignment(selectedAthlete)}
+                  disabled={saving === selectedAthlete}
+                  className="flex-1"
+                >
+                  {saving === selectedAthlete ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : null}
+                  Assign Schedule
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSelectedAthlete(null)}
+                >
+                  Cancel
+                </Button>
+              </>
+            )}
+          </div>
+        </motion.div>
+      )}
+
       <div className="max-h-96 overflow-y-auto space-y-2">
         {athletes.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
@@ -161,15 +391,19 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
         ) : (
           athletes.map(athlete => {
             const assigned = isAssigned(athlete.user_id);
+            const assignment = getAssignment(athlete.user_id);
             const isSaving = saving === athlete.user_id;
+            const isSelected = selectedAthlete === athlete.user_id;
 
             return (
               <motion.button
                 key={athlete.user_id}
-                onClick={() => toggleAssignment(athlete.user_id)}
+                onClick={() => handleAthleteClick(athlete)}
                 disabled={isSaving}
                 className={`w-full p-3 rounded-xl border flex items-center justify-between transition-colors ${
-                  assigned
+                  isSelected
+                    ? "bg-accent/20 border-accent ring-2 ring-accent/20"
+                    : assigned
                     ? "bg-accent/10 border-accent"
                     : "bg-secondary border-border hover:border-accent/50"
                 }`}
@@ -187,6 +421,11 @@ export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: Schedu
                       {athlete.display_name || "Unknown"}
                     </p>
                     <p className="text-xs text-muted-foreground">{athlete.email}</p>
+                    {assigned && assignment?.start_date && assignment?.end_date && (
+                      <p className="text-xs text-accent mt-0.5">
+                        {format(new Date(assignment.start_date), "MMM d")} - {format(new Date(assignment.end_date), "MMM d, yyyy")}
+                      </p>
+                    )}
                   </div>
                 </div>
 
