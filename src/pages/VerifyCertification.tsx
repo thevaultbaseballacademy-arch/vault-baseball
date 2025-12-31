@@ -13,6 +13,19 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getCertificationDisplayName, type CertificationType } from "@/lib/certificationPricing";
 
+interface CertificateVerificationResponse {
+  found: boolean;
+  message?: string;
+  certificate_number?: string;
+  certification_type?: string;
+  status?: string;
+  issued_at?: string;
+  expires_at?: string;
+  score?: number;
+  coach_name?: string;
+  is_valid?: boolean;
+}
+
 interface VerificationResult {
   valid: boolean;
   status?: 'active' | 'expired' | 'revoked';
@@ -39,23 +52,22 @@ const VerifyCertification = () => {
     setHasSearched(true);
 
     try {
-      // Look up the certificate
-      const { data: cert, error } = await supabase
-        .from('user_certifications')
-        .select(`
-          id,
-          certificate_number,
-          certification_type,
-          status,
-          issued_at,
-          expires_at,
-          score,
-          user_id
-        `)
-        .eq('certificate_number', certificateId.trim().toUpperCase())
-        .single();
+      // Use secure RPC function for public certificate verification
+      const { data: rawData, error } = await supabase
+        .rpc('verify_certificate_public', { cert_number: certificateId.trim() });
+      
+      const data = rawData as unknown as CertificateVerificationResponse | null;
 
-      if (error || !cert) {
+      if (error) {
+        console.error('Verification error:', error);
+        setResult({
+          valid: false,
+          message: "An error occurred while verifying. Please try again.",
+        });
+        return;
+      }
+
+      if (!data || !data.found) {
         setResult({
           valid: false,
           message: "Certificate not found. Please check the ID and try again.",
@@ -63,25 +75,18 @@ const VerifyCertification = () => {
         return;
       }
 
-      // Get coach profile info
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('display_name')
-        .eq('user_id', cert.user_id)
-        .single();
-
-      const isExpired = new Date(cert.expires_at) <= new Date();
-      const isActive = cert.status === 'active' && !isExpired;
+      const isExpired = new Date(data.expires_at) <= new Date();
+      const isActive = data.status === 'active' && !isExpired;
 
       setResult({
-        valid: isActive,
-        status: isExpired ? 'expired' : cert.status,
-        certificationType: cert.certification_type as CertificationType,
-        certificationName: getCertificationDisplayName(cert.certification_type as CertificationType),
-        coachName: profile?.display_name || 'Coach',
-        issuedAt: cert.issued_at,
-        expiresAt: cert.expires_at,
-        score: cert.score,
+        valid: data.is_valid,
+        status: isExpired ? 'expired' : (data.status as 'active' | 'expired' | 'revoked'),
+        certificationType: data.certification_type as CertificationType,
+        certificationName: getCertificationDisplayName(data.certification_type as CertificationType),
+        coachName: data.coach_name,
+        issuedAt: data.issued_at,
+        expiresAt: data.expires_at,
+        score: data.score,
         message: isActive 
           ? "This certificate is valid and active."
           : isExpired 
