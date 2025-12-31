@@ -15,9 +15,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
-import { Video, Plus, Loader2, Trash2, Play, X } from "lucide-react";
+import { Video, Plus, Loader2, Trash2, Play, X, Globe, Users, Lock } from "lucide-react";
 import { format } from "date-fns";
+
+type PrivacyLevel = 'public' | 'coaches_only' | 'private';
 
 interface HighlightVideo {
   id: string;
@@ -27,6 +36,7 @@ interface HighlightVideo {
   video_url: string;
   thumbnail_url: string | null;
   duration_seconds: number | null;
+  privacy_level: PrivacyLevel;
   created_at: string;
 }
 
@@ -35,11 +45,18 @@ interface HighlightVideosProps {
   isOwnProfile: boolean;
 }
 
+const privacyOptions: { value: PrivacyLevel; label: string; icon: React.ReactNode; description: string }[] = [
+  { value: 'public', label: 'Public', icon: <Globe className="w-4 h-4" />, description: 'Anyone can view' },
+  { value: 'coaches_only', label: 'Coaches Only', icon: <Users className="w-4 h-4" />, description: 'Only your assigned coaches' },
+  { value: 'private', label: 'Private', icon: <Lock className="w-4 h-4" />, description: 'Only you can view' },
+];
+
 const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [privacyLevel, setPrivacyLevel] = useState<PrivacyLevel>('public');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,19 +72,21 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as HighlightVideo[];
+      // Map data to include privacy_level with fallback for type safety
+      return (data || []).map(video => ({
+        ...video,
+        privacy_level: (video as any).privacy_level || 'public'
+      })) as HighlightVideo[];
     }
   });
 
   const deleteVideo = useMutation({
     mutationFn: async (video: HighlightVideo) => {
-      // Delete from storage
       const videoPath = video.video_url.split('/highlight-videos/')[1];
       if (videoPath) {
         await supabase.storage.from('highlight-videos').remove([videoPath]);
       }
 
-      // Delete from database
       const { error } = await supabase
         .from('highlight_videos')
         .delete()
@@ -84,6 +103,24 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
     }
   });
 
+  const updatePrivacy = useMutation({
+    mutationFn: async ({ videoId, privacy }: { videoId: string; privacy: PrivacyLevel }) => {
+      const { error } = await supabase
+        .from('highlight_videos')
+        .update({ privacy_level: privacy } as any)
+        .eq('id', videoId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['highlight-videos', userId] });
+      toast.success('Privacy updated');
+    },
+    onError: () => {
+      toast.error('Failed to update privacy');
+    }
+  });
+
   const handleUpload = async () => {
     if (!selectedFile || !title.trim()) {
       toast.error('Please provide a title and select a video');
@@ -97,36 +134,34 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
       const fileName = `video-${Date.now()}.${fileExt}`;
       const filePath = `${userId}/${fileName}`;
 
-      // Upload video
       const { error: uploadError } = await supabase.storage
         .from('highlight-videos')
         .upload(filePath, selectedFile);
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('highlight-videos')
         .getPublicUrl(filePath);
 
-      // Save to database
       const { error: dbError } = await supabase
         .from('highlight_videos')
         .insert({
           user_id: userId,
           title: title.trim(),
           description: description.trim() || null,
-          video_url: publicUrl
-        });
+          video_url: publicUrl,
+          privacy_level: privacyLevel
+        } as any);
 
       if (dbError) throw dbError;
 
       queryClient.invalidateQueries({ queryKey: ['highlight-videos', userId] });
       toast.success('Video uploaded successfully!');
       
-      // Reset form
       setTitle("");
       setDescription("");
+      setPrivacyLevel('public');
       setSelectedFile(null);
       setUploadOpen(false);
       if (fileInputRef.current) {
@@ -138,6 +173,16 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const getPrivacyIcon = (privacy: PrivacyLevel) => {
+    const option = privacyOptions.find(o => o.value === privacy);
+    return option?.icon || <Globe className="w-4 h-4" />;
+  };
+
+  const getPrivacyLabel = (privacy: PrivacyLevel) => {
+    const option = privacyOptions.find(o => o.value === privacy);
+    return option?.label || 'Public';
   };
 
   if (isLoading) {
@@ -197,6 +242,26 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
                   </div>
 
                   <div className="space-y-2">
+                    <Label>Privacy</Label>
+                    <Select value={privacyLevel} onValueChange={(v) => setPrivacyLevel(v as PrivacyLevel)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {privacyOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            <div className="flex items-center gap-2">
+                              {option.icon}
+                              <span>{option.label}</span>
+                              <span className="text-muted-foreground text-xs">- {option.description}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label>Video File *</Label>
                     <input
                       ref={fileInputRef}
@@ -249,7 +314,6 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
                   key={video.id}
                   className="group relative rounded-lg border border-border bg-muted/30 overflow-hidden"
                 >
-                  {/* Video Thumbnail / Player */}
                   <div className="aspect-video bg-black relative">
                     <video
                       src={video.video_url}
@@ -269,9 +333,35 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
                     )}
                   </div>
 
-                  {/* Video Info */}
                   <div className="p-3">
-                    <h4 className="font-medium text-foreground truncate">{video.title}</h4>
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="font-medium text-foreground truncate flex-1">{video.title}</h4>
+                      {isOwnProfile ? (
+                        <Select 
+                          value={video.privacy_level} 
+                          onValueChange={(v) => updatePrivacy.mutate({ videoId: video.id, privacy: v as PrivacyLevel })}
+                        >
+                          <SelectTrigger className="w-auto h-7 px-2 text-xs gap-1">
+                            {getPrivacyIcon(video.privacy_level)}
+                            <span className="hidden sm:inline">{getPrivacyLabel(video.privacy_level)}</span>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {privacyOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                <div className="flex items-center gap-2">
+                                  {option.icon}
+                                  <span>{option.label}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          {getPrivacyIcon(video.privacy_level)}
+                        </div>
+                      )}
+                    </div>
                     {video.description && (
                       <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                         {video.description}
@@ -282,7 +372,6 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
                     </p>
                   </div>
 
-                  {/* Delete Button */}
                   {isOwnProfile && (
                     <Button
                       variant="destructive"
@@ -300,7 +389,6 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
         </CardContent>
       </Card>
 
-      {/* Video Modal */}
       {playingVideo && (
         <div 
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
