@@ -1,13 +1,16 @@
 import { motion } from "framer-motion";
-import { Play, TrendingUp, Target, Zap, Download } from "lucide-react";
+import { TrendingUp, Target, Zap, Shield, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/vault-hero.jpg";
 
 const Hero = () => {
-  const metrics = [
-    { icon: TrendingUp, value: "+12 MPH", label: "Avg. Exit Velocity Gain" },
-    { icon: Target, value: "-0.15s", label: "Pop Time Reduction" },
-    { icon: Zap, value: "+8 MPH", label: "Velocity Increase" },
+  const pillars = [
+    { letter: "V", name: "Velocity", color: "text-red-500" },
+    { letter: "A", name: "Athleticism", color: "text-blue-500" },
+    { letter: "U", name: "Utility", color: "text-green-500" },
+    { letter: "L", name: "Longevity", color: "text-amber-500" },
+    { letter: "T", name: "Transfer", color: "text-purple-500" },
   ];
 
   return (
@@ -16,7 +19,7 @@ const Hero = () => {
       <div className="absolute inset-0 z-0">
         <img
           src={heroImage}
-          alt="Elite baseball athlete in batting stance"
+          alt="Elite baseball athlete training"
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/40" />
@@ -33,8 +36,8 @@ const Hero = () => {
             className="mb-6"
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-foreground text-sm font-medium border border-border">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              Data-Driven Performance Systems
+              <Shield className="w-4 h-4 text-accent" />
+              The Standardized Operating System for Baseball
             </span>
           </motion.div>
 
@@ -44,8 +47,8 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-5xl md:text-7xl lg:text-8xl font-display leading-[0.9] mb-6"
           >
-            <span className="text-foreground">UNLOCK YOUR</span>
-            <span className="block metallic-text">POTENTIAL</span>
+            <span className="text-foreground">ONE SYSTEM.</span>
+            <span className="block metallic-text">EVERY ATHLETE.</span>
           </motion.h1>
 
           <motion.p
@@ -54,52 +57,59 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed"
           >
-            Develop elite baseball athletes through data-driven performance systems. 
-            Master strength, speed, power, throwing, hitting, and mindset in one unified platform.
+            VAULT™ is a framework-based development system built on five performance pillars. 
+            Development should not depend on who is coaching that day.
           </motion.p>
 
+          {/* VAULT Pillars */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4 mb-12"
+            className="flex flex-wrap gap-3 mb-8"
           >
-            <Button variant="vault" size="xl">
-              Join Vault
-            </Button>
-            <Button variant="vaultOutline" size="xl">
-              View Programs
-            </Button>
-            <Button variant="ghost" size="xl" className="text-muted-foreground">
-              <Download className="w-5 h-5" />
-              Free Resource
-            </Button>
+            {pillars.map((pillar, index) => (
+              <motion.div
+                key={pillar.letter}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.4 + index * 0.05 }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border"
+              >
+                <span className={`text-2xl font-display ${pillar.color}`}>{pillar.letter}</span>
+                <span className="text-sm text-muted-foreground">{pillar.name}</span>
+              </motion.div>
+            ))}
           </motion.div>
 
-          {/* Performance Metrics */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="flex flex-col sm:flex-row gap-4 mb-12"
           >
-            {metrics.map((metric, index) => (
-              <motion.div
-                key={metric.label}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
-                className="flex items-center gap-4 p-4 rounded-xl bg-card/80 backdrop-blur-sm border border-border"
-              >
-                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
-                  <metric.icon className="w-6 h-6 text-foreground" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display text-foreground">{metric.value}</p>
-                  <p className="text-xs text-muted-foreground">{metric.label}</p>
-                </div>
-              </motion.div>
-            ))}
+            <Link to="/auth">
+              <Button variant="vault" size="xl">
+                Start Training
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Button variant="vaultOutline" size="xl" onClick={() => document.getElementById('pillars')?.scrollIntoView({ behavior: 'smooth' })}>
+              Explore the Framework
+            </Button>
+          </motion.div>
+
+          {/* The Promise */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border max-w-xl"
+          >
+            <p className="text-sm text-muted-foreground uppercase tracking-widest mb-2">The VAULT™ Promise</p>
+            <p className="text-xl font-display text-foreground">
+              "If it does not transfer to the game, it does not matter."
+            </p>
           </motion.div>
         </div>
       </div>

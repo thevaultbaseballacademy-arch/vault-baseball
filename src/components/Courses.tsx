@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Clock, PlayCircle, Star, Zap, Target, Dumbbell, Wind, Brain } from "lucide-react";
+import { Clock, Zap, Dumbbell, Shuffle, Heart, Target, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import courseHitting from "@/assets/course-hitting.jpg";
@@ -8,37 +8,67 @@ import courseFielding from "@/assets/course-fielding.jpg";
 
 const trainingSystems = [
   {
-    id: 1,
+    id: "velocity",
+    pillar: "V",
     title: "Velocity System",
-    description: "Increase bat speed, exit velocity, and throwing power with kinetic chain training.",
+    description: "Increase bat speed, exit velocity, and throwing power through intent-based training and efficient energy transfer.",
     image: courseHitting,
     duration: "12 Weeks",
     modules: 6,
     icon: Zap,
-    tag: "Most Popular",
-    metrics: ["Exit Velocity", "Bat Speed", "Throwing Velo"],
+    color: "from-red-500 to-orange-500",
+    bgColor: "bg-red-500/10",
+    textColor: "text-red-500",
+    metrics: ["Exit Velocity", "Bat Speed", "Throwing Velo", "Rotational Power"],
   },
   {
-    id: 2,
-    title: "Strength & Conditioning",
-    description: "Build total-body strength, durability, and athletic foundation for peak performance.",
+    id: "athleticism",
+    pillar: "A",
+    title: "Athleticism Program",
+    description: "Build fast, strong, resilient athletes with comprehensive strength, speed, and movement training.",
     image: coursePitching,
     duration: "12 Weeks",
-    modules: 4,
+    modules: 8,
     icon: Dumbbell,
-    tag: "Foundation",
-    metrics: ["Squat", "Deadlift", "Power Output"],
+    color: "from-blue-500 to-cyan-500",
+    bgColor: "bg-blue-500/10",
+    textColor: "text-blue-500",
+    metrics: ["Sprint Times", "Strength Ratios", "Jump Metrics", "Agility"],
   },
   {
-    id: 3,
-    title: "Speed & Agility",
-    description: "Improve sprint speed, base stealing, and first step quickness on the field.",
+    id: "utility",
+    pillar: "U",
+    title: "Utility Development",
+    description: "Develop positional versatility, baseball IQ, and adaptable skills that transfer across roles.",
     image: courseFielding,
     duration: "8 Weeks",
     modules: 5,
-    icon: Wind,
-    tag: "New",
-    metrics: ["10-Yard Sprint", "Home-to-First", "Reaction Time"],
+    icon: Shuffle,
+    color: "from-green-500 to-emerald-500",
+    bgColor: "bg-green-500/10",
+    textColor: "text-green-500",
+    metrics: ["Positional Flex", "Skill Transfer", "Baseball IQ", "Adaptability"],
+  },
+];
+
+const additionalSystems = [
+  {
+    pillar: "L",
+    title: "Longevity & Arm Care",
+    description: "Arm care systems, workload management, and recovery protocols to keep athletes available.",
+    icon: Heart,
+    color: "from-amber-500 to-yellow-500",
+    bgColor: "bg-amber-500/10",
+    textColor: "text-amber-500",
+  },
+  {
+    pillar: "T",
+    title: "Transfer Training",
+    description: "Practice design that ensures training adaptations appear in competition.",
+    icon: Target,
+    color: "from-purple-500 to-pink-500",
+    bgColor: "bg-purple-500/10",
+    textColor: "text-purple-500",
   },
 ];
 
@@ -62,17 +92,17 @@ const SystemCard = ({ system, index }: { system: typeof trainingSystems[0]; inde
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
         
-        {/* Tag */}
+        {/* Pillar Badge */}
         <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 rounded-full bg-background text-foreground text-xs font-semibold border border-border">
-            {system.tag}
-          </span>
+          <div className={`w-10 h-10 rounded-xl ${system.bgColor} flex items-center justify-center border border-border`}>
+            <span className={`text-xl font-display ${system.textColor}`}>{system.pillar}</span>
+          </div>
         </div>
 
         {/* Icon */}
         <div className="absolute bottom-4 right-4">
           <div className="w-12 h-12 rounded-xl bg-background/90 backdrop-blur-sm flex items-center justify-center border border-border">
-            <Icon className="w-6 h-6 text-foreground" />
+            <Icon className={`w-6 h-6 ${system.textColor}`} />
           </div>
         </div>
       </div>
@@ -107,8 +137,9 @@ const SystemCard = ({ system, index }: { system: typeof trainingSystems[0]; inde
           ))}
         </div>
 
-        <Button variant="default" className="w-full">
-          Learn More
+        <Button variant="default" className="w-full group/btn">
+          Start Program
+          <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/btn:translate-x-1" />
         </Button>
       </div>
     </motion.div>
@@ -117,7 +148,7 @@ const SystemCard = ({ system, index }: { system: typeof trainingSystems[0]; inde
 
 const Courses = () => {
   return (
-    <section id="courses" className="py-24 bg-background relative">
+    <section id="courses" className="py-24 bg-secondary/30 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -129,11 +160,11 @@ const Courses = () => {
             Training Systems
           </span>
           <h2 className="text-4xl md:text-6xl font-display text-foreground mb-4">
-            DATA-DRIVEN PERFORMANCE
+            PILLAR-BASED PROGRAMS
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Five core training systems designed to develop elite baseball athletes 
-            through proven, measurable methodologies.
+            Each program aligns with the VAULT™ framework pillars, ensuring systematic development 
+            that transfers to game performance.
           </p>
         </motion.div>
 
@@ -143,31 +174,34 @@ const Courses = () => {
           ))}
         </div>
 
-        {/* Additional Systems Preview */}
+        {/* Additional Systems */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="mt-12 grid md:grid-cols-2 gap-6"
         >
-          <div className="p-6 rounded-2xl border border-border bg-card flex items-center gap-6">
-            <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
-              <Target className="w-7 h-7 text-foreground" />
-            </div>
-            <div>
-              <h3 className="font-display text-lg text-foreground mb-1">Throwing & Arm Care</h3>
-              <p className="text-sm text-muted-foreground">Improve throwing velocity while reducing injury risk</p>
-            </div>
-          </div>
-          <div className="p-6 rounded-2xl border border-border bg-card flex items-center gap-6">
-            <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
-              <Brain className="w-7 h-7 text-foreground" />
-            </div>
-            <div>
-              <h3 className="font-display text-lg text-foreground mb-1">Mindset & Psychology</h3>
-              <p className="text-sm text-muted-foreground">Mental toughness, confidence, and emotional regulation</p>
-            </div>
-          </div>
+          {additionalSystems.map((system) => {
+            const Icon = system.icon;
+            return (
+              <div 
+                key={system.pillar}
+                className="p-6 rounded-2xl border border-border bg-card flex items-center gap-6 hover:border-foreground/20 transition-colors"
+              >
+                <div className={`w-14 h-14 rounded-xl ${system.bgColor} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`w-7 h-7 ${system.textColor}`} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-lg font-display ${system.textColor}`}>{system.pillar}</span>
+                    <h3 className="font-display text-lg text-foreground">{system.title}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{system.description}</p>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-secondary text-xs text-muted-foreground">Coming Soon</span>
+              </div>
+            );
+          })}
         </motion.div>
 
         <motion.div

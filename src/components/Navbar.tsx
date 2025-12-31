@@ -64,13 +64,14 @@ const Navbar = () => {
     { name: "Home", href: "/" },
     { name: "Courses", href: "/courses" },
     { 
-      name: "Programs", 
-      href: "#programs",
+      name: "The Framework", 
+      href: "/#pillars",
       dropdown: [
-        { name: "Youth Programs", href: "#youth" },
-        { name: "High School", href: "#highschool" },
-        { name: "College", href: "#college" },
-        { name: "Pro Development", href: "#pro" },
+        { name: "Velocity", href: "/#pillars" },
+        { name: "Athleticism", href: "/#pillars" },
+        { name: "Utility", href: "/#pillars" },
+        { name: "Longevity", href: "/#pillars" },
+        { name: "Transfer", href: "/#pillars" },
       ]
     },
     { 
@@ -78,22 +79,20 @@ const Navbar = () => {
       href: "/courses",
       dropdown: [
         { name: "Velocity System", href: "/courses" },
-        { name: "Strength & Conditioning", href: "/courses" },
-        { name: "Speed & Agility", href: "/courses" },
-        { name: "Throwing & Arm Care", href: "/courses" },
-        { name: "Mindset & Psychology", href: "/courses" },
+        { name: "Athleticism Program", href: "/courses" },
+        { name: "Utility Development", href: "/courses" },
+        { name: "Longevity & Arm Care", href: "/courses" },
+        { name: "Transfer Training", href: "/courses" },
       ]
     },
     { 
-      name: "Digital Products", 
-      href: "#products",
+      name: "Pathways", 
+      href: "#pathways",
       dropdown: [
-        { name: "PDF Programs", href: "#pdfs" },
-        { name: "Online Courses", href: "/courses" },
-        { name: "Books", href: "#books" },
+        { name: "Youth (Ages 8-12)", href: "#youth" },
+        { name: "Academy (Ages 13-18)", href: "#academy" },
       ]
     },
-    { name: "Vault App", href: "#app", badge: "Coming Soon" },
     { name: "About", href: "#about" },
     { name: "Contact", href: "#contact" },
   ];
@@ -130,11 +129,6 @@ const Navbar = () => {
                   className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
                 >
                   {link.name}
-                  {link.badge && (
-                    <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold bg-primary/10 text-primary rounded-full">
-                      {link.badge}
-                    </span>
-                  )}
                   {link.dropdown && <ChevronDown className="w-4 h-4 ml-1" />}
                 </a>
                 
@@ -181,6 +175,9 @@ const Navbar = () => {
                     Coach
                   </Button>
                 )}
+                <Button variant="ghost" size="sm" onClick={() => navigate("/vault")}>
+                  VAULT™
+                </Button>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
                   Dashboard
                 </Button>
@@ -243,11 +240,6 @@ const Navbar = () => {
                     >
                       <span className="flex items-center gap-2">
                         {link.name}
-                        {link.badge && (
-                          <span className="px-2 py-0.5 text-[10px] font-semibold bg-primary/10 text-primary rounded-full">
-                            {link.badge}
-                          </span>
-                        )}
                       </span>
                       {link.dropdown && <ChevronDown className="w-4 h-4" />}
                     </a>
