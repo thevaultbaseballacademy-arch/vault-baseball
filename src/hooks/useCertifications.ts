@@ -25,6 +25,7 @@ export interface UserCertification {
   expires_at: string;
   score: number;
   attempt_id: string | null;
+  certificate_number: string | null;
 }
 
 export interface CertificationQuestion {
