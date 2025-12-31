@@ -28,6 +28,7 @@ import Certifications from "./pages/Certifications";
 import CertificationExam from "./pages/CertificationExam";
 import VerifyCertification from "./pages/VerifyCertification";
 import CertificationLeaderboard from "./pages/CertificationLeaderboard";
+import PrivacySettings from "./pages/PrivacySettings";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="/certifications/exam/:certType" element={<CertificationExam />} />
             <Route path="/certifications/leaderboard" element={<CertificationLeaderboard />} />
             <Route path="/verify" element={<VerifyCertification />} />
+            <Route path="/privacy-settings" element={<PrivacySettings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
