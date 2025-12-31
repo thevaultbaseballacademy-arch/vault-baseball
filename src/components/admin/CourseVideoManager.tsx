@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Video, Save, Trash2, ExternalLink, ChevronDown, ChevronRight, CheckCircle, Circle, Search, Upload, FileSpreadsheet, X, AlertCircle, Copy } from "lucide-react";
+import { Video, Save, Trash2, ExternalLink, ChevronDown, ChevronRight, CheckCircle, Circle, Search, Upload, FileSpreadsheet, X, AlertCircle, Copy, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -252,6 +252,34 @@ const CourseVideoManager = () => {
     toast.success("Template copied to clipboard");
   };
 
+  const exportToCsv = () => {
+    if (videos.length === 0) {
+      toast.error("No videos to export");
+      return;
+    }
+
+    const headers = ["lesson_id", "video_url", "platform", "course_id", "module_id"];
+    const csvContent = [
+      headers.join(","),
+      ...videos.map(v => [
+        v.lesson_id,
+        `"${v.video_url}"`,
+        v.video_platform || "youtube",
+        v.course_id,
+        v.module_id
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `course-videos${selectedCourse ? `-${selectedCourse}` : ""}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${videos.length} video(s) to CSV`);
+  };
+
   // Filter courses by search
   const filteredCourses = allCourses.filter(course => 
     course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -277,6 +305,16 @@ const CourseVideoManager = () => {
         </div>
 
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="gap-2" 
+            onClick={exportToCsv}
+            disabled={videos.length === 0}
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </Button>
+
           <Dialog open={bulkImportOpen} onOpenChange={setBulkImportOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="gap-2">
