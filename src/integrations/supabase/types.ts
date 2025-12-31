@@ -909,6 +909,8 @@ export type Database = {
           certificate_number: string | null
           certification_type: Database["public"]["Enums"]["certification_type"]
           created_at: string
+          expiration_reminder_sent: boolean | null
+          expiration_reminder_sent_at: string | null
           expires_at: string
           id: string
           issued_at: string
@@ -923,6 +925,8 @@ export type Database = {
           certificate_number?: string | null
           certification_type: Database["public"]["Enums"]["certification_type"]
           created_at?: string
+          expiration_reminder_sent?: boolean | null
+          expiration_reminder_sent_at?: string | null
           expires_at: string
           id?: string
           issued_at?: string
@@ -937,6 +941,8 @@ export type Database = {
           certificate_number?: string | null
           certification_type?: Database["public"]["Enums"]["certification_type"]
           created_at?: string
+          expiration_reminder_sent?: boolean | null
+          expiration_reminder_sent_at?: string | null
           expires_at?: string
           id?: string
           issued_at?: string
