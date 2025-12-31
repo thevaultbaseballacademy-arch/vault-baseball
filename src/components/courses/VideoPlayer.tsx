@@ -2,14 +2,16 @@ import { useState } from "react";
 import { Play, Pause, Maximize, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
 
 interface VideoPlayerProps {
   videoUrl: string;
   title: string;
   thumbnail?: string;
+  isPreview?: boolean;
 }
 
-const VideoPlayer = ({ videoUrl, title, thumbnail }: VideoPlayerProps) => {
+const VideoPlayer = ({ videoUrl, title, thumbnail, isPreview }: VideoPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -36,6 +38,11 @@ const VideoPlayer = ({ videoUrl, title, thumbnail }: VideoPlayerProps) => {
   if (isYouTube || isVimeo) {
     return (
       <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black">
+        {isPreview && (
+          <Badge className="absolute top-3 left-3 z-10 bg-green-500 hover:bg-green-600 text-white">
+            Free Preview
+          </Badge>
+        )}
         {!isPlaying ? (
           <div 
             className="relative w-full h-full cursor-pointer group"
@@ -81,6 +88,11 @@ const VideoPlayer = ({ videoUrl, title, thumbnail }: VideoPlayerProps) => {
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(isPlaying ? false : true)}
     >
+      {isPreview && (
+        <Badge className="absolute top-3 left-3 z-10 bg-green-500 hover:bg-green-600 text-white">
+          Free Preview
+        </Badge>
+      )}
       <video
         src={videoUrl}
         className="w-full h-full object-contain"

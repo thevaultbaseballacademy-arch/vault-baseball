@@ -543,6 +543,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          is_preview: boolean
           lesson_id: string
           module_id: string
           updated_at: string
@@ -554,6 +555,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          is_preview?: boolean
           lesson_id: string
           module_id: string
           updated_at?: string
@@ -565,6 +567,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          is_preview?: boolean
           lesson_id?: string
           module_id?: string
           updated_at?: string
