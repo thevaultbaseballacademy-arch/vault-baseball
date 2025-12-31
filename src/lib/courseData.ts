@@ -1620,6 +1620,126 @@ export const courseContent: Record<string, CourseContent> = {
       },
     ],
   },
+  "annual-development-calendar": {
+    courseId: "annual-development-calendar",
+    modules: [
+      {
+        id: "adc-overview",
+        title: "Executive Overview",
+        description: "Understanding the annual development calendar",
+        lessons: [
+          {
+            id: "adc-1-1",
+            title: "Calendar Purpose & Philosophy",
+            description: "Aligns training priorities, workloads, and recovery across the entire year to prevent overuse and improve performance timing.",
+            duration: "10 min",
+            videoUrl: "",
+            isFree: true,
+          },
+          {
+            id: "adc-1-2",
+            title: "Annual Development Phases Overview",
+            description: "Post-Season Reset, Off-Season Build, Pre-Season Ramp, In-Season Compete, and Transition/Review.",
+            duration: "12 min",
+            videoUrl: "",
+            isFree: true,
+          },
+        ],
+      },
+      {
+        id: "adc-postseason",
+        title: "Post-Season Reset Phase",
+        description: "Recovery, mobility, and assessment (4-6 weeks)",
+        lessons: [
+          {
+            id: "adc-2-1",
+            title: "Post-Season Recovery Protocol",
+            description: "Mobility, light strength, arm recovery. No velocity chasing occurs.",
+            duration: "14 min",
+            videoUrl: "",
+            isFree: false,
+          },
+          {
+            id: "adc-2-2",
+            title: "Post-Season KPIs",
+            description: "ROM restored, soreness resolved, low load movement quality.",
+            duration: "10 min",
+            videoUrl: "",
+            isFree: false,
+          },
+        ],
+      },
+      {
+        id: "adc-offseason",
+        title: "Off-Season Build Phase",
+        description: "Strength, power, and arm capacity (8-12 weeks)",
+        lessons: [
+          {
+            id: "adc-3-1",
+            title: "Off-Season Training Structure",
+            description: "3-4 strength sessions/week with progressive, structured intent throwing.",
+            duration: "16 min",
+            videoUrl: "",
+            isFree: false,
+          },
+          {
+            id: "adc-3-2",
+            title: "Off-Season KPIs",
+            description: "Force gains, stable recovery, building the physical engine for the year.",
+            duration: "12 min",
+            videoUrl: "",
+            isFree: false,
+          },
+        ],
+      },
+      {
+        id: "adc-preseason",
+        title: "Pre-Season Ramp Phase",
+        description: "Velocity transfer and workload prep (6-8 weeks)",
+        lessons: [
+          {
+            id: "adc-4-1",
+            title: "Pre-Season Training Bridge",
+            description: "Reduced volume, high intent strength. Zone 2-3 planned throwing.",
+            duration: "14 min",
+            videoUrl: "",
+            isFree: false,
+          },
+          {
+            id: "adc-4-2",
+            title: "Pre-Season KPIs",
+            description: "Velocity stability, command development, competition readiness.",
+            duration: "10 min",
+            videoUrl: "",
+            isFree: false,
+          },
+        ],
+      },
+      {
+        id: "adc-inseason",
+        title: "In-Season & Transition Phases",
+        description: "Competition maintenance and review",
+        lessons: [
+          {
+            id: "adc-5-1",
+            title: "In-Season Competition Phase",
+            description: "1-2 strength sessions/week, competition-based throwing. Availability % and fatigue control.",
+            duration: "12 min",
+            videoUrl: "",
+            isFree: false,
+          },
+          {
+            id: "adc-5-2",
+            title: "Transition & Review Phase",
+            description: "Assessment, planning, light movement, optional catch play. Data review completed.",
+            duration: "10 min",
+            videoUrl: "",
+            isFree: false,
+          },
+        ],
+      },
+    ],
+  },
 };
 
 export const getCourseContent = (courseId: string): CourseContent | undefined => {

@@ -544,6 +544,30 @@ export const allCourses = [
     instructor: "Vault Performance",
     students: 1120,
   },
+  {
+    id: "annual-development-calendar",
+    title: "Annual Development Calendar",
+    description: "Seasonal blueprint for long-term athlete development. Aligns training priorities, workloads, and recovery across the entire year to prevent overuse and improve performance timing.",
+    image: courseFielding,
+    duration: "Reference",
+    modules: 5,
+    lessons: 10,
+    icon: Calendar,
+    tag: "Flagship",
+    pillar: "longevity",
+    category: "planning",
+    level: "Coach/Admin",
+    metrics: ["Phase Alignment", "Workload Balance", "Recovery Compliance"],
+    features: [
+      "Post-Season Reset (4-6 weeks)",
+      "Off-Season Build (8-12 weeks)",
+      "Pre-Season Ramp (6-8 weeks)",
+      "In-Season Compete (4-6 months)",
+      "Transition & Review (2-4 weeks)",
+    ],
+    instructor: "Vault Performance",
+    students: 680,
+  },
 ];
 
 interface CourseCardProps {
