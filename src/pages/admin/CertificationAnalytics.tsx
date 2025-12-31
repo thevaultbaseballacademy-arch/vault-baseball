@@ -7,9 +7,11 @@ import { KPICards } from "@/components/admin-analytics/KPICards";
 import { StatusBreakdownChart } from "@/components/admin-analytics/StatusBreakdownChart";
 import { ActionNeededTable } from "@/components/admin-analytics/ActionNeededTable";
 import { ExamPerformanceSection } from "@/components/admin-analytics/ExamPerformanceSection";
+import { ExamAttemptHistory } from "@/components/admin-analytics/ExamAttemptHistory";
 import { AnalyticsFilters } from "@/components/admin-analytics/AnalyticsFilters";
 import { useCertificationAnalytics, useExamPerformanceData, AnalyticsFilters as FiltersType } from "@/hooks/useCertificationAnalytics";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CertificationAnalytics = () => {
   const { user, isAdmin, isLoading: authLoading } = useAdminAuth();
@@ -89,8 +91,19 @@ const CertificationAnalytics = () => {
           </div>
 
           <div>
-            <h2 className="text-2xl font-display mb-4">Exam Performance</h2>
-            <ExamPerformanceSection data={examData} isLoading={examLoading} />
+            <h2 className="text-2xl font-display mb-4">Exam Analytics</h2>
+            <Tabs defaultValue="performance" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="performance">Performance Metrics</TabsTrigger>
+                <TabsTrigger value="history">Attempt History</TabsTrigger>
+              </TabsList>
+              <TabsContent value="performance">
+                <ExamPerformanceSection data={examData} isLoading={examLoading} />
+              </TabsContent>
+              <TabsContent value="history">
+                <ExamAttemptHistory dateRange={filters.dateRange} />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </main>
