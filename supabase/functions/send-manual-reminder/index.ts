@@ -33,13 +33,57 @@ serve(async (req) => {
   }
 
   try {
-    const { certificationId, userId, daysUntilExpiry }: ManualReminderRequest = await req.json();
-    
-    logStep("Processing manual reminder request", { certificationId, userId, daysUntilExpiry });
+    logStep("Processing manual reminder request");
+
+    // Security: Require admin authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      logStep("No authorization header provided");
+      return new Response(
+        JSON.stringify({ error: "Authorization required" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    
+    // Verify the user is an admin
+    const supabaseAuth = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: authError } = await supabaseAuth.auth.getUser(token);
+    
+    if (authError || !userData?.user) {
+      logStep("Invalid token", { error: authError });
+      return new Response(
+        JSON.stringify({ error: "Invalid authentication token" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Check admin role
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userData.user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    
+    if (roleError || !roleData) {
+      logStep("User is not an admin", { userId: userData.user.id });
+      return new Response(
+        JSON.stringify({ error: "Admin access required" }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    
+    logStep("Admin authorized", { userId: userData.user.id });
+
+    const { certificationId, userId, daysUntilExpiry }: ManualReminderRequest = await req.json();
+    
+    logStep("Processing request", { certificationId, userId, daysUntilExpiry });
 
     // Get certification details
     const { data: cert, error: certError } = await supabase
