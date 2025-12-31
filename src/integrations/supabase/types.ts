@@ -107,6 +107,141 @@ export type Database = {
         }
         Relationships: []
       }
+      certification_attempts: {
+        Row: {
+          answers: Json
+          certification_type: Database["public"]["Enums"]["certification_type"]
+          completed_at: string | null
+          created_at: string
+          id: string
+          passed: boolean | null
+          question_ids: string[]
+          score: number | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          certification_type: Database["public"]["Enums"]["certification_type"]
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          passed?: boolean | null
+          question_ids?: string[]
+          score?: number | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          certification_type?: Database["public"]["Enums"]["certification_type"]
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          passed?: boolean | null
+          question_ids?: string[]
+          score?: number | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      certification_definitions: {
+        Row: {
+          certification_type: Database["public"]["Enums"]["certification_type"]
+          created_at: string
+          description: string | null
+          id: string
+          is_required: boolean
+          name: string
+          passing_score: number
+          prerequisites:
+            | Database["public"]["Enums"]["certification_type"][]
+            | null
+          price_cents: number
+          question_count: number
+          updated_at: string
+          validity_months: number
+        }
+        Insert: {
+          certification_type: Database["public"]["Enums"]["certification_type"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_required?: boolean
+          name: string
+          passing_score?: number
+          prerequisites?:
+            | Database["public"]["Enums"]["certification_type"][]
+            | null
+          price_cents?: number
+          question_count?: number
+          updated_at?: string
+          validity_months?: number
+        }
+        Update: {
+          certification_type?: Database["public"]["Enums"]["certification_type"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_required?: boolean
+          name?: string
+          passing_score?: number
+          prerequisites?:
+            | Database["public"]["Enums"]["certification_type"][]
+            | null
+          price_cents?: number
+          question_count?: number
+          updated_at?: string
+          validity_months?: number
+        }
+        Relationships: []
+      }
+      certification_questions: {
+        Row: {
+          certification_type: Database["public"]["Enums"]["certification_type"]
+          correct_answer_index: number
+          created_at: string
+          display_order: number
+          explanation: string | null
+          id: string
+          is_active: boolean
+          is_scenario: boolean | null
+          options: Json
+          question_text: string
+          section: string
+          updated_at: string
+        }
+        Insert: {
+          certification_type: Database["public"]["Enums"]["certification_type"]
+          correct_answer_index: number
+          created_at?: string
+          display_order?: number
+          explanation?: string | null
+          id?: string
+          is_active?: boolean
+          is_scenario?: boolean | null
+          options?: Json
+          question_text: string
+          section: string
+          updated_at?: string
+        }
+        Update: {
+          certification_type?: Database["public"]["Enums"]["certification_type"]
+          correct_answer_index?: number
+          created_at?: string
+          display_order?: number
+          explanation?: string | null
+          id?: string
+          is_active?: boolean
+          is_scenario?: boolean | null
+          options?: Json
+          question_text?: string
+          section?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coach_alerts: {
         Row: {
           alert_type: string
@@ -768,6 +903,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_certifications: {
+        Row: {
+          attempt_id: string | null
+          certification_type: Database["public"]["Enums"]["certification_type"]
+          created_at: string
+          expires_at: string
+          id: string
+          issued_at: string
+          score: number
+          status: Database["public"]["Enums"]["certification_status"]
+          stripe_payment_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempt_id?: string | null
+          certification_type: Database["public"]["Enums"]["certification_type"]
+          created_at?: string
+          expires_at: string
+          id?: string
+          issued_at?: string
+          score: number
+          status?: Database["public"]["Enums"]["certification_status"]
+          stripe_payment_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempt_id?: string | null
+          certification_type?: Database["public"]["Enums"]["certification_type"]
+          created_at?: string
+          expires_at?: string
+          id?: string
+          issued_at?: string
+          score?: number
+          status?: Database["public"]["Enums"]["certification_status"]
+          stripe_payment_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -801,9 +978,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_valid_certification: {
+        Args: {
+          _cert_type: Database["public"]["Enums"]["certification_type"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "coach" | "athlete"
+      certification_status: "active" | "expired" | "revoked"
+      certification_type:
+        | "foundations"
+        | "performance"
+        | "catcher_specialist"
+        | "infield_specialist"
+        | "outfield_specialist"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -932,6 +1123,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "coach", "athlete"],
+      certification_status: ["active", "expired", "revoked"],
+      certification_type: [
+        "foundations",
+        "performance",
+        "catcher_specialist",
+        "infield_specialist",
+        "outfield_specialist",
+      ],
     },
   },
 } as const
