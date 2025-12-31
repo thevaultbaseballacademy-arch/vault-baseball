@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Award, Shield, CheckCircle, Clock, Lock, Play, 
-  ArrowRight, Loader2, AlertCircle, RefreshCw
+  ArrowRight, Loader2, AlertCircle, RefreshCw, Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -383,6 +383,15 @@ const Certifications = () => {
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Standardization • Accountability • Authority
               </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/certifications/leaderboard')}
+                className="gap-2"
+              >
+                <Trophy className="w-4 h-4" />
+                View Leaderboard
+              </Button>
             </div>
 
             {/* Progress Overview */}
