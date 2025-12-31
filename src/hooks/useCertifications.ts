@@ -165,6 +165,7 @@ export const useSubmitExam = () => {
       answers, 
       questions,
       certType,
+      certificationName,
       passingScore,
       validityMonths 
     }: { 
@@ -172,6 +173,7 @@ export const useSubmitExam = () => {
       answers: Record<string, number>;
       questions: CertificationQuestion[];
       certType: CertificationType;
+      certificationName: string;
       passingScore: number;
       validityMonths: number;
     }) => {
@@ -202,10 +204,13 @@ export const useSubmitExam = () => {
 
       if (attemptError) throw attemptError;
 
+      let expiresAt: string | undefined;
+
       // If passed, create/update certification
       if (passed) {
-        const expiresAt = new Date();
-        expiresAt.setMonth(expiresAt.getMonth() + validityMonths);
+        const expiryDate = new Date();
+        expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
+        expiresAt = expiryDate.toISOString();
 
         const { error: certError } = await supabase
           .from('user_certifications')
@@ -214,7 +219,7 @@ export const useSubmitExam = () => {
             certification_type: certType,
             status: 'active',
             issued_at: new Date().toISOString(),
-            expires_at: expiresAt.toISOString(),
+            expires_at: expiresAt,
             score,
             attempt_id: attemptId,
           }, {
@@ -224,6 +229,37 @@ export const useSubmitExam = () => {
         if (certError) throw certError;
       }
 
+      // Get user profile for email
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, email')
+        .eq('user_id', user.id)
+        .single();
+
+      const coachName = profile?.display_name || profile?.email?.split('@')[0] || 'Coach';
+      const email = user.email || profile?.email;
+
+      // Send email notification (non-blocking)
+      if (email) {
+        supabase.functions.invoke('send-certification-email', {
+          body: {
+            email,
+            coachName,
+            certificationName,
+            passed,
+            score,
+            passingScore,
+            expiresAt,
+          },
+        }).then(({ error }) => {
+          if (error) {
+            console.error('Failed to send certification email:', error);
+          } else {
+            console.log('Certification email sent successfully');
+          }
+        });
+      }
+
       return { score, passed, correct, total: questions.length };
     },
     onSuccess: (result) => {
@@ -231,9 +267,9 @@ export const useSubmitExam = () => {
       queryClient.invalidateQueries({ queryKey: ['certification-attempts'] });
       
       if (result.passed) {
-        toast.success(`Congratulations! You passed with ${result.score}%`);
+        toast.success(`Congratulations! You passed with ${result.score}%! Check your email.`);
       } else {
-        toast.error(`Score: ${result.score}%. You need ${result.passed ? '' : 'at least '}to pass.`);
+        toast.error(`Score: ${result.score}%. Keep studying and try again!`);
       }
     },
     onError: (error: any) => {
