@@ -75,6 +75,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          privacy_level: string
           season: string | null
           stat_name: string
           stat_type: string
@@ -86,6 +87,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          privacy_level?: string
           season?: string | null
           stat_name: string
           stat_type: string
@@ -97,6 +99,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          privacy_level?: string
           season?: string | null
           stat_name?: string
           stat_type?: string

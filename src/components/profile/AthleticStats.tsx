@@ -22,7 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Award, Plus, Loader2, Trash2, TrendingUp, Target, Percent } from "lucide-react";
+import { Award, Plus, Loader2, Trash2, TrendingUp, Target, Percent, Globe, Users, Lock } from "lucide-react";
+
+type PrivacyLevel = 'public' | 'coaches_only' | 'private';
 
 interface AthleticStat {
   id: string;
@@ -32,6 +34,7 @@ interface AthleticStat {
   stat_value: string;
   season: string | null;
   verified: boolean;
+  privacy_level: PrivacyLevel;
   created_at: string;
 }
 
@@ -62,6 +65,12 @@ const getStatOptions = (type: string) => {
   }
 };
 
+const privacyOptions: { value: PrivacyLevel; label: string; icon: React.ReactNode }[] = [
+  { value: 'public', label: 'Public', icon: <Globe className="w-3 h-3" /> },
+  { value: 'coaches_only', label: 'Coaches', icon: <Users className="w-3 h-3" /> },
+  { value: 'private', label: 'Private', icon: <Lock className="w-3 h-3" /> },
+];
+
 const currentYear = new Date().getFullYear();
 const seasons = Array.from({ length: 5 }, (_, i) => `${currentYear - i}`);
 
@@ -71,6 +80,7 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
   const [statName, setStatName] = useState("");
   const [statValue, setStatValue] = useState("");
   const [season, setSeason] = useState("");
+  const [privacyLevel, setPrivacyLevel] = useState<PrivacyLevel>('public');
   const queryClient = useQueryClient();
 
   const { data: stats = [], isLoading } = useQuery({
@@ -82,7 +92,10 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data as AthleticStat[];
+      return (data || []).map(stat => ({
+        ...stat,
+        privacy_level: (stat as any).privacy_level || 'public'
+      })) as AthleticStat[];
     }
   });
 
@@ -96,7 +109,8 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
           stat_name: statName,
           stat_value: statValue,
           season: season || null,
-        });
+          privacy_level: privacyLevel
+        } as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -107,8 +121,24 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
       setStatName("");
       setStatValue("");
       setSeason("");
+      setPrivacyLevel('public');
     },
     onError: () => toast.error("Failed to add stat"),
+  });
+
+  const updatePrivacy = useMutation({
+    mutationFn: async ({ statId, privacy }: { statId: string; privacy: PrivacyLevel }) => {
+      const { error } = await supabase
+        .from('athletic_stats')
+        .update({ privacy_level: privacy } as any)
+        .eq('id', statId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['athletic-stats', userId] });
+      toast.success("Privacy updated");
+    },
+    onError: () => toast.error("Failed to update privacy"),
   });
 
   const deleteStat = useMutation({
@@ -128,6 +158,11 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
     acc[stat.stat_type].push(stat);
     return acc;
   }, {} as Record<string, AthleticStat[]>);
+
+  const getPrivacyIcon = (privacy: PrivacyLevel) => {
+    const option = privacyOptions.find(o => o.value === privacy);
+    return option?.icon || <Globe className="w-3 h-3" />;
+  };
 
   if (isLoading) {
     return (
@@ -192,16 +227,36 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
                     placeholder="e.g., .350, 92 mph, 6.8s"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Season (optional)</Label>
-                  <Select value={season} onValueChange={setSeason}>
-                    <SelectTrigger><SelectValue placeholder="Select season" /></SelectTrigger>
-                    <SelectContent>
-                      {seasons.map(s => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Season (optional)</Label>
+                    <Select value={season} onValueChange={setSeason}>
+                      <SelectTrigger><SelectValue placeholder="Select season" /></SelectTrigger>
+                      <SelectContent>
+                        {seasons.map(s => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Privacy</Label>
+                    <Select value={privacyLevel} onValueChange={(v) => setPrivacyLevel(v as PrivacyLevel)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {privacyOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            <div className="flex items-center gap-2">
+                              {option.icon}
+                              <span>{option.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
               <DialogFooter>
@@ -245,14 +300,38 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
                         key={stat.id} 
                         className="group relative p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
                       >
-                        <p className="text-xs text-muted-foreground mb-1">{stat.stat_name}</p>
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-xs text-muted-foreground">{stat.stat_name}</p>
+                          {isOwnProfile ? (
+                            <Select 
+                              value={stat.privacy_level} 
+                              onValueChange={(v) => updatePrivacy.mutate({ statId: stat.id, privacy: v as PrivacyLevel })}
+                            >
+                              <SelectTrigger className="w-auto h-5 px-1 text-xs border-0 bg-transparent hover:bg-muted">
+                                {getPrivacyIcon(stat.privacy_level)}
+                              </SelectTrigger>
+                              <SelectContent>
+                                {privacyOptions.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    <div className="flex items-center gap-2">
+                                      {option.icon}
+                                      <span>{option.label}</span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <span className="text-muted-foreground">{getPrivacyIcon(stat.privacy_level)}</span>
+                          )}
+                        </div>
                         <p className="text-xl font-bold text-foreground">{stat.stat_value}</p>
                         {stat.season && <p className="text-xs text-muted-foreground mt-1">{stat.season}</p>}
                         {isOwnProfile && (
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute bottom-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={() => deleteStat.mutate(stat.id)}
                           >
                             <Trash2 className="w-3 h-3 text-destructive" />
