@@ -36,8 +36,54 @@ const LessonVideoForm = ({
   const upsertVideo = useUpsertCourseVideo();
   const deleteVideo = useDeleteCourseVideo();
 
+  const validateUrl = (videoUrl: string, videoPlatform: string): { valid: boolean; error?: string } => {
+    if (!videoUrl.trim()) return { valid: false, error: "URL is required" };
+    
+    const trimmedUrl = videoUrl.trim();
+    
+    // Basic URL format check
+    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+      return { valid: false, error: "URL must start with http:// or https://" };
+    }
+
+    // Platform-specific validation
+    if (videoPlatform === 'youtube') {
+      const youtubePatterns = [
+        /^https?:\/\/(www\.)?youtube\.com\/watch\?v=[\w-]+/,
+        /^https?:\/\/(www\.)?youtube\.com\/embed\/[\w-]+/,
+        /^https?:\/\/youtu\.be\/[\w-]+/,
+        /^https?:\/\/(www\.)?youtube\.com\/shorts\/[\w-]+/,
+      ];
+      if (!youtubePatterns.some(p => p.test(trimmedUrl))) {
+        return { valid: false, error: "Invalid YouTube URL format" };
+      }
+    } else if (videoPlatform === 'vimeo') {
+      const vimeoPatterns = [
+        /^https?:\/\/(www\.)?vimeo\.com\/\d+/,
+        /^https?:\/\/player\.vimeo\.com\/video\/\d+/,
+      ];
+      if (!vimeoPatterns.some(p => p.test(trimmedUrl))) {
+        return { valid: false, error: "Invalid Vimeo URL format" };
+      }
+    } else if (videoPlatform === 'wistia') {
+      const wistiaPatterns = [
+        /^https?:\/\/.*\.wistia\.(com|net)\//,
+      ];
+      if (!wistiaPatterns.some(p => p.test(trimmedUrl))) {
+        return { valid: false, error: "Invalid Wistia URL format" };
+      }
+    }
+
+    return { valid: true };
+  };
+
+  const validation = validateUrl(url, platform);
+
   const handleSave = () => {
-    if (!url.trim()) return;
+    if (!validation.valid) {
+      toast.error(validation.error || "Invalid URL");
+      return;
+    }
     upsertVideo.mutate({
       course_id: courseId,
       module_id: moduleId,
@@ -81,15 +127,20 @@ const LessonVideoForm = ({
         </SelectContent>
       </Select>
 
-      <Input
-        placeholder="Enter video URL..."
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        className="flex-1 max-w-md h-8 text-sm"
-      />
+      <div className="flex-1 max-w-md relative">
+        <Input
+          placeholder="Enter video URL..."
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          className={`h-8 text-sm ${url && !validation.valid ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+        />
+        {url && !validation.valid && (
+          <p className="absolute -bottom-4 left-0 text-xs text-destructive">{validation.error}</p>
+        )}
+      </div>
 
       <div className="flex gap-1">
-        {url && (
+        {url && validation.valid && (
           <Button
             size="sm"
             variant="ghost"
@@ -103,7 +154,7 @@ const LessonVideoForm = ({
         <Button
           size="sm"
           onClick={handleSave}
-          disabled={!url.trim() || upsertVideo.isPending}
+          disabled={!url.trim() || !validation.valid || upsertVideo.isPending}
           className="h-8"
         >
           <Save className="w-4 h-4 mr-1" />
