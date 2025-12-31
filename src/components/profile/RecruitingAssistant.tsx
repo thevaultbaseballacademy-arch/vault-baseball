@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { Bot, Send, Loader2, Sparkles, User, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
@@ -53,11 +54,20 @@ const RecruitingAssistant = ({ athleteContext }: RecruitingAssistantProps) => {
     let assistantContent = "";
 
     try {
+      // Get user session for authenticated API call
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        toast.error("Please sign in to use the recruiting assistant");
+        setIsLoading(false);
+        return;
+      }
+
       const response = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           messages: newMessages,
