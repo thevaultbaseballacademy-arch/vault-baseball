@@ -121,6 +121,24 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
     }
   });
 
+  const updateAllPrivacy = useMutation({
+    mutationFn: async (privacy: PrivacyLevel) => {
+      const { error } = await supabase
+        .from('highlight_videos')
+        .update({ privacy_level: privacy } as any)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['highlight-videos', userId] });
+      toast.success('All videos updated');
+    },
+    onError: () => {
+      toast.error('Failed to update videos');
+    }
+  });
+
   const handleUpload = async () => {
     if (!selectedFile || !title.trim()) {
       toast.error('Please provide a title and select a video');
@@ -198,103 +216,122 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
   return (
     <>
       <Card className="border-border bg-card">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
           <CardTitle className="flex items-center gap-2">
             <Video className="w-5 h-5 text-primary" />
             Highlight Videos
           </CardTitle>
           {isOwnProfile && (
-            <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Add Video
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Upload Highlight Video</DialogTitle>
-                  <DialogDescription>
-                    Share your best plays with college recruiters. Max file size: 100MB.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="video-title">Title *</Label>
-                    <Input
-                      id="video-title"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="e.g., Game-winning home run vs. State"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="video-description">Description</Label>
-                    <Textarea
-                      id="video-description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Add context about this highlight..."
-                      className="min-h-[80px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Privacy</Label>
-                    <Select value={privacyLevel} onValueChange={(v) => setPrivacyLevel(v as PrivacyLevel)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {privacyOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            <div className="flex items-center gap-2">
-                              {option.icon}
-                              <span>{option.label}</span>
-                              <span className="text-muted-foreground text-xs">- {option.description}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Video File *</Label>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-muted-foreground
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-md file:border-0
-                        file:text-sm file:font-medium
-                        file:bg-primary file:text-primary-foreground
-                        hover:file:bg-primary/90
-                        file:cursor-pointer cursor-pointer"
-                    />
-                    {selectedFile && (
-                      <p className="text-xs text-muted-foreground">
-                        Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setUploadOpen(false)}>
-                    Cancel
+            <div className="flex items-center gap-2">
+              {videos.length > 1 && (
+                <Select onValueChange={(v) => updateAllPrivacy.mutate(v as PrivacyLevel)}>
+                  <SelectTrigger className="w-auto h-8 text-xs gap-1">
+                    <span>Set All</span>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {privacyOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex items-center gap-2">
+                          {option.icon}
+                          <span>{option.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add Video
                   </Button>
-                  <Button onClick={handleUpload} disabled={uploading}>
-                    {uploading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    Upload Video
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Upload Highlight Video</DialogTitle>
+                    <DialogDescription>
+                      Share your best plays with college recruiters. Max file size: 100MB.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="video-title">Title *</Label>
+                      <Input
+                        id="video-title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="e.g., Game-winning home run vs. State"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="video-description">Description</Label>
+                      <Textarea
+                        id="video-description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Add context about this highlight..."
+                        className="min-h-[80px]"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Privacy</Label>
+                      <Select value={privacyLevel} onValueChange={(v) => setPrivacyLevel(v as PrivacyLevel)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {privacyOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              <div className="flex items-center gap-2">
+                                {option.icon}
+                                <span>{option.label}</span>
+                                <span className="text-muted-foreground text-xs">- {option.description}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Video File *</Label>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                        className="w-full text-sm text-muted-foreground
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-md file:border-0
+                          file:text-sm file:font-medium
+                          file:bg-primary file:text-primary-foreground
+                          hover:file:bg-primary/90
+                          file:cursor-pointer cursor-pointer"
+                      />
+                      {selectedFile && (
+                        <p className="text-xs text-muted-foreground">
+                          Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setUploadOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleUpload} disabled={uploading}>
+                      {uploading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                      Upload Video
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           )}
         </CardHeader>
 

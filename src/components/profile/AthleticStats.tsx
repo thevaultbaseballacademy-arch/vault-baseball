@@ -141,6 +141,21 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
     onError: () => toast.error("Failed to update privacy"),
   });
 
+  const updateAllPrivacy = useMutation({
+    mutationFn: async (privacy: PrivacyLevel) => {
+      const { error } = await supabase
+        .from('athletic_stats')
+        .update({ privacy_level: privacy } as any)
+        .eq('user_id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['athletic-stats', userId] });
+      toast.success("All stats updated");
+    },
+    onError: () => toast.error("Failed to update stats"),
+  });
+
   const deleteStat = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from('athletic_stats').delete().eq('id', id);
@@ -176,101 +191,120 @@ const AthleticStats = ({ userId, isOwnProfile }: AthleticStatsProps) => {
 
   return (
     <Card className="border-border bg-card">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <CardTitle className="flex items-center gap-2">
           <Award className="w-5 h-5 text-primary" />
           Athletic Stats & Achievements
         </CardTitle>
         {isOwnProfile && (
-          <Dialog open={addOpen} onOpenChange={setAddOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
-                <Plus className="w-4 h-4" />
-                Add Stat
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add Athletic Stat</DialogTitle>
-                <DialogDescription>Add your performance metrics for recruiters to see.</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>Category</Label>
-                  <Select value={statType} onValueChange={(v) => { setStatType(v); setStatName(""); }}>
-                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                    <SelectContent>
-                      {statTypes.map(t => (
-                        <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {statType && (
-                  <div className="space-y-2">
-                    <Label>Stat</Label>
-                    <Select value={statName} onValueChange={setStatName}>
-                      <SelectTrigger><SelectValue placeholder="Select stat" /></SelectTrigger>
-                      <SelectContent>
-                        {getStatOptions(statType).map(s => (
-                          <SelectItem key={s} value={s}>{s}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                <div className="space-y-2">
-                  <Label>Value</Label>
-                  <Input
-                    value={statValue}
-                    onChange={(e) => setStatValue(e.target.value)}
-                    placeholder="e.g., .350, 92 mph, 6.8s"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Season (optional)</Label>
-                    <Select value={season} onValueChange={setSeason}>
-                      <SelectTrigger><SelectValue placeholder="Select season" /></SelectTrigger>
-                      <SelectContent>
-                        {seasons.map(s => (
-                          <SelectItem key={s} value={s}>{s}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Privacy</Label>
-                    <Select value={privacyLevel} onValueChange={(v) => setPrivacyLevel(v as PrivacyLevel)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {privacyOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            <div className="flex items-center gap-2">
-                              {option.icon}
-                              <span>{option.label}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-                <Button 
-                  onClick={() => addStat.mutate()} 
-                  disabled={!statType || !statName || !statValue || addStat.isPending}
-                >
-                  {addStat.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          <div className="flex items-center gap-2">
+            {stats.length > 1 && (
+              <Select onValueChange={(v) => updateAllPrivacy.mutate(v as PrivacyLevel)}>
+                <SelectTrigger className="w-auto h-8 text-xs gap-1">
+                  <span>Set All</span>
+                </SelectTrigger>
+                <SelectContent>
+                  {privacyOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <div className="flex items-center gap-2">
+                        {option.icon}
+                        <span>{option.label}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            <Dialog open={addOpen} onOpenChange={setAddOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-2">
+                  <Plus className="w-4 h-4" />
                   Add Stat
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Athletic Stat</DialogTitle>
+                  <DialogDescription>Add your performance metrics for recruiters to see.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>Category</Label>
+                    <Select value={statType} onValueChange={(v) => { setStatType(v); setStatName(""); }}>
+                      <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                      <SelectContent>
+                        {statTypes.map(t => (
+                          <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {statType && (
+                    <div className="space-y-2">
+                      <Label>Stat</Label>
+                      <Select value={statName} onValueChange={setStatName}>
+                        <SelectTrigger><SelectValue placeholder="Select stat" /></SelectTrigger>
+                        <SelectContent>
+                          {getStatOptions(statType).map(s => (
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label>Value</Label>
+                    <Input
+                      value={statValue}
+                      onChange={(e) => setStatValue(e.target.value)}
+                      placeholder="e.g., .350, 92 mph, 6.8s"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Season (optional)</Label>
+                      <Select value={season} onValueChange={setSeason}>
+                        <SelectTrigger><SelectValue placeholder="Select season" /></SelectTrigger>
+                        <SelectContent>
+                          {seasons.map(s => (
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Privacy</Label>
+                      <Select value={privacyLevel} onValueChange={(v) => setPrivacyLevel(v as PrivacyLevel)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {privacyOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              <div className="flex items-center gap-2">
+                                {option.icon}
+                                <span>{option.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
+                  <Button 
+                    onClick={() => addStat.mutate()} 
+                    disabled={!statType || !statName || !statValue || addStat.isPending}
+                  >
+                    {addStat.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    Add Stat
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         )}
       </CardHeader>
 
