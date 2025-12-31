@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock
+  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +17,7 @@ import CoachAthleteAssignments from "@/components/admin/CoachAthleteAssignments"
 import CourseVideoManager from "@/components/admin/CourseVideoManager";
 import CertificationQuestionManager from "@/components/admin/CertificationQuestionManager";
 import CertificationExpirationManager from "@/components/admin/CertificationExpirationManager";
+import AuditLogViewer from "@/components/admin/AuditLogViewer";
 
 interface Profile {
   user_id: string;
@@ -280,7 +281,7 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-5xl grid-cols-7">
+              <TabsList className="grid w-full max-w-5xl grid-cols-8">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
                 <TabsTrigger value="certifications">Questions</TabsTrigger>
@@ -288,6 +289,7 @@ const Admin = () => {
                 <TabsTrigger value="videos">Videos</TabsTrigger>
                 <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="audit">Audit Logs</TabsTrigger>
               </TabsList>
 
               <TabsContent value="users" className="mt-6 space-y-6">
@@ -403,6 +405,10 @@ const Admin = () => {
 
               <TabsContent value="analytics" className="mt-6">
                 <NotificationAnalytics />
+              </TabsContent>
+
+              <TabsContent value="audit" className="mt-6">
+                <AuditLogViewer />
               </TabsContent>
             </Tabs>
           </motion.div>
