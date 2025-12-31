@@ -47,10 +47,10 @@ const CommunityFeed = ({ currentUserId, filter }: CommunityFeedProps) => {
         return;
       }
 
-      // Get author names
+      // Get author names using public_profiles view (limited data exposure)
       const userIds = [...new Set(postsData.map(p => p.user_id))];
       const { data: profiles } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('user_id, display_name')
         .in('user_id', userIds);
 

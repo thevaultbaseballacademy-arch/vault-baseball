@@ -26,8 +26,9 @@ const MentionText = ({ content }: MentionTextProps) => {
     const fetchProfiles = async () => {
       if (mentions.length === 0) return;
 
+      // Use public_profiles view which only exposes limited data
       const { data: profiles } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('user_id, display_name')
         .in('display_name', mentions);
 

@@ -46,10 +46,10 @@ const CommentsSection = ({ postId, postOwnerId, currentUserId, onCommentsCountCh
         return;
       }
 
-      // Get author names
+      // Get author names using public_profiles view (limited data exposure)
       const userIds = [...new Set(commentsData.map(c => c.user_id))];
       const { data: profiles } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('user_id, display_name')
         .in('user_id', userIds);
 
@@ -92,9 +92,9 @@ const CommentsSection = ({ postId, postOwnerId, currentUserId, onCommentsCountCh
 
       if (error) throw error;
 
-      // Get current user's name
+      // Get current user's name using public_profiles view
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('display_name')
         .eq('user_id', currentUserId)
         .single();
