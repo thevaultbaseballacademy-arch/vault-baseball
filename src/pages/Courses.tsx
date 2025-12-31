@@ -296,6 +296,30 @@ export const allCourses = [
     instructor: "Vault Performance",
     students: 480,
   },
+  {
+    id: "vault-catcher-complete",
+    title: "Vault Complete Catcher Program",
+    description: "The complete 12-week elite catcher development program. Build receiving, blocking, throwing velocity, footwork, pop time, leadership, game-calling, mobility, and durability.",
+    image: courseFielding,
+    duration: "12 Weeks",
+    modules: 12,
+    lessons: 60,
+    icon: Shield,
+    tag: "Complete",
+    pillar: "utility",
+    category: "catching",
+    level: "All Levels",
+    metrics: ["Pop-Time", "Game-Calling IQ", "Durability"],
+    features: [
+      "5-day weekly training structure",
+      "Week 0 testing protocol",
+      "Pop-time improvement: 0.15-0.30s",
+      "Leadership development",
+      "Catcher-specific strength & mobility",
+    ],
+    instructor: "Vault Performance",
+    students: 720,
+  },
 
   // LONGEVITY PILLAR - Availability Systems (cross-program integration)
   {
