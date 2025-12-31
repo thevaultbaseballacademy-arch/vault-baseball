@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video, Award
+  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +16,7 @@ import NotificationAnalytics from "@/components/admin/NotificationAnalytics";
 import CoachAthleteAssignments from "@/components/admin/CoachAthleteAssignments";
 import CourseVideoManager from "@/components/admin/CourseVideoManager";
 import CertificationQuestionManager from "@/components/admin/CertificationQuestionManager";
+import CertificationExpirationManager from "@/components/admin/CertificationExpirationManager";
 
 interface Profile {
   user_id: string;
@@ -279,10 +280,11 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-4xl grid-cols-6">
+              <TabsList className="grid w-full max-w-5xl grid-cols-7">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
-                <TabsTrigger value="certifications">Certifications</TabsTrigger>
+                <TabsTrigger value="certifications">Questions</TabsTrigger>
+                <TabsTrigger value="expirations">Expirations</TabsTrigger>
                 <TabsTrigger value="videos">Videos</TabsTrigger>
                 <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -385,6 +387,10 @@ const Admin = () => {
 
               <TabsContent value="certifications" className="mt-6">
                 <CertificationQuestionManager />
+              </TabsContent>
+
+              <TabsContent value="expirations" className="mt-6">
+                <CertificationExpirationManager />
               </TabsContent>
 
               <TabsContent value="videos" className="mt-6">
