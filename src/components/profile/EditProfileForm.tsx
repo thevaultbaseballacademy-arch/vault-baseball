@@ -24,25 +24,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Pencil, X, Loader2, Plus } from "lucide-react";
-
-interface Profile {
-  user_id: string;
-  display_name: string;
-  email: string;
-  bio?: string | null;
-  position?: string | null;
-  graduation_year?: number | null;
-  target_schools?: string[] | null;
-  height_inches?: number | null;
-  weight_lbs?: number | null;
-  throwing_arm?: string | null;
-  batting_side?: string | null;
-  sixty_yard_dash?: number | null;
-  twitter_url?: string | null;
-  instagram_url?: string | null;
-  youtube_url?: string | null;
-  hudl_url?: string | null;
-}
+import type { Profile } from "@/types/profile";
 
 interface EditProfileFormProps {
   profile: Profile;

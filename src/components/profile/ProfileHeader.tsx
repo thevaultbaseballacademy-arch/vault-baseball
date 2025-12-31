@@ -17,33 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import EditProfileForm from "./EditProfileForm";
 import ProfileImageUpload from "./ProfileImageUpload";
-
-type PrivacyLevel = 'public' | 'coaches_only' | 'private';
-
-interface Profile {
-  user_id: string;
-  display_name: string;
-  email: string;
-  created_at: string;
-  bio?: string | null;
-  position?: string | null;
-  graduation_year?: number | null;
-  target_schools?: string[] | null;
-  avatar_url?: string | null;
-  cover_url?: string | null;
-  height_inches?: number | null;
-  weight_lbs?: number | null;
-  throwing_arm?: string | null;
-  batting_side?: string | null;
-  sixty_yard_dash?: number | null;
-  twitter_url?: string | null;
-  instagram_url?: string | null;
-  youtube_url?: string | null;
-  hudl_url?: string | null;
-  bio_privacy?: PrivacyLevel;
-  contact_privacy?: PrivacyLevel;
-  physical_stats_privacy?: PrivacyLevel;
-}
+import type { Profile, PrivacyLevel } from "@/types/profile";
 
 interface ProfileHeaderProps {
   profile: Profile;
