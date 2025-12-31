@@ -46,14 +46,13 @@ const CommentsSection = ({ postId, postOwnerId, currentUserId, onCommentsCountCh
         return;
       }
 
-      // Get author names using public_profiles view (limited data exposure)
+      // Get author names using secure RPC function
       const userIds = [...new Set(commentsData.map(c => c.user_id))];
-      const { data: profiles } = await supabase
-        .from('public_profiles')
-        .select('user_id, display_name')
-        .in('user_id', userIds);
+      const { data: profilesData } = await supabase
+        .rpc('get_public_profiles_by_ids', { user_ids: userIds });
 
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p.display_name]) || []);
+      const profiles = (profilesData || []) as Array<{ user_id: string; display_name: string }>;
+      const profileMap = new Map(profiles.map(p => [p.user_id, p.display_name]));
 
       const enrichedComments: Comment[] = commentsData.map(comment => ({
         ...comment,
@@ -92,14 +91,8 @@ const CommentsSection = ({ postId, postOwnerId, currentUserId, onCommentsCountCh
 
       if (error) throw error;
 
-      // Get current user's name using public_profiles view
-      const { data: profile } = await supabase
-        .from('public_profiles')
-        .select('display_name')
-        .eq('user_id', currentUserId)
-        .single();
-
-      const actorName = profile?.display_name || 'Someone';
+      // Get current user's name using secure RPC function
+      const actorName = await getActorName(currentUserId);
 
       // Notify post owner about the comment
       if (postOwnerId !== currentUserId) {

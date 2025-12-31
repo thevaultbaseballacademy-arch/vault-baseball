@@ -47,14 +47,13 @@ const CommunityFeed = ({ currentUserId, filter }: CommunityFeedProps) => {
         return;
       }
 
-      // Get author names using public_profiles view (limited data exposure)
+      // Get author names using secure RPC function
       const userIds = [...new Set(postsData.map(p => p.user_id))];
-      const { data: profiles } = await supabase
-        .from('public_profiles')
-        .select('user_id, display_name')
-        .in('user_id', userIds);
+      const { data: profilesData } = await supabase
+        .rpc('get_public_profiles_by_ids', { user_ids: userIds });
 
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p.display_name]) || []);
+      const profiles = (profilesData || []) as Array<{ user_id: string; display_name: string }>;
+      const profileMap = new Map(profiles.map(p => [p.user_id, p.display_name]));
 
       // Get likes counts
       const postIds = postsData.map(p => p.id);

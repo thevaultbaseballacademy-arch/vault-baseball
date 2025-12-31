@@ -26,21 +26,22 @@ const MentionText = ({ content }: MentionTextProps) => {
     const fetchProfiles = async () => {
       if (mentions.length === 0) return;
 
-      // Use public_profiles view which only exposes limited data
-      const { data: profiles } = await supabase
-        .from('public_profiles')
-        .select('user_id, display_name')
-        .in('display_name', mentions);
-
-      if (profiles) {
-        const map = new Map<string, string>();
-        profiles.forEach(p => {
-          if (p.display_name) {
-            map.set(p.display_name.toLowerCase(), p.user_id);
+      // Use secure RPC function to search for each mentioned name
+      const map = new Map<string, string>();
+      
+      for (const mentionName of mentions) {
+        const { data } = await supabase
+          .rpc('search_public_profiles', { search_term: mentionName, result_limit: 1 });
+        
+        if (data && data.length > 0) {
+          const profile = data[0] as { user_id: string; display_name: string };
+          if (profile.display_name && profile.display_name.toLowerCase() === mentionName.toLowerCase()) {
+            map.set(mentionName.toLowerCase(), profile.user_id);
           }
-        });
-        setProfileMap(map);
+        }
       }
+      
+      setProfileMap(map);
     };
 
     fetchProfiles();
