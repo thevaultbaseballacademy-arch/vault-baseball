@@ -25,7 +25,10 @@ import {
   Lock, 
   Loader2,
   Eye,
-  EyeOff
+  EyeOff,
+  User,
+  Mail,
+  Ruler
 } from "lucide-react";
 
 type PrivacyLevel = 'public' | 'coaches_only' | 'private';
@@ -88,6 +91,59 @@ const PrivacySettings = () => {
       }));
     },
     enabled: !!user?.id,
+  });
+
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['profile-privacy', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      if (error) throw error;
+      return {
+        bio_privacy: ((data as any).bio_privacy || 'public') as PrivacyLevel,
+        contact_privacy: ((data as any).contact_privacy || 'public') as PrivacyLevel,
+        physical_stats_privacy: ((data as any).physical_stats_privacy || 'public') as PrivacyLevel,
+      };
+    },
+    enabled: !!user?.id,
+  });
+
+  const updateProfilePrivacy = useMutation({
+    mutationFn: async ({ field, value }: { field: string; value: PrivacyLevel }) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ [field]: value } as any)
+        .eq('user_id', user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile-privacy', user?.id] });
+      toast.success('Profile privacy updated');
+    },
+    onError: () => toast.error('Failed to update profile privacy'),
+  });
+
+  const setAllProfilePrivacy = useMutation({
+    mutationFn: async (privacy: PrivacyLevel) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          bio_privacy: privacy,
+          contact_privacy: privacy,
+          physical_stats_privacy: privacy 
+        } as any)
+        .eq('user_id', user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile-privacy', user?.id] });
+      toast.success('All profile sections updated');
+    },
+    onError: () => toast.error('Failed to update profile privacy'),
   });
 
   const updateAllVideos = useMutation({
@@ -235,6 +291,143 @@ const PrivacySettings = () => {
                     </Button>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Profile Privacy */}
+            <Card className="border-border bg-card">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="w-5 h-5 text-primary" />
+                      Profile Information
+                    </CardTitle>
+                    <CardDescription>
+                      Control visibility of your profile sections
+                    </CardDescription>
+                  </div>
+                  <Select onValueChange={(v) => setAllProfilePrivacy.mutate(v as PrivacyLevel)}>
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue placeholder="Set all..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {privacyOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          <div className="flex items-center gap-2">
+                            {option.icon}
+                            <span>{option.label}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {profileLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Bio Privacy */}
+                    <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/20">
+                      <div className="flex items-center gap-3">
+                        <User className="w-5 h-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium text-foreground">Bio & About</p>
+                          <p className="text-sm text-muted-foreground">Your personal description</p>
+                        </div>
+                      </div>
+                      <Select 
+                        value={profile?.bio_privacy || 'public'} 
+                        onValueChange={(v) => updateProfilePrivacy.mutate({ field: 'bio_privacy', value: v as PrivacyLevel })}
+                      >
+                        <SelectTrigger className="w-[130px]">
+                          <div className="flex items-center gap-2">
+                            {privacyOptions.find(o => o.value === (profile?.bio_privacy || 'public'))?.icon}
+                            <span>{privacyOptions.find(o => o.value === (profile?.bio_privacy || 'public'))?.label}</span>
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {privacyOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              <div className="flex items-center gap-2">
+                                {option.icon}
+                                <span>{option.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Contact Privacy */}
+                    <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/20">
+                      <div className="flex items-center gap-3">
+                        <Mail className="w-5 h-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium text-foreground">Contact & Social</p>
+                          <p className="text-sm text-muted-foreground">Email, graduation year, social links</p>
+                        </div>
+                      </div>
+                      <Select 
+                        value={profile?.contact_privacy || 'public'} 
+                        onValueChange={(v) => updateProfilePrivacy.mutate({ field: 'contact_privacy', value: v as PrivacyLevel })}
+                      >
+                        <SelectTrigger className="w-[130px]">
+                          <div className="flex items-center gap-2">
+                            {privacyOptions.find(o => o.value === (profile?.contact_privacy || 'public'))?.icon}
+                            <span>{privacyOptions.find(o => o.value === (profile?.contact_privacy || 'public'))?.label}</span>
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {privacyOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              <div className="flex items-center gap-2">
+                                {option.icon}
+                                <span>{option.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Physical Stats Privacy */}
+                    <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/20">
+                      <div className="flex items-center gap-3">
+                        <Ruler className="w-5 h-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium text-foreground">Physical Stats</p>
+                          <p className="text-sm text-muted-foreground">Height, weight, throwing arm, etc.</p>
+                        </div>
+                      </div>
+                      <Select 
+                        value={profile?.physical_stats_privacy || 'public'} 
+                        onValueChange={(v) => updateProfilePrivacy.mutate({ field: 'physical_stats_privacy', value: v as PrivacyLevel })}
+                      >
+                        <SelectTrigger className="w-[130px]">
+                          <div className="flex items-center gap-2">
+                            {privacyOptions.find(o => o.value === (profile?.physical_stats_privacy || 'public'))?.icon}
+                            <span>{privacyOptions.find(o => o.value === (profile?.physical_stats_privacy || 'public'))?.label}</span>
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {privacyOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              <div className="flex items-center gap-2">
+                                {option.icon}
+                                <span>{option.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
