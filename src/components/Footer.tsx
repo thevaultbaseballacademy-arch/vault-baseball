@@ -64,6 +64,11 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/certifications/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Leaderboard
+                  </Link>
+                </li>
+                <li>
                   <Link to="/verify" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                     Verify Certificate
                   </Link>
