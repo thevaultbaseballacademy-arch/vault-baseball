@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video
+  Search, Plus, X, Check, BarChart3, Link2, Video, Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +15,7 @@ import BroadcastPanel from "@/components/admin/BroadcastPanel";
 import NotificationAnalytics from "@/components/admin/NotificationAnalytics";
 import CoachAthleteAssignments from "@/components/admin/CoachAthleteAssignments";
 import CourseVideoManager from "@/components/admin/CourseVideoManager";
+import CertificationQuestionManager from "@/components/admin/CertificationQuestionManager";
 
 interface Profile {
   user_id: string;
@@ -278,9 +279,10 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-3xl grid-cols-5">
+              <TabsList className="grid w-full max-w-4xl grid-cols-6">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
+                <TabsTrigger value="certifications">Certifications</TabsTrigger>
                 <TabsTrigger value="videos">Videos</TabsTrigger>
                 <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -379,6 +381,10 @@ const Admin = () => {
 
               <TabsContent value="assignments" className="mt-6">
                 <CoachAthleteAssignments />
+              </TabsContent>
+
+              <TabsContent value="certifications" className="mt-6">
+                <CertificationQuestionManager />
               </TabsContent>
 
               <TabsContent value="videos" className="mt-6">

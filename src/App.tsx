@@ -24,6 +24,8 @@ import YouthPathway from "./pages/YouthPathway";
 import AcademyPathway from "./pages/AcademyPathway";
 import LongevityDashboard from "./pages/LongevityDashboard";
 import WeeklyCalendar from "./pages/WeeklyCalendar";
+import Certifications from "./pages/Certifications";
+import CertificationExam from "./pages/CertificationExam";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +56,8 @@ const App = () => (
             <Route path="/pathway/academy" element={<AcademyPathway />} />
             <Route path="/longevity" element={<LongevityDashboard />} />
             <Route path="/calendar" element={<WeeklyCalendar />} />
+            <Route path="/certifications" element={<Certifications />} />
+            <Route path="/certifications/exam/:certType" element={<CertificationExam />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
