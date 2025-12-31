@@ -41,14 +41,13 @@ export const createNotification = async ({
 };
 
 export const getActorName = async (actorId: string): Promise<string> => {
-  // Use public_profiles view which only exposes limited data
+  // Use secure RPC function to get public profile data
   const { data } = await supabase
-    .from('public_profiles')
-    .select('display_name')
-    .eq('user_id', actorId)
-    .maybeSingle();
+    .rpc('get_public_profile', { target_user_id: actorId });
 
-  return data?.display_name || 'Someone';
+  // get_public_profile returns an array with one row
+  const profiles = data as Array<{ display_name: string }> | null;
+  return profiles && profiles.length > 0 ? profiles[0].display_name || 'Someone' : 'Someone';
 };
 
 export const extractMentions = (content: string): string[] => {
@@ -64,11 +63,20 @@ export const extractMentions = (content: string): string[] => {
 export const getMentionedUserIds = async (mentionNames: string[]): Promise<string[]> => {
   if (mentionNames.length === 0) return [];
 
-  // Use public_profiles view which only exposes limited data
-  const { data } = await supabase
-    .from('public_profiles')
-    .select('user_id')
-    .in('display_name', mentionNames);
+  const userIds: string[] = [];
+  
+  // Use secure RPC function to search for each mentioned name
+  for (const mentionName of mentionNames) {
+    const { data } = await supabase
+      .rpc('search_public_profiles', { search_term: mentionName, result_limit: 1 });
+    
+    if (data && data.length > 0) {
+      const profile = data[0] as { user_id: string; display_name: string };
+      if (profile.display_name && profile.display_name.toLowerCase() === mentionName.toLowerCase()) {
+        userIds.push(profile.user_id);
+      }
+    }
+  }
 
-  return data?.map(p => p.user_id) || [];
+  return userIds;
 };

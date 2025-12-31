@@ -1022,33 +1022,30 @@ export type Database = {
       }
     }
     Views: {
-      public_profiles: {
-        Row: {
-          avatar_url: string | null
-          display_name: string | null
-          graduation_year: number | null
-          position: string | null
-          user_id: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          display_name?: string | null
-          graduation_year?: number | null
-          position?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          display_name?: string | null
-          graduation_year?: number | null
-          position?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       generate_certificate_number: { Args: never; Returns: string }
+      get_public_profile: {
+        Args: { target_user_id: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          graduation_year: number
+          player_position: string
+          user_id: string
+        }[]
+      }
+      get_public_profiles_by_ids: {
+        Args: { user_ids: string[] }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          graduation_year: number
+          player_position: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1062,6 +1059,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      search_public_profiles: {
+        Args: { result_limit?: number; search_term: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          graduation_year: number
+          player_position: string
+          user_id: string
+        }[]
       }
       verify_certificate_public: {
         Args: { cert_number: string }

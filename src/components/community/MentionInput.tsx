@@ -32,15 +32,19 @@ const MentionInput = ({ value, onChange, placeholder, className, minHeight = "10
     }
 
     try {
-      // Use public_profiles view which only exposes limited data
+      // Use secure RPC function for searching public profiles
       const { data, error } = await supabase
-        .from('public_profiles')
-        .select('user_id, display_name')
-        .ilike('display_name', `%${search}%`)
-        .limit(5);
+        .rpc('search_public_profiles', { search_term: search, result_limit: 5 });
 
       if (error) throw error;
-      setSuggestions(data || []);
+      
+      // Map the response to match our Profile interface
+      const profiles: Profile[] = (data || []).map((p: { user_id: string; display_name: string; player_position: string; }) => ({
+        user_id: p.user_id,
+        display_name: p.display_name
+      }));
+      
+      setSuggestions(profiles);
       setSelectedIndex(0);
     } catch (error) {
       console.error("Error fetching users:", error);
