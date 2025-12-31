@@ -14,6 +14,94 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_certifications: {
+        Row: {
+          cert_type: Database["public"]["Enums"]["admin_cert_type"]
+          coach_id: string
+          created_at: string
+          expiration_date: string | null
+          id: string
+          issued_date: string | null
+          last_score: number | null
+          org_id: string
+          status: Database["public"]["Enums"]["admin_cert_status"]
+          updated_at: string
+        }
+        Insert: {
+          cert_type: Database["public"]["Enums"]["admin_cert_type"]
+          coach_id: string
+          created_at?: string
+          expiration_date?: string | null
+          id?: string
+          issued_date?: string | null
+          last_score?: number | null
+          org_id: string
+          status?: Database["public"]["Enums"]["admin_cert_status"]
+          updated_at?: string
+        }
+        Update: {
+          cert_type?: Database["public"]["Enums"]["admin_cert_type"]
+          coach_id?: string
+          created_at?: string
+          expiration_date?: string | null
+          id?: string
+          issued_date?: string | null
+          last_score?: number | null
+          org_id?: string
+          status?: Database["public"]["Enums"]["admin_cert_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_certifications_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_exam_attempts: {
+        Row: {
+          cert_type: Database["public"]["Enums"]["admin_cert_type"]
+          coach_id: string
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          org_id: string
+          pass_fail: boolean
+          score: number
+        }
+        Insert: {
+          cert_type: Database["public"]["Enums"]["admin_cert_type"]
+          coach_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          org_id: string
+          pass_fail: boolean
+          score: number
+        }
+        Update: {
+          cert_type?: Database["public"]["Enums"]["admin_cert_type"]
+          coach_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          org_id?: string
+          pass_fail?: boolean
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_exam_attempts_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       athlete_checkins: {
         Row: {
           checkin_date: string
@@ -350,6 +438,42 @@ export type Database = {
         }
         Relationships: []
       }
+      coaches: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          org_id: string
+          role: Database["public"]["Enums"]["coach_role"]
+          status: Database["public"]["Enums"]["coach_status"]
+          team_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          org_id: string
+          role?: Database["public"]["Enums"]["coach_role"]
+          status?: Database["public"]["Enums"]["coach_status"]
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          org_id?: string
+          role?: Database["public"]["Enums"]["coach_role"]
+          status?: Database["public"]["Enums"]["coach_status"]
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       coaching_sessions: {
         Row: {
           coach_name: string
@@ -672,6 +796,48 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_questions: {
+        Row: {
+          cert_type: Database["public"]["Enums"]["admin_cert_type"]
+          correct_answer: string
+          created_at: string
+          id: string
+          option_a: string
+          option_b: string
+          option_c: string
+          option_d: string
+          question: string
+          question_id: string
+          updated_at: string
+        }
+        Insert: {
+          cert_type: Database["public"]["Enums"]["admin_cert_type"]
+          correct_answer: string
+          created_at?: string
+          id?: string
+          option_a: string
+          option_b: string
+          option_c: string
+          option_d: string
+          question: string
+          question_id: string
+          updated_at?: string
+        }
+        Update: {
+          cert_type?: Database["public"]["Enums"]["admin_cert_type"]
+          correct_answer?: string
+          created_at?: string
+          id?: string
+          option_a?: string
+          option_b?: string
+          option_c?: string
+          option_d?: string
+          question?: string
+          question_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       highlight_videos: {
         Row: {
           created_at: string
@@ -939,6 +1105,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      question_results: {
+        Row: {
+          attempt_id: string
+          correct_answer: string
+          created_at: string
+          id: string
+          is_correct: boolean
+          question_id: string
+          selected_answer: string
+        }
+        Insert: {
+          attempt_id: string
+          correct_answer: string
+          created_at?: string
+          id?: string
+          is_correct: boolean
+          question_id: string
+          selected_answer: string
+        }
+        Update: {
+          attempt_id?: string
+          correct_answer?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          question_id?: string
+          selected_answer?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_results_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "admin_exam_attempts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       schedule_assignments: {
         Row: {
@@ -1219,6 +1423,7 @@ export type Database = {
           is_correct: boolean
         }[]
       }
+      has_admin_role: { Args: { user_uuid: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1251,12 +1456,20 @@ export type Database = {
           user_id: string
         }[]
       }
+      update_certification_statuses: { Args: never; Returns: undefined }
       verify_certificate_public: {
         Args: { cert_number: string }
         Returns: Json
       }
     }
     Enums: {
+      admin_cert_status: "Active" | "Expiring" | "Expired" | "Locked"
+      admin_cert_type:
+        | "Foundations"
+        | "Performance"
+        | "Catcher"
+        | "Infield"
+        | "Outfield"
       app_role: "admin" | "coach" | "athlete"
       certification_status: "active" | "expired" | "revoked"
       certification_type:
@@ -1265,6 +1478,8 @@ export type Database = {
         | "catcher_specialist"
         | "infield_specialist"
         | "outfield_specialist"
+      coach_role: "Coach" | "Director" | "OrgAdmin" | "VAULTHQ"
+      coach_status: "Active" | "Suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1392,6 +1607,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admin_cert_status: ["Active", "Expiring", "Expired", "Locked"],
+      admin_cert_type: [
+        "Foundations",
+        "Performance",
+        "Catcher",
+        "Infield",
+        "Outfield",
+      ],
       app_role: ["admin", "coach", "athlete"],
       certification_status: ["active", "expired", "revoked"],
       certification_type: [
@@ -1401,6 +1624,8 @@ export const Constants = {
         "infield_specialist",
         "outfield_specialist",
       ],
+      coach_role: ["Coach", "Director", "OrgAdmin", "VAULTHQ"],
+      coach_status: ["Active", "Suspended"],
     },
   },
 } as const

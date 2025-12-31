@@ -29,6 +29,10 @@ import CertificationExam from "./pages/CertificationExam";
 import VerifyCertification from "./pages/VerifyCertification";
 import CertificationLeaderboard from "./pages/CertificationLeaderboard";
 import PrivacySettings from "./pages/PrivacySettings";
+import CertificationAnalytics from "./pages/admin/CertificationAnalytics";
+import AdminCoaches from "./pages/admin/AdminCoaches";
+import AdminExams from "./pages/admin/AdminExams";
+import AdminCertifications from "./pages/admin/AdminCertifications";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +53,10 @@ const App = () => (
             <Route path="/vault" element={<VaultDashboard />} />
             <Route path="/coach" element={<CoachDashboard />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/certification-analytics" element={<CertificationAnalytics />} />
+            <Route path="/admin/coaches" element={<AdminCoaches />} />
+            <Route path="/admin/exams" element={<AdminExams />} />
+            <Route path="/admin/certifications" element={<AdminCertifications />} />
             <Route path="/community" element={<Community />} />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/courses" element={<Courses />} />
