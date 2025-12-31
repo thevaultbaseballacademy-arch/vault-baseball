@@ -319,6 +319,9 @@ export type Database = {
       }
       coach_athlete_assignments: {
         Row: {
+          approval_requested_at: string | null
+          approved_at: string | null
+          athlete_approved: boolean | null
           athlete_user_id: string
           coach_user_id: string
           created_at: string
@@ -326,6 +329,9 @@ export type Database = {
           is_active: boolean
         }
         Insert: {
+          approval_requested_at?: string | null
+          approved_at?: string | null
+          athlete_approved?: boolean | null
           athlete_user_id: string
           coach_user_id: string
           created_at?: string
@@ -333,6 +339,9 @@ export type Database = {
           is_active?: boolean
         }
         Update: {
+          approval_requested_at?: string | null
+          approved_at?: string | null
+          athlete_approved?: boolean | null
           athlete_user_id?: string
           coach_user_id?: string
           created_at?: string
@@ -445,8 +454,14 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          flag_reason: string | null
+          flagged_at: string | null
+          flagged_by: string | null
+          hidden_by_admin: boolean
           id: string
+          is_flagged: boolean
           media_url: string | null
+          moderation_notes: string | null
           post_type: string
           updated_at: string
           user_id: string
@@ -454,8 +469,14 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          flag_reason?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
+          hidden_by_admin?: boolean
           id?: string
+          is_flagged?: boolean
           media_url?: string | null
+          moderation_notes?: string | null
           post_type?: string
           updated_at?: string
           user_id: string
@@ -463,8 +484,14 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          flag_reason?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
+          hidden_by_admin?: boolean
           id?: string
+          is_flagged?: boolean
           media_url?: string | null
+          moderation_notes?: string | null
           post_type?: string
           updated_at?: string
           user_id?: string
@@ -618,6 +645,33 @@ export type Database = {
         }
         Relationships: []
       }
+      data_retention_config: {
+        Row: {
+          config_key: string
+          config_value: Json
+          description: string | null
+          id: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          config_key: string
+          config_value: Json
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          config_key?: string
+          config_value?: Json
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       highlight_videos: {
         Row: {
           created_at: string
@@ -694,6 +748,8 @@ export type Database = {
       }
       notification_preferences: {
         Row: {
+          analytics_consent: boolean
+          analytics_consent_updated_at: string | null
           coach_messages: boolean
           community_comments: boolean
           community_likes: boolean
@@ -705,6 +761,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          analytics_consent?: boolean
+          analytics_consent_updated_at?: string | null
           coach_messages?: boolean
           community_comments?: boolean
           community_likes?: boolean
@@ -716,6 +774,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          analytics_consent?: boolean
+          analytics_consent_updated_at?: string | null
           coach_messages?: boolean
           community_comments?: boolean
           community_likes?: boolean
@@ -929,6 +989,8 @@ export type Database = {
           created_at: string
           created_by: string
           id: string
+          last_viewed_at: string | null
+          last_viewed_by: string | null
           message: string
           notified_count: number | null
           scheduled_at: string
@@ -941,6 +1003,8 @@ export type Database = {
           created_at?: string
           created_by: string
           id?: string
+          last_viewed_at?: string | null
+          last_viewed_by?: string | null
           message: string
           notified_count?: number | null
           scheduled_at: string
@@ -953,6 +1017,8 @@ export type Database = {
           created_at?: string
           created_by?: string
           id?: string
+          last_viewed_at?: string | null
+          last_viewed_by?: string | null
           message?: string
           notified_count?: number | null
           scheduled_at?: string
@@ -1046,6 +1112,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anonymize_old_audit_ips: {
+        Args: { days_threshold?: number }
+        Returns: number
+      }
       check_exam_answer: {
         Args: { question_id: string; selected_answer: number }
         Returns: boolean
@@ -1166,6 +1236,10 @@ export type Database = {
       is_active_coach_for_athlete: {
         Args: { _athlete_id: string; _coach_id: string }
         Returns: boolean
+      }
+      purge_old_audit_logs: {
+        Args: { retention_days?: number }
+        Returns: number
       }
       search_public_profiles: {
         Args: { result_limit?: number; search_term: string }
