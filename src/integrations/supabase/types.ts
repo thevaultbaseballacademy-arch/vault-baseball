@@ -323,18 +323,21 @@ export type Database = {
           coach_user_id: string
           created_at: string
           id: string
+          is_active: boolean
         }
         Insert: {
           athlete_user_id: string
           coach_user_id: string
           created_at?: string
           id?: string
+          is_active?: boolean
         }
         Update: {
           athlete_user_id?: string
           coach_user_id?: string
           created_at?: string
           id?: string
+          is_active?: boolean
         }
         Relationships: []
       }
@@ -1096,6 +1099,10 @@ export type Database = {
           youtube_url: string
         }[]
       }
+      get_coach_user_id_by_name: {
+        Args: { _coach_name: string }
+        Returns: string
+      }
       get_exam_questions: {
         Args: {
           cert_type: Database["public"]["Enums"]["certification_type"]
@@ -1154,6 +1161,10 @@ export type Database = {
           _cert_type: Database["public"]["Enums"]["certification_type"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_active_coach_for_athlete: {
+        Args: { _athlete_id: string; _coach_id: string }
         Returns: boolean
       }
       search_public_profiles: {
