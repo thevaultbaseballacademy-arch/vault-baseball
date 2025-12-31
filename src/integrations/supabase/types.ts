@@ -363,6 +363,42 @@ export type Database = {
         }
         Relationships: []
       }
+      course_videos: {
+        Row: {
+          course_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          lesson_id: string
+          module_id: string
+          updated_at: string
+          video_platform: string | null
+          video_url: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lesson_id: string
+          module_id: string
+          updated_at?: string
+          video_platform?: string | null
+          video_url: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lesson_id?: string
+          module_id?: string
+          updated_at?: string
+          video_platform?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       custom_training_schedules: {
         Row: {
           coach_user_id: string
