@@ -16,10 +16,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { 
   useCertificationDefinitions,
-  useCertificationQuestions,
+  useExamQuestions,
   useStartExamAttempt,
   useSubmitExam,
-  CertificationQuestion
+  ExamQuestion
 } from "@/hooks/useCertifications";
 import { getCertificationDisplayName, type CertificationType } from "@/lib/certificationPricing";
 
@@ -37,9 +37,10 @@ const CertificationExam = () => {
   const [examResults, setExamResults] = useState<{ score: number; passed: boolean; correct: number; total: number } | null>(null);
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [examQuestions, setExamQuestions] = useState<ExamQuestion[]>([]);
 
   const { data: definitions = [] } = useCertificationDefinitions();
-  const { data: questions = [], isLoading: questionsLoading } = useCertificationQuestions(certType || null);
+  const { data: fetchedQuestions = [], isLoading: questionsLoading, refetch: refetchQuestions } = useExamQuestions(certType || null);
   const startAttemptMutation = useStartExamAttempt();
   const submitExamMutation = useSubmitExam();
 
@@ -77,11 +78,23 @@ const CertificationExam = () => {
   const handleStartExam = async () => {
     if (!certType) return;
     
-    const result = await startAttemptMutation.mutateAsync(certType);
+    // Refetch to get fresh randomized questions
+    const { data: freshQuestions } = await refetchQuestions();
+    const questionsToUse = freshQuestions || fetchedQuestions;
+    
+    if (questionsToUse.length === 0) {
+      return;
+    }
+    
+    // Store the questions for this exam session
+    setExamQuestions(questionsToUse);
+    
+    const questionIds = questionsToUse.map(q => q.id);
+    const result = await startAttemptMutation.mutateAsync({ certType, questionIds });
     setAttemptId(result.id);
     setExamStarted(true);
     // Set timer based on question count (1.5 min per question)
-    setTimeRemaining(questions.length * 90);
+    setTimeRemaining(questionsToUse.length * 90);
   };
 
   const handleAnswerSelect = (questionId: string, answerIndex: number) => {
@@ -106,7 +119,7 @@ const CertificationExam = () => {
     const result = await submitExamMutation.mutateAsync({
       attemptId,
       answers,
-      questions,
+      questions: examQuestions,
       certType,
       certificationName: definition.name,
       passingScore: definition.passing_score,
@@ -123,19 +136,21 @@ const CertificationExam = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentQuestion = questions[currentQuestionIndex];
+  // Use examQuestions during exam, fetchedQuestions for pre-exam display
+  const displayQuestions = examStarted ? examQuestions : fetchedQuestions;
+  const currentQuestion = displayQuestions[currentQuestionIndex];
   const answeredCount = Object.keys(answers).length;
-  const progressPercent = (answeredCount / questions.length) * 100;
+  const progressPercent = displayQuestions.length > 0 ? (answeredCount / displayQuestions.length) * 100 : 0;
 
   // Group questions by section
   const sections = useMemo(() => {
-    const sectionMap = new Map<string, CertificationQuestion[]>();
-    questions.forEach(q => {
+    const sectionMap = new Map<string, ExamQuestion[]>();
+    displayQuestions.forEach(q => {
       const existing = sectionMap.get(q.section) || [];
       sectionMap.set(q.section, [...existing, q]);
     });
     return Array.from(sectionMap.entries());
-  }, [questions]);
+  }, [displayQuestions]);
 
   if (loading || questionsLoading) {
     return (
@@ -161,7 +176,7 @@ const CertificationExam = () => {
     );
   }
 
-  if (questions.length === 0) {
+  if (fetchedQuestions.length === 0 && !examStarted) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -270,7 +285,7 @@ const CertificationExam = () => {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-3xl font-display text-foreground">{questions.length}</p>
+                    <p className="text-3xl font-display text-foreground">{definition.question_count}</p>
                     <p className="text-sm text-muted-foreground">Questions</p>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-4">
@@ -278,7 +293,7 @@ const CertificationExam = () => {
                     <p className="text-sm text-muted-foreground">To Pass</p>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-3xl font-display text-foreground">{Math.round(questions.length * 1.5)}</p>
+                    <p className="text-3xl font-display text-foreground">{Math.round(definition.question_count * 1.5)}</p>
                     <p className="text-sm text-muted-foreground">Minutes</p>
                   </div>
                 </div>
@@ -338,14 +353,14 @@ const CertificationExam = () => {
             <div className="flex items-center gap-4">
               <span className="font-display text-lg">{getCertificationDisplayName(certType)}</span>
               <Badge variant="secondary">
-                {currentQuestionIndex + 1} / {questions.length}
+                {currentQuestionIndex + 1} / {examQuestions.length}
               </Badge>
             </div>
             
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">Answered:</span>
-                <span className="font-medium">{answeredCount}/{questions.length}</span>
+                <span className="font-medium">{answeredCount}/{examQuestions.length}</span>
               </div>
               
               {timeRemaining !== null && (
@@ -362,66 +377,68 @@ const CertificationExam = () => {
 
       <main className="pt-24 pb-32">
         <div className="container mx-auto px-4 max-w-3xl">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentQuestion.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="outline">{currentQuestion.section}</Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleToggleFlag(currentQuestion.id)}
-                      className={flaggedQuestions.has(currentQuestion.id) ? 'text-amber-600' : ''}
-                    >
-                      <Flag className="w-4 h-4 mr-1" />
-                      {flaggedQuestions.has(currentQuestion.id) ? 'Flagged' : 'Flag'}
-                    </Button>
-                  </div>
-                  <CardTitle className="text-xl leading-relaxed">
-                    {currentQuestion.question_text}
-                  </CardTitle>
-                  {currentQuestion.is_scenario && (
-                    <Badge className="bg-primary/10 text-primary mt-2">Scenario-Based</Badge>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <RadioGroup
-                    value={answers[currentQuestion.id]?.toString()}
-                    onValueChange={(value) => handleAnswerSelect(currentQuestion.id, parseInt(value))}
-                    className="space-y-3"
-                  >
-                    {currentQuestion.options.map((option, index) => (
-                      <div
-                        key={index}
-                        className={`flex items-center space-x-3 p-4 rounded-lg border transition-all cursor-pointer ${
-                          answers[currentQuestion.id] === index 
-                            ? 'border-primary bg-primary/5' 
-                            : 'border-border hover:border-muted-foreground/30'
-                        }`}
-                        onClick={() => handleAnswerSelect(currentQuestion.id, index)}
+          {currentQuestion && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQuestion.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="outline">{currentQuestion.section}</Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleToggleFlag(currentQuestion.id)}
+                        className={flaggedQuestions.has(currentQuestion.id) ? 'text-amber-600' : ''}
                       >
-                        <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                        <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
-                          {option}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </AnimatePresence>
+                        <Flag className="w-4 h-4 mr-1" />
+                        {flaggedQuestions.has(currentQuestion.id) ? 'Flagged' : 'Flag'}
+                      </Button>
+                    </div>
+                    <CardTitle className="text-xl leading-relaxed">
+                      {currentQuestion.question_text}
+                    </CardTitle>
+                    {currentQuestion.is_scenario && (
+                      <Badge className="bg-primary/10 text-primary mt-2">Scenario-Based</Badge>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <RadioGroup
+                      value={answers[currentQuestion.id]?.toString()}
+                      onValueChange={(value) => handleAnswerSelect(currentQuestion.id, parseInt(value))}
+                      className="space-y-3"
+                    >
+                      {currentQuestion.options.map((option, index) => (
+                        <div
+                          key={index}
+                          className={`flex items-center space-x-3 p-4 rounded-lg border transition-all cursor-pointer ${
+                            answers[currentQuestion.id] === index 
+                              ? 'border-primary bg-primary/5' 
+                              : 'border-border hover:border-muted-foreground/30'
+                          }`}
+                          onClick={() => handleAnswerSelect(currentQuestion.id, index)}
+                        >
+                          <RadioGroupItem value={index.toString()} id={`option-${index}`} />
+                          <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
+                            {option}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </AnimatePresence>
+          )}
 
           {/* Question navigator */}
           <div className="mt-6 flex flex-wrap gap-2 justify-center">
-            {questions.map((q, index) => (
+            {examQuestions.map((q, index) => (
               <button
                 key={q.id}
                 onClick={() => setCurrentQuestionIndex(index)}
@@ -455,7 +472,7 @@ const CertificationExam = () => {
               Previous
             </Button>
 
-            {currentQuestionIndex === questions.length - 1 ? (
+            {currentQuestionIndex === examQuestions.length - 1 ? (
               <Button 
                 variant="vault"
                 onClick={handleSubmitExam}
@@ -469,7 +486,7 @@ const CertificationExam = () => {
             ) : (
               <Button
                 variant="vault"
-                onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                onClick={() => setCurrentQuestionIndex(prev => Math.min(examQuestions.length - 1, prev + 1))}
               >
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />

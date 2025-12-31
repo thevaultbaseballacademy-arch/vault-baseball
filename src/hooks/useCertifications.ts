@@ -28,6 +28,17 @@ export interface UserCertification {
   certificate_number: string | null;
 }
 
+// Exam question interface - does NOT include correct_answer_index
+export interface ExamQuestion {
+  id: string;
+  question_text: string;
+  options: string[];
+  section: string;
+  is_scenario: boolean;
+  display_order: number;
+}
+
+// Admin/coach question interface - includes answer for management
 export interface CertificationQuestion {
   id: string;
   certification_type: CertificationType;
@@ -87,7 +98,33 @@ export const useUserCertifications = () => {
   });
 };
 
-// Fetch questions for a certification exam
+// Fetch exam questions using secure RPC (no answers exposed)
+export const useExamQuestions = (certType: CertificationType | null) => {
+  return useQuery({
+    queryKey: ['exam-questions', certType],
+    queryFn: async () => {
+      if (!certType) return [];
+
+      const { data, error } = await supabase.rpc('get_exam_questions', {
+        cert_type: certType,
+        question_limit: 40
+      });
+
+      if (error) throw error;
+      
+      // Parse options from JSONB
+      return (data || []).map(q => ({
+        ...q,
+        options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,
+      })) as ExamQuestion[];
+    },
+    enabled: !!certType,
+    staleTime: 0, // Always refetch to get randomized questions
+    gcTime: 0, // Don't cache exam questions
+  });
+};
+
+// Legacy hook for admin question management (with answers)
 export const useCertificationQuestions = (certType: CertificationType | null) => {
   return useQuery({
     queryKey: ['certification-questions', certType],
@@ -118,22 +155,11 @@ export const useStartExamAttempt = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (certType: CertificationType) => {
+    mutationFn: async ({ certType, questionIds }: { certType: CertificationType; questionIds: string[] }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get questions for this exam
-      const { data: questions, error: questionsError } = await supabase
-        .from('certification_questions')
-        .select('id')
-        .eq('certification_type', certType)
-        .eq('is_active', true);
-
-      if (questionsError) throw questionsError;
-
-      const questionIds = (questions || []).map(q => q.id);
-
-      // Create attempt
+      // Create attempt with the question IDs from the exam
       const { data, error } = await supabase
         .from('certification_attempts')
         .insert({
@@ -156,7 +182,7 @@ export const useStartExamAttempt = () => {
   });
 };
 
-// Submit exam answers
+// Grade exam using secure RPC function
 export const useSubmitExam = () => {
   const queryClient = useQueryClient();
 
@@ -172,7 +198,7 @@ export const useSubmitExam = () => {
     }: { 
       attemptId: string; 
       answers: Record<string, number>;
-      questions: CertificationQuestion[];
+      questions: ExamQuestion[];
       certType: CertificationType;
       certificationName: string;
       passingScore: number;
@@ -181,13 +207,21 @@ export const useSubmitExam = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Calculate score
+      // Grade each answer using secure RPC
       let correct = 0;
-      questions.forEach(q => {
-        if (answers[q.id] === q.correct_answer_index) {
-          correct++;
+      const gradePromises = questions.map(async (q) => {
+        if (answers[q.id] !== undefined) {
+          const { data: isCorrect } = await supabase.rpc('check_exam_answer', {
+            question_id: q.id,
+            selected_answer: answers[q.id]
+          });
+          return isCorrect === true;
         }
+        return false;
       });
+
+      const results = await Promise.all(gradePromises);
+      correct = results.filter(Boolean).length;
 
       const score = Math.round((correct / questions.length) * 100);
       const passed = score >= passingScore;
@@ -279,7 +313,7 @@ export const useSubmitExam = () => {
   });
 };
 
-// Bulk import questions
+// Bulk import questions (admin only)
 export const useBulkImportQuestions = () => {
   const queryClient = useQueryClient();
 
