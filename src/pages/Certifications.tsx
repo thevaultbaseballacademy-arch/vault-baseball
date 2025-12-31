@@ -26,6 +26,7 @@ import {
   getCertificationPrice,
   type CertificationType 
 } from "@/lib/certificationPricing";
+import CertificateGenerator from "@/components/certifications/CertificateGenerator";
 
 const CertificationCard = ({ 
   definition, 
@@ -34,7 +35,8 @@ const CertificationCard = ({
   allUserCerts,
   onStartExam,
   onPurchase,
-  isLoading
+  isLoading,
+  coachName,
 }: { 
   definition: CertificationDefinition;
   userCert?: UserCertification;
@@ -43,6 +45,7 @@ const CertificationCard = ({
   onStartExam: (type: CertificationType) => void;
   onPurchase: (type: CertificationType) => void;
   isLoading: boolean;
+  coachName: string;
 }) => {
   const { canTake, missing } = useCheckPrerequisites(
     definition.certification_type, 
@@ -181,12 +184,21 @@ const CertificationCard = ({
           </div>
 
           {userCert && isActive && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Your Score</span>
-                <span className="font-medium">{userCert.score}%</span>
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Your Score</span>
+                  <span className="font-medium">{userCert.score}%</span>
+                </div>
+                <Progress value={userCert.score} className="h-2" />
               </div>
-              <Progress value={userCert.score} className="h-2" />
+              <CertificateGenerator
+                coachName={coachName}
+                certificationType={definition.certification_type}
+                score={userCert.score}
+                issuedAt={userCert.issued_at}
+                expiresAt={userCert.expires_at}
+              />
             </div>
           )}
 
@@ -209,6 +221,7 @@ const CertificationCard = ({
 
 const Certifications = () => {
   const [user, setUser] = useState<any>(null);
+  const [coachName, setCoachName] = useState<string>("");
   const [isCoach, setIsCoach] = useState(false);
   const [loading, setLoading] = useState(true);
   const [purchaseLoading, setPurchaseLoading] = useState<string | null>(null);
@@ -250,13 +263,26 @@ const Certifications = () => {
 
   const checkCoachRole = async (userId: string) => {
     try {
-      const { data } = await supabase
+      // Check roles
+      const { data: roles } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .in('role', ['admin', 'coach']);
 
-      setIsCoach((data || []).length > 0);
+      setIsCoach((roles || []).length > 0);
+
+      // Get profile for coach name
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, email')
+        .eq('user_id', userId)
+        .single();
+
+      if (profile) {
+        setCoachName(profile.display_name || profile.email || 'Coach');
+      }
+
       setLoading(false);
     } catch (error) {
       console.error('Error checking role:', error);
@@ -400,6 +426,7 @@ const Certifications = () => {
                     onStartExam={handleStartExam}
                     onPurchase={handlePurchase}
                     isLoading={purchaseLoading === def.certification_type}
+                    coachName={coachName}
                   />
                 ))}
               </div>
@@ -422,6 +449,7 @@ const Certifications = () => {
                     onStartExam={handleStartExam}
                     onPurchase={handlePurchase}
                     isLoading={purchaseLoading === def.certification_type}
+                    coachName={coachName}
                   />
                 ))}
               </div>
@@ -444,6 +472,7 @@ const Certifications = () => {
                     onStartExam={handleStartExam}
                     onPurchase={handlePurchase}
                     isLoading={purchaseLoading === def.certification_type}
+                    coachName={coachName}
                   />
                 ))}
               </div>
