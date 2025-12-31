@@ -32,8 +32,9 @@ const MentionInput = ({ value, onChange, placeholder, className, minHeight = "10
     }
 
     try {
+      // Use public_profiles view which only exposes limited data
       const { data, error } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('user_id, display_name')
         .ilike('display_name', `%${search}%`)
         .limit(5);

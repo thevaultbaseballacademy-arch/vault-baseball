@@ -41,8 +41,9 @@ export const createNotification = async ({
 };
 
 export const getActorName = async (actorId: string): Promise<string> => {
+  // Use public_profiles view which only exposes limited data
   const { data } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select('display_name')
     .eq('user_id', actorId)
     .maybeSingle();
@@ -63,8 +64,9 @@ export const extractMentions = (content: string): string[] => {
 export const getMentionedUserIds = async (mentionNames: string[]): Promise<string[]> => {
   if (mentionNames.length === 0) return [];
 
+  // Use public_profiles view which only exposes limited data
   const { data } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select('user_id')
     .in('display_name', mentionNames);
 
