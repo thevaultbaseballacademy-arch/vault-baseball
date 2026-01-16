@@ -288,18 +288,31 @@ const Pricing = () => {
           ))}
         </div>
 
-        {/* Coach Membership */}
+        {/* Team & Coach Options */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 max-w-3xl mx-auto text-center p-8 rounded-2xl border border-border bg-card"
+          className="mt-12 grid md:grid-cols-2 gap-6 max-w-4xl mx-auto"
         >
-          <h3 className="font-display text-2xl text-foreground mb-2">Coach & Team Memberships</h3>
-          <p className="text-muted-foreground mb-4">
-            Program templates, licensing rights, drill libraries, and education modules for coaches and organizations.
-          </p>
-          <Button variant="outline">Contact for Pricing</Button>
+          <div className="p-6 rounded-2xl border border-border bg-card">
+            <h3 className="font-display text-xl text-foreground mb-2">Teams & Organizations</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Small org licenses starting at $1,999/year for up to 25 athletes.
+            </p>
+            <Button variant="vault" className="w-full" onClick={() => window.location.href = '/products/teams'}>
+              View Team Licenses
+            </Button>
+          </div>
+          <div className="p-6 rounded-2xl border border-border bg-card">
+            <h3 className="font-display text-xl text-foreground mb-2">Coaches</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Get certified, access drill libraries, and grow your coaching business.
+            </p>
+            <Button variant="outline" className="w-full" onClick={() => window.location.href = '/products/certified-coach'}>
+              Coach Certification - $500/yr
+            </Button>
+          </div>
         </motion.div>
       </div>
     </section>
