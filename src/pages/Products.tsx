@@ -87,6 +87,53 @@ const Products = () => {
     },
   ];
 
+  const newProducts = [
+    {
+      key: "transfer_intensive",
+      icon: Users,
+      title: "Transfer Intensive",
+      subtitle: "4-Week Live Coaching",
+      description: "Live virtual coaching block with weekly group sessions and personalized feedback.",
+      href: "/products/transfer-intensive",
+      price: PRODUCT_PRICES.transfer_intensive.price,
+      badge: "Live",
+      badgeColor: "bg-blue-500",
+    },
+    {
+      key: "vault_verified_coach",
+      icon: Award,
+      title: "VAULT Verified Coach",
+      subtitle: "Annual Certification",
+      description: "Official certification with badge, directory listing, and marketing materials.",
+      href: "/products/vault-verified",
+      price: PRODUCT_PRICES.vault_verified_coach.price,
+      badge: "B2B",
+      badgeColor: "bg-emerald-500",
+    },
+    {
+      key: "showcase_prep",
+      icon: TrendingUp,
+      title: "Showcase Prep Bundle",
+      subtitle: "30-Day Program",
+      description: "High-intensity preparation for tryouts, showcases, and draft workouts.",
+      href: "/products/showcase-prep",
+      price: PRODUCT_PRICES.showcase_prep.price,
+      badge: "Spring Ready",
+      badgeColor: "bg-orange-500",
+    },
+    {
+      key: "video_analysis_5pack",
+      icon: Video,
+      title: "Video Analysis 5-Pack",
+      subtitle: "A-la-carte",
+      description: "5 professional video reviews with detailed feedback. Perfect add-on for members.",
+      href: "/products/video-analysis",
+      price: PRODUCT_PRICES.video_analysis_5pack.price,
+      badge: "Add-On",
+      badgeColor: "bg-cyan-500",
+    },
+  ];
+
   const bundles = [
     {
       key: "velocity_max_pack",
@@ -255,6 +302,59 @@ const Products = () => {
                       <span className="text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1">
                         Learn More <ArrowRight className="w-4 h-4" />
                       </span>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* New Revenue Products */}
+      <section className="py-16 bg-gradient-to-b from-background to-muted/30">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-12"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                <Star className="w-5 h-5 text-cyan-500" />
+              </div>
+              <h2 className="text-3xl font-display text-foreground">Featured Products</h2>
+              <Badge className="bg-red-500 text-white border-0">New</Badge>
+            </div>
+            <p className="text-muted-foreground max-w-2xl">
+              Fresh offerings designed for maximum impact — live coaching, certifications, and targeted programs.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {newProducts.map((product, index) => (
+              <motion.div
+                key={product.key}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Link to={product.href}>
+                  <div className="group relative h-full p-6 rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300">
+                    <Badge className={`absolute top-3 right-3 ${product.badgeColor} text-white border-0 text-xs`}>
+                      {product.badge}
+                    </Badge>
+                    <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4">
+                      <product.icon className="w-6 h-6 text-cyan-500" />
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-1">{product.subtitle}</p>
+                    <h3 className="text-lg font-display text-foreground mb-2">{product.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-foreground">{formatPrice(product.price)}</span>
+                      <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </Link>

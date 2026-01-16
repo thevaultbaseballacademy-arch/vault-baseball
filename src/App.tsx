@@ -44,6 +44,10 @@ import VeloCheck from "./pages/products/VeloCheck";
 import Bundles from "./pages/products/Bundles";
 import RecruitmentAudit from "./pages/products/RecruitmentAudit";
 import CertifiedCoach from "./pages/products/CertifiedCoach";
+import TransferIntensive from "./pages/products/TransferIntensive";
+import VaultVerifiedCoach from "./pages/products/VaultVerifiedCoach";
+import ShowcasePrep from "./pages/products/ShowcasePrep";
+import VideoAnalysis from "./pages/products/VideoAnalysis";
 import Products from "./pages/Products";
 import FindCoach from "./pages/FindCoach";
 import SharedProfile from "./pages/SharedProfile";
@@ -110,6 +114,10 @@ const App = () => (
             <Route path="/products/bundles" element={<Bundles />} />
             <Route path="/products/recruitment" element={<RecruitmentAudit />} />
             <Route path="/products/certified-coach" element={<CertifiedCoach />} />
+            <Route path="/products/transfer-intensive" element={<TransferIntensive />} />
+            <Route path="/products/vault-verified" element={<VaultVerifiedCoach />} />
+            <Route path="/products/showcase-prep" element={<ShowcasePrep />} />
+            <Route path="/products/video-analysis" element={<VideoAnalysis />} />
             <Route path="/find-coach" element={<FindCoach />} />
             <Route path="/shared/:token" element={<SharedProfile />} />
             <Route path="/verify-course-certificate" element={<VerifyCourseCertificate />} />
