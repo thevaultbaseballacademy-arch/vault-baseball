@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Award, Check, ArrowRight, Loader2, BookOpen, Users, Globe, Building } from "lucide-react";
+import { Award, Check, ArrowRight, Loader2, BookOpen, Users, Globe, Building, Shield, Calendar, MessageSquare, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -11,46 +11,46 @@ const CertifiedCoach = () => {
   const { checkout, loading } = useProductCheckout();
   const product = PRODUCT_PRICES.certified_coach;
 
-  const benefits = [
+  const whatCoachesGet = [
     {
       icon: Award,
       title: "VAULT™ Certification Badge",
-      description: "Official credentials recognized across the industry",
+      description: "Official credentials recognized across the baseball training industry",
     },
     {
       icon: BookOpen,
       title: "Drill & Program Library",
-      description: "Complete access to 200+ exercises and programming templates",
+      description: "200+ exercises and programming templates at your fingertips",
+    },
+    {
+      icon: Shield,
+      title: "Brand Usage Rights",
+      description: "Permission to use VAULT™ branding in your marketing and facility",
     },
     {
       icon: Globe,
       title: "Website Listing",
       description: "Get listed in the official VAULT™ Certified Coach directory",
     },
-    {
-      icon: Users,
-      title: "Brand Usage Rights",
-      description: "Permission to use VAULT™ branding in your business",
-    },
   ];
 
-  const includes = [
-    "VAULT™ Certification badge",
-    "Drill library access",
-    "Brand usage rights",
-    "Listing on Vault website",
-    "Programming templates",
-    "Coach education modules",
-    "Exclusive coach community",
-    "Quarterly webinars & updates",
-    "Priority support channel",
-    "Annual certification renewal",
+  const fullIncludes = [
+    { icon: Award, text: "VAULT™ Certification badge" },
+    { icon: BookOpen, text: "Complete drill library access" },
+    { icon: Shield, text: "Brand usage rights" },
+    { icon: Globe, text: "Listing on Vault website" },
+    { icon: Video, text: "Programming templates" },
+    { icon: Calendar, text: "Coach education modules" },
+    { icon: Users, text: "Exclusive coach community" },
+    { icon: MessageSquare, text: "Quarterly webinars & updates" },
+    { icon: Shield, text: "Priority support channel" },
+    { icon: Calendar, text: "Annual certification renewal" },
   ];
 
   const whoItsFor = [
-    { icon: Users, text: "Private instructors" },
-    { icon: Building, text: "Facility owners" },
-    { icon: Award, text: "Travel org coaches" },
+    { icon: Users, title: "Private Instructors", description: "Elevate your 1-on-1 coaching with proven methodology" },
+    { icon: Building, title: "Facility Owners", description: "Differentiate your training center with VAULT™ certification" },
+    { icon: Award, title: "Travel Org Coaches", description: "Bring elite training systems to your organization" },
   ];
 
   return (
@@ -77,14 +77,14 @@ const CertifiedCoach = () => {
               </p>
             </motion.div>
 
-            {/* Benefits Grid */}
+            {/* What Coaches Get - Main Grid */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
             >
-              {benefits.map((benefit, i) => {
+              {whatCoachesGet.map((benefit, i) => {
                 const Icon = benefit.icon;
                 return (
                   <div key={i} className="bg-card border border-border rounded-xl p-6 text-center">
@@ -125,9 +125,10 @@ const CertifiedCoach = () => {
                 >
                   {loading === 'certified_coach' ? (
                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  ) : null}
+                  ) : (
+                    <Award className="w-5 h-5 mr-2" />
+                  )}
                   Become VAULT™ Certified
-                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
             </motion.div>
@@ -144,9 +145,33 @@ const CertifiedCoach = () => {
                 {whoItsFor.map((item, i) => {
                   const Icon = item.icon;
                   return (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
+                    <div key={i} className="bg-secondary/30 rounded-xl p-5">
+                      <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center mb-3">
                         <Icon className="w-5 h-5 text-foreground" />
+                      </div>
+                      <h4 className="font-display text-foreground mb-2">{item.title}</h4>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* Full Includes List */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-card border border-border rounded-2xl p-8 mb-12"
+            >
+              <h3 className="text-2xl font-display text-foreground mb-6">Everything You Get</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {fullIncludes.map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-4 h-4 text-foreground" />
                       </div>
                       <span className="text-muted-foreground">{item.text}</span>
                     </div>
@@ -155,22 +180,25 @@ const CertifiedCoach = () => {
               </div>
             </motion.div>
 
-            {/* What's Included */}
+            {/* Bundle Hook */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-card border border-border rounded-2xl p-8 mb-12"
+              transition={{ delay: 0.35 }}
+              className="bg-vault/5 border border-vault/20 rounded-2xl p-8 mb-12 text-center"
             >
-              <h3 className="text-2xl font-display text-foreground mb-6">What Coaches Get</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                {includes.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">{item}</span>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-xl font-display text-foreground mb-2">
+                Coach Authority Pack — Save $250
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Get VAULT™ Certification + Velocity System License + Metrics Playbook in one bundle.
+              </p>
+              <Link to="/products/bundles">
+                <Button variant="outline" className="border-vault text-vault hover:bg-vault hover:text-white">
+                  View Coach Bundle
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Directory Link */}
