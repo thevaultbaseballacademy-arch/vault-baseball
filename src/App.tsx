@@ -33,6 +33,16 @@ import CertificationAnalytics from "./pages/admin/CertificationAnalytics";
 import AdminCoaches from "./pages/admin/AdminCoaches";
 import AdminExams from "./pages/admin/AdminExams";
 import AdminCertifications from "./pages/admin/AdminCertifications";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCanceled from "./pages/PaymentCanceled";
+import LongevityBeta from "./pages/products/LongevityBeta";
+import TransferBeta from "./pages/products/TransferBeta";
+import VelocitySystem from "./pages/products/VelocitySystem";
+import TeamLicenses from "./pages/products/TeamLicenses";
+import VeloCheck from "./pages/products/VeloCheck";
+import RecruitmentAudit from "./pages/products/RecruitmentAudit";
+import CertifiedCoach from "./pages/products/CertifiedCoach";
+import FindCoach from "./pages/FindCoach";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +82,18 @@ const App = () => (
             <Route path="/certifications/leaderboard" element={<CertificationLeaderboard />} />
             <Route path="/verify" element={<VerifyCertification />} />
             <Route path="/privacy-settings" element={<PrivacySettings />} />
+            {/* Payment Pages */}
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-canceled" element={<PaymentCanceled />} />
+            {/* Product Pages */}
+            <Route path="/products/longevity" element={<LongevityBeta />} />
+            <Route path="/products/transfer" element={<TransferBeta />} />
+            <Route path="/products/velocity" element={<VelocitySystem />} />
+            <Route path="/products/teams" element={<TeamLicenses />} />
+            <Route path="/products/velo-check" element={<VeloCheck />} />
+            <Route path="/products/recruitment" element={<RecruitmentAudit />} />
+            <Route path="/products/certified-coach" element={<CertifiedCoach />} />
+            <Route path="/find-coach" element={<FindCoach />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
