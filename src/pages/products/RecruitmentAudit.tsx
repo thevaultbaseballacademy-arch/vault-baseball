@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { GraduationCap, Check, ArrowRight, Loader2, Target, FileText, BarChart3, Map, Calendar } from "lucide-react";
+import { GraduationCap, Check, ArrowRight, Loader2, Target, FileText, BarChart3, Map, Calendar, TrendingUp, Route } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -11,28 +11,54 @@ const RecruitmentAudit = () => {
   const { checkout, loading } = useProductCheckout();
   const product = PRODUCT_PRICES.recruitment_audit;
 
-  const includes = [
-    "Metrics review",
-    "Division-fit analysis (D1 / D2 / D3 / JUCO)",
-    "Development roadmap",
-    "Next 6–12 month plan",
+  const athleteSnapshot = [
+    "Name, Position, Grad Year",
+    "Current School/Organization",
+    "Playing Experience Summary",
+    "Training History",
   ];
 
-  const process = [
+  const currentMetrics = [
+    "Exit Velocity / Bat Speed",
+    "Throwing Velocity",
+    "60-Yard Dash / Sprint Times",
+    "Strength Markers (if available)",
+  ];
+
+  const positionalExpectations = [
+    "D1 Standards by Position",
+    "D2 Standards by Position", 
+    "D3 Standards by Position",
+    "JUCO Standards by Position",
+  ];
+
+  const divisionFitCategories = [
+    { title: "D1 Ready Now", description: "Metrics meet or exceed D1 standards" },
+    { title: "D1 Potential", description: "On track with development path" },
+    { title: "D2/D3 Fit", description: "Strong fit for competitive programs" },
+    { title: "JUCO Development", description: "Best path to maximize potential" },
+  ];
+
+  const deliverables = [
     {
-      step: "1",
-      title: "Submit Your Info",
-      description: "Complete the intake form with your stats and video",
+      icon: TrendingUp,
+      title: "Strengths Analysis",
+      description: "What's already working and how to leverage it",
     },
     {
-      step: "2",
-      title: "Expert Analysis",
-      description: "Our specialists analyze your profile and realistic targets",
+      icon: Target,
+      title: "Gaps Identified", 
+      description: "Specific areas holding you back from next level",
     },
     {
-      step: "3",
-      title: "Get Your Roadmap",
-      description: "Receive your personalized recruiting strategy",
+      icon: Map,
+      title: "6–12 Month Development Plan",
+      description: "Prioritized roadmap to close gaps and get recruited",
+    },
+    {
+      icon: Route,
+      title: "Recommended Vault Path",
+      description: "Which Vault programs align with your goals",
     },
   ];
 
@@ -97,43 +123,101 @@ const RecruitmentAudit = () => {
               </div>
             </motion.div>
 
-            {/* Process */}
+            {/* Athlete Snapshot & Current Metrics */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="grid md:grid-cols-3 gap-6 mb-12"
+              className="grid md:grid-cols-2 gap-6 mb-12"
             >
-              {process.map((step, i) => (
-                <div key={i} className="bg-card border border-border rounded-xl p-6 text-center">
-                  <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-lg font-display text-green-500">{step.step}</span>
-                  </div>
-                  <h3 className="font-display text-lg text-foreground mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
-                </div>
-              ))}
+              <div className="bg-card border border-border rounded-xl p-6">
+                <h3 className="font-display text-lg text-foreground mb-4 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-green-500" />
+                  Athlete Snapshot
+                </h3>
+                <ul className="space-y-2">
+                  {athleteSnapshot.map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Check className="w-4 h-4 text-green-500" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-6">
+                <h3 className="font-display text-lg text-foreground mb-4 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-green-500" />
+                  Current Metrics Reviewed
+                </h3>
+                <ul className="space-y-2">
+                  {currentMetrics.map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Check className="w-4 h-4 text-green-500" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </motion.div>
 
-            {/* What's Included */}
+            {/* Positional Expectations */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.25 }}
               className="bg-card border border-border rounded-2xl p-8 mb-12"
             >
               <h3 className="text-2xl font-display text-foreground mb-6 flex items-center gap-3">
                 <Target className="w-6 h-6 text-green-500" />
-                Includes
+                Positional Expectations Compared
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
-                {includes.map((item, i) => (
+                {positionalExpectations.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                     <span className="text-muted-foreground">{item}</span>
                   </div>
                 ))}
               </div>
+            </motion.div>
+
+            {/* Division Fit Analysis */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-gradient-to-br from-green-500/5 to-green-600/5 border border-green-500/20 rounded-2xl p-8 mb-12"
+            >
+              <h3 className="text-2xl font-display text-foreground mb-6 flex items-center gap-3">
+                <GraduationCap className="w-6 h-6 text-green-500" />
+                Division Fit Analysis
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {divisionFitCategories.map((cat, i) => (
+                  <div key={i} className="bg-background/50 rounded-lg p-4">
+                    <h4 className="font-display text-foreground mb-1">{cat.title}</h4>
+                    <p className="text-sm text-muted-foreground">{cat.description}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* What You'll Receive */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="grid md:grid-cols-2 gap-6 mb-12"
+            >
+              {deliverables.map((item, i) => (
+                <div key={i} className="bg-card border border-border rounded-xl p-6">
+                  <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center mb-4">
+                    <item.icon className="w-6 h-6 text-green-500" />
+                  </div>
+                  <h3 className="font-display text-lg text-foreground mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                </div>
+              ))}
             </motion.div>
 
             {/* Bundle Hook */}
