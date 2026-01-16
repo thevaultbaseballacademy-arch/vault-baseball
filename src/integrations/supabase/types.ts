@@ -1610,6 +1610,17 @@ export type Database = {
           youtube_url: string
         }[]
       }
+      get_certificate_leaderboard: {
+        Args: { result_limit?: number }
+        Returns: {
+          avatar_url: string
+          certificate_count: number
+          courses_completed: string[]
+          display_name: string
+          latest_certificate_date: string
+          user_id: string
+        }[]
+      }
       get_coach_user_id_by_name: {
         Args: { _coach_name: string }
         Returns: string
