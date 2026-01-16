@@ -29,6 +29,37 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
+    // Authentication: Require valid user JWT
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      logStep("Missing authorization header");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+    
+    if (claimsError || !claimsData?.claims) {
+      logStep("Invalid JWT", { error: claimsError?.message });
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const authenticatedUserId = claimsData.claims.sub;
+    logStep("Authenticated user", { userId: authenticatedUserId });
+
+    // Use service role for database operations
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -37,6 +68,24 @@ serve(async (req) => {
 
     const payload: PushNotificationPayload = await req.json();
     logStep("Received payload", payload);
+
+    // For broadcast notifications, check if user is admin
+    if (payload.broadcast) {
+      const { data: roleData } = await supabaseClient
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", authenticatedUserId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!roleData) {
+        logStep("Broadcast attempted by non-admin", { userId: authenticatedUserId });
+        return new Response(
+          JSON.stringify({ error: "Only admins can send broadcast notifications" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     // Get target user IDs based on notification type and preferences
     let userIds: string[] = payload.targetUserIds || [];
@@ -98,7 +147,7 @@ serve(async (req) => {
       title: payload.title,
       message: payload.body,
       type: payload.type,
-      actor_id: payload.data?.actorId || userId, // fallback to same user for system notifications
+      actor_id: payload.data?.actorId || authenticatedUserId, // Use authenticated user as actor
       post_id: payload.data?.postId || null,
       is_read: false,
     }));

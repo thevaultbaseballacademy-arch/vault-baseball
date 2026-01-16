@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -18,8 +19,13 @@ interface CertificationEmailRequest {
   expiresAt?: string;
 }
 
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
+  console.log(`[SEND-CERT-EMAIL] ${step}${detailsStr}`);
+};
+
 const handler = async (req: Request): Promise<Response> => {
-  console.log("send-certification-email function invoked");
+  logStep("Function invoked");
 
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -27,6 +33,36 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Authentication: Require valid user JWT
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      logStep("Missing authorization header");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    
+    if (claimsError || !claimsData?.claims) {
+      logStep("Invalid JWT", { error: claimsError?.message });
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+    logStep("Authenticated user", { userId });
+
     const { 
       email, 
       coachName, 
@@ -37,7 +73,7 @@ const handler = async (req: Request): Promise<Response> => {
       expiresAt 
     }: CertificationEmailRequest = await req.json();
 
-    console.log(`Sending ${passed ? 'pass' : 'fail'} email to ${email} for ${certificationName}`);
+    logStep(`Sending ${passed ? 'pass' : 'fail'} email to ${email} for ${certificationName}`);
 
     const subject = passed 
       ? `🎉 Congratulations! You've Earned Your ${certificationName} Certification`
@@ -173,14 +209,14 @@ const handler = async (req: Request): Promise<Response> => {
       html: passed ? passedHtml : failedHtml,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    logStep("Email sent successfully", { response: emailResponse });
 
     return new Response(JSON.stringify({ success: true, data: emailResponse }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
-    console.error("Error sending certification email:", error);
+    logStep("Error", { message: error.message });
     return new Response(
       JSON.stringify({ error: error.message }),
       {
