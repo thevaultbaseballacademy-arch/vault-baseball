@@ -42,11 +42,14 @@ export const CookieConsent = () => {
               <p className="text-xs text-muted-foreground">
                 We use cookies and similar technologies to improve your browsing experience, 
                 analyze site traffic, and personalize content. By clicking "Accept All", you consent 
-                to our use of cookies. Read our{" "}
+                to our use of cookies.{" "}
+                <Link to="/cookie-settings" className="text-primary hover:underline">
+                  Manage preferences
+                </Link>{" "}
+                or read our{" "}
                 <Link to="/privacy" className="text-primary hover:underline">
                   Privacy Policy
-                </Link>{" "}
-                for more information.
+                </Link>.
               </p>
             </div>
           </div>
