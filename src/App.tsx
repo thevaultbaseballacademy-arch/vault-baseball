@@ -55,6 +55,7 @@ import RefundPolicy from "./pages/RefundPolicy";
 import CookieSettings from "./pages/CookieSettings";
 import Contact from "./pages/Contact";
 import { CookieConsent } from "@/components/CookieConsent";
+import { FloatingChatWidget } from "@/components/FloatingChatWidget";
 
 const queryClient = new QueryClient();
 
@@ -121,6 +122,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <CookieConsent />
+          <FloatingChatWidget />
         </BrowserRouter>
       </TooltipProvider>
     </SubscriptionProvider>
