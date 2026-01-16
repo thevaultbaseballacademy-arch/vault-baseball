@@ -79,12 +79,14 @@ const Navbar = () => {
       href: "/products/velocity-system",
       dropdown: [
         { name: "12-Week Velocity System", href: "/products/velocity-system" },
-        { name: "Longevity System (Beta)", href: "/products/longevity-beta" },
-        { name: "Transfer System (Beta)", href: "/products/transfer-beta" },
+        { name: "Velocity Accelerator", href: "/products/velocity-accelerator" },
         { name: "Velo-Check Analysis", href: "/products/velo-check" },
         { name: "Recruitment Audit", href: "/products/recruitment-audit" },
+        { name: "Longevity System (Beta)", href: "/products/longevity-beta" },
+        { name: "Transfer System (Beta)", href: "/products/transfer-beta" },
         { name: "Team Licenses", href: "/products/team-licenses" },
         { name: "Coach Certification", href: "/products/certified-coach" },
+        { name: "Bundles", href: "/products/bundles" },
       ]
     },
     { 
