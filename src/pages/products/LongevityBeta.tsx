@@ -166,43 +166,60 @@ const LongevityBeta = () => {
               </div>
             </motion.div>
 
-            {/* What's Included */}
+            {/* Comparison Table */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="grid md:grid-cols-2 gap-8 mb-16"
+              className="mb-16"
             >
-              <div className="bg-card border border-border rounded-2xl p-6">
-                <h3 className="text-xl font-display text-foreground mb-6 flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-amber-500" />
-                  What's Included Now
-                </h3>
-                <ul className="space-y-3">
-                  {included.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-muted-foreground text-sm">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-card border border-border rounded-2xl p-6">
-                <h3 className="text-xl font-display text-foreground mb-6">
-                  Coming in Full Release
-                </h3>
-                <ul className="space-y-3">
-                  {futureFeatures.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-foreground/30 flex-shrink-0 mt-0.5" />
-                      <span className="text-muted-foreground text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-xs text-muted-foreground mt-4 pt-4 border-t border-border">
-                  Beta purchasers get all future updates at no additional cost
-                </p>
+              <h3 className="text-2xl font-display text-foreground mb-6 text-center">Beta vs Full Release</h3>
+              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left p-4 text-foreground font-medium">Feature</th>
+                        <th className="text-center p-4 min-w-[120px]">
+                          <div className="flex flex-col items-center">
+                            <span className="text-amber-500 font-display text-lg">Beta</span>
+                            <span className="text-xs text-muted-foreground">{formatPrice(product.price)}</span>
+                          </div>
+                        </th>
+                        <th className="text-center p-4 min-w-[120px]">
+                          <div className="flex flex-col items-center">
+                            <span className="text-foreground font-display text-lg">Full</span>
+                            <span className="text-xs text-muted-foreground">$299</span>
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      <tr><td className="p-4 text-muted-foreground">12-Week Progressive Arm Care Program</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr><td className="p-4 text-muted-foreground">Daily Readiness Assessment Framework</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr><td className="p-4 text-muted-foreground">Throw Count & Intensity Tracking</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr><td className="p-4 text-muted-foreground">Recovery Protocol Library (25+ routines)</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr><td className="p-4 text-muted-foreground">Shoulder & Elbow Mobility Program</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr><td className="p-4 text-muted-foreground">Sleep & Nutrition Guides</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr><td className="p-4 text-muted-foreground">Private Community Access</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">AI-Powered Workload Recommendations</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Injury Risk Scoring Algorithm</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Wearable Device Integration</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Video Analysis for Arm Action</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Coach Dashboard</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
+                      <tr className="border-t-2 border-amber-500/30 bg-amber-500/5">
+                        <td className="p-4 text-foreground font-medium">Grandfathered Beta Pricing</td>
+                        <td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td>
+                        <td className="p-4 text-center"><span className="text-muted-foreground">—</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="p-4 bg-amber-500/5 border-t border-amber-500/20 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    <strong className="text-amber-500">Beta purchasers get all future updates</strong> at no additional cost when full release launches
+                  </p>
+                </div>
               </div>
             </motion.div>
 
