@@ -99,6 +99,11 @@ const Footer = () => {
                     Refund Policy
                   </Link>
                 </li>
+                <li>
+                  <Link to="/cookie-settings" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Cookie Settings
+                  </Link>
+                </li>
               </ul>
             </div>
 
