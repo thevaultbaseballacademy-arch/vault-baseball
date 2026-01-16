@@ -9,9 +9,10 @@ import ProfileStats from "@/components/profile/ProfileStats";
 import ProfilePosts from "@/components/profile/ProfilePosts";
 import HighlightVideos from "@/components/profile/HighlightVideos";
 import AthleticStats from "@/components/profile/AthleticStats";
+import AthleteKPIForm from "@/components/profile/AthleteKPIForm";
 import RecruitingAssistant from "@/components/profile/RecruitingAssistant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, FileText, GraduationCap, Video, Loader2, Bot, Award } from "lucide-react";
+import { Trophy, FileText, GraduationCap, Video, Loader2, Bot, Award, Gauge } from "lucide-react";
 import type { Profile } from "@/types/profile";
 
 const ProfilePage = () => {
@@ -133,10 +134,14 @@ const ProfilePage = () => {
 
           {/* Content Tabs */}
           <Tabs defaultValue="stats" className="mt-8">
-            <TabsList className="grid w-full grid-cols-6 bg-card border border-border">
+            <TabsList className="grid w-full grid-cols-7 bg-card border border-border">
               <TabsTrigger value="stats" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
                 <span className="hidden sm:inline">Training</span>
+              </TabsTrigger>
+              <TabsTrigger value="kpis" className="flex items-center gap-2">
+                <Gauge className="w-4 h-4" />
+                <span className="hidden sm:inline">KPIs</span>
               </TabsTrigger>
               <TabsTrigger value="athletic" className="flex items-center gap-2">
                 <Award className="w-4 h-4" />
@@ -164,6 +169,10 @@ const ProfilePage = () => {
 
             <TabsContent value="stats" className="mt-6">
               <ProfileStats userId={userId!} />
+            </TabsContent>
+
+            <TabsContent value="kpis" className="mt-6">
+              <AthleteKPIForm userId={userId!} isOwnProfile={isOwnProfile} />
             </TabsContent>
 
             <TabsContent value="athletic" className="mt-6">
