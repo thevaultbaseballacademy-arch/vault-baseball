@@ -28,14 +28,14 @@ export const PRODUCT_PRICES = {
     price_id: 'price_1SqEGAPhXS410TO5ZIx2g0RZ',
     product_id: 'prod_TnpwnzycjMTqXu',
     name: 'VAULT™ Longevity System (Beta)',
-    price: 19900,
+    price: 14900,
     type: 'payment' as const,
   },
   transfer_beta: {
     price_id: 'price_1SqEGCPhXS410TO5iCsokNpV',
     product_id: 'prod_Tnpwn4vDbQNQGz',
     name: 'VAULT™ Transfer System (Beta)',
-    price: 19900,
+    price: 14900,
     type: 'payment' as const,
   },
   
