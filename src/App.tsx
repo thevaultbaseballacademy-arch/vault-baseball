@@ -47,6 +47,7 @@ import CertifiedCoach from "./pages/products/CertifiedCoach";
 import Products from "./pages/Products";
 import FindCoach from "./pages/FindCoach";
 import SharedProfile from "./pages/SharedProfile";
+import VerifyCourseCertificate from "./pages/VerifyCourseCertificate";
 
 const queryClient = new QueryClient();
 
@@ -102,6 +103,7 @@ const App = () => (
             <Route path="/products/certified-coach" element={<CertifiedCoach />} />
             <Route path="/find-coach" element={<FindCoach />} />
             <Route path="/shared/:token" element={<SharedProfile />} />
+            <Route path="/verify-course-certificate" element={<VerifyCourseCertificate />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

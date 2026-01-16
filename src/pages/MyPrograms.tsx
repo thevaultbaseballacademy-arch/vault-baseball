@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { PlayCircle, Clock, Target, TrendingUp, CheckCircle, BookOpen, Calendar, ArrowRight, LogIn } from "lucide-react";
+import { PlayCircle, Clock, Target, TrendingUp, CheckCircle, BookOpen, Calendar, ArrowRight, LogIn, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +13,7 @@ import { useCourseEnrollments } from "@/hooks/useCourseEnrollment";
 import { allCourses } from "@/pages/Courses";
 import { Link, useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+import CourseCertificatesList from "@/components/certifications/CourseCertificatesList";
 
 const MyPrograms = () => {
   const [user, setUser] = useState<{ id: string } | null>(null);
@@ -249,9 +251,21 @@ const MyPrograms = () => {
               )}
             </div>
 
-            {/* Right Column - Course Cards */}
+            {/* Right Column - Course Cards & Certificates */}
             <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-foreground mb-6">Your Programs</h2>
+              <Tabs defaultValue="programs" className="w-full">
+                <TabsList className="mb-6">
+                  <TabsTrigger value="programs" className="gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    Programs
+                  </TabsTrigger>
+                  <TabsTrigger value="certificates" className="gap-2">
+                    <Award className="w-4 h-4" />
+                    Certificates
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="programs">
               
               {isLoading ? (
                 <div className="grid gap-4">
@@ -394,6 +408,12 @@ const MyPrograms = () => {
                   </Button>
                 </div>
               )}
+                </TabsContent>
+                
+                <TabsContent value="certificates">
+                  {user && <CourseCertificatesList userId={user.id} />}
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>

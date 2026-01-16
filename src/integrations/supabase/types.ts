@@ -739,6 +739,42 @@ export type Database = {
         }
         Relationships: []
       }
+      course_certificates: {
+        Row: {
+          certificate_number: string
+          completion_date: string
+          course_id: string
+          course_title: string
+          created_at: string
+          id: string
+          issued_at: string
+          recipient_name: string
+          user_id: string
+        }
+        Insert: {
+          certificate_number?: string
+          completion_date: string
+          course_id: string
+          course_title: string
+          created_at?: string
+          id?: string
+          issued_at?: string
+          recipient_name: string
+          user_id: string
+        }
+        Update: {
+          certificate_number?: string
+          completion_date?: string
+          course_id?: string
+          course_title?: string
+          created_at?: string
+          id?: string
+          issued_at?: string
+          recipient_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       course_enrollments: {
         Row: {
           completed_at: string | null
@@ -1660,6 +1696,10 @@ export type Database = {
       }
       update_certification_statuses: { Args: never; Returns: undefined }
       verify_certificate_public: {
+        Args: { cert_number: string }
+        Returns: Json
+      }
+      verify_course_certificate: {
         Args: { cert_number: string }
         Returns: Json
       }
