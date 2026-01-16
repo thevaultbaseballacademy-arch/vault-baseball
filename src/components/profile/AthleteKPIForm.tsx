@@ -39,9 +39,21 @@ import {
   Target,
   Trophy,
   CheckCircle2,
-  Clock
+  Clock,
+  LineChart,
+  X
 } from "lucide-react";
-import { format, differenceInDays } from "date-fns";
+import { format, differenceInDays, parseISO } from "date-fns";
+import { 
+  LineChart as RechartsLineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  ReferenceLine
+} from "recharts";
 
 interface AthleteKPI {
   id: string;
@@ -136,6 +148,8 @@ const getKPIDirection = (category: string, name: string): string => {
 const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
   const [addOpen, setAddOpen] = useState(false);
   const [goalOpen, setGoalOpen] = useState(false);
+  const [chartOpen, setChartOpen] = useState(false);
+  const [selectedKPIForChart, setSelectedKPIForChart] = useState<{ category: string; name: string; unit: string | null } | null>(null);
   const [category, setCategory] = useState<string>("");
   const [kpiName, setKpiName] = useState("");
   const [kpiValue, setKpiValue] = useState("");
@@ -325,7 +339,34 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
       latest: entries[0],
       previous: entries[1],
       trend: entries.length > 1 ? entries[0].kpi_value - entries[1].kpi_value : 0,
+      historyCount: entries.length,
     }));
+  };
+
+  const getChartData = () => {
+    if (!selectedKPIForChart) return [];
+    const categoryKPIs = groupedKPIs[selectedKPIForChart.category]?.[selectedKPIForChart.name] || [];
+    // Reverse to show oldest first for chart
+    return [...categoryKPIs].reverse().map(kpi => ({
+      date: format(parseISO(kpi.recorded_at), "MMM d"),
+      fullDate: format(parseISO(kpi.recorded_at), "MMM d, yyyy"),
+      value: kpi.kpi_value,
+      notes: kpi.notes,
+    }));
+  };
+
+  const getGoalForSelectedKPI = () => {
+    if (!selectedKPIForChart) return null;
+    return goals.find(
+      g => g.kpi_category === selectedKPIForChart.category && 
+           g.kpi_name === selectedKPIForChart.name && 
+           !g.is_achieved
+    );
+  };
+
+  const openChart = (cat: string, name: string, unit: string | null) => {
+    setSelectedKPIForChart({ category: cat, name, unit });
+    setChartOpen(true);
   };
 
   const getGoalProgress = (goal: AthleteKPIGoal, latestValue: number | null): { percent: number; remaining: number } => {
@@ -767,19 +808,25 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {latestKPIs.map(({ name, latest, trend }) => {
+                        {latestKPIs.map(({ name, latest, trend, historyCount }) => {
                           const goal = goals.find(g => g.kpi_category === cat.value && g.kpi_name === name && !g.is_achieved);
                           
                           return (
                             <div 
                               key={name}
-                              className="group relative p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+                              className="group relative p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                              onClick={() => historyCount > 1 && openChart(cat.value, name, latest.kpi_unit)}
                             >
                               <div className="flex items-center justify-between mb-1">
                                 <p className="text-xs text-muted-foreground truncate pr-2">{name}</p>
-                                {trend !== 0 && (
-                                  <TrendingUp className={`w-3 h-3 flex-shrink-0 ${trend > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
-                                )}
+                                <div className="flex items-center gap-1">
+                                  {historyCount > 1 && (
+                                    <LineChart className="w-3 h-3 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  )}
+                                  {trend !== 0 && (
+                                    <TrendingUp className={`w-3 h-3 flex-shrink-0 ${trend > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
+                                  )}
+                                </div>
                               </div>
                               <p className="text-xl font-bold text-foreground">
                                 {latest.kpi_value}
@@ -795,18 +842,25 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
                                   </span>
                                 </div>
                               )}
-                              <div className="flex items-center gap-1 mt-1">
-                                <Calendar className="w-3 h-3 text-muted-foreground" />
-                                <p className="text-xs text-muted-foreground">
-                                  {format(new Date(latest.recorded_at), "MMM d, yyyy")}
-                                </p>
+                              <div className="flex items-center justify-between mt-1">
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3 text-muted-foreground" />
+                                  <p className="text-xs text-muted-foreground">
+                                    {format(new Date(latest.recorded_at), "MMM d, yyyy")}
+                                  </p>
+                                </div>
+                                {historyCount > 1 && (
+                                  <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
+                                    {historyCount} logs
+                                  </Badge>
+                                )}
                               </div>
                               {isOwnProfile && (
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                  onClick={() => deleteKPI.mutate(latest.id)}
+                                  onClick={(e) => { e.stopPropagation(); deleteKPI.mutate(latest.id); }}
                                 >
                                   <Trash2 className="w-3 h-3 text-destructive" />
                                 </Button>
@@ -823,6 +877,141 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
           )}
         </CardContent>
       </Card>
+
+      {/* KPI Chart Dialog */}
+      <Dialog open={chartOpen} onOpenChange={setChartOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LineChart className="w-5 h-5 text-primary" />
+              {selectedKPIForChart?.name} Trend
+            </DialogTitle>
+            <DialogDescription>
+              Historical progress over time
+              {getGoalForSelectedKPI() && (
+                <span className="ml-2 text-primary">
+                  • Target: {getGoalForSelectedKPI()?.target_value}{selectedKPIForChart?.unit ? ` ${selectedKPIForChart.unit}` : ''}
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {selectedKPIForChart && getChartData().length > 0 ? (
+              <div className="space-y-4">
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsLineChart data={getChartData()} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis 
+                        dataKey="date" 
+                        className="text-xs fill-muted-foreground"
+                        tick={{ fontSize: 11 }}
+                      />
+                      <YAxis 
+                        className="text-xs fill-muted-foreground"
+                        tick={{ fontSize: 11 }}
+                        domain={['auto', 'auto']}
+                        tickFormatter={(value) => `${value}${selectedKPIForChart.unit ? ` ${selectedKPIForChart.unit}` : ''}`}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          fontSize: '12px'
+                        }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        formatter={(value: number) => [
+                          `${value}${selectedKPIForChart.unit ? ` ${selectedKPIForChart.unit}` : ''}`,
+                          'Value'
+                        ]}
+                        labelFormatter={(label, payload) => {
+                          const item = payload?.[0]?.payload;
+                          return item?.fullDate || label;
+                        }}
+                      />
+                      {getGoalForSelectedKPI() && (
+                        <ReferenceLine 
+                          y={getGoalForSelectedKPI()!.target_value} 
+                          stroke="hsl(var(--primary))" 
+                          strokeDasharray="5 5"
+                          label={{ 
+                            value: `Goal: ${getGoalForSelectedKPI()!.target_value}`, 
+                            position: 'right',
+                            fill: 'hsl(var(--primary))',
+                            fontSize: 11
+                          }}
+                        />
+                      )}
+                      <Line 
+                        type="monotone" 
+                        dataKey="value" 
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                        dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
+                      />
+                    </RechartsLineChart>
+                  </ResponsiveContainer>
+                </div>
+                
+                {/* Summary Stats */}
+                <div className="grid grid-cols-4 gap-3 pt-2 border-t border-border">
+                  {(() => {
+                    const data = getChartData();
+                    const values = data.map(d => d.value);
+                    const latest = values[values.length - 1];
+                    const first = values[0];
+                    const max = Math.max(...values);
+                    const min = Math.min(...values);
+                    const change = latest - first;
+                    const direction = getKPIDirection(selectedKPIForChart.category, selectedKPIForChart.name);
+                    const isPositiveChange = direction === 'lower' ? change < 0 : change > 0;
+                    
+                    return (
+                      <>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Latest</p>
+                          <p className="text-lg font-bold">{latest}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Change</p>
+                          <p className={`text-lg font-bold ${isPositiveChange ? 'text-green-500' : change !== 0 ? 'text-red-500' : ''}`}>
+                            {change > 0 ? '+' : ''}{change.toFixed(1)}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Best</p>
+                          <p className="text-lg font-bold text-primary">
+                            {direction === 'lower' ? min : max}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Entries</p>
+                          <p className="text-lg font-bold">{data.length}</p>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <LineChart className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>Not enough data to display chart</p>
+                <p className="text-sm mt-1">Log more entries to see trends</p>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setChartOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
