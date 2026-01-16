@@ -54,6 +54,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import CookieSettings from "./pages/CookieSettings";
 import Contact from "./pages/Contact";
+import FAQ from "./pages/FAQ";
 import { CookieConsent } from "@/components/CookieConsent";
 import { FloatingChatWidget } from "@/components/FloatingChatWidget";
 
@@ -118,6 +119,7 @@ const App = () => (
             <Route path="/refunds" element={<RefundPolicy />} />
             <Route path="/cookie-settings" element={<CookieSettings />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
