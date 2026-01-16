@@ -49,6 +49,9 @@ import FindCoach from "./pages/FindCoach";
 import SharedProfile from "./pages/SharedProfile";
 import VerifyCourseCertificate from "./pages/VerifyCourseCertificate";
 import CertificateLeaderboard from "./pages/CertificateLeaderboard";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
 
 const queryClient = new QueryClient();
 
@@ -106,6 +109,9 @@ const App = () => (
             <Route path="/shared/:token" element={<SharedProfile />} />
             <Route path="/verify-course-certificate" element={<VerifyCourseCertificate />} />
             <Route path="/certificate-leaderboard" element={<CertificateLeaderboard />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/refunds" element={<RefundPolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
