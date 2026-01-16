@@ -41,7 +41,10 @@ import {
   CheckCircle2,
   Clock,
   LineChart,
-  X
+  X,
+  MessageSquare,
+  Send,
+  User
 } from "lucide-react";
 import { format, differenceInDays, parseISO } from "date-fns";
 import { 
@@ -81,9 +84,21 @@ interface AthleteKPIGoal {
   created_at: string;
 }
 
+interface CoachKPIComment {
+  id: string;
+  coach_user_id: string;
+  athlete_user_id: string;
+  kpi_category: string;
+  kpi_name: string;
+  comment: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AthleteKPIFormProps {
   userId: string;
   isOwnProfile: boolean;
+  currentUserId?: string;
 }
 
 const kpiCategories = [
@@ -145,7 +160,7 @@ const getKPIDirection = (category: string, name: string): string => {
   return found?.direction || "higher";
 };
 
-const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
+const AthleteKPIForm = ({ userId, isOwnProfile, currentUserId }: AthleteKPIFormProps) => {
   const [addOpen, setAddOpen] = useState(false);
   const [goalOpen, setGoalOpen] = useState(false);
   const [chartOpen, setChartOpen] = useState(false);
@@ -160,7 +175,29 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
   const [targetDate, setTargetDate] = useState("");
   const [goalNotes, setGoalNotes] = useState("");
   const [activeTab, setActiveTab] = useState("performance");
+  const [newComment, setNewComment] = useState("");
+  const [commentCategory, setCommentCategory] = useState("");
+  const [commentKpiName, setCommentKpiName] = useState("");
   const queryClient = useQueryClient();
+
+  // Check if current user is a coach for this athlete
+  const { data: isCoachForAthlete = false } = useQuery({
+    queryKey: ['is-coach-for-athlete', currentUserId, userId],
+    queryFn: async () => {
+      if (!currentUserId || currentUserId === userId) return false;
+      const { data, error } = await supabase
+        .from('coach_athlete_assignments')
+        .select('id')
+        .eq('coach_user_id', currentUserId)
+        .eq('athlete_user_id', userId)
+        .eq('is_active', true)
+        .eq('athlete_approved', true)
+        .maybeSingle();
+      if (error) return false;
+      return !!data;
+    },
+    enabled: !!currentUserId && currentUserId !== userId
+  });
 
   const { data: kpis = [], isLoading } = useQuery({
     queryKey: ['athlete-kpis', userId],
@@ -186,6 +223,34 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
       if (error) throw error;
       return data as AthleteKPIGoal[];
     }
+  });
+
+  const { data: comments = [] } = useQuery({
+    queryKey: ['coach-kpi-comments', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('coach_kpi_comments')
+        .select('*')
+        .eq('athlete_user_id', userId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as CoachKPIComment[];
+    }
+  });
+
+  const { data: coachProfiles = {} } = useQuery({
+    queryKey: ['coach-profiles', comments.map(c => c.coach_user_id)],
+    queryFn: async () => {
+      const coachIds = [...new Set(comments.map(c => c.coach_user_id))];
+      if (coachIds.length === 0) return {};
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, display_name, avatar_url')
+        .in('user_id', coachIds);
+      if (error) return {};
+      return data.reduce((acc, p) => ({ ...acc, [p.user_id]: p }), {} as Record<string, { display_name: string | null; avatar_url: string | null }>);
+    },
+    enabled: comments.length > 0
   });
 
   const addKPI = useMutation({
@@ -274,6 +339,42 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
       toast.success("🎉 Goal achieved!");
     },
     onError: () => toast.error("Failed to update goal"),
+  });
+
+  const addComment = useMutation({
+    mutationFn: async () => {
+      if (!currentUserId) throw new Error("Not authenticated");
+      const { error } = await supabase
+        .from('coach_kpi_comments')
+        .insert({
+          coach_user_id: currentUserId,
+          athlete_user_id: userId,
+          kpi_category: commentCategory,
+          kpi_name: commentKpiName,
+          comment: newComment,
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coach-kpi-comments', userId] });
+      toast.success("Comment added!");
+      setNewComment("");
+      setCommentCategory("");
+      setCommentKpiName("");
+    },
+    onError: () => toast.error("Failed to add comment"),
+  });
+
+  const deleteComment = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('coach_kpi_comments').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coach-kpi-comments', userId] });
+      toast.success("Comment removed");
+    },
+    onError: () => toast.error("Failed to remove comment"),
   });
 
   const checkGoalAchievement = async () => {
@@ -407,6 +508,12 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
 
   const activeGoals = goals.filter(g => !g.is_achieved);
   const achievedGoals = goals.filter(g => g.is_achieved);
+
+  const getCommentsForKPI = (cat: string, name: string) => {
+    return comments.filter(c => c.kpi_category === cat && c.kpi_name === name);
+  };
+
+  const allKPINames = [...new Set(kpis.map(k => ({ category: k.kpi_category, name: k.kpi_name })))];
 
   if (isLoading) {
     return (
@@ -1012,6 +1119,135 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Coach Comments Section */}
+      {(isCoachForAthlete || comments.length > 0) && (
+        <Card className="border-border bg-card">
+          <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-primary" />
+              Coach Feedback
+            </CardTitle>
+            {isCoachForAthlete && (
+              <Badge variant="secondary" className="gap-1">
+                <User className="w-3 h-3" />
+                Coach Access
+              </Badge>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Add Comment Form for Coaches */}
+            {isCoachForAthlete && (
+              <div className="p-4 rounded-lg border border-border bg-muted/30 space-y-3">
+                <p className="text-sm font-medium">Add Feedback</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Select value={commentCategory} onValueChange={(v) => { setCommentCategory(v); setCommentKpiName(""); }}>
+                    <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
+                    <SelectContent>
+                      {kpiCategories.map(c => (
+                        <SelectItem key={c.value} value={c.value}>
+                          <div className="flex items-center gap-2">
+                            <c.icon className={`w-4 h-4 ${c.color}`} />
+                            {c.label.split(' ')[0]}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select 
+                    value={commentKpiName} 
+                    onValueChange={setCommentKpiName}
+                    disabled={!commentCategory}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Metric" /></SelectTrigger>
+                    <SelectContent>
+                      {commentCategory && getKPIOptions(commentCategory).map(k => (
+                        <SelectItem key={k.name} value={k.name}>{k.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-2">
+                  <Textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Add your coaching feedback..."
+                    rows={2}
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={() => addComment.mutate()}
+                    disabled={!commentCategory || !commentKpiName || !newComment.trim() || addComment.isPending}
+                    size="icon"
+                    className="self-end"
+                  >
+                    {addComment.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Comments List */}
+            {comments.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground">
+                <MessageSquare className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No coach feedback yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {comments.map(comment => {
+                  const coachProfile = coachProfiles[comment.coach_user_id];
+                  const categoryInfo = kpiCategories.find(c => c.value === comment.kpi_category);
+                  const Icon = categoryInfo?.icon || Gauge;
+                  const isOwnComment = currentUserId === comment.coach_user_id;
+
+                  return (
+                    <div 
+                      key={comment.id}
+                      className="group relative p-3 rounded-lg border border-border bg-muted/20"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          {coachProfile?.avatar_url ? (
+                            <img src={coachProfile.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+                          ) : (
+                            <User className="w-4 h-4 text-primary" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <span className="text-sm font-medium">
+                              {coachProfile?.display_name || 'Coach'}
+                            </span>
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 gap-1">
+                              <Icon className={`w-3 h-3 ${categoryInfo?.color || ''}`} />
+                              {comment.kpi_name}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {format(parseISO(comment.created_at), "MMM d, yyyy")}
+                            </span>
+                          </div>
+                          <p className="text-sm text-foreground">{comment.comment}</p>
+                        </div>
+                        {isOwnComment && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                            onClick={() => deleteComment.mutate(comment.id)}
+                          >
+                            <Trash2 className="w-3 h-3 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

@@ -172,7 +172,7 @@ const ProfilePage = () => {
             </TabsContent>
 
             <TabsContent value="kpis" className="mt-6">
-              <AthleteKPIForm userId={userId!} isOwnProfile={isOwnProfile} />
+              <AthleteKPIForm userId={userId!} isOwnProfile={isOwnProfile} currentUserId={currentUser?.id} />
             </TabsContent>
 
             <TabsContent value="athletic" className="mt-6">
