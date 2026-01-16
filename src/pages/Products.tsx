@@ -3,10 +3,16 @@ import { Link } from "react-router-dom";
 import { 
   Zap, Video, Target, GraduationCap, Award, Package, 
   ArrowRight, Clock, Users, TrendingUp, Flame, Shield,
-  Star, Sparkles
+  Star, Sparkles, HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
@@ -538,6 +544,109 @@ const Products = () => {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-12 text-center"
+          >
+            <div className="w-14 h-14 rounded-xl bg-primary/10 mx-auto flex items-center justify-center mb-6">
+              <HelpCircle className="w-7 h-7 text-primary" />
+            </div>
+            <h2 className="text-3xl font-display text-foreground mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to know about purchasing and accessing VAULT™ products.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto"
+          >
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="access" className="border border-border rounded-xl px-6 bg-card">
+                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                  How do I access my purchased products?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  After purchase, you'll receive an email with login instructions. All your products are accessible through your VAULT™ Dashboard. Simply log in with your account credentials and navigate to "My Programs" to access all purchased content, including videos, workouts, and resources.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="payment" className="border border-border rounded-xl px-6 bg-card">
+                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                  What payment methods do you accept?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  We accept all major credit cards (Visa, Mastercard, American Express, Discover) through our secure Stripe payment system. All transactions are encrypted and your payment information is never stored on our servers.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="lifetime" className="border border-border rounded-xl px-6 bg-card">
+                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                  What does "Lifetime Access" mean for Beta products?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Beta Access products grant you permanent access to the program at the founding member price. As we develop and enhance the program, you'll receive all updates and new content at no additional cost. This is our thank you for being an early supporter.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="refund" className="border border-border rounded-xl px-6 bg-card">
+                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                  What is your refund policy?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  We offer a 7-day satisfaction guarantee on all digital products. If you're not satisfied with your purchase, contact our support team within 7 days of purchase for a full refund. One-on-one services like video analysis are non-refundable once delivered. See our full Refund Policy for details.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="difference" className="border border-border rounded-xl px-6 bg-card">
+                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                  What's the difference between one-time purchases and memberships?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  One-time purchases (like the 12-Week Velocity System) give you permanent access to that specific program. Memberships provide ongoing access to premium content, community features, and coach support for a monthly or annual fee. You can combine both — use one-time programs for structured training and memberships for ongoing development.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="bundle" className="border border-border rounded-xl px-6 bg-card">
+                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                  Can I upgrade from a single product to a bundle?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Yes! Contact our support team and we'll apply your previous purchase as credit toward the bundle price. We want to make sure you get the best value, so we'll always honor what you've already invested with us.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="multiple" className="border border-border rounded-xl px-6 bg-card">
+                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                  Can I purchase products for multiple athletes (team or family)?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Absolutely! For teams or organizations, check out our Team & Organization Licenses which include volume pricing, admin dashboards, and custom onboarding. For families with multiple athletes, contact us for family pricing options.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="support" className="border border-border rounded-xl px-6 bg-card">
+                <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                  How do I get help if I have issues with my purchase?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Our support team is here to help! Use the chat widget in the bottom-right corner of any page, email us at support@vaultbaseball.com, or visit our Contact page. We typically respond within 24 hours on business days.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </motion.div>
         </div>
       </section>
