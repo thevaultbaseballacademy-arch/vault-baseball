@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, TrendingUp, Calendar, 
-  ChevronDown, ChevronUp, Search, Activity
+  ChevronDown, ChevronUp, Search, Activity, Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +15,7 @@ import { CoachAlerts } from "@/components/CoachAlerts";
 import { useCoachAlerts } from "@/hooks/useCoachAlerts";
 import { WeeklySummaryReport } from "@/components/WeeklySummaryReport";
 import { CoachScheduleManager } from "@/components/coach/CoachScheduleManager";
+import { KPILeaderboards } from "@/components/coach/KPILeaderboards";
 import {
   LineChart,
   Line,
@@ -280,12 +281,20 @@ const CoachDashboard = () => {
               </div>
             </div>
 
-            {/* Tabs for Athletes vs Schedules */}
+            {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsList className="grid w-full max-w-lg grid-cols-3">
                 <TabsTrigger value="athletes">Athletes</TabsTrigger>
-                <TabsTrigger value="schedules">Training Schedules</TabsTrigger>
+                <TabsTrigger value="leaderboards" className="flex items-center gap-1">
+                  <Trophy className="w-3 h-3" />
+                  Leaderboards
+                </TabsTrigger>
+                <TabsTrigger value="schedules">Schedules</TabsTrigger>
               </TabsList>
+
+              <TabsContent value="leaderboards" className="space-y-6">
+                <KPILeaderboards coachUserId={user?.id || ''} />
+              </TabsContent>
 
               <TabsContent value="athletes" className="space-y-6">
                 {/* Overview Stats */}
