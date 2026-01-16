@@ -1,9 +1,10 @@
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { 
   Zap, Video, Target, GraduationCap, Award, Package, 
-  ArrowRight, Clock, Users, TrendingUp, Flame, Shield,
-  Star, Sparkles, HelpCircle
+  ArrowRight, Users, TrendingUp, Flame, Shield,
+  Star, Sparkles, HelpCircle, SearchX
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,10 +16,31 @@ import {
 } from "@/components/ui/accordion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ProductFilters, { Category, PriceRange } from "@/components/products/ProductFilters";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
 
+interface Product {
+  key: string;
+  icon: React.ElementType;
+  title: string;
+  subtitle: string;
+  description: string;
+  features?: string[];
+  href: string;
+  price: number;
+  badge?: string;
+  badgeColor?: string;
+  category: Category;
+  savings?: number;
+}
+
 const Products = () => {
-  const flagshipProducts = [
+  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState<Category>("all");
+  const [priceRange, setPriceRange] = useState<PriceRange>("all");
+
+  const allProducts: Product[] = useMemo(() => [
+    // Flagship Products
     {
       key: "velocity_12week",
       icon: Zap,
@@ -30,6 +52,7 @@ const Products = () => {
       price: PRODUCT_PRICES.velocity_12week.price,
       badge: "Most Popular",
       badgeColor: "bg-red-500",
+      category: "flagship" as Category,
     },
     {
       key: "velocity_accelerator",
@@ -42,10 +65,9 @@ const Products = () => {
       price: PRODUCT_PRICES.velocity_accelerator.price,
       badge: "Intensive",
       badgeColor: "bg-orange-500",
+      category: "flagship" as Category,
     },
-  ];
-
-  const entryProducts = [
+    // Entry Products
     {
       key: "velo_check",
       icon: Video,
@@ -57,6 +79,7 @@ const Products = () => {
       price: PRODUCT_PRICES.velo_check.price,
       badge: "Quick Start",
       badgeColor: "bg-blue-500",
+      category: "entry" as Category,
     },
     {
       key: "recruitment_audit",
@@ -69,10 +92,9 @@ const Products = () => {
       price: PRODUCT_PRICES.recruitment_audit.price,
       badge: "Parents Love",
       badgeColor: "bg-green-500",
+      category: "entry" as Category,
     },
-  ];
-
-  const betaSystems = [
+    // Beta Systems
     {
       key: "longevity_beta",
       icon: Shield,
@@ -81,6 +103,7 @@ const Products = () => {
       description: "Arm health monitoring and workload management to maximize availability.",
       href: "/products/longevity-beta",
       price: PRODUCT_PRICES.longevity_beta.price,
+      category: "beta" as Category,
     },
     {
       key: "transfer_beta",
@@ -90,10 +113,9 @@ const Products = () => {
       description: "Bridge practice performance to game-day execution.",
       href: "/products/transfer-beta",
       price: PRODUCT_PRICES.transfer_beta.price,
+      category: "beta" as Category,
     },
-  ];
-
-  const newProducts = [
+    // Featured Products
     {
       key: "transfer_intensive",
       icon: Users,
@@ -104,6 +126,7 @@ const Products = () => {
       price: PRODUCT_PRICES.transfer_intensive.price,
       badge: "Live",
       badgeColor: "bg-blue-500",
+      category: "featured" as Category,
     },
     {
       key: "vault_verified_coach",
@@ -115,6 +138,7 @@ const Products = () => {
       price: PRODUCT_PRICES.vault_verified_coach.price,
       badge: "B2B",
       badgeColor: "bg-emerald-500",
+      category: "coaching" as Category,
     },
     {
       key: "showcase_prep",
@@ -126,6 +150,7 @@ const Products = () => {
       price: PRODUCT_PRICES.showcase_prep.price,
       badge: "Spring Ready",
       badgeColor: "bg-orange-500",
+      category: "featured" as Category,
     },
     {
       key: "video_analysis_5pack",
@@ -137,42 +162,105 @@ const Products = () => {
       price: PRODUCT_PRICES.video_analysis_5pack.price,
       badge: "Add-On",
       badgeColor: "bg-cyan-500",
+      category: "featured" as Category,
     },
-  ];
-
-  const bundles = [
+    // Bundles
     {
       key: "velocity_max_pack",
+      icon: Package,
       title: "Velocity Max Pack",
+      subtitle: "Bundle",
       description: "12-Week System + Velo-Check + Accelerator Lite",
       price: PRODUCT_PRICES.velocity_max_pack.price,
       savings: PRODUCT_PRICES.velocity_max_pack.savings,
       href: "/products/bundles",
+      category: "bundles" as Category,
     },
     {
       key: "recruiting_edge_pack",
+      icon: Package,
       title: "Recruiting Edge Pack",
+      subtitle: "Bundle",
       description: "Recruitment Audit + 12-Week S&C + 30-day membership",
       price: PRODUCT_PRICES.recruiting_edge_pack.price,
       savings: PRODUCT_PRICES.recruiting_edge_pack.savings,
       href: "/products/bundles",
+      category: "bundles" as Category,
     },
     {
       key: "coach_authority_pack",
+      icon: Package,
       title: "Coach Authority Pack",
+      subtitle: "Bundle",
       description: "Certification + Velocity System License + Metrics Playbook",
       price: PRODUCT_PRICES.coach_authority_pack.price,
       savings: PRODUCT_PRICES.coach_authority_pack.savings,
       href: "/products/bundles",
+      category: "bundles" as Category,
     },
-  ];
+    // Coaching products
+    {
+      key: "certified_coach",
+      icon: Award,
+      title: "Certified Coach Program",
+      subtitle: "Annual Certification",
+      description: "Get certified, access our drill library, and grow your coaching business with VAULT™ credentialing.",
+      href: "/products/certified-coach",
+      price: PRODUCT_PRICES.certified_coach.price,
+      category: "coaching" as Category,
+    },
+  ], []);
+
+  const filterByPrice = (price: number, range: PriceRange): boolean => {
+    const priceInDollars = price / 100;
+    switch (range) {
+      case "under100":
+        return priceInDollars < 100;
+      case "100to300":
+        return priceInDollars >= 100 && priceInDollars <= 300;
+      case "300to500":
+        return priceInDollars > 300 && priceInDollars <= 500;
+      case "over500":
+        return priceInDollars > 500;
+      default:
+        return true;
+    }
+  };
+
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((product) => {
+      // Search filter
+      const matchesSearch = searchQuery === "" || 
+        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.subtitle.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Category filter
+      const matchesCategory = category === "all" || product.category === category;
+
+      // Price filter
+      const matchesPrice = filterByPrice(product.price, priceRange);
+
+      return matchesSearch && matchesCategory && matchesPrice;
+    });
+  }, [allProducts, searchQuery, category, priceRange]);
+
+  // Group filtered products by category for display
+  const flagshipProducts = filteredProducts.filter(p => p.category === "flagship");
+  const entryProducts = filteredProducts.filter(p => p.category === "entry");
+  const betaSystems = filteredProducts.filter(p => p.category === "beta");
+  const featuredProducts = filteredProducts.filter(p => p.category === "featured");
+  const bundles = filteredProducts.filter(p => p.category === "bundles");
+  const coachingProducts = filteredProducts.filter(p => p.category === "coaching");
+
+  const hasNoResults = filteredProducts.length === 0;
 
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-muted/50 to-background">
+      <section className="pt-32 pb-8 bg-gradient-to-b from-muted/50 to-background">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -193,291 +281,397 @@ const Products = () => {
         </div>
       </section>
 
+      {/* Search & Filters */}
+      <ProductFilters
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        category={category}
+        onCategoryChange={setCategory}
+        priceRange={priceRange}
+        onPriceRangeChange={setPriceRange}
+        resultCount={filteredProducts.length}
+      />
+
+      {/* No Results State */}
+      {hasNoResults && (
+        <section className="py-24">
+          <div className="container mx-auto px-4 text-center">
+            <div className="w-16 h-16 rounded-full bg-muted/50 mx-auto flex items-center justify-center mb-6">
+              <SearchX className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-2xl font-display text-foreground mb-2">No products found</h3>
+            <p className="text-muted-foreground mb-6">Try adjusting your search or filters to find what you're looking for.</p>
+            <Button variant="outline" onClick={() => { setSearchQuery(""); setCategory("all"); setPriceRange("all"); }}>
+              Clear Filters
+            </Button>
+          </div>
+        </section>
+      )}
+
       {/* Flagship Products */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-red-500" />
+      {flagshipProducts.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-red-500" />
+                </div>
+                <h2 className="text-3xl font-display text-foreground">Flagship Programs</h2>
               </div>
-              <h2 className="text-3xl font-display text-foreground">Flagship Programs</h2>
-            </div>
-            <p className="text-muted-foreground max-w-2xl">
-              Our core velocity development systems — structured, proven, and designed for serious athletes.
-            </p>
-          </motion.div>
+              <p className="text-muted-foreground max-w-2xl">
+                Our core velocity development systems — structured, proven, and designed for serious athletes.
+              </p>
+            </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {flagshipProducts.map((product, index) => (
-              <motion.div
-                key={product.key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link to={product.href}>
-                  <div className="group relative h-full p-8 rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-                    <Badge className={`absolute top-4 right-4 ${product.badgeColor} text-white border-0`}>
-                      {product.badge}
-                    </Badge>
-                    <div className="w-14 h-14 rounded-xl bg-red-500/10 flex items-center justify-center mb-6">
-                      <product.icon className="w-7 h-7 text-red-500" />
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-1">{product.subtitle}</p>
-                    <h3 className="text-2xl font-display text-foreground mb-3">{product.title}</h3>
-                    <p className="text-muted-foreground mb-6">{product.description}</p>
-                    <ul className="space-y-2 mb-8">
-                      {product.features.map((feature, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-foreground">{formatPrice(product.price)}</span>
-                      <span className="text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                        Learn More <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Entry Products */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                <Target className="w-5 h-5 text-blue-500" />
-              </div>
-              <h2 className="text-3xl font-display text-foreground">Entry Points</h2>
-            </div>
-            <p className="text-muted-foreground max-w-2xl">
-              Low-friction ways to experience Vault quality before committing to a full program.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {entryProducts.map((product, index) => (
-              <motion.div
-                key={product.key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link to={product.href}>
-                  <div className="group relative h-full p-8 rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-                    <Badge className={`absolute top-4 right-4 ${product.badgeColor} text-white border-0`}>
-                      {product.badge}
-                    </Badge>
-                    <div className="w-14 h-14 rounded-xl bg-blue-500/10 flex items-center justify-center mb-6">
-                      <product.icon className="w-7 h-7 text-blue-500" />
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-1">{product.subtitle}</p>
-                    <h3 className="text-2xl font-display text-foreground mb-3">{product.title}</h3>
-                    <p className="text-muted-foreground mb-6">{product.description}</p>
-                    <ul className="space-y-2 mb-8">
-                      {product.features.map((feature, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-foreground">{formatPrice(product.price)}</span>
-                      <span className="text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                        Learn More <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* New Revenue Products */}
-      <section className="py-16 bg-gradient-to-b from-background to-muted/30">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
-                <Star className="w-5 h-5 text-cyan-500" />
-              </div>
-              <h2 className="text-3xl font-display text-foreground">Featured Products</h2>
-              <Badge className="bg-red-500 text-white border-0">New</Badge>
-            </div>
-            <p className="text-muted-foreground max-w-2xl">
-              Fresh offerings designed for maximum impact — live coaching, certifications, and targeted programs.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {newProducts.map((product, index) => (
-              <motion.div
-                key={product.key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link to={product.href}>
-                  <div className="group relative h-full p-6 rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-                    <Badge className={`absolute top-3 right-3 ${product.badgeColor} text-white border-0 text-xs`}>
-                      {product.badge}
-                    </Badge>
-                    <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4">
-                      <product.icon className="w-6 h-6 text-cyan-500" />
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-1">{product.subtitle}</p>
-                    <h3 className="text-lg font-display text-foreground mb-2">{product.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold text-foreground">{formatPrice(product.price)}</span>
-                      <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Beta Systems */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-purple-500" />
-              </div>
-              <h2 className="text-3xl font-display text-foreground">Beta Systems</h2>
-            </div>
-            <p className="text-muted-foreground max-w-2xl">
-              Early access to our newest development systems. Get lifetime access at founding member pricing.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {betaSystems.map((product, index) => (
-              <motion.div
-                key={product.key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link to={product.href}>
-                  <div className="group flex items-center gap-6 p-6 rounded-2xl border border-border bg-card hover:border-purple-500/50 hover:shadow-lg transition-all duration-300">
-                    <div className="w-14 h-14 shrink-0 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                      <product.icon className="w-7 h-7 text-purple-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-xl font-display text-foreground">{product.title}</h3>
-                        <Badge variant="outline" className="border-purple-500/50 text-purple-600 text-xs">
-                          {product.subtitle}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{product.description}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-xl font-bold text-foreground">{formatPrice(product.price)}</span>
-                      <p className="text-xs text-muted-foreground">Lifetime Access</p>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Bundles */}
-      <section className="py-16 bg-gradient-to-b from-muted/30 to-background">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                <Package className="w-5 h-5 text-green-500" />
-              </div>
-              <h2 className="text-3xl font-display text-foreground">Value Bundles</h2>
-            </div>
-            <p className="text-muted-foreground max-w-2xl">
-              Combine products for maximum impact and savings.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {bundles.map((bundle, index) => (
-              <motion.div
-                key={bundle.key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link to={bundle.href}>
-                  <div className="group h-full p-6 rounded-2xl border border-border bg-card hover:border-green-500/50 hover:shadow-lg transition-all duration-300">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-display text-foreground">{bundle.title}</h3>
-                      {bundle.savings && (
-                        <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
-                          Save {formatPrice(bundle.savings)}
+            <div className="grid md:grid-cols-2 gap-8">
+              {flagshipProducts.map((product, index) => (
+                <motion.div
+                  key={product.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link to={product.href}>
+                    <div className="group relative h-full p-8 rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300">
+                      {product.badge && (
+                        <Badge className={`absolute top-4 right-4 ${product.badgeColor} text-white border-0`}>
+                          {product.badge}
                         </Badge>
                       )}
+                      <div className="w-14 h-14 rounded-xl bg-red-500/10 flex items-center justify-center mb-6">
+                        <product.icon className="w-7 h-7 text-red-500" />
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-1">{product.subtitle}</p>
+                      <h3 className="text-2xl font-display text-foreground mb-3">{product.title}</h3>
+                      <p className="text-muted-foreground mb-6">{product.description}</p>
+                      {product.features && (
+                        <ul className="space-y-2 mb-8">
+                          {product.features.map((feature, i) => (
+                            <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold text-foreground">{formatPrice(product.price)}</span>
+                        <span className="text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                          Learn More <ArrowRight className="w-4 h-4" />
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-6">{bundle.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-foreground">{formatPrice(bundle.price)}</span>
-                      <span className="text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1 text-sm">
-                        View Bundle <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Entry Products */}
+      {entryProducts.length > 0 && (
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                  <Target className="w-5 h-5 text-blue-500" />
+                </div>
+                <h2 className="text-3xl font-display text-foreground">Entry Points</h2>
+              </div>
+              <p className="text-muted-foreground max-w-2xl">
+                Low-friction ways to experience Vault quality before committing to a full program.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {entryProducts.map((product, index) => (
+                <motion.div
+                  key={product.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link to={product.href}>
+                    <div className="group relative h-full p-8 rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300">
+                      {product.badge && (
+                        <Badge className={`absolute top-4 right-4 ${product.badgeColor} text-white border-0`}>
+                          {product.badge}
+                        </Badge>
+                      )}
+                      <div className="w-14 h-14 rounded-xl bg-blue-500/10 flex items-center justify-center mb-6">
+                        <product.icon className="w-7 h-7 text-blue-500" />
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-1">{product.subtitle}</p>
+                      <h3 className="text-2xl font-display text-foreground mb-3">{product.title}</h3>
+                      <p className="text-muted-foreground mb-6">{product.description}</p>
+                      {product.features && (
+                        <ul className="space-y-2 mb-8">
+                          {product.features.map((feature, i) => (
+                            <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold text-foreground">{formatPrice(product.price)}</span>
+                        <span className="text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                          Learn More <ArrowRight className="w-4 h-4" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Featured Products */}
+      {featuredProducts.length > 0 && (
+        <section className="py-16 bg-gradient-to-b from-background to-muted/30">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                  <Star className="w-5 h-5 text-cyan-500" />
+                </div>
+                <h2 className="text-3xl font-display text-foreground">Featured Products</h2>
+                <Badge className="bg-red-500 text-white border-0">New</Badge>
+              </div>
+              <p className="text-muted-foreground max-w-2xl">
+                Fresh offerings designed for maximum impact — live coaching, certifications, and targeted programs.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product, index) => (
+                <motion.div
+                  key={product.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link to={product.href}>
+                    <div className="group relative h-full p-6 rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300">
+                      {product.badge && (
+                        <Badge className={`absolute top-3 right-3 ${product.badgeColor} text-white border-0 text-xs`}>
+                          {product.badge}
+                        </Badge>
+                      )}
+                      <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4">
+                        <product.icon className="w-6 h-6 text-cyan-500" />
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-1">{product.subtitle}</p>
+                      <h3 className="text-lg font-display text-foreground mb-2">{product.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xl font-bold text-foreground">{formatPrice(product.price)}</span>
+                        <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Beta Systems */}
+      {betaSystems.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                </div>
+                <h2 className="text-3xl font-display text-foreground">Beta Systems</h2>
+              </div>
+              <p className="text-muted-foreground max-w-2xl">
+                Early access to our newest development systems. Get lifetime access at founding member pricing.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {betaSystems.map((product, index) => (
+                <motion.div
+                  key={product.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link to={product.href}>
+                    <div className="group flex items-center gap-6 p-6 rounded-2xl border border-border bg-card hover:border-purple-500/50 hover:shadow-lg transition-all duration-300">
+                      <div className="w-14 h-14 shrink-0 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                        <product.icon className="w-7 h-7 text-purple-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-xl font-display text-foreground">{product.title}</h3>
+                          <Badge variant="outline" className="border-purple-500/50 text-purple-600 text-xs">
+                            {product.subtitle}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{product.description}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-xl font-bold text-foreground">{formatPrice(product.price)}</span>
+                        <p className="text-xs text-muted-foreground">Lifetime Access</p>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Bundles */}
+      {bundles.length > 0 && (
+        <section className="py-16 bg-gradient-to-b from-muted/30 to-background">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+                  <Package className="w-5 h-5 text-green-500" />
+                </div>
+                <h2 className="text-3xl font-display text-foreground">Value Bundles</h2>
+              </div>
+              <p className="text-muted-foreground max-w-2xl">
+                Combine products for maximum impact and savings.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {bundles.map((bundle, index) => (
+                <motion.div
+                  key={bundle.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link to={bundle.href}>
+                    <div className="group h-full p-6 rounded-2xl border border-border bg-card hover:border-green-500/50 hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-display text-foreground">{bundle.title}</h3>
+                        {bundle.savings && (
+                          <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                            Save {formatPrice(bundle.savings)}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-6">{bundle.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold text-foreground">{formatPrice(bundle.price)}</span>
+                        <span className="text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1 text-sm">
+                          View Bundle <ArrowRight className="w-4 h-4" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Coaching Products */}
+      {coachingProducts.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                  <Award className="w-5 h-5 text-emerald-500" />
+                </div>
+                <h2 className="text-3xl font-display text-foreground">For Coaches</h2>
+              </div>
+              <p className="text-muted-foreground max-w-2xl">
+                Grow your coaching business with VAULT™ certification and credentialing.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {coachingProducts.map((product, index) => (
+                <motion.div
+                  key={product.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link to={product.href}>
+                    <div className="group flex items-center gap-6 p-6 rounded-2xl border border-border bg-card hover:border-emerald-500/50 hover:shadow-lg transition-all duration-300">
+                      <div className="w-14 h-14 shrink-0 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                        <product.icon className="w-7 h-7 text-emerald-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-xl font-display text-foreground">{product.title}</h3>
+                          {product.badge && (
+                            <Badge className={`${product.badgeColor} text-white border-0 text-xs`}>
+                              {product.badge}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{product.description}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-xl font-bold text-foreground">{formatPrice(product.price)}</span>
+                        <p className="text-xs text-muted-foreground">per year</p>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Coach Certification CTA */}
       <section className="py-16">
