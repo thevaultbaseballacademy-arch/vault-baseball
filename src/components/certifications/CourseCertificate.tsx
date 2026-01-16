@@ -1,6 +1,6 @@
-import { useRef } from "react";
-import { motion } from "framer-motion";
-import { Download, Share2, Award, Calendar, Hash, CheckCircle } from "lucide-react";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Download, Share2, Award, Calendar, Hash, CheckCircle, Twitter, Linkedin, Facebook, Link2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
@@ -16,6 +16,11 @@ interface CourseCertificateProps {
 
 const CourseCertificate = ({ certificate, onShare }: CourseCertificateProps) => {
   const certificateRef = useRef<HTMLDivElement>(null);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+
+  const shareUrl = `${window.location.origin}/verify-course-certificate?cert=${certificate.certificate_number}`;
+  const shareText = `🎓 I just completed "${certificate.course_title}" at VAULT™ Baseball! Check out my verified certificate:`;
+  const hashtags = "VAULTBaseball,Baseball,Training,Achievement";
 
   const handleDownloadPDF = async () => {
     if (!certificateRef.current) return;
@@ -74,27 +79,48 @@ const CourseCertificate = ({ certificate, onShare }: CourseCertificateProps) => 
     }
   };
 
-  const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/verify-course-certificate?cert=${certificate.certificate_number}`;
-    
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText(shareUrl);
+    toast.success("Certificate link copied to clipboard!");
+    setShowShareMenu(false);
+    onShare?.();
+  };
+
+  const handleShareTwitter = () => {
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}&hashtags=${hashtags}`;
+    window.open(twitterUrl, "_blank", "width=600,height=400");
+    setShowShareMenu(false);
+    onShare?.();
+  };
+
+  const handleShareLinkedIn = () => {
+    const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+    window.open(linkedInUrl, "_blank", "width=600,height=600");
+    setShowShareMenu(false);
+    onShare?.();
+  };
+
+  const handleShareFacebook = () => {
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+    window.open(facebookUrl, "_blank", "width=600,height=400");
+    setShowShareMenu(false);
+    onShare?.();
+  };
+
+  const handleNativeShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
           title: "VAULT™ Course Certificate",
-          text: `I completed ${certificate.course_title} at VAULT™ Baseball!`,
+          text: shareText,
           url: shareUrl,
         });
+        onShare?.();
       } catch {
-        // User cancelled or share failed, copy to clipboard instead
-        await navigator.clipboard.writeText(shareUrl);
-        toast.success("Share link copied to clipboard!");
+        // User cancelled
       }
-    } else {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success("Share link copied to clipboard!");
     }
-    
-    onShare?.();
+    setShowShareMenu(false);
   };
 
   return (
@@ -196,10 +222,113 @@ const CourseCertificate = ({ certificate, onShare }: CourseCertificateProps) => 
               <Download className="w-4 h-4" />
               Download Image
             </Button>
-            <Button variant="secondary" onClick={handleShare} className="gap-2">
-              <Share2 className="w-4 h-4" />
-              Share Certificate
-            </Button>
+            <div className="relative">
+              <Button 
+                variant="secondary" 
+                onClick={() => setShowShareMenu(!showShareMenu)} 
+                className="gap-2"
+              >
+                <Share2 className="w-4 h-4" />
+                Share Certificate
+              </Button>
+              
+              {/* Share Menu Dropdown */}
+              <AnimatePresence>
+                {showShareMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50"
+                  >
+                    <Card className="border-border bg-card shadow-xl">
+                      <CardContent className="p-2 min-w-[200px]">
+                        <div className="flex flex-col gap-1">
+                          {/* Close button */}
+                          <div className="flex justify-between items-center px-2 py-1 mb-1">
+                            <span className="text-xs font-medium text-muted-foreground">Share to</span>
+                            <button 
+                              onClick={() => setShowShareMenu(false)}
+                              className="text-muted-foreground hover:text-foreground"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          
+                          {/* Twitter/X */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleShareTwitter}
+                            className="w-full justify-start gap-3 h-10"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
+                              <Twitter className="w-4 h-4 text-white" />
+                            </div>
+                            <span>X (Twitter)</span>
+                          </Button>
+                          
+                          {/* LinkedIn */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleShareLinkedIn}
+                            className="w-full justify-start gap-3 h-10"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#0A66C2] flex items-center justify-center">
+                              <Linkedin className="w-4 h-4 text-white" />
+                            </div>
+                            <span>LinkedIn</span>
+                          </Button>
+                          
+                          {/* Facebook */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleShareFacebook}
+                            className="w-full justify-start gap-3 h-10"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#1877F2] flex items-center justify-center">
+                              <Facebook className="w-4 h-4 text-white" />
+                            </div>
+                            <span>Facebook</span>
+                          </Button>
+                          
+                          {/* Copy Link */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleCopyLink}
+                            className="w-full justify-start gap-3 h-10"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                              <Link2 className="w-4 h-4" />
+                            </div>
+                            <span>Copy Link</span>
+                          </Button>
+                          
+                          {/* Native Share (mobile) */}
+                          {typeof navigator !== 'undefined' && navigator.share && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={handleNativeShare}
+                              className="w-full justify-start gap-3 h-10"
+                            >
+                              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                                <Share2 className="w-4 h-4 text-primary" />
+                              </div>
+                              <span>More Options</span>
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </CardContent>
       </Card>
