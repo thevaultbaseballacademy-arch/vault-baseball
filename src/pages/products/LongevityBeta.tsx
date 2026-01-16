@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
+import BetaUrgencyBanner from "@/components/products/BetaUrgencyBanner";
 
 const LongevityBeta = () => {
   const { checkout, loading } = useProductCheckout();
@@ -97,6 +98,9 @@ const LongevityBeta = () => {
                 and stay on the field when it matters most. Because you can't perform if you're on the IL.
               </p>
             </motion.div>
+
+            {/* Urgency Banner */}
+            <BetaUrgencyBanner accentColor="amber" spotsTotal={100} spotsClaimed={73} />
 
             {/* Stats Section */}
             <motion.div
