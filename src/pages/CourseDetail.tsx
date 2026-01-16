@@ -3,12 +3,13 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Clock, CheckCircle, Users, ArrowLeft, BookOpen, 
-  PlayCircle, Lock, ChevronDown, ChevronUp, Play, Video, ShoppingCart
+  PlayCircle, Lock, ChevronDown, ChevronUp, Play, Video, ShoppingCart, Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Collapsible,
   CollapsibleContent,
@@ -26,26 +27,32 @@ import {
 } from "@/hooks/useCourseEnrollment";
 import { useCourseVideos } from "@/hooks/useCourseVideos";
 import { useHasCourseAccess } from "@/hooks/useUserPurchases";
+import { useCertificateForCourse, useGenerateCertificate } from "@/hooks/useCourseCertificates";
 import { allCourses } from "./Courses";
 import { courseContent } from "@/lib/courseData";
 import { useToast } from "@/hooks/use-toast";
 import VideoPlayer from "@/components/courses/VideoPlayer";
+import CourseCertificate from "@/components/certifications/CourseCertificate";
 
 const CourseDetailPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [userId, setUserId] = useState<string | undefined>();
+  const [userName, setUserName] = useState<string>("");
   const [openModules, setOpenModules] = useState<number[]>([0]);
   const [activeLesson, setActiveLesson] = useState<{ moduleIndex: number; lessonIndex: number } | null>(null);
+  const [showCertificateDialog, setShowCertificateDialog] = useState(false);
   
   const { data: enrollments = [] } = useCourseEnrollments(userId);
   const { data: progressData = [] } = useCourseProgress(userId, courseId || "");
   const { data: dbVideos = [] } = useCourseVideos(courseId || undefined);
   const { hasAccess: hasPurchasedAccess, isLoading: accessLoading } = useHasCourseAccess(userId, courseId || "");
+  const { data: existingCertificate } = useCertificateForCourse(userId, courseId);
   const enrollMutation = useEnrollInCourse();
   const updateProgressMutation = useUpdateProgress();
   const updateEnrollmentMutation = useUpdateEnrollmentProgress();
+  const generateCertificateMutation = useGenerateCertificate();
 
   // Create a map of lesson IDs to video URLs from database
   const videoUrlMap = useMemo(() => {
@@ -55,8 +62,17 @@ const CourseDetailPage = () => {
   }, [dbVideos]);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       setUserId(data.user?.id);
+      if (data.user?.id) {
+        // Fetch user profile for certificate name
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("display_name, email")
+          .eq("user_id", data.user.id)
+          .maybeSingle();
+        setUserName(profile?.display_name || profile?.email || data.user.email || "Athlete");
+      }
     });
   }, []);
 
@@ -316,9 +332,41 @@ const CourseDetailPage = () => {
                     
                     {progressPercent === 100 && (
                       <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6 text-center">
-                        <CheckCircle className="w-8 h-8 text-primary mx-auto mb-2" />
+                        <Award className="w-8 h-8 text-primary mx-auto mb-2" />
                         <p className="font-semibold text-foreground">Program Completed!</p>
-                        <p className="text-sm text-muted-foreground">Congratulations on finishing this program.</p>
+                        <p className="text-sm text-muted-foreground mb-3">Congratulations on finishing this program.</p>
+                        {existingCertificate ? (
+                          <Button 
+                            size="sm" 
+                            onClick={() => setShowCertificateDialog(true)}
+                            className="gap-2"
+                          >
+                            <Award className="w-4 h-4" />
+                            View Certificate
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              if (userId && courseId && course) {
+                                generateCertificateMutation.mutate({
+                                  userId,
+                                  courseId,
+                                  courseTitle: course.title,
+                                  recipientName: userName,
+                                  completionDate: new Date().toISOString(),
+                                }, {
+                                  onSuccess: () => setShowCertificateDialog(true),
+                                });
+                              }
+                            }}
+                            disabled={generateCertificateMutation.isPending}
+                            className="gap-2"
+                          >
+                            <Award className="w-4 h-4" />
+                            {generateCertificateMutation.isPending ? "Generating..." : "Get Certificate"}
+                          </Button>
+                        )}
                       </div>
                     )}
                   </>
@@ -544,6 +592,21 @@ const CourseDetailPage = () => {
           </motion.div>
         </section>
       </main>
+
+      {/* Certificate Dialog */}
+      <Dialog open={showCertificateDialog} onOpenChange={setShowCertificateDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Award className="w-5 h-5 text-primary" />
+              Course Certificate
+            </DialogTitle>
+          </DialogHeader>
+          {existingCertificate && (
+            <CourseCertificate certificate={existingCertificate} />
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
