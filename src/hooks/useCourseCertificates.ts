@@ -53,6 +53,37 @@ export const useCertificateForCourse = (userId?: string, courseId?: string) => {
   });
 };
 
+const sendCertificateEmail = async (
+  email: string,
+  recipientName: string,
+  courseTitle: string,
+  certificateNumber: string,
+  completionDate: string
+) => {
+  try {
+    const verifyUrl = `${window.location.origin}/verify-course-certificate?number=${certificateNumber}`;
+    
+    const { error } = await supabase.functions.invoke("send-course-certificate-email", {
+      body: {
+        email,
+        recipientName,
+        courseTitle,
+        certificateNumber,
+        completionDate,
+        verifyUrl,
+      },
+    });
+
+    if (error) {
+      console.error("Error sending certificate email:", error);
+    } else {
+      console.log("Certificate email sent successfully");
+    }
+  } catch (error) {
+    console.error("Error invoking email function:", error);
+  }
+};
+
 export const useGenerateCertificate = () => {
   const queryClient = useQueryClient();
   
@@ -95,12 +126,27 @@ export const useGenerateCertificate = () => {
         .single();
       
       if (error) throw error;
-      return data as unknown as CourseCertificate;
+      
+      const certificate = data as unknown as CourseCertificate;
+      
+      // Get user email and send notification
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        await sendCertificateEmail(
+          user.email,
+          recipientName,
+          courseTitle,
+          certificate.certificate_number,
+          completionDate
+        );
+      }
+      
+      return certificate;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["course-certificates"] });
       queryClient.invalidateQueries({ queryKey: ["course-certificate"] });
-      toast.success("Certificate generated successfully!");
+      toast.success("Certificate generated! Check your email for confirmation.");
     },
     onError: (error) => {
       console.error("Error generating certificate:", error);
