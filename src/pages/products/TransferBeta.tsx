@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
+import BetaUrgencyBanner from "@/components/products/BetaUrgencyBanner";
 
 const TransferBeta = () => {
   const { checkout, loading } = useProductCheckout();
@@ -104,6 +105,9 @@ const TransferBeta = () => {
                 practice performance and game-day execution with competition-focused training design.
               </p>
             </motion.div>
+
+            {/* Urgency Banner */}
+            <BetaUrgencyBanner accentColor="purple" spotsTotal={100} spotsClaimed={61} />
 
             {/* Problem Section */}
             <motion.div
