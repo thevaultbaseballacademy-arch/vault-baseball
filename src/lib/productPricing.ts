@@ -122,6 +122,36 @@ export const PRODUCT_PRICES = {
     type: 'payment' as const,
     savings: 16400, // Save $164
   },
+  
+  // New Revenue Products
+  transfer_intensive: {
+    price_id: 'price_1SqMSsPhXS410TO5HQjuGUIn',
+    product_id: 'prod_TnyPcUaSwW9LEC',
+    name: 'Transfer Intensive (4-Week Live Coaching)',
+    price: 29900,
+    type: 'payment' as const,
+  },
+  vault_verified_coach: {
+    price_id: 'price_1SqMSuPhXS410TO5ymOiyyUa',
+    product_id: 'prod_TnyPm39VCsKdTa',
+    name: 'VAULT Verified Coach Certification',
+    price: 49900,
+    type: 'payment' as const,
+  },
+  showcase_prep: {
+    price_id: 'price_1SqMSxPhXS410TO5rYo4echT',
+    product_id: 'prod_TnyPDYJ35srlRl',
+    name: 'Draft/Showcase Prep Bundle (30-Day)',
+    price: 19900,
+    type: 'payment' as const,
+  },
+  video_analysis_5pack: {
+    price_id: 'price_1SqMSzPhXS410TO5VpvnedaW',
+    product_id: 'prod_TnyPgLXxZlLWli',
+    name: 'Video Analysis 5-Pack',
+    price: 14900,
+    type: 'payment' as const,
+  },
 } as const;
 
 export type ProductKey = keyof typeof PRODUCT_PRICES;
