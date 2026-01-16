@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MobileConversionBar from "@/components/products/MobileConversionBar";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
 
@@ -224,6 +225,14 @@ const CertifiedCoach = () => {
           </div>
         </div>
       </section>
+      <MobileConversionBar
+        productName={product.name}
+        price={product.price}
+        productKey="certified_coach"
+        onCheckout={checkout}
+        loading={loading}
+        ctaText="Get Certified"
+      />
       <Footer />
     </main>
   );
