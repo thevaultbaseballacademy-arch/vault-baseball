@@ -11,8 +11,9 @@ import HighlightVideos from "@/components/profile/HighlightVideos";
 import AthleticStats from "@/components/profile/AthleticStats";
 import AthleteKPIForm from "@/components/profile/AthleteKPIForm";
 import RecruitingAssistant from "@/components/profile/RecruitingAssistant";
+import { KPIShareManager } from "@/components/profile/KPIShareManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, FileText, GraduationCap, Video, Loader2, Bot, Award, Gauge } from "lucide-react";
+import { Trophy, FileText, GraduationCap, Video, Loader2, Bot, Award, Gauge, Share2 } from "lucide-react";
 import type { Profile } from "@/types/profile";
 
 const ProfilePage = () => {
@@ -134,7 +135,7 @@ const ProfilePage = () => {
 
           {/* Content Tabs */}
           <Tabs defaultValue="stats" className="mt-8">
-            <TabsList className="grid w-full grid-cols-7 bg-card border border-border">
+            <TabsList className={`grid w-full bg-card border border-border ${isOwnProfile ? 'grid-cols-8' : 'grid-cols-6'}`}>
               <TabsTrigger value="stats" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
                 <span className="hidden sm:inline">Training</span>
@@ -159,6 +160,12 @@ const ProfilePage = () => {
                 <GraduationCap className="w-4 h-4" />
                 <span className="hidden sm:inline">Recruiting</span>
               </TabsTrigger>
+              {isOwnProfile && (
+                <TabsTrigger value="share" className="flex items-center gap-2">
+                  <Share2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Share</span>
+                </TabsTrigger>
+              )}
               {isOwnProfile && (
                 <TabsTrigger value="assistant" className="flex items-center gap-2">
                   <Bot className="w-4 h-4" />
@@ -190,6 +197,12 @@ const ProfilePage = () => {
             <TabsContent value="recruiting" className="mt-6">
               <ProfilePosts userId={userId!} currentUserId={currentUser?.id} filterType="recruiting" />
             </TabsContent>
+
+            {isOwnProfile && (
+              <TabsContent value="share" className="mt-6">
+                <KPIShareManager userId={userId!} />
+              </TabsContent>
+            )}
 
             {isOwnProfile && (
               <TabsContent value="assistant" className="mt-6">
