@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Share2, Copy, Trash2, Eye, Link2, Calendar, Plus, QrCode, Download, X, Tag } from "lucide-react";
+import { Share2, Copy, Trash2, Eye, Link2, Calendar, Plus, QrCode, Download, X, Tag, Pencil, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { QRCodeSVG } from "qrcode.react";
@@ -55,6 +55,8 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
   const [creating, setCreating] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [qrToken, setQrToken] = useState<ShareToken | null>(null);
+  const [editingTokenId, setEditingTokenId] = useState<string | null>(null);
+  const [editLabel, setEditLabel] = useState("");
   const qrRef = useRef<HTMLDivElement>(null);
   
   // New token settings
@@ -141,6 +143,34 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
       toast.success("Share link deleted");
       setTokens(tokens.filter(t => t.id !== id));
     }
+  };
+
+  const startEditingLabel = (token: ShareToken) => {
+    setEditingTokenId(token.id);
+    setEditLabel(token.label || "");
+  };
+
+  const saveLabel = async (tokenId: string) => {
+    const { error } = await supabase
+      .from('kpi_share_tokens' as any)
+      .update({ label: editLabel.trim() || null })
+      .eq('id', tokenId);
+
+    if (error) {
+      toast.error("Failed to update label");
+    } else {
+      toast.success("Label updated!");
+      setTokens(tokens.map(t => 
+        t.id === tokenId ? { ...t, label: editLabel.trim() || null } : t
+      ));
+    }
+    setEditingTokenId(null);
+    setEditLabel("");
+  };
+
+  const cancelEditing = () => {
+    setEditingTokenId(null);
+    setEditLabel("");
   };
 
   const copyLink = (token: string) => {
@@ -316,22 +346,66 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
                   isExpired(token.expires_at) ? 'bg-muted/50 opacity-60' : 'bg-card'
                 }`}
               >
-                <div className="space-y-1">
+                <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    {token.label ? (
-                      <span className="font-medium flex items-center gap-1">
-                        <Tag className="h-3 w-3" />
-                        {token.label}
-                      </span>
+                    {editingTokenId === token.id ? (
+                      <div className="flex items-center gap-2 flex-1">
+                        <Input
+                          value={editLabel}
+                          onChange={(e) => setEditLabel(e.target.value)}
+                          placeholder="Enter label..."
+                          className="h-8 text-sm"
+                          maxLength={100}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveLabel(token.id);
+                            if (e.key === 'Escape') cancelEditing();
+                          }}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => saveLabel(token.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Check className="h-4 w-4 text-green-600" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={cancelEditing}
+                          className="h-8 w-8 p-0"
+                        >
+                          <X className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </div>
                     ) : (
-                      <code className="text-sm bg-muted px-2 py-1 rounded">
-                        {token.token.substring(0, 8)}...
-                      </code>
-                    )}
-                    {isExpired(token.expires_at) ? (
-                      <Badge variant="destructive">Expired</Badge>
-                    ) : (
-                      <Badge variant="secondary">Active</Badge>
+                      <>
+                        {token.label ? (
+                          <span className="font-medium flex items-center gap-1">
+                            <Tag className="h-3 w-3" />
+                            {token.label}
+                          </span>
+                        ) : (
+                          <code className="text-sm bg-muted px-2 py-1 rounded">
+                            {token.token.substring(0, 8)}...
+                          </code>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => startEditingLabel(token)}
+                          className="h-6 w-6 p-0"
+                          title="Edit label"
+                        >
+                          <Pencil className="h-3 w-3 text-muted-foreground" />
+                        </Button>
+                        {isExpired(token.expires_at) ? (
+                          <Badge variant="destructive">Expired</Badge>
+                        ) : (
+                          <Badge variant="secondary">Active</Badge>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
