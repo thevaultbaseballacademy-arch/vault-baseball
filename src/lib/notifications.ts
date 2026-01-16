@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface CreateNotificationParams {
   userId: string;
-  type: 'like' | 'comment' | 'mention';
+  type: 'like' | 'comment' | 'mention' | 'coach_feedback';
   title: string;
   message: string;
   postId?: string;

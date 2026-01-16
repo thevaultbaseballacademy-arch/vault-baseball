@@ -354,6 +354,23 @@ const AthleteKPIForm = ({ userId, isOwnProfile, currentUserId }: AthleteKPIFormP
           comment: newComment,
         });
       if (error) throw error;
+
+      // Create notification for the athlete
+      if (userId !== currentUserId) {
+        // Get coach name for the notification
+        const { data: coachProfile } = await supabase
+          .rpc('get_public_profile', { target_user_id: currentUserId });
+        
+        const coachName = (coachProfile as Array<{ display_name: string }> | null)?.[0]?.display_name || 'Your coach';
+        
+        await supabase.from('notifications').insert({
+          user_id: userId,
+          type: 'coach_feedback',
+          title: 'New Coach Feedback',
+          message: `${coachName} commented on your ${commentKpiName} (${commentCategory}): "${newComment.slice(0, 100)}${newComment.length > 100 ? '...' : ''}"`,
+          actor_id: currentUserId,
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['coach-kpi-comments', userId] });

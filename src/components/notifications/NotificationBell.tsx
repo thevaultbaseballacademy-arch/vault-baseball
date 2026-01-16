@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bell, Heart, MessageCircle, AtSign, Check, Trash2, BookOpen, Users, ExternalLink } from "lucide-react";
+import { Bell, Heart, MessageCircle, AtSign, Check, Trash2, BookOpen, Users, ExternalLink, Target } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { trackNotificationOpened, trackNotificationClicked, trackNotificationDismissed } from "@/lib/notificationAnalytics";
 
@@ -36,6 +36,7 @@ const typeConfig: Record<string, { icon: typeof Heart; color: string; bg: string
   mention: { icon: AtSign, color: "text-purple-500", bg: "bg-purple-500/10" },
   course_update: { icon: BookOpen, color: "text-green-500", bg: "bg-green-500/10" },
   coach_message: { icon: Users, color: "text-orange-500", bg: "bg-orange-500/10" },
+  coach_feedback: { icon: Target, color: "text-accent", bg: "bg-accent/10" },
   community_like: { icon: Heart, color: "text-red-500", bg: "bg-red-500/10" },
   community_comment: { icon: MessageCircle, color: "text-blue-500", bg: "bg-blue-500/10" },
   community_mention: { icon: AtSign, color: "text-purple-500", bg: "bg-purple-500/10" },
@@ -165,6 +166,8 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
       destination = "/courses";
     } else if (notification.type === "coach_message") {
       destination = "/dashboard";
+    } else if (notification.type === "coach_feedback") {
+      destination = "/profile";
     } else if (notification.actor_id && notification.actor_id !== userId) {
       destination = `/profile/${notification.actor_id}`;
     }
