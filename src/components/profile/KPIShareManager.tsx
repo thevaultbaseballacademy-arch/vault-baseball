@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Share2, Copy, Trash2, Eye, Link2, Calendar, Plus } from "lucide-react";
+import { Share2, Copy, Trash2, Eye, Link2, Calendar, Plus, QrCode, Download, X } from "lucide-react";
 import { format } from "date-fns";
+import { QRCodeSVG } from "qrcode.react";
 import {
   Select,
   SelectContent,
@@ -16,6 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ShareToken {
   id: string;
@@ -46,6 +52,8 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [qrToken, setQrToken] = useState<ShareToken | null>(null);
+  const qrRef = useRef<HTMLDivElement>(null);
   
   // New token settings
   const [includeGoals, setIncludeGoals] = useState(true);
@@ -59,7 +67,7 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
 
   const fetchTokens = async () => {
     const { data, error } = await supabase
-      .from('kpi_share_tokens')
+      .from('kpi_share_tokens' as any)
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
@@ -67,7 +75,7 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
     if (error) {
       console.error('Error fetching share tokens:', error);
     } else {
-      setTokens(data || []);
+      setTokens((data as unknown as ShareToken[]) || []);
     }
     setLoading(false);
   };
@@ -95,7 +103,7 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
     const token = generateToken();
     
     const { error } = await supabase
-      .from('kpi_share_tokens')
+      .from('kpi_share_tokens' as any)
       .insert({
         user_id: userId,
         token,
@@ -118,7 +126,7 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
 
   const deleteToken = async (id: string) => {
     const { error } = await supabase
-      .from('kpi_share_tokens')
+      .from('kpi_share_tokens' as any)
       .delete()
       .eq('id', id);
 
@@ -139,6 +147,59 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
   const isExpired = (expiresAt: string | null) => {
     if (!expiresAt) return false;
     return new Date(expiresAt) < new Date();
+  };
+
+  const getShareUrl = (token: string) => `${window.location.origin}/shared/${token}`;
+
+  const downloadQRCode = (token: ShareToken) => {
+    const svg = qrRef.current?.querySelector('svg');
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = 400;
+      canvas.height = 480;
+      
+      if (ctx) {
+        // White background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw QR code centered
+        ctx.drawImage(img, 50, 30, 300, 300);
+        
+        // Add text below
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Scan to view my profile', canvas.width / 2, 370);
+        
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#666666';
+        ctx.fillText('Vault Baseball', canvas.width / 2, 400);
+        
+        if (token.expires_at) {
+          ctx.font = '12px Arial';
+          ctx.fillText(`Valid until ${format(new Date(token.expires_at), 'MMM d, yyyy')}`, canvas.width / 2, 430);
+        }
+      }
+
+      const pngUrl = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pngUrl;
+      downloadLink.download = `profile-qr-${token.token.substring(0, 8)}.png`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      toast.success("QR code downloaded!");
+    };
+
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
 
   if (loading) {
@@ -270,6 +331,15 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={() => setQrToken(token)}
+                    disabled={isExpired(token.expires_at)}
+                    title="Show QR Code"
+                  >
+                    <QrCode className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => copyLink(token.token)}
                     disabled={isExpired(token.expires_at)}
                   >
@@ -288,6 +358,58 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
           </div>
         )}
       </CardContent>
+
+      {/* QR Code Dialog */}
+      <Dialog open={!!qrToken} onOpenChange={(open) => !open && setQrToken(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <QrCode className="h-5 w-5" />
+              QR Code for Recruiters
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center space-y-4 py-4">
+            <div 
+              ref={qrRef}
+              className="bg-white p-6 rounded-lg shadow-inner"
+            >
+              {qrToken && (
+                <QRCodeSVG
+                  value={getShareUrl(qrToken.token)}
+                  size={200}
+                  level="H"
+                  includeMargin={true}
+                />
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Recruiters can scan this QR code to view your profile
+            </p>
+            {qrToken?.expires_at && (
+              <p className="text-xs text-muted-foreground">
+                Valid until {format(new Date(qrToken.expires_at), 'MMMM d, yyyy')}
+              </p>
+            )}
+            <div className="flex gap-2 w-full">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => qrToken && copyLink(qrToken.token)}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Link
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={() => qrToken && downloadQRCode(qrToken)}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
