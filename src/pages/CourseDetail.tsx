@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Clock, CheckCircle, Users, ArrowLeft, BookOpen, 
-  PlayCircle, Lock, ChevronDown, ChevronUp, Play, Video
+  PlayCircle, Lock, ChevronDown, ChevronUp, Play, Video, ShoppingCart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -25,6 +25,7 @@ import {
   useUpdateEnrollmentProgress
 } from "@/hooks/useCourseEnrollment";
 import { useCourseVideos } from "@/hooks/useCourseVideos";
+import { useHasCourseAccess } from "@/hooks/useUserPurchases";
 import { allCourses } from "./Courses";
 import { courseContent } from "@/lib/courseData";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +42,7 @@ const CourseDetailPage = () => {
   const { data: enrollments = [] } = useCourseEnrollments(userId);
   const { data: progressData = [] } = useCourseProgress(userId, courseId || "");
   const { data: dbVideos = [] } = useCourseVideos(courseId || undefined);
+  const { hasAccess: hasPurchasedAccess, isLoading: accessLoading } = useHasCourseAccess(userId, courseId || "");
   const enrollMutation = useEnrollInCourse();
   const updateProgressMutation = useUpdateProgress();
   const updateEnrollmentMutation = useUpdateEnrollmentProgress();
@@ -62,6 +64,7 @@ const CourseDetailPage = () => {
   const staticCourseContent = courseId ? courseContent[courseId] : undefined;
   const enrollment = enrollments.find(e => e.course_id === courseId);
   const isEnrolled = !!enrollment;
+  const hasFullAccess = hasPurchasedAccess || isEnrolled;
 
   // Generate module structure from courseData.ts or fallback to generic structure
   const modules = useMemo(() => {
@@ -145,7 +148,7 @@ const CourseDetailPage = () => {
   };
 
   const handleToggleLesson = (moduleIndex: number, lessonIndex: number) => {
-    if (!userId || !courseId || !isEnrolled) return;
+    if (!userId || !courseId || !hasFullAccess) return;
     
     const isCompleted = isLessonCompleted(moduleIndex, lessonIndex);
     updateProgressMutation.mutate({
@@ -290,9 +293,15 @@ const CourseDetailPage = () => {
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
                   </div>
+                  {hasPurchasedAccess && (
+                    <Badge className="absolute top-4 right-4 bg-green-500">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Purchased
+                    </Badge>
+                  )}
                 </div>
 
-                {isEnrolled ? (
+                {hasFullAccess ? (
                   <>
                     <div className="mb-6">
                       <div className="flex items-center justify-between text-sm mb-2">
@@ -315,27 +324,30 @@ const CourseDetailPage = () => {
                   </>
                 ) : (
                   <div className="mb-6">
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Enroll to track your progress through all {course.lessons} lessons.
-                    </p>
+                    <div className="bg-secondary/50 rounded-lg p-4 mb-4">
+                      <Lock className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-center text-muted-foreground">
+                        Purchase this program to unlock all {course.lessons} lessons and track your progress.
+                      </p>
+                    </div>
+                    <Link to="/products" className="block">
+                      <Button className="w-full" variant="vault" size="lg">
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        View Purchase Options
+                      </Button>
+                    </Link>
                   </div>
                 )}
 
-                <Button 
-                  className="w-full" 
-                  size="lg"
-                  onClick={isEnrolled ? undefined : handleEnroll}
-                  disabled={enrollMutation.isPending}
-                >
-                  {isEnrolled ? (
-                    <>
-                      <PlayCircle className="w-4 h-4 mr-2" />
-                      Continue Training
-                    </>
-                  ) : (
-                    enrollMutation.isPending ? "Enrolling..." : "Enroll Now - Free"
-                  )}
-                </Button>
+                {hasFullAccess && (
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                  >
+                    <PlayCircle className="w-4 h-4 mr-2" />
+                    Continue Training
+                  </Button>
+                )}
 
                 <p className="text-xs text-muted-foreground text-center mt-4">
                   By {course.instructor}
@@ -346,7 +358,7 @@ const CourseDetailPage = () => {
         </section>
 
         {/* Video Player Section */}
-        {activeLesson && isEnrolled && (
+        {activeLesson && hasFullAccess && (
           <section className="container mx-auto px-4 mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

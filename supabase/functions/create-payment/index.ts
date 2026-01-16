@@ -57,9 +57,12 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: successUrl || `${origin}/payment-success`,
+      success_url: successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${origin}/payment-canceled`,
       allow_promotion_codes: true,
+      metadata: {
+        user_id: userEmail ? undefined : 'guest',
+      },
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
