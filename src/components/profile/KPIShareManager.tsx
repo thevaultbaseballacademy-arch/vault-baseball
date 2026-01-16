@@ -6,7 +6,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Share2, Copy, Trash2, Eye, Link2, Calendar, Plus, QrCode, Download, X } from "lucide-react";
+import { Share2, Copy, Trash2, Eye, Link2, Calendar, Plus, QrCode, Download, X, Tag } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -26,6 +27,7 @@ import {
 interface ShareToken {
   id: string;
   token: string;
+  label: string | null;
   expires_at: string | null;
   include_goals: boolean;
   include_stats: boolean;
@@ -56,6 +58,7 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
   const qrRef = useRef<HTMLDivElement>(null);
   
   // New token settings
+  const [label, setLabel] = useState("");
   const [includeGoals, setIncludeGoals] = useState(true);
   const [includeStats, setIncludeStats] = useState(true);
   const [includeVideos, setIncludeVideos] = useState(false);
@@ -107,6 +110,7 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
       .insert({
         user_id: userId,
         token,
+        label: label.trim() || null,
         expires_at: expiresAt,
         include_goals: includeGoals,
         include_stats: includeStats,
@@ -119,6 +123,7 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
     } else {
       toast.success("Share link created!");
       setShowCreateForm(false);
+      setLabel("");
       fetchTokens();
     }
     setCreating(false);
@@ -231,6 +236,19 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
         {showCreateForm && (
           <Card className="border-dashed">
             <CardContent className="pt-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="link-label">Label (optional)</Label>
+                <Input
+                  id="link-label"
+                  placeholder="e.g., Stanford Showcase 2026, Coach Smith"
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  maxLength={100}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Add a label to organize links by event or recruiter
+                </p>
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="include-stats">Include KPI Stats</Label>
@@ -300,9 +318,16 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <code className="text-sm bg-muted px-2 py-1 rounded">
-                      {token.token.substring(0, 8)}...
-                    </code>
+                    {token.label ? (
+                      <span className="font-medium flex items-center gap-1">
+                        <Tag className="h-3 w-3" />
+                        {token.label}
+                      </span>
+                    ) : (
+                      <code className="text-sm bg-muted px-2 py-1 rounded">
+                        {token.token.substring(0, 8)}...
+                      </code>
+                    )}
                     {isExpired(token.expires_at) ? (
                       <Badge variant="destructive">Expired</Badge>
                     ) : (

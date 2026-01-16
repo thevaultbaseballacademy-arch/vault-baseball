@@ -1002,6 +1002,7 @@ export type Database = {
           include_goals: boolean | null
           include_stats: boolean | null
           include_videos: boolean | null
+          label: string | null
           token: string
           updated_at: string
           user_id: string
@@ -1014,6 +1015,7 @@ export type Database = {
           include_goals?: boolean | null
           include_stats?: boolean | null
           include_videos?: boolean | null
+          label?: string | null
           token: string
           updated_at?: string
           user_id: string
@@ -1026,6 +1028,7 @@ export type Database = {
           include_goals?: boolean | null
           include_stats?: boolean | null
           include_videos?: boolean | null
+          label?: string | null
           token?: string
           updated_at?: string
           user_id?: string
