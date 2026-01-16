@@ -159,6 +159,51 @@ export type Database = {
         }
         Relationships: []
       }
+      athlete_kpi_goals: {
+        Row: {
+          achieved_at: string | null
+          created_at: string
+          id: string
+          is_achieved: boolean | null
+          kpi_category: string
+          kpi_name: string
+          kpi_unit: string | null
+          notes: string | null
+          target_date: string | null
+          target_value: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string | null
+          created_at?: string
+          id?: string
+          is_achieved?: boolean | null
+          kpi_category: string
+          kpi_name: string
+          kpi_unit?: string | null
+          notes?: string | null
+          target_date?: string | null
+          target_value: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string | null
+          created_at?: string
+          id?: string
+          is_achieved?: boolean | null
+          kpi_category?: string
+          kpi_name?: string
+          kpi_unit?: string | null
+          notes?: string | null
+          target_date?: string | null
+          target_value?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       athlete_kpis: {
         Row: {
           created_at: string
