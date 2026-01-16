@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { GraduationCap, Check, ArrowRight, Loader2, Target, FileText } from "lucide-react";
+import { GraduationCap, Check, ArrowRight, Loader2, Target, FileText, BarChart3, Map, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -12,30 +12,27 @@ const RecruitmentAudit = () => {
   const product = PRODUCT_PRICES.recruitment_audit;
 
   const includes = [
-    "Complete metrics review and assessment",
-    "Target school identification (10-15 schools)",
-    "Recruiting timeline roadmap",
-    "Video evaluation for recruiting purposes",
-    "Email templates for coach outreach",
-    "Social media profile optimization guide",
-    "Follow-up Q&A session (30 min)",
+    "Metrics review",
+    "Division-fit analysis (D1 / D2 / D3 / JUCO)",
+    "Development roadmap",
+    "Next 6–12 month plan",
   ];
 
   const process = [
     {
       step: "1",
       title: "Submit Your Info",
-      description: "Complete the intake form with your stats, video, and target schools",
+      description: "Complete the intake form with your stats and video",
     },
     {
       step: "2",
-      title: "Expert Review",
-      description: "Our recruiting specialists analyze your profile and identify opportunities",
+      title: "Expert Analysis",
+      description: "Our specialists analyze your profile and realistic targets",
     },
     {
       step: "3",
       title: "Get Your Roadmap",
-      description: "Receive your personalized recruiting strategy within 5 business days",
+      description: "Receive your personalized recruiting strategy",
     },
   ];
 
@@ -55,11 +52,14 @@ const RecruitmentAudit = () => {
                 <GraduationCap className="w-10 h-10 text-green-500" />
               </div>
               <h1 className="text-4xl md:text-6xl font-display text-foreground mb-4">
-                VAULT RECRUITMENT AUDIT
+                KNOW EXACTLY WHERE YOU STAND
               </h1>
+              <p className="text-2xl font-display text-green-500 mb-4">
+                AND WHAT IT TAKES TO GET RECRUITED
+              </p>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Get a clear recruiting roadmap with target schools, timeline, 
-                and strategy guidance from experienced recruiting specialists.
+                A deep dive into your metrics, position, and realistic recruiting targets. 
+                Parents pay for clarity — we deliver it.
               </p>
             </motion.div>
 
@@ -77,7 +77,7 @@ const RecruitmentAudit = () => {
                     <span className="text-5xl font-display text-foreground">{formatPrice(product.price)}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Complete recruiting roadmap delivered in 5 business days
+                    Complete recruiting roadmap • Clear next steps
                   </p>
                 </div>
                 <Button
@@ -85,13 +85,14 @@ const RecruitmentAudit = () => {
                   size="xl"
                   onClick={() => checkout('recruitment_audit')}
                   disabled={loading === 'recruitment_audit'}
+                  className="bg-green-600 hover:bg-green-700"
                 >
                   {loading === 'recruitment_audit' ? (
                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
                   ) : (
                     <FileText className="w-5 h-5 mr-2" />
                   )}
-                  Get My Audit
+                  Get Your Recruitment Audit
                 </Button>
               </div>
             </motion.div>
@@ -123,7 +124,7 @@ const RecruitmentAudit = () => {
             >
               <h3 className="text-2xl font-display text-foreground mb-6 flex items-center gap-3">
                 <Target className="w-6 h-6 text-green-500" />
-                What's Included
+                Includes
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 {includes.map((item, i) => (
@@ -135,19 +136,19 @@ const RecruitmentAudit = () => {
               </div>
             </motion.div>
 
-            {/* Note for Elite Members */}
+            {/* Bundle Hook */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="bg-secondary/50 rounded-2xl p-8 text-center"
+              className="bg-green-500/5 border border-green-500/20 rounded-2xl p-8 text-center"
             >
               <h3 className="text-xl font-display text-foreground mb-2">
-                Elite Members: This is Included
+                Included FREE in Vault Elite Membership
               </h3>
               <p className="text-muted-foreground mb-4">
-                The Recruitment Audit is included as part of the VAULT™ Elite Membership 
-                along with 1-on-1 coaching and unlimited video analysis.
+                Elite members get the Recruitment Audit included along with 
+                1-on-1 coaching and unlimited video analysis.
               </p>
               <Link to="/#pricing">
                 <Button variant="outline">

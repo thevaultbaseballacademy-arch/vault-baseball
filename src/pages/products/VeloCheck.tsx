@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Video, Check, ArrowRight, Loader2, Clock, Upload } from "lucide-react";
+import { Video, Check, ArrowRight, Loader2, Clock, Upload, Users, MapPin, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -20,7 +20,7 @@ const VeloCheck = () => {
     {
       step: "2",
       title: "Upload Video",
-      description: "Submit your throwing or hitting video after purchase",
+      description: "Submit your hitting or throwing video after purchase",
     },
     {
       step: "3",
@@ -30,12 +30,16 @@ const VeloCheck = () => {
   ];
 
   const includes = [
-    "Professional video breakdown",
-    "3 specific, actionable fixes",
-    "VAULT™ framework-based analysis",
-    "Priority processing (48-hour delivery)",
-    "Written summary with timestamps",
+    "Video breakdown by Vault coaches",
+    "3 mechanical or movement fixes",
     "Drill recommendations for each fix",
+    "Delivered within 48 hours",
+  ];
+
+  const perfectFor = [
+    { icon: Users, text: "Non-members testing Vault" },
+    { icon: MapPin, text: "Remote athletes" },
+    { icon: UserCheck, text: "Parents before committing" },
   ];
 
   return (
@@ -54,11 +58,11 @@ const VeloCheck = () => {
                 <Video className="w-10 h-10 text-blue-500" />
               </div>
               <h1 className="text-4xl md:text-6xl font-display text-foreground mb-4">
-                VAULT VELO-CHECK ANALYSIS
+                GET 3 EXACT FIXES THAT UNLOCK MORE VELOCITY
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Professional video analysis with 3 specific VAULT™ Fixes. 
-                Upload your video, get actionable feedback in 48 hours.
+                Upload a hitting or throwing video. Vault coaches analyze it and deliver 
+                3 specific Vault Fixes you can apply immediately.
               </p>
             </motion.div>
 
@@ -109,7 +113,7 @@ const VeloCheck = () => {
                   ) : (
                     <Upload className="w-5 h-5 mr-2" />
                   )}
-                  Get My Analysis
+                  Get Your Velo-Check
                 </Button>
               </div>
             </motion.div>
@@ -121,7 +125,7 @@ const VeloCheck = () => {
               transition={{ delay: 0.3 }}
               className="bg-card border border-border rounded-2xl p-8 mb-12"
             >
-              <h3 className="text-2xl font-display text-foreground mb-6">What's Included</h3>
+              <h3 className="text-2xl font-display text-foreground mb-6">Includes</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 {includes.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
@@ -129,6 +133,29 @@ const VeloCheck = () => {
                     <span className="text-muted-foreground">{item}</span>
                   </div>
                 ))}
+              </div>
+            </motion.div>
+
+            {/* Perfect For */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="bg-card border border-border rounded-2xl p-8 mb-12"
+            >
+              <h3 className="text-2xl font-display text-foreground mb-6">Perfect For</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {perfectFor.map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <span className="text-muted-foreground">{item.text}</span>
+                    </div>
+                  );
+                })}
               </div>
             </motion.div>
 
@@ -140,15 +167,15 @@ const VeloCheck = () => {
               className="bg-secondary/50 rounded-2xl p-8 text-center"
             >
               <h3 className="text-xl font-display text-foreground mb-2">
-                Ready to Apply Your Fixes?
+                Apply Your Fixes Inside Vault Performance
               </h3>
               <p className="text-muted-foreground mb-4">
-                Get the full VAULT™ Membership to access all training systems, 
+                Get the full VAULT™ Membership for $59/month to access all training systems, 
                 ongoing video analysis, and direct coach support.
               </p>
               <Link to="/#pricing">
                 <Button variant="outline">
-                  View Membership Options
+                  View Performance Membership
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
