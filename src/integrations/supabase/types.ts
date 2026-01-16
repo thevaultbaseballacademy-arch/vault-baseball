@@ -522,6 +522,39 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_kpi_comments: {
+        Row: {
+          athlete_user_id: string
+          coach_user_id: string
+          comment: string
+          created_at: string
+          id: string
+          kpi_category: string
+          kpi_name: string
+          updated_at: string
+        }
+        Insert: {
+          athlete_user_id: string
+          coach_user_id: string
+          comment: string
+          created_at?: string
+          id?: string
+          kpi_category: string
+          kpi_name: string
+          updated_at?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          coach_user_id?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          kpi_category?: string
+          kpi_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coaches: {
         Row: {
           created_at: string
