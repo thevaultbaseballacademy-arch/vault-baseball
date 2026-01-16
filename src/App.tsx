@@ -44,6 +44,7 @@ import VeloCheck from "./pages/products/VeloCheck";
 import Bundles from "./pages/products/Bundles";
 import RecruitmentAudit from "./pages/products/RecruitmentAudit";
 import CertifiedCoach from "./pages/products/CertifiedCoach";
+import Products from "./pages/Products";
 import FindCoach from "./pages/FindCoach";
 
 const queryClient = new QueryClient();
@@ -88,6 +89,7 @@ const App = () => (
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* Product Pages */}
+            <Route path="/products" element={<Products />} />
             <Route path="/products/longevity" element={<LongevityBeta />} />
             <Route path="/products/transfer" element={<TransferBeta />} />
             <Route path="/products/velocity-system" element={<VelocitySystem />} />

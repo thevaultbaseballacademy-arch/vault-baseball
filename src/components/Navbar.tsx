@@ -76,8 +76,9 @@ const Navbar = () => {
     },
     { 
       name: "Products", 
-      href: "/products/velocity-system",
+      href: "/products",
       dropdown: [
+        { name: "All Products", href: "/products" },
         { name: "12-Week Velocity System", href: "/products/velocity-system" },
         { name: "Velocity Accelerator", href: "/products/velocity-accelerator" },
         { name: "Velo-Check Analysis", href: "/products/velo-check" },
