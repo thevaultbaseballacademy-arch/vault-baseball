@@ -23,6 +23,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -44,7 +50,10 @@ import {
   X,
   MessageSquare,
   Send,
-  User
+  User,
+  Download,
+  FileText,
+  FileSpreadsheet
 } from "lucide-react";
 import { format, differenceInDays, parseISO } from "date-fns";
 import { 
@@ -57,6 +66,7 @@ import {
   ResponsiveContainer,
   ReferenceLine
 } from "recharts";
+import jsPDF from "jspdf";
 
 interface AthleteKPI {
   id: string;
@@ -532,6 +542,196 @@ const AthleteKPIForm = ({ userId, isOwnProfile, currentUserId }: AthleteKPIFormP
 
   const allKPINames = [...new Set(kpis.map(k => ({ category: k.kpi_category, name: k.kpi_name })))];
 
+  // Export to CSV
+  const exportToCSV = () => {
+    if (kpis.length === 0) {
+      toast.error("No KPI data to export");
+      return;
+    }
+
+    const headers = ["Category", "Metric", "Value", "Unit", "Recorded At", "Notes"];
+    const rows = kpis.map(kpi => [
+      kpi.kpi_category,
+      kpi.kpi_name,
+      kpi.kpi_value.toString(),
+      kpi.kpi_unit || "",
+      format(parseISO(kpi.recorded_at), "yyyy-MM-dd"),
+      kpi.notes || ""
+    ]);
+
+    // Add goals section
+    const goalsHeaders = ["", "", "", "", "", ""];
+    const goalsTitle = ["", "", "", "", "", ""];
+    const goalRows = goals.map(goal => [
+      goal.kpi_category,
+      goal.kpi_name,
+      `Target: ${goal.target_value}`,
+      goal.kpi_unit || "",
+      goal.target_date ? format(parseISO(goal.target_date), "yyyy-MM-dd") : "",
+      goal.is_achieved ? "Achieved" : "In Progress"
+    ]);
+
+    const csvContent = [
+      "KPI Performance Data",
+      `Exported: ${format(new Date(), "MMMM d, yyyy")}`,
+      "",
+      headers.join(","),
+      ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(",")),
+      "",
+      "Goals",
+      ["Category", "Metric", "Target", "Unit", "Target Date", "Status"].join(","),
+      ...goalRows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `kpi-report-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success("CSV exported successfully!");
+  };
+
+  // Export to PDF
+  const exportToPDF = () => {
+    if (kpis.length === 0) {
+      toast.error("No KPI data to export");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPos = 20;
+
+    // Title
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("KPI Performance Report", pageWidth / 2, yPos, { align: "center" });
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Generated: ${format(new Date(), "MMMM d, yyyy")}`, pageWidth / 2, yPos, { align: "center" });
+    yPos += 15;
+
+    // Group by category for better organization
+    const categories = ["performance", "physical", "training"];
+    const categoryLabels: Record<string, string> = {
+      performance: "Performance Metrics",
+      physical: "Physical Measurements",
+      training: "Training Progress"
+    };
+
+    categories.forEach(cat => {
+      const categoryKPIs = groupedKPIs[cat];
+      if (!categoryKPIs || Object.keys(categoryKPIs).length === 0) return;
+
+      // Check if we need a new page
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      // Category header
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(59, 130, 246); // Blue color
+      doc.text(categoryLabels[cat], 14, yPos);
+      yPos += 8;
+      doc.setTextColor(0, 0, 0);
+
+      // Latest values for each metric in this category
+      const latestKPIs = getLatestKPIs(categoryKPIs);
+      
+      latestKPIs.forEach(({ name, latest, trend, historyCount }) => {
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text(name, 14, yPos);
+        
+        doc.setFont("helvetica", "normal");
+        const valueText = `${latest.kpi_value}${latest.kpi_unit ? ` ${latest.kpi_unit}` : ""}`;
+        doc.text(valueText, 100, yPos);
+
+        // Trend indicator
+        if (trend !== 0) {
+          const trendText = trend > 0 ? `+${trend.toFixed(1)}` : trend.toFixed(1);
+          doc.setTextColor(trend > 0 ? 34 : 239, trend > 0 ? 197 : 68, trend > 0 ? 94 : 68);
+          doc.text(trendText, 140, yPos);
+          doc.setTextColor(0, 0, 0);
+        }
+
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`${historyCount} entries | Last: ${format(parseISO(latest.recorded_at), "MMM d, yyyy")}`, 14, yPos + 5);
+        doc.setTextColor(0, 0, 0);
+        
+        yPos += 12;
+      });
+
+      yPos += 5;
+    });
+
+    // Goals Section
+    if (goals.length > 0) {
+      if (yPos > 230) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      yPos += 5;
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(139, 92, 246); // Purple color
+      doc.text("Goals", 14, yPos);
+      yPos += 8;
+      doc.setTextColor(0, 0, 0);
+
+      goals.forEach(goal => {
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        const latestValue = getLatestValueForGoal(goal);
+        const progress = latestValue !== null ? getGoalProgress(goal, latestValue) : null;
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text(goal.kpi_name, 14, yPos);
+
+        doc.setFont("helvetica", "normal");
+        const targetText = `Target: ${goal.target_value}${goal.kpi_unit ? ` ${goal.kpi_unit}` : ""}`;
+        doc.text(targetText, 100, yPos);
+
+        if (goal.is_achieved) {
+          doc.setTextColor(34, 197, 94);
+          doc.text("✓ Achieved", 160, yPos);
+          doc.setTextColor(0, 0, 0);
+        } else if (progress) {
+          doc.text(`${progress.percent.toFixed(0)}%`, 160, yPos);
+        }
+
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        if (goal.target_date) {
+          doc.text(`Target date: ${format(parseISO(goal.target_date), "MMM d, yyyy")}`, 14, yPos + 5);
+        }
+        doc.setTextColor(0, 0, 0);
+        
+        yPos += 12;
+      });
+    }
+
+    // Save PDF
+    doc.save(`kpi-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    toast.success("PDF exported successfully!");
+  };
+
   if (isLoading) {
     return (
       <Card className="border-border bg-card">
@@ -803,14 +1003,36 @@ const AthleteKPIForm = ({ userId, isOwnProfile, currentUserId }: AthleteKPIFormP
             <Gauge className="w-5 h-5 text-primary" />
             Recorded KPIs
           </CardTitle>
-          {isOwnProfile && (
-            <Dialog open={addOpen} onOpenChange={setAddOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Log KPI
-                </Button>
-              </DialogTrigger>
+          <div className="flex items-center gap-2">
+            {/* Export Button */}
+            {kpis.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="outline" className="gap-2">
+                    <Download className="w-4 h-4" />
+                    Export
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-card border-border">
+                  <DropdownMenuItem onClick={exportToCSV} className="gap-2 cursor-pointer">
+                    <FileSpreadsheet className="w-4 h-4 text-green-500" />
+                    Export as CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToPDF} className="gap-2 cursor-pointer">
+                    <FileText className="w-4 h-4 text-red-500" />
+                    Export as PDF
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {isOwnProfile && (
+              <Dialog open={addOpen} onOpenChange={setAddOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Log KPI
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Log New KPI</DialogTitle>
@@ -898,7 +1120,8 @@ const AthleteKPIForm = ({ userId, isOwnProfile, currentUserId }: AthleteKPIFormP
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          )}
+            )}
+          </div>
         </CardHeader>
 
         <CardContent>
