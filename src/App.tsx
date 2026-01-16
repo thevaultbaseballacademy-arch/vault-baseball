@@ -38,8 +38,10 @@ import PaymentCanceled from "./pages/PaymentCanceled";
 import LongevityBeta from "./pages/products/LongevityBeta";
 import TransferBeta from "./pages/products/TransferBeta";
 import VelocitySystem from "./pages/products/VelocitySystem";
+import VelocityAccelerator from "./pages/products/VelocityAccelerator";
 import TeamLicenses from "./pages/products/TeamLicenses";
 import VeloCheck from "./pages/products/VeloCheck";
+import Bundles from "./pages/products/Bundles";
 import RecruitmentAudit from "./pages/products/RecruitmentAudit";
 import CertifiedCoach from "./pages/products/CertifiedCoach";
 import FindCoach from "./pages/FindCoach";
@@ -88,9 +90,11 @@ const App = () => (
             {/* Product Pages */}
             <Route path="/products/longevity" element={<LongevityBeta />} />
             <Route path="/products/transfer" element={<TransferBeta />} />
-            <Route path="/products/velocity" element={<VelocitySystem />} />
+            <Route path="/products/velocity-system" element={<VelocitySystem />} />
+            <Route path="/products/velocity-accelerator" element={<VelocityAccelerator />} />
             <Route path="/products/teams" element={<TeamLicenses />} />
             <Route path="/products/velo-check" element={<VeloCheck />} />
+            <Route path="/products/bundles" element={<Bundles />} />
             <Route path="/products/recruitment" element={<RecruitmentAudit />} />
             <Route path="/products/certified-coach" element={<CertifiedCoach />} />
             <Route path="/find-coach" element={<FindCoach />} />

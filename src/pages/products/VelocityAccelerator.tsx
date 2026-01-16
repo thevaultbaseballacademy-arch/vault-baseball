@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Zap, Check, ArrowRight, Loader2, TrendingUp, Target, Users } from "lucide-react";
+import { Flame, Check, ArrowRight, Loader2, Timer, Target, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -7,25 +7,23 @@ import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
 
-const VelocitySystem = () => {
+const VelocityAccelerator = () => {
   const { checkout, loading } = useProductCheckout();
-  const product = PRODUCT_PRICES.velocity_12week;
+  const product = PRODUCT_PRICES.velocity_accelerator;
 
   const features = [
-    "12 weeks of structured programming",
-    "Lower body → rotational → transfer phases",
-    "Med ball & intent-based training",
-    "Weekly progression model",
-    "Built-in testing checkpoints",
-    "Video demonstration library",
-    "Exit velocity tracking templates",
-    "Pitch velocity development protocols",
+    "6-week focused velocity program",
+    "Weekly structured training",
+    "Intent & overload emphasis",
+    "1 coach feedback video included",
+    "High-intensity progression model",
+    "Built for serious gains in short time",
   ];
 
-  const whoItsFor = [
-    { icon: Target, text: "HS & college-bound hitters" },
-    { icon: TrendingUp, text: "Players chasing real EV jumps" },
-    { icon: Users, text: "Athletes who want results without ongoing membership" },
+  const bestFor = [
+    { icon: Timer, text: "Off-season pushes" },
+    { icon: Target, text: "Showcase prep" },
+    { icon: TrendingUp, text: "Plateau breakers" },
   ];
 
   return (
@@ -40,22 +38,22 @@ const VelocitySystem = () => {
               animate={{ opacity: 1, y: 0 }}
               className="text-center mb-12"
             >
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-600 text-sm font-medium border border-red-500/20 mb-6">
-                <TrendingUp className="w-4 h-4" />
-                Stand-Alone Program - No Subscription Required
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 text-orange-600 text-sm font-medium border border-orange-500/20 mb-6">
+                <Flame className="w-4 h-4" />
+                Premium Short-Term Program
               </span>
-              <div className="w-20 h-20 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-10 h-10 text-red-500" />
+              <div className="w-20 h-20 rounded-2xl bg-orange-500/10 flex items-center justify-center mx-auto mb-6">
+                <Flame className="w-10 h-10 text-orange-500" />
               </div>
               <h1 className="text-4xl md:text-6xl font-display text-foreground mb-4">
-                INCREASE BAT SPEED. INCREASE EXIT VELOCITY.
+                6 WEEKS. MAXIMUM INTENT.
               </h1>
-              <p className="text-2xl font-display text-red-500 mb-4">
-                DO IT THE RIGHT WAY.
+              <p className="text-2xl font-display text-orange-500 mb-4">
+                SERIOUS VELOCITY GAINS.
               </p>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                A 12-week, phase-based velocity system built for serious baseball players 
-                who want real, measurable power gains — without a subscription.
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                A high-intensity velocity sprint for athletes who want results fast. 
+                Short timeline, maximum output, measurable gains.
               </p>
             </motion.div>
 
@@ -64,33 +62,31 @@ const VelocitySystem = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-card to-secondary border border-border rounded-2xl p-8 mb-12"
+              className="bg-gradient-to-br from-orange-500/5 to-orange-600/10 border border-orange-500/20 rounded-2xl p-8 mb-12"
             >
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
-                  <p className="text-sm text-red-600 font-medium mb-2">One-Time Purchase</p>
+                  <p className="text-sm text-orange-600 font-medium mb-2">Premium Program</p>
                   <div className="flex items-baseline gap-2 mb-2">
                     <span className="text-5xl font-display text-foreground">{formatPrice(product.price)}</span>
-                    <span className="text-muted-foreground line-through">$499</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Lifetime access • No recurring fees • Instant access
+                    6 weeks • Includes coach feedback video • One-time purchase
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    variant="vault"
-                    size="xl"
-                    onClick={() => checkout('velocity_12week')}
-                    disabled={loading === 'velocity_12week'}
-                  >
-                    {loading === 'velocity_12week' ? (
-                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    ) : null}
-                    Buy the 12-Week Velocity System
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </div>
+                <Button
+                  variant="vault"
+                  size="xl"
+                  onClick={() => checkout('velocity_accelerator')}
+                  disabled={loading === 'velocity_accelerator'}
+                  className="bg-orange-600 hover:bg-orange-700"
+                >
+                  {loading === 'velocity_accelerator' ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : null}
+                  Start the Velocity Accelerator
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
               </div>
             </motion.div>
 
@@ -101,32 +97,32 @@ const VelocitySystem = () => {
               transition={{ delay: 0.2 }}
               className="bg-card border border-border rounded-2xl p-8 mb-12"
             >
-              <h3 className="text-2xl font-display text-foreground mb-6">What's Included</h3>
+              <h3 className="text-2xl font-display text-foreground mb-6">Includes</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 {features.map((feature, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <Check className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
                     <span className="text-muted-foreground">{feature}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
 
-            {/* Who It's For */}
+            {/* Best For */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="bg-card border border-border rounded-2xl p-8 mb-12"
             >
-              <h3 className="text-2xl font-display text-foreground mb-6">Who It's For</h3>
+              <h3 className="text-2xl font-display text-foreground mb-6">Best For</h3>
               <div className="grid md:grid-cols-3 gap-6">
-                {whoItsFor.map((item, i) => {
+                {bestFor.map((item, i) => {
                   const Icon = item.icon;
                   return (
                     <div key={i} className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5 text-red-500" />
+                      <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 text-orange-500" />
                       </div>
                       <span className="text-muted-foreground">{item.text}</span>
                     </div>
@@ -135,7 +131,7 @@ const VelocitySystem = () => {
               </div>
             </motion.div>
 
-            {/* Upsell */}
+            {/* Bundle Upsell */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -143,15 +139,15 @@ const VelocitySystem = () => {
               className="bg-secondary/50 rounded-2xl p-8 text-center"
             >
               <h3 className="text-xl font-display text-foreground mb-2">
-                Want Coaching Feedback, Metrics Tracking, and Ongoing Programming?
+                Want the Complete Velocity Package?
               </h3>
               <p className="text-muted-foreground mb-4">
-                Upgrade to Vault Performance Membership for personalized coaching, 
-                video analysis, and access to all five training systems.
+                Get the Velocity Max Pack — includes the 12-Week System, Velo-Check Analysis, 
+                and Accelerator Lite for maximum gains.
               </p>
-              <Link to="/#pricing">
+              <Link to="/products/bundles">
                 <Button variant="outline">
-                  Upgrade to Vault Performance Membership
+                  View Bundles & Save
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
@@ -164,4 +160,4 @@ const VelocitySystem = () => {
   );
 };
 
-export default VelocitySystem;
+export default VelocityAccelerator;

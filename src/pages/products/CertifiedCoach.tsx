@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Award, Check, ArrowRight, Loader2, BookOpen, Users, Globe } from "lucide-react";
+import { Award, Check, ArrowRight, Loader2, BookOpen, Users, Globe, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -14,13 +14,13 @@ const CertifiedCoach = () => {
   const benefits = [
     {
       icon: Award,
-      title: "Official Certification",
-      description: "Earn the VAULT™ Certified Coach badge and credentials",
+      title: "VAULT™ Certification Badge",
+      description: "Official credentials recognized across the industry",
     },
     {
       icon: BookOpen,
-      title: "Drill Library Access",
-      description: "Complete access to the VAULT™ drill library with 200+ exercises",
+      title: "Drill & Program Library",
+      description: "Complete access to 200+ exercises and programming templates",
     },
     {
       icon: Globe,
@@ -30,21 +30,27 @@ const CertifiedCoach = () => {
     {
       icon: Users,
       title: "Brand Usage Rights",
-      description: "Permission to use VAULT™ branding in your coaching business",
+      description: "Permission to use VAULT™ branding in your business",
     },
   ];
 
   const includes = [
-    "VAULT™ Certified Coach digital badge",
-    "Annual certification renewal",
-    "Full drill library access (200+ drills)",
+    "VAULT™ Certification badge",
+    "Drill library access",
+    "Brand usage rights",
+    "Listing on Vault website",
     "Programming templates",
     "Coach education modules",
-    "Listing on Find a Coach directory",
-    "VAULT™ brand usage license",
-    "Exclusive coach community access",
+    "Exclusive coach community",
     "Quarterly webinars & updates",
     "Priority support channel",
+    "Annual certification renewal",
+  ];
+
+  const whoItsFor = [
+    { icon: Users, text: "Private instructors" },
+    { icon: Building, text: "Facility owners" },
+    { icon: Award, text: "Travel org coaches" },
   ];
 
   return (
@@ -63,7 +69,7 @@ const CertifiedCoach = () => {
                 <Award className="w-10 h-10 text-background" />
               </div>
               <h1 className="text-4xl md:text-6xl font-display text-foreground mb-4">
-                VAULT™ CERTIFIED COACH PROGRAM
+                BECOME A VAULT™ CERTIFIED COACH
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Join the network of certified VAULT™ coaches. Get the credentials, 
@@ -120,9 +126,32 @@ const CertifiedCoach = () => {
                   {loading === 'certified_coach' ? (
                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
                   ) : null}
-                  Get Certified
+                  Become VAULT™ Certified
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
+              </div>
+            </motion.div>
+
+            {/* Who It's For */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="bg-card border border-border rounded-2xl p-8 mb-12"
+            >
+              <h3 className="text-2xl font-display text-foreground mb-6">Who It's For</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {whoItsFor.map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 text-foreground" />
+                      </div>
+                      <span className="text-muted-foreground">{item.text}</span>
+                    </div>
+                  );
+                })}
               </div>
             </motion.div>
 
@@ -133,7 +162,7 @@ const CertifiedCoach = () => {
               transition={{ delay: 0.3 }}
               className="bg-card border border-border rounded-2xl p-8 mb-12"
             >
-              <h3 className="text-2xl font-display text-foreground mb-6">Everything Included</h3>
+              <h3 className="text-2xl font-display text-foreground mb-6">What Coaches Get</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 {includes.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
