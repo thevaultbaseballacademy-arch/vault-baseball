@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Share2, Copy, Trash2, Eye, Link2, Calendar, Plus, QrCode, Download, X, Tag, Pencil, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -57,6 +58,8 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
   const [qrToken, setQrToken] = useState<ShareToken | null>(null);
   const [editingTokenId, setEditingTokenId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
   
   // New token settings
@@ -171,6 +174,45 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
   const cancelEditing = () => {
     setEditingTokenId(null);
     setEditLabel("");
+  };
+
+  const toggleSelection = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === tokens.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(tokens.map(t => t.id)));
+    }
+  };
+
+  const deleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+    
+    setBulkDeleting(true);
+    const idsToDelete = Array.from(selectedIds);
+    
+    const { error } = await supabase
+      .from('kpi_share_tokens' as any)
+      .delete()
+      .in('id', idsToDelete);
+
+    if (error) {
+      toast.error("Failed to delete selected links");
+    } else {
+      toast.success(`${idsToDelete.length} link${idsToDelete.length > 1 ? 's' : ''} deleted`);
+      setTokens(tokens.filter(t => !selectedIds.has(t.id)));
+      setSelectedIds(new Set());
+    }
+    setBulkDeleting(false);
   };
 
   const copyLink = (token: string) => {
@@ -339,13 +381,45 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
           </div>
         ) : (
           <div className="space-y-3">
+            {/* Bulk actions bar */}
+            <div className="flex items-center justify-between py-2 border-b">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  checked={selectedIds.size === tokens.length && tokens.length > 0}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Select all"
+                />
+                <span className="text-sm text-muted-foreground">
+                  {selectedIds.size > 0 
+                    ? `${selectedIds.size} selected`
+                    : "Select all"}
+                </span>
+              </div>
+              {selectedIds.size > 0 && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={deleteSelected}
+                  disabled={bulkDeleting}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {bulkDeleting ? "Deleting..." : `Delete (${selectedIds.size})`}
+                </Button>
+              )}
+            </div>
+            
             {tokens.map((token) => (
               <div
                 key={token.id}
-                className={`flex items-center justify-between p-4 rounded-lg border ${
+                className={`flex items-center gap-3 p-4 rounded-lg border ${
                   isExpired(token.expires_at) ? 'bg-muted/50 opacity-60' : 'bg-card'
-                }`}
+                } ${selectedIds.has(token.id) ? 'ring-2 ring-primary' : ''}`}
               >
+                <Checkbox
+                  checked={selectedIds.has(token.id)}
+                  onCheckedChange={() => toggleSelection(token.id)}
+                  aria-label={`Select ${token.label || token.token.substring(0, 8)}`}
+                />
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     {editingTokenId === token.id ? (
@@ -426,7 +500,7 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
                     {token.include_videos && <Badge variant="outline">Videos</Badge>}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <Button
                     variant="outline"
                     size="sm"
