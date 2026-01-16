@@ -36,6 +36,11 @@ const Footer = () => {
                     My Programs
                   </Link>
                 </li>
+                <li>
+                  <Link to="/certificate-leaderboard" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Leaderboard
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -65,12 +70,33 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link to="/certifications/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                    Leaderboard
+                    Cert Leaderboard
                   </Link>
                 </li>
                 <li>
                   <Link to="/verify" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                     Verify Certificate
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-display text-sm text-foreground mb-3">LEGAL</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/refunds" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Refund Policy
                   </Link>
                 </li>
               </ul>
@@ -105,10 +131,15 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border mt-8 pt-6 text-center">
+        <div className="border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} Vault Baseball. All rights reserved.
           </p>
+          <div className="flex gap-4 text-xs text-muted-foreground">
+            <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link to="/refunds" className="hover:text-foreground transition-colors">Refunds</Link>
+          </div>
         </div>
       </div>
     </footer>
