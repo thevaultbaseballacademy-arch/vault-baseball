@@ -46,6 +46,7 @@ import RecruitmentAudit from "./pages/products/RecruitmentAudit";
 import CertifiedCoach from "./pages/products/CertifiedCoach";
 import Products from "./pages/Products";
 import FindCoach from "./pages/FindCoach";
+import SharedProfile from "./pages/SharedProfile";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,7 @@ const App = () => (
             <Route path="/products/recruitment" element={<RecruitmentAudit />} />
             <Route path="/products/certified-coach" element={<CertifiedCoach />} />
             <Route path="/find-coach" element={<FindCoach />} />
+            <Route path="/shared/:token" element={<SharedProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

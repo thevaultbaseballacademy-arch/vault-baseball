@@ -994,6 +994,45 @@ export type Database = {
         }
         Relationships: []
       }
+      kpi_share_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          include_goals: boolean | null
+          include_stats: boolean | null
+          include_videos: boolean | null
+          token: string
+          updated_at: string
+          user_id: string
+          view_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          include_goals?: boolean | null
+          include_stats?: boolean | null
+          include_videos?: boolean | null
+          token: string
+          updated_at?: string
+          user_id: string
+          view_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          include_goals?: boolean | null
+          include_stats?: boolean | null
+          include_videos?: boolean | null
+          token?: string
+          updated_at?: string
+          user_id?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       notification_analytics: {
         Row: {
           created_at: string
@@ -1540,6 +1579,7 @@ export type Database = {
           is_correct: boolean
         }[]
       }
+      get_shared_kpi_profile: { Args: { share_token: string }; Returns: Json }
       has_admin_role: { Args: { user_uuid: string }; Returns: boolean }
       has_role: {
         Args: {
