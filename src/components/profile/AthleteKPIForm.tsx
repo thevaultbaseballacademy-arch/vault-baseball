@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   Gauge, 
@@ -33,9 +35,13 @@ import {
   Ruler, 
   Dumbbell,
   TrendingUp,
-  Calendar
+  Calendar,
+  Target,
+  Trophy,
+  CheckCircle2,
+  Clock
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 
 interface AthleteKPI {
   id: string;
@@ -46,6 +52,20 @@ interface AthleteKPI {
   kpi_unit: string | null;
   recorded_at: string;
   notes: string | null;
+  created_at: string;
+}
+
+interface AthleteKPIGoal {
+  id: string;
+  user_id: string;
+  kpi_category: string;
+  kpi_name: string;
+  target_value: number;
+  kpi_unit: string | null;
+  target_date: string | null;
+  notes: string | null;
+  is_achieved: boolean;
+  achieved_at: string | null;
   created_at: string;
 }
 
@@ -61,41 +81,41 @@ const kpiCategories = [
 ];
 
 const performanceKPIs = [
-  { name: "Fastball Velocity", unit: "mph" },
-  { name: "Exit Velocity", unit: "mph" },
-  { name: "Sprint Speed", unit: "mph" },
-  { name: "60-Yard Dash", unit: "sec" },
-  { name: "Throwing Velocity", unit: "mph" },
-  { name: "Pop Time", unit: "sec" },
-  { name: "Bat Speed", unit: "mph" },
-  { name: "Spin Rate", unit: "rpm" },
-  { name: "Launch Angle", unit: "°" },
-  { name: "Home to First", unit: "sec" },
+  { name: "Fastball Velocity", unit: "mph", direction: "higher" },
+  { name: "Exit Velocity", unit: "mph", direction: "higher" },
+  { name: "Sprint Speed", unit: "mph", direction: "higher" },
+  { name: "60-Yard Dash", unit: "sec", direction: "lower" },
+  { name: "Throwing Velocity", unit: "mph", direction: "higher" },
+  { name: "Pop Time", unit: "sec", direction: "lower" },
+  { name: "Bat Speed", unit: "mph", direction: "higher" },
+  { name: "Spin Rate", unit: "rpm", direction: "higher" },
+  { name: "Launch Angle", unit: "°", direction: "higher" },
+  { name: "Home to First", unit: "sec", direction: "lower" },
 ];
 
 const physicalKPIs = [
-  { name: "Height", unit: "in" },
-  { name: "Weight", unit: "lbs" },
-  { name: "Body Fat", unit: "%" },
-  { name: "Wingspan", unit: "in" },
-  { name: "Vertical Jump", unit: "in" },
-  { name: "Broad Jump", unit: "in" },
-  { name: "Grip Strength (L)", unit: "lbs" },
-  { name: "Grip Strength (R)", unit: "lbs" },
-  { name: "Flexibility Score", unit: "" },
+  { name: "Height", unit: "in", direction: "higher" },
+  { name: "Weight", unit: "lbs", direction: "neutral" },
+  { name: "Body Fat", unit: "%", direction: "lower" },
+  { name: "Wingspan", unit: "in", direction: "higher" },
+  { name: "Vertical Jump", unit: "in", direction: "higher" },
+  { name: "Broad Jump", unit: "in", direction: "higher" },
+  { name: "Grip Strength (L)", unit: "lbs", direction: "higher" },
+  { name: "Grip Strength (R)", unit: "lbs", direction: "higher" },
+  { name: "Flexibility Score", unit: "", direction: "higher" },
 ];
 
 const trainingKPIs = [
-  { name: "Weekly Workouts", unit: "sessions" },
-  { name: "Training Hours", unit: "hrs" },
-  { name: "Squat Max", unit: "lbs" },
-  { name: "Bench Press Max", unit: "lbs" },
-  { name: "Deadlift Max", unit: "lbs" },
-  { name: "Pull-ups", unit: "reps" },
-  { name: "Plyo Throws", unit: "throws" },
-  { name: "Long Toss Max", unit: "ft" },
-  { name: "Bullpen Count", unit: "pitches" },
-  { name: "BP Swings", unit: "swings" },
+  { name: "Weekly Workouts", unit: "sessions", direction: "higher" },
+  { name: "Training Hours", unit: "hrs", direction: "higher" },
+  { name: "Squat Max", unit: "lbs", direction: "higher" },
+  { name: "Bench Press Max", unit: "lbs", direction: "higher" },
+  { name: "Deadlift Max", unit: "lbs", direction: "higher" },
+  { name: "Pull-ups", unit: "reps", direction: "higher" },
+  { name: "Plyo Throws", unit: "throws", direction: "higher" },
+  { name: "Long Toss Max", unit: "ft", direction: "higher" },
+  { name: "Bullpen Count", unit: "pitches", direction: "higher" },
+  { name: "BP Swings", unit: "swings", direction: "higher" },
 ];
 
 const getKPIOptions = (category: string) => {
@@ -107,14 +127,24 @@ const getKPIOptions = (category: string) => {
   }
 };
 
+const getKPIDirection = (category: string, name: string): string => {
+  const options = getKPIOptions(category);
+  const found = options.find(k => k.name === name);
+  return found?.direction || "higher";
+};
+
 const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
   const [addOpen, setAddOpen] = useState(false);
+  const [goalOpen, setGoalOpen] = useState(false);
   const [category, setCategory] = useState<string>("");
   const [kpiName, setKpiName] = useState("");
   const [kpiValue, setKpiValue] = useState("");
   const [kpiUnit, setKpiUnit] = useState("");
   const [recordedAt, setRecordedAt] = useState(format(new Date(), "yyyy-MM-dd"));
   const [notes, setNotes] = useState("");
+  const [targetValue, setTargetValue] = useState("");
+  const [targetDate, setTargetDate] = useState("");
+  const [goalNotes, setGoalNotes] = useState("");
   const [activeTab, setActiveTab] = useState("performance");
   const queryClient = useQueryClient();
 
@@ -128,6 +158,19 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data as AthleteKPI[];
+    }
+  });
+
+  const { data: goals = [] } = useQuery({
+    queryKey: ['athlete-kpi-goals', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('athlete_kpi_goals')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as AthleteKPIGoal[];
     }
   });
 
@@ -148,10 +191,36 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['athlete-kpis', userId] });
+      checkGoalAchievement();
       toast.success("KPI recorded!");
       resetForm();
     },
     onError: () => toast.error("Failed to add KPI"),
+  });
+
+  const addGoal = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('athlete_kpi_goals')
+        .upsert({
+          user_id: userId,
+          kpi_category: category,
+          kpi_name: kpiName,
+          target_value: parseFloat(targetValue),
+          kpi_unit: kpiUnit || null,
+          target_date: targetDate || null,
+          notes: goalNotes || null,
+        }, {
+          onConflict: 'user_id,kpi_category,kpi_name'
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['athlete-kpi-goals', userId] });
+      toast.success("Goal set!");
+      resetGoalForm();
+    },
+    onError: () => toast.error("Failed to set goal"),
   });
 
   const deleteKPI = useMutation({
@@ -166,6 +235,54 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
     onError: () => toast.error("Failed to remove KPI"),
   });
 
+  const deleteGoal = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('athlete_kpi_goals').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['athlete-kpi-goals', userId] });
+      toast.success("Goal removed");
+    },
+    onError: () => toast.error("Failed to remove goal"),
+  });
+
+  const markGoalAchieved = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('athlete_kpi_goals')
+        .update({ is_achieved: true, achieved_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['athlete-kpi-goals', userId] });
+      toast.success("🎉 Goal achieved!");
+    },
+    onError: () => toast.error("Failed to update goal"),
+  });
+
+  const checkGoalAchievement = async () => {
+    // Check if any goals should be marked as achieved based on new KPI
+    const relevantGoal = goals.find(g => 
+      g.kpi_category === category && 
+      g.kpi_name === kpiName && 
+      !g.is_achieved
+    );
+    
+    if (relevantGoal) {
+      const newValue = parseFloat(kpiValue);
+      const direction = getKPIDirection(category, kpiName);
+      const achieved = direction === "lower" 
+        ? newValue <= relevantGoal.target_value
+        : newValue >= relevantGoal.target_value;
+      
+      if (achieved) {
+        await markGoalAchieved.mutateAsync(relevantGoal.id);
+      }
+    }
+  };
+
   const resetForm = () => {
     setAddOpen(false);
     setCategory("");
@@ -174,6 +291,16 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
     setKpiUnit("");
     setRecordedAt(format(new Date(), "yyyy-MM-dd"));
     setNotes("");
+  };
+
+  const resetGoalForm = () => {
+    setGoalOpen(false);
+    setCategory("");
+    setKpiName("");
+    setTargetValue("");
+    setKpiUnit("");
+    setTargetDate("");
+    setGoalNotes("");
   };
 
   const handleKPISelect = (name: string) => {
@@ -201,10 +328,44 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
     }));
   };
 
-  const getCategoryIcon = (cat: string) => {
-    const found = kpiCategories.find(c => c.value === cat);
-    return found ? found.icon : Gauge;
+  const getGoalProgress = (goal: AthleteKPIGoal, latestValue: number | null): { percent: number; remaining: number } => {
+    if (latestValue === null) return { percent: 0, remaining: goal.target_value };
+    
+    const direction = getKPIDirection(goal.kpi_category, goal.kpi_name);
+    
+    // Get the starting point (first recorded value for this KPI)
+    const categoryKPIs = groupedKPIs[goal.kpi_category]?.[goal.kpi_name] || [];
+    const startValue = categoryKPIs.length > 0 
+      ? categoryKPIs[categoryKPIs.length - 1].kpi_value 
+      : latestValue;
+    
+    if (direction === "lower") {
+      // For "lower is better" metrics (like 60-yard dash)
+      const totalToImprove = startValue - goal.target_value;
+      if (totalToImprove <= 0) return { percent: 100, remaining: 0 };
+      const improved = startValue - latestValue;
+      const percent = Math.min(100, Math.max(0, (improved / totalToImprove) * 100));
+      const remaining = Math.max(0, latestValue - goal.target_value);
+      return { percent, remaining };
+    } else {
+      // For "higher is better" metrics (like fastball velocity)
+      const totalToImprove = goal.target_value - startValue;
+      if (totalToImprove <= 0) return { percent: 100, remaining: 0 };
+      const improved = latestValue - startValue;
+      const percent = Math.min(100, Math.max(0, (improved / totalToImprove) * 100));
+      const remaining = Math.max(0, goal.target_value - latestValue);
+      return { percent, remaining };
+    }
   };
+
+  const getLatestValueForGoal = (goal: AthleteKPIGoal): number | null => {
+    const categoryKPIs = groupedKPIs[goal.kpi_category]?.[goal.kpi_name];
+    if (!categoryKPIs || categoryKPIs.length === 0) return null;
+    return categoryKPIs[0].kpi_value;
+  };
+
+  const activeGoals = goals.filter(g => !g.is_achieved);
+  const achievedGoals = goals.filter(g => g.is_achieved);
 
   if (isLoading) {
     return (
@@ -217,185 +378,452 @@ const AthleteKPIForm = ({ userId, isOwnProfile }: AthleteKPIFormProps) => {
   }
 
   return (
-    <Card className="border-border bg-card">
-      <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
-        <CardTitle className="flex items-center gap-2">
-          <Gauge className="w-5 h-5 text-primary" />
-          Athlete KPIs
-        </CardTitle>
-        {isOwnProfile && (
-          <Dialog open={addOpen} onOpenChange={setAddOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
-                <Plus className="w-4 h-4" />
-                Log KPI
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Log New KPI</DialogTitle>
-                <DialogDescription>Track your performance, physical, or training metrics.</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>Category</Label>
-                  <Select value={category} onValueChange={(v) => { setCategory(v); setKpiName(""); setKpiUnit(""); }}>
-                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                    <SelectContent>
-                      {kpiCategories.map(c => (
-                        <SelectItem key={c.value} value={c.value}>
-                          <div className="flex items-center gap-2">
-                            <c.icon className={`w-4 h-4 ${c.color}`} />
-                            {c.label}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {category && (
+    <div className="space-y-6">
+      {/* Goals Section */}
+      <Card className="border-border bg-card">
+        <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
+          <CardTitle className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            KPI Goals
+          </CardTitle>
+          {isOwnProfile && (
+            <Dialog open={goalOpen} onOpenChange={setGoalOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="gap-2">
+                  <Target className="w-4 h-4" />
+                  Set Goal
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Set Performance Goal</DialogTitle>
+                  <DialogDescription>Define a target to work toward, like 90mph fastball or 6.5 sec 60-yard dash.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label>Metric</Label>
-                    <Select value={kpiName} onValueChange={handleKPISelect}>
-                      <SelectTrigger><SelectValue placeholder="Select metric" /></SelectTrigger>
+                    <Label>Category</Label>
+                    <Select value={category} onValueChange={(v) => { setCategory(v); setKpiName(""); setKpiUnit(""); }}>
+                      <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                       <SelectContent>
-                        {getKPIOptions(category).map(k => (
-                          <SelectItem key={k.name} value={k.name}>
-                            {k.name} {k.unit && `(${k.unit})`}
+                        {kpiCategories.map(c => (
+                          <SelectItem key={c.value} value={c.value}>
+                            <div className="flex items-center gap-2">
+                              <c.icon className={`w-4 h-4 ${c.color}`} />
+                              {c.label}
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                )}
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Value</Label>
-                    <div className="flex items-center gap-2">
+                  {category && (
+                    <div className="space-y-2">
+                      <Label>Metric</Label>
+                      <Select value={kpiName} onValueChange={handleKPISelect}>
+                        <SelectTrigger><SelectValue placeholder="Select metric" /></SelectTrigger>
+                        <SelectContent>
+                          {getKPIOptions(category).map(k => (
+                            <SelectItem key={k.name} value={k.name}>
+                              {k.name} {k.unit && `(${k.unit})`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Target Value</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={targetValue}
+                          onChange={(e) => setTargetValue(e.target.value)}
+                          placeholder="90"
+                        />
+                        {kpiUnit && (
+                          <span className="text-sm text-muted-foreground whitespace-nowrap">{kpiUnit}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Target Date (optional)</Label>
                       <Input
-                        type="number"
-                        step="0.01"
-                        value={kpiValue}
-                        onChange={(e) => setKpiValue(e.target.value)}
-                        placeholder="0"
+                        type="date"
+                        value={targetDate}
+                        onChange={(e) => setTargetDate(e.target.value)}
                       />
-                      {kpiUnit && (
-                        <span className="text-sm text-muted-foreground whitespace-nowrap">{kpiUnit}</span>
-                      )}
                     </div>
                   </div>
+
                   <div className="space-y-2">
-                    <Label>Date</Label>
-                    <Input
-                      type="date"
-                      value={recordedAt}
-                      onChange={(e) => setRecordedAt(e.target.value)}
+                    <Label>Notes (optional)</Label>
+                    <Textarea
+                      value={goalNotes}
+                      onChange={(e) => setGoalNotes(e.target.value)}
+                      placeholder="Why this goal matters to you..."
+                      rows={2}
                     />
                   </div>
                 </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={resetGoalForm}>Cancel</Button>
+                  <Button 
+                    onClick={() => addGoal.mutate()} 
+                    disabled={!category || !kpiName || !targetValue || addGoal.isPending}
+                  >
+                    {addGoal.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    Set Goal
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        </CardHeader>
 
-                <div className="space-y-2">
-                  <Label>Notes (optional)</Label>
-                  <Textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Add context or details..."
-                    rows={2}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={resetForm}>Cancel</Button>
-                <Button 
-                  onClick={() => addKPI.mutate()} 
-                  disabled={!category || !kpiName || !kpiValue || addKPI.isPending}
-                >
-                  {addKPI.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  Log KPI
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
-      </CardHeader>
+        <CardContent>
+          {goals.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Target className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No goals set yet</p>
+              {isOwnProfile && <p className="text-sm mt-1">Set targets to track your progress</p>}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Active Goals */}
+              {activeGoals.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Active Goals ({activeGoals.length})
+                  </h4>
+                  <div className="grid gap-3">
+                    {activeGoals.map(goal => {
+                      const latestValue = getLatestValueForGoal(goal);
+                      const { percent, remaining } = getGoalProgress(goal, latestValue);
+                      const daysLeft = goal.target_date 
+                        ? differenceInDays(new Date(goal.target_date), new Date())
+                        : null;
+                      const categoryInfo = kpiCategories.find(c => c.value === goal.kpi_category);
+                      const Icon = categoryInfo?.icon || Target;
 
-      <CardContent>
-        {kpis.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <Gauge className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No KPIs logged yet</p>
-            {isOwnProfile && <p className="text-sm mt-1">Start tracking your performance metrics</p>}
-          </div>
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3 mb-4">
-              {kpiCategories.map(cat => (
-                <TabsTrigger key={cat.value} value={cat.value} className="flex items-center gap-1.5">
-                  <cat.icon className={`w-4 h-4 ${cat.color}`} />
-                  <span className="hidden sm:inline">{cat.label.split(' ')[0]}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {kpiCategories.map(cat => {
-              const categoryData = groupedKPIs[cat.value] || {};
-              const latestKPIs = getLatestKPIs(categoryData);
-
-              return (
-                <TabsContent key={cat.value} value={cat.value}>
-                  {latestKPIs.length === 0 ? (
-                    <div className="text-center py-6 text-muted-foreground">
-                      <cat.icon className={`w-8 h-8 mx-auto mb-2 opacity-50 ${cat.color}`} />
-                      <p className="text-sm">No {cat.label.toLowerCase()} recorded</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {latestKPIs.map(({ name, latest, trend }) => (
+                      return (
                         <div 
-                          key={name}
-                          className="group relative p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+                          key={goal.id}
+                          className="group relative p-4 rounded-lg border border-border bg-muted/30"
                         >
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-muted-foreground truncate pr-2">{name}</p>
-                            {trend !== 0 && (
-                              <TrendingUp className={`w-3 h-3 flex-shrink-0 ${trend > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
-                            )}
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Icon className={`w-4 h-4 ${categoryInfo?.color || 'text-muted-foreground'}`} />
+                              <span className="font-medium">{goal.kpi_name}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {daysLeft !== null && daysLeft >= 0 && (
+                                <Badge variant="outline" className="text-xs">
+                                  {daysLeft === 0 ? 'Today' : `${daysLeft}d left`}
+                                </Badge>
+                              )}
+                              {daysLeft !== null && daysLeft < 0 && (
+                                <Badge variant="destructive" className="text-xs">
+                                  Overdue
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-xl font-bold text-foreground">
-                            {latest.kpi_value}
-                            {latest.kpi_unit && (
-                              <span className="text-sm font-normal text-muted-foreground ml-1">{latest.kpi_unit}</span>
-                            )}
-                          </p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Calendar className="w-3 h-3 text-muted-foreground" />
-                            <p className="text-xs text-muted-foreground">
-                              {format(new Date(latest.recorded_at), "MMM d, yyyy")}
-                            </p>
+                          
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">
+                                Current: {latestValue !== null ? `${latestValue}${goal.kpi_unit ? ` ${goal.kpi_unit}` : ''}` : 'No data'}
+                              </span>
+                              <span className="font-medium text-primary">
+                                Target: {goal.target_value}{goal.kpi_unit ? ` ${goal.kpi_unit}` : ''}
+                              </span>
+                            </div>
+                            <Progress value={percent} className="h-2" />
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span>{Math.round(percent)}% complete</span>
+                              {remaining > 0 && (
+                                <span>{remaining.toFixed(1)} {goal.kpi_unit} to go</span>
+                              )}
+                            </div>
                           </div>
+
+                          {goal.notes && (
+                            <p className="text-xs text-muted-foreground mt-2 italic">"{goal.notes}"</p>
+                          )}
+
                           {isOwnProfile && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => deleteKPI.mutate(latest.id)}
-                            >
-                              <Trash2 className="w-3 h-3 text-destructive" />
-                            </Button>
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                              {percent >= 100 && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => markGoalAchieved.mutate(goal.id)}
+                                >
+                                  <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => deleteGoal.mutate(goal.id)}
+                              >
+                                <Trash2 className="w-3 h-3 text-destructive" />
+                              </Button>
+                            </div>
                           )}
                         </div>
-                      ))}
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Achieved Goals */}
+              {achievedGoals.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-amber-500" />
+                    Achieved ({achievedGoals.length})
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {achievedGoals.map(goal => (
+                      <div 
+                        key={goal.id}
+                        className="group relative p-3 rounded-lg border border-green-500/30 bg-green-500/10"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm font-medium truncate">{goal.kpi_name}</span>
+                        </div>
+                        <p className="text-lg font-bold text-foreground">
+                          {goal.target_value}
+                          {goal.kpi_unit && <span className="text-sm font-normal ml-1">{goal.kpi_unit}</span>}
+                        </p>
+                        {goal.achieved_at && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {format(new Date(goal.achieved_at), "MMM d, yyyy")}
+                          </p>
+                        )}
+                        {isOwnProfile && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => deleteGoal.mutate(goal.id)}
+                          >
+                            <Trash2 className="w-3 h-3 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* KPIs Section */}
+      <Card className="border-border bg-card">
+        <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
+          <CardTitle className="flex items-center gap-2">
+            <Gauge className="w-5 h-5 text-primary" />
+            Recorded KPIs
+          </CardTitle>
+          {isOwnProfile && (
+            <Dialog open={addOpen} onOpenChange={setAddOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  Log KPI
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Log New KPI</DialogTitle>
+                  <DialogDescription>Track your performance, physical, or training metrics.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>Category</Label>
+                    <Select value={category} onValueChange={(v) => { setCategory(v); setKpiName(""); setKpiUnit(""); }}>
+                      <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                      <SelectContent>
+                        {kpiCategories.map(c => (
+                          <SelectItem key={c.value} value={c.value}>
+                            <div className="flex items-center gap-2">
+                              <c.icon className={`w-4 h-4 ${c.color}`} />
+                              {c.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {category && (
+                    <div className="space-y-2">
+                      <Label>Metric</Label>
+                      <Select value={kpiName} onValueChange={handleKPISelect}>
+                        <SelectTrigger><SelectValue placeholder="Select metric" /></SelectTrigger>
+                        <SelectContent>
+                          {getKPIOptions(category).map(k => (
+                            <SelectItem key={k.name} value={k.name}>
+                              {k.name} {k.unit && `(${k.unit})`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   )}
-                </TabsContent>
-              );
-            })}
-          </Tabs>
-        )}
-      </CardContent>
-    </Card>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Value</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={kpiValue}
+                          onChange={(e) => setKpiValue(e.target.value)}
+                          placeholder="0"
+                        />
+                        {kpiUnit && (
+                          <span className="text-sm text-muted-foreground whitespace-nowrap">{kpiUnit}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Date</Label>
+                      <Input
+                        type="date"
+                        value={recordedAt}
+                        onChange={(e) => setRecordedAt(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Notes (optional)</Label>
+                    <Textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Add context or details..."
+                      rows={2}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={resetForm}>Cancel</Button>
+                  <Button 
+                    onClick={() => addKPI.mutate()} 
+                    disabled={!category || !kpiName || !kpiValue || addKPI.isPending}
+                  >
+                    {addKPI.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    Log KPI
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        </CardHeader>
+
+        <CardContent>
+          {kpis.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Gauge className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No KPIs logged yet</p>
+              {isOwnProfile && <p className="text-sm mt-1">Start tracking your performance metrics</p>}
+            </div>
+          ) : (
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                {kpiCategories.map(cat => (
+                  <TabsTrigger key={cat.value} value={cat.value} className="flex items-center gap-1.5">
+                    <cat.icon className={`w-4 h-4 ${cat.color}`} />
+                    <span className="hidden sm:inline">{cat.label.split(' ')[0]}</span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              {kpiCategories.map(cat => {
+                const categoryData = groupedKPIs[cat.value] || {};
+                const latestKPIs = getLatestKPIs(categoryData);
+
+                return (
+                  <TabsContent key={cat.value} value={cat.value}>
+                    {latestKPIs.length === 0 ? (
+                      <div className="text-center py-6 text-muted-foreground">
+                        <cat.icon className={`w-8 h-8 mx-auto mb-2 opacity-50 ${cat.color}`} />
+                        <p className="text-sm">No {cat.label.toLowerCase()} recorded</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {latestKPIs.map(({ name, latest, trend }) => {
+                          const goal = goals.find(g => g.kpi_category === cat.value && g.kpi_name === name && !g.is_achieved);
+                          
+                          return (
+                            <div 
+                              key={name}
+                              className="group relative p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+                            >
+                              <div className="flex items-center justify-between mb-1">
+                                <p className="text-xs text-muted-foreground truncate pr-2">{name}</p>
+                                {trend !== 0 && (
+                                  <TrendingUp className={`w-3 h-3 flex-shrink-0 ${trend > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
+                                )}
+                              </div>
+                              <p className="text-xl font-bold text-foreground">
+                                {latest.kpi_value}
+                                {latest.kpi_unit && (
+                                  <span className="text-sm font-normal text-muted-foreground ml-1">{latest.kpi_unit}</span>
+                                )}
+                              </p>
+                              {goal && (
+                                <div className="flex items-center gap-1 mt-1">
+                                  <Target className="w-3 h-3 text-primary" />
+                                  <span className="text-xs text-primary">
+                                    Goal: {goal.target_value}{goal.kpi_unit ? ` ${goal.kpi_unit}` : ''}
+                                  </span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1 mt-1">
+                                <Calendar className="w-3 h-3 text-muted-foreground" />
+                                <p className="text-xs text-muted-foreground">
+                                  {format(new Date(latest.recorded_at), "MMM d, yyyy")}
+                                </p>
+                              </div>
+                              {isOwnProfile && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => deleteKPI.mutate(latest.id)}
+                                >
+                                  <Trash2 className="w-3 h-3 text-destructive" />
+                                </Button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </TabsContent>
+                );
+              })}
+            </Tabs>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
