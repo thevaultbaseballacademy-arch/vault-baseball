@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Trophy, Award, Medal, Crown, GraduationCap, Calendar, ChevronRight } from "lucide-react";
+import { Trophy, Award, Medal, Crown, GraduationCap, Calendar, ChevronRight, Clock, CalendarDays, CalendarRange, Infinity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCertificateLeaderboard } from "@/hooks/useCertificateLeaderboard";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCertificateLeaderboard, TimeFilter } from "@/hooks/useCertificateLeaderboard";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -35,8 +37,16 @@ const getRankBadgeClass = (rank: number) => {
   }
 };
 
+const timeFilterLabels: Record<TimeFilter, { label: string; icon: React.ReactNode; description: string }> = {
+  week: { label: "This Week", icon: <Clock className="w-4 h-4" />, description: "Last 7 days" },
+  month: { label: "This Month", icon: <CalendarDays className="w-4 h-4" />, description: "Last 30 days" },
+  year: { label: "This Year", icon: <CalendarRange className="w-4 h-4" />, description: "Last 365 days" },
+  all: { label: "All Time", icon: <Infinity className="w-4 h-4" />, description: "Since the beginning" },
+};
+
 const CertificateLeaderboard = () => {
-  const { data: leaderboard, isLoading } = useCertificateLeaderboard(50);
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const { data: leaderboard, isLoading } = useCertificateLeaderboard(50, timeFilter);
 
   const topThree = leaderboard?.slice(0, 3) || [];
   const rest = leaderboard?.slice(3) || [];
@@ -50,7 +60,7 @@ const CertificateLeaderboard = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <Trophy className="w-10 h-10 text-primary" />
@@ -62,6 +72,45 @@ const CertificateLeaderboard = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Celebrating our top achievers who have earned the most course completion certificates at VAULT™ Baseball.
           </p>
+        </motion.div>
+
+        {/* Time Filter Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex justify-center mb-8"
+        >
+          <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)} className="w-full max-w-lg">
+            <TabsList className="grid grid-cols-4 w-full h-auto p-1">
+              {(Object.keys(timeFilterLabels) as TimeFilter[]).map((filter) => (
+                <TabsTrigger
+                  key={filter}
+                  value={filter}
+                  className="flex flex-col gap-0.5 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <span className="flex items-center gap-1.5 text-xs font-medium">
+                    {timeFilterLabels[filter].icon}
+                    <span className="hidden sm:inline">{timeFilterLabels[filter].label}</span>
+                    <span className="sm:hidden">{filter === 'all' ? '∞' : filter.charAt(0).toUpperCase()}</span>
+                  </span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </motion.div>
+
+        {/* Current Filter Info */}
+        <motion.div
+          key={timeFilter}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center mb-8"
+        >
+          <Badge variant="outline" className="gap-2 px-4 py-2">
+            {timeFilterLabels[timeFilter].icon}
+            <span>{timeFilterLabels[timeFilter].description}</span>
+          </Badge>
         </motion.div>
 
         {isLoading ? (
@@ -82,7 +131,13 @@ const CertificateLeaderboard = () => {
             ))}
           </div>
         ) : leaderboard && leaderboard.length > 0 ? (
-          <div className="space-y-8">
+          <motion.div 
+            key={timeFilter}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-8"
+          >
             {/* Top 3 Podium */}
             {topThree.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
@@ -240,14 +295,19 @@ const CertificateLeaderboard = () => {
                 </CardContent>
               </Card>
             )}
-          </div>
+          </motion.div>
         ) : (
           <Card className="border-border/50">
             <CardContent className="p-12 text-center">
               <GraduationCap className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Certificates Yet</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                {timeFilter === 'all' ? 'No Certificates Yet' : `No Certificates ${timeFilterLabels[timeFilter].description}`}
+              </h3>
               <p className="text-muted-foreground mb-4">
-                Be the first to complete a course and earn your certificate!
+                {timeFilter === 'all' 
+                  ? 'Be the first to complete a course and earn your certificate!'
+                  : `No one has earned a certificate ${timeFilterLabels[timeFilter].description.toLowerCase()}. Check back soon!`
+                }
               </p>
               <a
                 href="/courses"

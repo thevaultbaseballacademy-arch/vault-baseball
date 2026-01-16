@@ -1611,7 +1611,7 @@ export type Database = {
         }[]
       }
       get_certificate_leaderboard: {
-        Args: { result_limit?: number }
+        Args: { result_limit?: number; time_filter?: string }
         Returns: {
           avatar_url: string
           certificate_count: number
