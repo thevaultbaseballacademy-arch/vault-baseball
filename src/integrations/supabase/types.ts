@@ -159,6 +159,45 @@ export type Database = {
         }
         Relationships: []
       }
+      athlete_kpis: {
+        Row: {
+          created_at: string
+          id: string
+          kpi_category: string
+          kpi_name: string
+          kpi_unit: string | null
+          kpi_value: number
+          notes: string | null
+          recorded_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kpi_category: string
+          kpi_name: string
+          kpi_unit?: string | null
+          kpi_value: number
+          notes?: string | null
+          recorded_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kpi_category?: string
+          kpi_name?: string
+          kpi_unit?: string | null
+          kpi_value?: number
+          notes?: string | null
+          recorded_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       athletic_stats: {
         Row: {
           created_at: string
