@@ -1,7 +1,22 @@
 import { motion } from "framer-motion";
-import { Zap, Dumbbell, Shuffle, Heart, Target } from "lucide-react";
+import { Zap, Dumbbell, Shuffle, Heart, Target, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-const pillars = [
+const pillars: {
+  letter: string;
+  name: string;
+  icon: typeof Zap;
+  color: string;
+  bgColor: string;
+  textColor: string;
+  description: string;
+  focus: string[];
+  metrics: string[];
+  badge?: string;
+  link?: string;
+}[] = [
   {
     letter: "V",
     name: "Velocity",
@@ -45,6 +60,8 @@ const pillars = [
     description: "Keep athletes healthy, available, and progressing over time. Availability is the most overlooked performance metric.",
     focus: ["Arm care systems", "Workload management", "Recovery protocols", "Tissue resilience"],
     metrics: ["Throw volume", "Recovery indicators", "Availability rate", "Injury risk markers"],
+    badge: "Beta Access",
+    link: "/products/longevity-beta",
   },
   {
     letter: "T",
@@ -56,6 +73,8 @@ const pillars = [
     description: "Ensure training adaptations appear in competition. Training that does not show up in games fails its purpose.",
     focus: ["Practice design", "Decision-making under pressure", "Competitive execution", "Game realism"],
     metrics: ["Practice-to-game carryover", "Situational success", "Consistency under pressure"],
+    badge: "Beta Access",
+    link: "/products/transfer-beta",
   },
 ];
 
@@ -101,11 +120,26 @@ const VaultPillars = () => {
                           <span className={`text-4xl font-display ${pillar.textColor}`}>{pillar.letter}</span>
                         </div>
                         <div>
-                          <h3 className="text-2xl font-display text-foreground">{pillar.name}</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-2xl font-display text-foreground">{pillar.name}</h3>
+                            {pillar.badge && (
+                              <Badge variant="secondary" className="bg-accent/20 text-accent border-accent/30">
+                                {pillar.badge}
+                              </Badge>
+                            )}
+                          </div>
                           <div className={`w-12 h-1 rounded-full bg-gradient-to-r ${pillar.color} mt-1`} />
                         </div>
                       </div>
                       <p className="text-muted-foreground">{pillar.description}</p>
+                      {pillar.link && (
+                        <Link to={pillar.link} className="inline-block mt-4">
+                          <Button variant="vault" size="sm">
+                            Get Beta Access
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </Link>
+                      )}
                     </div>
 
                     {/* Right - Focus & Metrics */}

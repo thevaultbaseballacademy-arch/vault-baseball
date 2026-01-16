@@ -86,7 +86,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row gap-4 mb-12"
+            className="flex flex-col sm:flex-row gap-4 mb-8"
           >
             <Link to="/auth">
               <Button variant="vault" size="xl">
@@ -97,6 +97,21 @@ const Hero = () => {
             <Button variant="vaultOutline" size="xl" onClick={() => document.getElementById('pillars')?.scrollIntoView({ behavior: 'smooth' })}>
               Explore the Framework
             </Button>
+          </motion.div>
+
+          {/* Velocity Upsell CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.55 }}
+            className="mb-12"
+          >
+            <Link to="/products/velocity-system" className="group inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 hover:border-red-500/40 transition-all">
+              <Zap className="w-5 h-5 text-red-500" />
+              <span className="text-foreground font-medium">12-Week Velocity System</span>
+              <span className="text-muted-foreground">$299 one-time</span>
+              <ArrowRight className="w-4 h-4 text-red-500 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </motion.div>
 
           {/* The Promise */}

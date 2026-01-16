@@ -70,8 +70,21 @@ const Navbar = () => {
         { name: "Velocity", href: "/#pillars" },
         { name: "Athleticism", href: "/#pillars" },
         { name: "Utility", href: "/#pillars" },
-        { name: "Longevity", href: "/#pillars" },
-        { name: "Transfer", href: "/#pillars" },
+        { name: "Longevity (Beta)", href: "/products/longevity-beta" },
+        { name: "Transfer (Beta)", href: "/products/transfer-beta" },
+      ]
+    },
+    { 
+      name: "Products", 
+      href: "/products/velocity-system",
+      dropdown: [
+        { name: "12-Week Velocity System", href: "/products/velocity-system" },
+        { name: "Longevity System (Beta)", href: "/products/longevity-beta" },
+        { name: "Transfer System (Beta)", href: "/products/transfer-beta" },
+        { name: "Velo-Check Analysis", href: "/products/velo-check" },
+        { name: "Recruitment Audit", href: "/products/recruitment-audit" },
+        { name: "Team Licenses", href: "/products/team-licenses" },
+        { name: "Coach Certification", href: "/products/certified-coach" },
       ]
     },
     { 
@@ -93,8 +106,8 @@ const Navbar = () => {
         { name: "Academy (Ages 13-18)", href: "/pathway/academy" },
       ]
     },
+    { name: "Find a Coach", href: "/find-coach" },
     { name: "About", href: "#about" },
-    { name: "Contact", href: "#contact" },
   ];
 
   return (
