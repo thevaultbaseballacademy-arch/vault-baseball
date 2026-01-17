@@ -6,13 +6,64 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation constants
+const MAX_TITLE_LENGTH = 200;
+const MAX_MESSAGE_LENGTH = 2000;
+const VALID_TYPES = ["course_update", "coach_message", "announcement"];
+
 interface BroadcastPayload {
   title: string;
   message: string;
   type: string;
 }
 
-const logStep = (step: string, details?: any) => {
+function validateBroadcastPayload(payload: unknown): { valid: boolean; error?: string; payload?: BroadcastPayload } {
+  if (typeof payload !== "object" || payload === null) {
+    return { valid: false, error: "Payload must be an object" };
+  }
+
+  const p = payload as Record<string, unknown>;
+
+  // Validate title
+  if (typeof p.title !== "string") {
+    return { valid: false, error: "Title must be a string" };
+  }
+  const title = p.title.trim();
+  if (title.length === 0) {
+    return { valid: false, error: "Title cannot be empty" };
+  }
+  if (title.length > MAX_TITLE_LENGTH) {
+    return { valid: false, error: `Title must be ${MAX_TITLE_LENGTH} characters or less` };
+  }
+
+  // Validate message
+  if (typeof p.message !== "string") {
+    return { valid: false, error: "Message must be a string" };
+  }
+  const message = p.message.trim();
+  if (message.length === 0) {
+    return { valid: false, error: "Message cannot be empty" };
+  }
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    return { valid: false, error: `Message must be ${MAX_MESSAGE_LENGTH} characters or less` };
+  }
+
+  // Validate type
+  if (typeof p.type !== "string") {
+    return { valid: false, error: "Type must be a string" };
+  }
+  const type = p.type.trim();
+  if (!VALID_TYPES.includes(type)) {
+    return { valid: false, error: `Type must be one of: ${VALID_TYPES.join(", ")}` };
+  }
+
+  return { 
+    valid: true, 
+    payload: { title, message, type } 
+  };
+}
+
+const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
   console.log(`[ADMIN-BROADCAST] ${step}${detailsStr}`);
 };
@@ -60,12 +111,28 @@ serve(async (req) => {
 
     logStep("Admin verified");
 
-    const payload: BroadcastPayload = await req.json();
-    logStep("Received payload", payload);
-
-    if (!payload.title || !payload.message) {
-      throw new Error("Title and message are required");
+    // Parse and validate payload
+    let rawPayload: unknown;
+    try {
+      rawPayload = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
+
+    const validation = validateBroadcastPayload(rawPayload);
+    if (!validation.valid) {
+      logStep("Validation failed", { error: validation.error });
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const payload = validation.payload!;
+    logStep("Received validated payload", payload);
 
     // Get all users with notification preferences enabled for this type
     const preferenceColumn = getPreferenceColumn(payload.type);
@@ -130,7 +197,7 @@ serve(async (req) => {
         insertedCount += insertedBatch.length;
         
         // Track delivered analytics events
-        const analyticsEvents = insertedBatch.map((notification: any) => ({
+        const analyticsEvents = insertedBatch.map((notification: { id: string; user_id: string }) => ({
           notification_id: notification.id,
           user_id: notification.user_id,
           event_type: "delivered",

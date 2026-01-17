@@ -5,6 +5,70 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation constants
+const MAX_MESSAGES = 50;
+const MAX_MESSAGE_LENGTH = 4000;
+const MAX_TOTAL_CONTENT_LENGTH = 50000;
+
+// Simple message schema validator
+interface ChatMessage {
+  role: "user" | "assistant" | "system";
+  content: string;
+}
+
+function validateMessages(messages: unknown): { valid: boolean; error?: string; messages?: ChatMessage[] } {
+  if (!Array.isArray(messages)) {
+    return { valid: false, error: "Messages must be an array" };
+  }
+
+  if (messages.length === 0) {
+    return { valid: false, error: "Messages array cannot be empty" };
+  }
+
+  if (messages.length > MAX_MESSAGES) {
+    return { valid: false, error: `Maximum ${MAX_MESSAGES} messages allowed` };
+  }
+
+  let totalContentLength = 0;
+  const validatedMessages: ChatMessage[] = [];
+
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+
+    if (typeof msg !== "object" || msg === null) {
+      return { valid: false, error: `Message at index ${i} must be an object` };
+    }
+
+    const { role, content } = msg as Record<string, unknown>;
+
+    if (!role || typeof role !== "string") {
+      return { valid: false, error: `Message at index ${i} must have a valid role` };
+    }
+
+    if (!["user", "assistant", "system"].includes(role)) {
+      return { valid: false, error: `Invalid role "${role}" at index ${i}. Must be user, assistant, or system` };
+    }
+
+    if (typeof content !== "string") {
+      return { valid: false, error: `Message content at index ${i} must be a string` };
+    }
+
+    if (content.length > MAX_MESSAGE_LENGTH) {
+      return { valid: false, error: `Message at index ${i} exceeds maximum length of ${MAX_MESSAGE_LENGTH} characters` };
+    }
+
+    totalContentLength += content.length;
+
+    if (totalContentLength > MAX_TOTAL_CONTENT_LENGTH) {
+      return { valid: false, error: `Total message content exceeds maximum of ${MAX_TOTAL_CONTENT_LENGTH} characters` };
+    }
+
+    validatedMessages.push({ role: role as ChatMessage["role"], content });
+  }
+
+  return { valid: true, messages: validatedMessages };
+}
+
 const systemPrompt = `You are a helpful AI support assistant for Vault Baseball, an elite baseball training platform. You help users with:
 
 - Course and training program questions
@@ -27,7 +91,36 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    // Parse and validate request body
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (typeof body !== "object" || body === null) {
+      return new Response(
+        JSON.stringify({ error: "Request body must be an object" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { messages } = body as Record<string, unknown>;
+
+    // Validate messages array
+    const validation = validateMessages(messages);
+    if (!validation.valid) {
+      console.error("Input validation failed:", validation.error);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -44,7 +137,7 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
+          ...validation.messages!,
         ],
         stream: true,
       }),
@@ -77,7 +170,7 @@ serve(async (req) => {
   } catch (e) {
     console.error("Support chat error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: "An unexpected error occurred. Please try again." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
