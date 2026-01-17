@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import MFAVerify from "@/components/auth/MFAVerify";
+import { useSessionManagement } from "@/hooks/useSessionManagement";
 
 const authSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -33,6 +34,7 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { recordSession } = useSessionManagement();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -122,7 +124,8 @@ const Auth = () => {
             description: "Please enter your authentication code.",
           });
         } else {
-          // No MFA, proceed to app
+          // No MFA, record session and proceed to app
+          await recordSession();
           toast({
             title: "Welcome back!",
             description: "You have been signed in successfully.",
@@ -168,7 +171,9 @@ const Auth = () => {
     }
   };
 
-  const handleMFASuccess = () => {
+  const handleMFASuccess = async () => {
+    // Record session after MFA verification
+    await recordSession();
     toast({
       title: "Welcome back!",
       description: "You have been signed in successfully.",

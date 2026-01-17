@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import NotificationSettings from "@/components/notifications/NotificationSettings";
 import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequests";
 import MFASettings from "@/components/auth/MFASettings";
+import SessionManagement from "@/components/account/SessionManagement";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -270,6 +271,9 @@ const Account = () => {
 
             {/* Two-Factor Authentication (Admin Only) */}
             <MFASettings userId={user?.id} />
+
+            {/* Session Management */}
+            <SessionManagement />
 
             {/* Coach Assignment Requests */}
             <CoachAssignmentRequests userId={user?.id} />
