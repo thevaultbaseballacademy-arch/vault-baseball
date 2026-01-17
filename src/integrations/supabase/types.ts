@@ -1741,6 +1741,22 @@ export type Database = {
         }[]
       }
       get_shared_kpi_profile: { Args: { share_token: string }; Returns: Json }
+      get_user_purchase_for_admin: {
+        Args: { purchase_id: string }
+        Returns: {
+          amount_cents: number
+          created_at: string
+          expires_at: string
+          id: string
+          product_key: string
+          purchased_at: string
+          status: string
+          stripe_payment_intent_id: string
+          stripe_session_id: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       has_admin_role: { Args: { user_uuid: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -1759,6 +1775,19 @@ export type Database = {
       is_active_coach_for_athlete: {
         Args: { _athlete_id: string; _coach_id: string }
         Returns: boolean
+      }
+      list_all_purchases_for_admin: {
+        Args: never
+        Returns: {
+          amount_cents: number
+          created_at: string
+          expires_at: string
+          id: string
+          product_key: string
+          purchased_at: string
+          status: string
+          user_id: string
+        }[]
       }
       purge_old_audit_logs: {
         Args: { retention_days?: number }
