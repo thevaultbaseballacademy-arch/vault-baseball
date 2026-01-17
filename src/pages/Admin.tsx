@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText
+  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,6 +18,7 @@ import CourseVideoManager from "@/components/admin/CourseVideoManager";
 import CertificationQuestionManager from "@/components/admin/CertificationQuestionManager";
 import CertificationExpirationManager from "@/components/admin/CertificationExpirationManager";
 import AuditLogViewer from "@/components/admin/AuditLogViewer";
+import DataRetentionPanel from "@/components/admin/DataRetentionPanel";
 
 interface Profile {
   user_id: string;
@@ -281,7 +282,7 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-5xl grid-cols-8">
+              <TabsList className="grid w-full max-w-6xl grid-cols-9">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
                 <TabsTrigger value="certifications">Questions</TabsTrigger>
@@ -290,6 +291,7 @@ const Admin = () => {
                 <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 <TabsTrigger value="audit">Audit Logs</TabsTrigger>
+                <TabsTrigger value="retention">Retention</TabsTrigger>
               </TabsList>
 
               <TabsContent value="users" className="mt-6 space-y-6">
@@ -409,6 +411,10 @@ const Admin = () => {
 
               <TabsContent value="audit" className="mt-6">
                 <AuditLogViewer />
+              </TabsContent>
+
+              <TabsContent value="retention" className="mt-6">
+                <DataRetentionPanel />
               </TabsContent>
             </Tabs>
           </motion.div>
