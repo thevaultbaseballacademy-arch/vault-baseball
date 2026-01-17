@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle } from "lucide-react";
+import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -577,7 +577,99 @@ const FoundersAccess = () => {
           </section>
         )}
 
-        {/* Testimonial */}
+        {/* Video Testimonials */}
+        <section className="container mx-auto px-4 mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4">
+              <Play className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-medium text-amber-500">Founder Stories</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-display text-foreground">
+              Hear From Our Founders
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              {
+                name: "Jake Morrison",
+                role: "D1 Commit, Class of 2025",
+                videoUrl: "https://cdn.marblism.com/1NxauWxFGtn.webp",
+                quote: "Best investment I've ever made",
+                metric: "+8 mph"
+              },
+              {
+                name: "Ryan Chen",
+                role: "High School Junior",
+                videoUrl: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
+                quote: "Completely transformed my game",
+                metric: "3 Offers"
+              },
+              {
+                name: "Mike Patterson",
+                role: "Travel Ball Coach",
+                videoUrl: "https://cdn.marblism.com/e9fzmmT2o9Q.webp",
+                quote: "Worth every penny for my son",
+                metric: "Top 100"
+              },
+            ].map((testimonial, index) => (
+              <motion.div
+                key={testimonial.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="overflow-hidden bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/20 hover:border-amber-500/40 transition-all group">
+                  {/* Video Thumbnail */}
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={testimonial.videoUrl}
+                      alt={`${testimonial.name} testimonial`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    
+                    {/* Play button overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center shadow-lg cursor-pointer"
+                      >
+                        <Play className="w-6 h-6 text-black ml-1" fill="currentColor" />
+                      </motion.div>
+                    </div>
+
+                    {/* Metric badge */}
+                    <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-amber-500 text-black text-sm font-bold">
+                      {testimonial.metric}
+                    </div>
+
+                    {/* Founder badge */}
+                    <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center gap-1">
+                      <Crown className="w-3 h-3 text-amber-500" />
+                      <span className="text-xs text-amber-500 font-medium">Founder</span>
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-4">
+                    <p className="text-foreground font-semibold">{testimonial.name}</p>
+                    <p className="text-muted-foreground text-sm mb-2">{testimonial.role}</p>
+                    <p className="text-amber-500 text-sm italic">"{testimonial.quote}"</p>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Text Testimonial */}
         <section className="container mx-auto px-4 mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
