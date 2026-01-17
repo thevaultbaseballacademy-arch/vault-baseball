@@ -295,13 +295,14 @@ const Pricing = () => {
           viewport={{ once: true }}
           className="mt-12 grid md:grid-cols-2 gap-6 max-w-4xl mx-auto"
         >
-          <div className="p-6 rounded-2xl border border-border bg-card">
-            <h3 className="font-display text-xl text-foreground mb-2">Teams & Organizations</h3>
-            <p className="text-muted-foreground text-sm mb-4">
-              Small org licenses starting at $1,999/year for up to 25 athletes.
+          <div className="p-6 rounded-2xl border-2 border-accent bg-accent/5">
+            <h3 className="font-display text-xl text-foreground mb-2">Org Starter Pack</h3>
+            <p className="text-muted-foreground text-sm mb-2">
+              Complete VAULT™ system for your organization. 25 athletes, coach certification included.
             </p>
-            <Button variant="vault" className="w-full" onClick={() => window.location.href = '/products/teams'}>
-              View Team Licenses
+            <p className="text-2xl font-display text-foreground mb-4">$2,500 <span className="text-sm text-muted-foreground font-normal">one-time</span></p>
+            <Button variant="vault" className="w-full" onClick={() => window.location.href = '/products/org-starter-pack'}>
+              Buy Now
             </Button>
           </div>
           <div className="p-6 rounded-2xl border border-border bg-card">
