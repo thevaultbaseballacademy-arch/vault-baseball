@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Trash2, Clock, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { Loader2, Trash2, Clock, CheckCircle, XCircle, AlertTriangle, Play } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -34,7 +34,31 @@ const DeletionRequestsManager = () => {
   const [selectedRequest, setSelectedRequest] = useState<DeletionRequest | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [actionType, setActionType] = useState<"approve" | "reject" | "complete" | null>(null);
+  const [processingPurge, setProcessingPurge] = useState(false);
 
+  const handleRunPurge = async () => {
+    setProcessingPurge(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('process-deletion-requests');
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Purge Complete",
+        description: `Processed ${data.processed} requests. Success: ${data.success}, Failed: ${data.failed}`,
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ["deletion-requests-admin"] });
+    } catch (error: any) {
+      toast({
+        title: "Purge Failed",
+        description: error.message || "Failed to run data purge",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingPurge(false);
+    }
+  };
   const { data: requests, isLoading } = useQuery({
     queryKey: ["deletion-requests-admin"],
     queryFn: async () => {
@@ -130,7 +154,7 @@ const DeletionRequestsManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Trash2 className="w-5 h-5" />
@@ -140,20 +164,55 @@ const DeletionRequestsManager = () => {
             GDPR Right to Erasure requests from users
           </p>
         </div>
-        {(pendingCount > 0 || approvedCount > 0) && (
-          <div className="flex gap-2">
-            {pendingCount > 0 && (
-              <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500">
-                {pendingCount} Pending
-              </Badge>
-            )}
-            {approvedCount > 0 && (
-              <Badge variant="outline" className="bg-blue-500/10 text-blue-500">
-                {approvedCount} To Process
-              </Badge>
-            )}
+        <div className="flex items-center gap-2">
+          {approvedCount > 0 && (
+            <Button
+              onClick={handleRunPurge}
+              disabled={processingPurge}
+              variant="destructive"
+              size="sm"
+            >
+              {processingPurge ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 mr-2" />
+                  Run Purge Now ({approvedCount})
+                </>
+              )}
+            </Button>
+          )}
+          {(pendingCount > 0 || approvedCount > 0) && (
+            <div className="flex gap-2">
+              {pendingCount > 0 && (
+                <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500">
+                  {pendingCount} Pending
+                </Badge>
+              )}
+              {approvedCount > 0 && (
+                <Badge variant="outline" className="bg-blue-500/10 text-blue-500">
+                  {approvedCount} To Process
+                </Badge>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-secondary/50 rounded-xl p-4 text-sm">
+        <div className="flex items-start gap-2">
+          <Clock className="w-4 h-4 mt-0.5 text-muted-foreground" />
+          <div>
+            <p className="font-medium text-foreground">Automated Processing</p>
+            <p className="text-muted-foreground">
+              Approved deletion requests are automatically processed daily at 4 AM UTC. 
+              Use "Run Purge Now" for immediate processing.
+            </p>
           </div>
-        )}
+        </div>
       </div>
 
       {requests?.length === 0 ? (
