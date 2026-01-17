@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play } from "lucide-react";
+import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import useEmblaCarousel from "embla-carousel-react";
 
 const FoundersAccess = () => {
   const { checkout, loading } = useProductCheckout();
@@ -234,6 +235,92 @@ const FoundersAccess = () => {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  const founderTestimonials = [
+    {
+      name: "Jake Morrison",
+      role: "D1 Commit, Class of 2025",
+      videoUrl: "https://cdn.marblism.com/1NxauWxFGtn.webp",
+      quote: "Best investment I've ever made",
+      metric: "+8 mph"
+    },
+    {
+      name: "Ryan Chen",
+      role: "High School Junior",
+      videoUrl: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
+      quote: "Completely transformed my game",
+      metric: "3 Offers"
+    },
+    {
+      name: "Mike Patterson",
+      role: "Travel Ball Coach",
+      videoUrl: "https://cdn.marblism.com/e9fzmmT2o9Q.webp",
+      quote: "Worth every penny for my son",
+      metric: "Top 100"
+    },
+    {
+      name: "Sarah Williams",
+      role: "Parent of 2027 Prospect",
+      videoUrl: "https://cdn.marblism.com/nwf4_GebeVT.webp",
+      quote: "My son's development skyrocketed",
+      metric: "+12 mph"
+    },
+    {
+      name: "Bailey Ramirez",
+      role: "JUCO Transfer",
+      videoUrl: "https://cdn.marblism.com/7oEYJwzA1AH.webp",
+      quote: "Helped me get to the next level",
+      metric: "D1 Offer"
+    },
+    {
+      name: "Coach Eric Silva",
+      role: "High School Head Coach",
+      videoUrl: "https://cdn.marblism.com/Aq6IXFkCdm5.webp",
+      quote: "Game-changer for our program",
+      metric: "State Champs"
+    },
+    {
+      name: "Dylan Foster",
+      role: "Class of 2026 Pitcher",
+      videoUrl: "https://cdn.marblism.com/1NxauWxFGtn.webp",
+      quote: "The velocity system is legit",
+      metric: "+6 mph"
+    },
+    {
+      name: "Marcus Johnson",
+      role: "Travel Ball Parent",
+      videoUrl: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
+      quote: "Structured approach we needed",
+      metric: "5 Camps"
+    },
+  ];
+
+  // Carousel setup
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true, 
+    align: 'start',
+    slidesToScroll: 1,
+  });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi, onSelect]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -577,7 +664,7 @@ const FoundersAccess = () => {
           </section>
         )}
 
-        {/* Video Testimonials */}
+        {/* Video Testimonials Carousel */}
         <section className="container mx-auto px-4 mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -594,78 +681,97 @@ const FoundersAccess = () => {
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              {
-                name: "Jake Morrison",
-                role: "D1 Commit, Class of 2025",
-                videoUrl: "https://cdn.marblism.com/1NxauWxFGtn.webp",
-                quote: "Best investment I've ever made",
-                metric: "+8 mph"
-              },
-              {
-                name: "Ryan Chen",
-                role: "High School Junior",
-                videoUrl: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
-                quote: "Completely transformed my game",
-                metric: "3 Offers"
-              },
-              {
-                name: "Mike Patterson",
-                role: "Travel Ball Coach",
-                videoUrl: "https://cdn.marblism.com/e9fzmmT2o9Q.webp",
-                quote: "Worth every penny for my son",
-                metric: "Top 100"
-              },
-            ].map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="overflow-hidden bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/20 hover:border-amber-500/40 transition-all group">
-                  {/* Video Thumbnail */}
-                  <div className="relative aspect-video overflow-hidden">
-                    <img
-                      src={testimonial.videoUrl}
-                      alt={`${testimonial.name} testimonial`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    
-                    {/* Play button overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center shadow-lg cursor-pointer"
-                      >
-                        <Play className="w-6 h-6 text-black ml-1" fill="currentColor" />
-                      </motion.div>
-                    </div>
+          {/* Carousel Container */}
+          <div className="relative max-w-6xl mx-auto">
+            {/* Navigation Buttons */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={scrollPrev}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-background/80 backdrop-blur-sm border-amber-500/30 hover:bg-amber-500/10 hover:border-amber-500 hidden md:flex"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={scrollNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-background/80 backdrop-blur-sm border-amber-500/30 hover:bg-amber-500/10 hover:border-amber-500 hidden md:flex"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
 
-                    {/* Metric badge */}
-                    <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-amber-500 text-black text-sm font-bold">
-                      {testimonial.metric}
-                    </div>
+            {/* Carousel */}
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex gap-4 md:gap-6">
+                {founderTestimonials.map((testimonial, index) => (
+                  <div 
+                    key={testimonial.name + index} 
+                    className="flex-none w-[85%] sm:w-[45%] md:w-[31%]"
+                  >
+                    <Card className="overflow-hidden bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/20 hover:border-amber-500/40 transition-all group h-full">
+                      {/* Video Thumbnail */}
+                      <div className="relative aspect-video overflow-hidden">
+                        <img
+                          src={testimonial.videoUrl}
+                          alt={`${testimonial.name} testimonial`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        
+                        {/* Play button overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-amber-500 flex items-center justify-center shadow-lg cursor-pointer"
+                          >
+                            <Play className="w-5 h-5 md:w-6 md:h-6 text-black ml-1" fill="currentColor" />
+                          </motion.div>
+                        </div>
 
-                    {/* Founder badge */}
-                    <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center gap-1">
-                      <Crown className="w-3 h-3 text-amber-500" />
-                      <span className="text-xs text-amber-500 font-medium">Founder</span>
-                    </div>
+                        {/* Metric badge */}
+                        <div className="absolute top-3 right-3 px-2 md:px-3 py-1 rounded-full bg-amber-500 text-black text-xs md:text-sm font-bold">
+                          {testimonial.metric}
+                        </div>
+
+                        {/* Founder badge */}
+                        <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center gap-1">
+                          <Crown className="w-3 h-3 text-amber-500" />
+                          <span className="text-xs text-amber-500 font-medium">Founder</span>
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="p-4">
+                        <p className="text-foreground font-semibold text-sm md:text-base">{testimonial.name}</p>
+                        <p className="text-muted-foreground text-xs md:text-sm mb-2">{testimonial.role}</p>
+                        <p className="text-amber-500 text-xs md:text-sm italic">"{testimonial.quote}"</p>
+                      </div>
+                    </Card>
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  {/* Info */}
-                  <div className="p-4">
-                    <p className="text-foreground font-semibold">{testimonial.name}</p>
-                    <p className="text-muted-foreground text-sm mb-2">{testimonial.role}</p>
-                    <p className="text-amber-500 text-sm italic">"{testimonial.quote}"</p>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
+            {/* Dots Navigation */}
+            <div className="flex justify-center gap-2 mt-6">
+              {founderTestimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => emblaApi?.scrollTo(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    selectedIndex === index 
+                      ? 'bg-amber-500 w-6' 
+                      : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Mobile Swipe Hint */}
+            <p className="text-center text-muted-foreground text-xs mt-4 md:hidden">
+              ← Swipe to see more →
+            </p>
           </div>
         </section>
 
