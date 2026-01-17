@@ -1,19 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, ArrowRight, Loader2, BookOpen, Zap } from "lucide-react";
+import { CheckCircle, ArrowRight, Loader2, BookOpen, Zap, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import confetti from "canvas-confetti";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
   const [unlockedCourses, setUnlockedCourses] = useState<string[]>([]);
+  const [isFoundersAccess, setIsFoundersAccess] = useState(false);
   const { toast } = useToast();
+
+  const fireConfetti = useCallback(() => {
+    // First burst - left side
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { x: 0.1, y: 0.6 },
+      colors: ['#f59e0b', '#eab308', '#fcd34d', '#ffffff', '#a855f7'],
+    });
+
+    // Second burst - right side
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { x: 0.9, y: 0.6 },
+      colors: ['#f59e0b', '#eab308', '#fcd34d', '#ffffff', '#a855f7'],
+    });
+
+    // Center burst with delay
+    setTimeout(() => {
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { x: 0.5, y: 0.5 },
+        colors: ['#f59e0b', '#eab308', '#fcd34d', '#ffffff', '#a855f7', '#22c55e'],
+      });
+    }, 200);
+
+    // Final celebration burst
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        spread: 120,
+        origin: { x: 0.5, y: 0.3 },
+        colors: ['#f59e0b', '#eab308', '#fcd34d'],
+        gravity: 0.8,
+      });
+    }, 400);
+  }, []);
 
   useEffect(() => {
     const verifyPurchase = async () => {
@@ -45,23 +86,40 @@ const PaymentSuccess = () => {
         setVerified(data.verified);
         setUnlockedCourses(data.coursesUnlocked || []);
         
+        // Check if this was a Founder's Access purchase
+        const isFounders = data.productKey === 'founders_access' || 
+                          data.coursesUnlocked?.includes('founders_access');
+        setIsFoundersAccess(isFounders);
+        
         if (data.verified && !data.alreadyProcessed) {
+          // Fire confetti for successful purchases
+          fireConfetti();
+          
+          // Extra confetti for Founder's Access
+          if (isFounders) {
+            setTimeout(() => fireConfetti(), 600);
+            setTimeout(() => fireConfetti(), 1200);
+          }
+          
           toast({
-            title: "Access Granted! 🎉",
-            description: `You now have access to ${data.coursesUnlocked?.length || 0} training programs.`,
+            title: isFounders ? "Welcome, Founder! 👑" : "Access Granted! 🎉",
+            description: isFounders 
+              ? "You now have lifetime access to the complete V.A.U.L.T. suite!"
+              : `You now have access to ${data.coursesUnlocked?.length || 0} training programs.`,
           });
         }
       } catch (error) {
         console.error('Verification error:', error);
         // Still show success - payment went through, verification is secondary
         setVerified(true);
+        fireConfetti(); // Still celebrate!
       } finally {
         setVerifying(false);
       }
     };
 
     verifyPurchase();
-  }, [searchParams, toast]);
+  }, [searchParams, toast, fireConfetti]);
 
   const courseNames: Record<string, string> = {
     'velocity-system': 'Velocity System',
@@ -97,15 +155,45 @@ const PaymentSuccess = () => {
               </>
             ) : (
               <>
-                <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-10 h-10 text-green-500" />
-                </div>
-                <h1 className="text-4xl md:text-5xl font-display text-foreground mb-4">
-                  PAYMENT SUCCESSFUL
-                </h1>
-                <p className="text-lg text-muted-foreground mb-6">
-                  Thank you for your purchase! You now have access to your VAULT™ content.
-                </p>
+                <motion.div 
+                  className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                    isFoundersAccess ? 'bg-amber-500/20' : 'bg-green-500/10'
+                  }`}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                >
+                  {isFoundersAccess ? (
+                    <Crown className="w-10 h-10 text-amber-500" />
+                  ) : (
+                    <CheckCircle className="w-10 h-10 text-green-500" />
+                  )}
+                </motion.div>
+                <motion.h1 
+                  className="text-4xl md:text-5xl font-display text-foreground mb-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {isFoundersAccess ? (
+                    <>
+                      WELCOME, <span className="text-amber-500">FOUNDER</span>
+                    </>
+                  ) : (
+                    "PAYMENT SUCCESSFUL"
+                  )}
+                </motion.h1>
+                <motion.p 
+                  className="text-lg text-muted-foreground mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  {isFoundersAccess 
+                    ? "You now have lifetime access to the complete V.A.U.L.T. suite. Thank you for believing in us!"
+                    : "Thank you for your purchase! You now have access to your VAULT™ content."
+                  }
+                </motion.p>
                 
                 {unlockedCourses.length > 0 && (
                   <div className="bg-card border border-border rounded-xl p-6 mb-8 text-left">
