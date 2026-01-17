@@ -12,6 +12,7 @@ import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequest
 import MFASettings from "@/components/auth/MFASettings";
 import SessionManagement from "@/components/account/SessionManagement";
 import DataExportPanel from "@/components/account/DataExportPanel";
+import DataDeletionPanel from "@/components/account/DataDeletionPanel";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -278,6 +279,9 @@ const Account = () => {
 
             {/* Data Export (GDPR) */}
             <DataExportPanel />
+
+            {/* Data Deletion (GDPR) */}
+            <DataDeletionPanel userId={user?.id} userEmail={user?.email} />
 
             {/* Coach Assignment Requests */}
             <CoachAssignmentRequests userId={user?.id} />

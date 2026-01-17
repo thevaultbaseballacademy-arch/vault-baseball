@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database
+  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database, Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,6 +19,7 @@ import CertificationQuestionManager from "@/components/admin/CertificationQuesti
 import CertificationExpirationManager from "@/components/admin/CertificationExpirationManager";
 import AuditLogViewer from "@/components/admin/AuditLogViewer";
 import DataRetentionPanel from "@/components/admin/DataRetentionPanel";
+import DeletionRequestsManager from "@/components/admin/DeletionRequestsManager";
 
 interface Profile {
   user_id: string;
@@ -282,7 +283,7 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-6xl grid-cols-9">
+              <TabsList className="grid w-full max-w-6xl grid-cols-10">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
                 <TabsTrigger value="certifications">Questions</TabsTrigger>
@@ -290,8 +291,9 @@ const Admin = () => {
                 <TabsTrigger value="videos">Videos</TabsTrigger>
                 <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                <TabsTrigger value="audit">Audit Logs</TabsTrigger>
+                <TabsTrigger value="audit">Audit</TabsTrigger>
                 <TabsTrigger value="retention">Retention</TabsTrigger>
+                <TabsTrigger value="deletion">Deletion</TabsTrigger>
               </TabsList>
 
               <TabsContent value="users" className="mt-6 space-y-6">
@@ -415,6 +417,10 @@ const Admin = () => {
 
               <TabsContent value="retention" className="mt-6">
                 <DataRetentionPanel />
+              </TabsContent>
+
+              <TabsContent value="deletion" className="mt-6">
+                <DeletionRequestsManager />
               </TabsContent>
             </Tabs>
           </motion.div>
