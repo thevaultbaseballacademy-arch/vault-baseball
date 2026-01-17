@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer } from "lucide-react";
+import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -8,11 +8,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const FoundersAccess = () => {
   const { checkout, loading } = useProductCheckout();
   const [spotsTaken, setSpotsTaken] = useState(0);
   const TOTAL_SPOTS = 50;
+  const { toast } = useToast();
+  const initialLoadRef = useRef(true);
   
   // Countdown timer state - set end date to 30 days from now for demo
   const [timeLeft, setTimeLeft] = useState({
@@ -37,6 +40,10 @@ const FoundersAccess = () => {
         .eq('status', 'completed');
       
       setSpotsTaken(count || 0);
+      // Mark initial load as complete after fetching
+      setTimeout(() => {
+        initialLoadRef.current = false;
+      }, 1000);
     };
     checkSpots();
 
@@ -54,7 +61,23 @@ const FoundersAccess = () => {
         (payload) => {
           // When a new founders_access purchase is inserted, refresh the count
           if (payload.new && (payload.new as any).status === 'completed') {
-            setSpotsTaken((prev) => prev + 1);
+            setSpotsTaken((prev) => {
+              const newCount = prev + 1;
+              const remaining = TOTAL_SPOTS - newCount;
+              
+              // Only show toast after initial load
+              if (!initialLoadRef.current) {
+                toast({
+                  title: "🔥 Spot Just Claimed!",
+                  description: remaining > 0 
+                    ? `Someone just became a Founder! Only ${remaining} spots remaining.`
+                    : "That was the last spot! Founder's Access is now SOLD OUT.",
+                  duration: 5000,
+                });
+              }
+              
+              return newCount;
+            });
           }
         }
       )
@@ -71,7 +94,23 @@ const FoundersAccess = () => {
           const oldStatus = (payload.old as any)?.status;
           const newStatus = (payload.new as any)?.status;
           if (oldStatus !== 'completed' && newStatus === 'completed') {
-            setSpotsTaken((prev) => prev + 1);
+            setSpotsTaken((prev) => {
+              const newCount = prev + 1;
+              const remaining = TOTAL_SPOTS - newCount;
+              
+              // Only show toast after initial load
+              if (!initialLoadRef.current) {
+                toast({
+                  title: "🔥 Spot Just Claimed!",
+                  description: remaining > 0 
+                    ? `Someone just became a Founder! Only ${remaining} spots remaining.`
+                    : "That was the last spot! Founder's Access is now SOLD OUT.",
+                  duration: 5000,
+                });
+              }
+              
+              return newCount;
+            });
           }
         }
       )
@@ -80,7 +119,7 @@ const FoundersAccess = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
