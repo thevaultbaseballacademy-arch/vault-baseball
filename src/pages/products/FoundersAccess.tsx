@@ -105,6 +105,7 @@ const FoundersAccess = () => {
 
   const spotsRemaining = TOTAL_SPOTS - spotsTaken;
   const isSoldOut = spotsRemaining <= 0;
+  const isUrgent = spotsRemaining <= 10 && !isSoldOut;
   const spotsPercentage = (spotsTaken / TOTAL_SPOTS) * 100;
 
   const pillars = [
@@ -201,41 +202,88 @@ const FoundersAccess = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mb-10"
             >
-              <Card className={`max-w-2xl mx-auto p-6 ${isSoldOut ? 'border-red-500/50 bg-red-500/5' : 'border-amber-500/50 bg-gradient-to-br from-amber-500/5 to-amber-500/10'}`}>
-                {/* Spots Progress Bar */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-muted-foreground">
-                      <span className="text-foreground font-semibold">{spotsTaken}</span> of {TOTAL_SPOTS} spots claimed
-                    </span>
-                    <span className={`text-sm font-semibold ${spotsRemaining <= 10 ? 'text-red-500' : 'text-amber-500'}`}>
-                      {spotsRemaining} remaining
-                    </span>
-                  </div>
-                  <Progress value={spotsPercentage} className="h-3 bg-muted" />
-                  {spotsRemaining <= 10 && !isSoldOut && (
-                    <div className="flex items-center justify-center gap-2 mt-3 text-red-500 text-sm">
-                      <AlertTriangle className="w-4 h-4" />
-                      <span>Almost sold out! Only {spotsRemaining} spots left!</span>
+              <motion.div
+                animate={isUrgent ? {
+                  boxShadow: [
+                    "0 0 0 0 rgba(239, 68, 68, 0)",
+                    "0 0 20px 4px rgba(239, 68, 68, 0.4)",
+                    "0 0 0 0 rgba(239, 68, 68, 0)",
+                  ],
+                } : {}}
+                transition={isUrgent ? {
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                } : {}}
+              >
+                <Card className={`max-w-2xl mx-auto p-6 transition-all duration-300 ${
+                  isSoldOut 
+                    ? 'border-red-500/50 bg-red-500/5' 
+                    : isUrgent 
+                      ? 'border-red-500 bg-gradient-to-br from-red-500/10 to-red-500/5' 
+                      : 'border-amber-500/50 bg-gradient-to-br from-amber-500/5 to-amber-500/10'
+                }`}>
+                  {/* Spots Progress Bar */}
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-muted-foreground">
+                        <span className="text-foreground font-semibold">{spotsTaken}</span> of {TOTAL_SPOTS} spots claimed
+                      </span>
+                      <motion.span 
+                        className={`text-sm font-semibold ${isUrgent ? 'text-red-500' : 'text-amber-500'}`}
+                        animate={isUrgent ? { scale: [1, 1.1, 1] } : {}}
+                        transition={isUrgent ? { duration: 0.8, repeat: Infinity } : {}}
+                      >
+                        {spotsRemaining} remaining
+                      </motion.span>
                     </div>
-                  )}
-                </div>
+                    <Progress 
+                      value={spotsPercentage} 
+                      className={`h-3 ${isUrgent ? 'bg-red-500/20' : 'bg-muted'}`}
+                    />
+                    {isUrgent && (
+                      <motion.div 
+                        className="flex items-center justify-center gap-2 mt-3 text-red-500 text-sm font-semibold"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ 
+                          opacity: 1, 
+                          y: 0,
+                        }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <motion.div
+                          animate={{ rotate: [0, -10, 10, -10, 0] }}
+                          transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
+                        >
+                          <AlertTriangle className="w-5 h-5" />
+                        </motion.div>
+                        <span>🔥 Almost sold out! Only {spotsRemaining} spots left!</span>
+                      </motion.div>
+                    )}
+                  </div>
 
-                {/* Pricing */}
-                <div className="flex items-center justify-center gap-8">
-                  <div className="text-center">
-                    <div className="text-sm text-muted-foreground line-through mb-1">$1,500+</div>
-                    <div className="text-5xl font-display text-foreground">$499</div>
-                    <div className="text-sm text-muted-foreground">Lifetime Access</div>
+                  {/* Pricing */}
+                  <div className="flex items-center justify-center gap-8">
+                    <div className="text-center">
+                      <div className="text-sm text-muted-foreground line-through mb-1">$1,500+</div>
+                      <motion.div 
+                        className={`text-5xl font-display ${isUrgent ? 'text-red-500' : 'text-foreground'}`}
+                        animate={isUrgent ? { scale: [1, 1.02, 1] } : {}}
+                        transition={isUrgent ? { duration: 1, repeat: Infinity } : {}}
+                      >
+                        $499
+                      </motion.div>
+                      <div className="text-sm text-muted-foreground">Lifetime Access</div>
+                    </div>
+                    <div className="w-px h-16 bg-border" />
+                    <div className="text-center">
+                      <div className="text-sm text-muted-foreground mb-1">You Save</div>
+                      <div className="text-3xl font-display text-green-500">$1,000+</div>
+                      <div className="text-sm text-muted-foreground">vs. Individual</div>
+                    </div>
                   </div>
-                  <div className="w-px h-16 bg-border" />
-                  <div className="text-center">
-                    <div className="text-sm text-muted-foreground mb-1">You Save</div>
-                    <div className="text-3xl font-display text-green-500">$1,000+</div>
-                    <div className="text-sm text-muted-foreground">vs. Individual</div>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </motion.div>
             </motion.div>
 
             {/* CTA */}
@@ -244,27 +292,32 @@ const FoundersAccess = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <Button 
-                variant="vault" 
-                size="xl"
-                onClick={() => checkout('founders_access')}
-                disabled={loading === 'founders_access' || isSoldOut}
-                className="mb-4 px-12"
+              <motion.div
+                animate={isUrgent ? { scale: [1, 1.03, 1] } : {}}
+                transition={isUrgent ? { duration: 0.8, repeat: Infinity } : {}}
               >
-                {isSoldOut ? (
-                  <>
-                    <Lock className="w-5 h-5 mr-2" />
-                    Sold Out
-                  </>
-                ) : loading === 'founders_access' ? (
-                  'Processing...'
-                ) : (
-                  <>
-                    Claim Your Founder's Spot - $499
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </>
-                )}
-              </Button>
+                <Button 
+                  variant="vault" 
+                  size="xl"
+                  onClick={() => checkout('founders_access')}
+                  disabled={loading === 'founders_access' || isSoldOut}
+                  className={`mb-4 px-12 ${isUrgent ? 'animate-pulse bg-red-600 hover:bg-red-700' : ''}`}
+                >
+                  {isSoldOut ? (
+                    <>
+                      <Lock className="w-5 h-5 mr-2" />
+                      Sold Out
+                    </>
+                  ) : loading === 'founders_access' ? (
+                    'Processing...'
+                  ) : (
+                    <>
+                      {isUrgent ? '🔥 ' : ''}Claim Your Founder's Spot - $499
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </motion.div>
               <p className="text-sm text-muted-foreground">
                 Secure checkout • Instant access • No recurring fees
               </p>
