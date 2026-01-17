@@ -28,6 +28,7 @@ const Auth = () => {
   // MFA state
   const [mfaRequired, setMfaRequired] = useState(false);
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [mfaUserId, setMfaUserId] = useState<string | null>(null);
   
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ const Auth = () => {
           // User has MFA, needs to verify
           setMfaRequired(true);
           setMfaFactorId(verifiedFactors[0].id);
+          setMfaUserId(session.user.id);
         } else {
           // No MFA, redirect
           const from = (location.state as any)?.from?.pathname || "/";
@@ -110,10 +112,11 @@ const Auth = () => {
         const { data: factors } = await supabase.auth.mfa.listFactors();
         const verifiedFactors = factors?.totp?.filter(f => f.status === "verified") || [];
         
-        if (verifiedFactors.length > 0) {
+        if (verifiedFactors.length > 0 && data.user) {
           // User has MFA enabled, show verification screen
           setMfaRequired(true);
           setMfaFactorId(verifiedFactors[0].id);
+          setMfaUserId(data.user.id);
           toast({
             title: "2FA Required",
             description: "Please enter your authentication code.",
@@ -177,6 +180,7 @@ const Auth = () => {
   const handleMFACancel = async () => {
     await supabase.auth.signOut();
     setMfaRequired(false);
+    setMfaUserId(null);
     setMfaFactorId(null);
   };
 
@@ -204,6 +208,7 @@ const Auth = () => {
         
         <MFAVerify
           factorId={mfaFactorId}
+          userId={mfaUserId || ""}
           onSuccess={handleMFASuccess}
           onCancel={handleMFACancel}
         />

@@ -6,22 +6,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useBackupCodes } from "@/hooks/useBackupCodes";
 import { QRCodeSVG } from "qrcode.react";
+import BackupCodesDisplay from "./BackupCodesDisplay";
 
 interface MFASetupProps {
   onComplete?: () => void;
   onCancel?: () => void;
 }
 
+type SetupStep = "qr" | "verify" | "backup";
+
 const MFASetup = ({ onComplete, onCancel }: MFASetupProps) => {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
+  const [step, setStep] = useState<SetupStep>("qr");
   const [factorId, setFactorId] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | null>(null);
   const [verificationCode, setVerificationCode] = useState("");
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const { codes, generateBackupCodes, loading: generatingCodes } = useBackupCodes();
 
   useEffect(() => {
     enrollMFA();
@@ -73,11 +79,17 @@ const MFASetup = ({ onComplete, onCancel }: MFASetupProps) => {
 
       if (verifyError) throw verifyError;
 
+      // Generate backup codes after successful verification
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await generateBackupCodes(user.id);
+        setStep("backup");
+      }
+
       toast({
         title: "2FA Enabled",
         description: "Two-factor authentication has been set up successfully.",
       });
-      onComplete?.();
     } catch (error: any) {
       toast({
         title: "Verification Failed",
@@ -102,6 +114,16 @@ const MFASetup = ({ onComplete, onCancel }: MFASetupProps) => {
       <div className="flex items-center justify-center p-8">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
+    );
+  }
+
+  // Show backup codes after verification
+  if (step === "backup" && codes.length > 0) {
+    return (
+      <BackupCodesDisplay
+        codes={codes}
+        onContinue={() => onComplete?.()}
+      />
     );
   }
 
@@ -174,14 +196,13 @@ const MFASetup = ({ onComplete, onCancel }: MFASetupProps) => {
           </div>
         </div>
 
-        {/* Warning */}
-        <div className="flex items-start gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-          <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-yellow-500">
-            <p className="font-medium">Save your backup codes</p>
-            <p className="mt-1 text-yellow-500/80">
-              Make sure you save your authenticator app's backup codes. If you lose access to your
-              authenticator, you may be locked out of your account.
+        {/* Info about backup codes */}
+        <div className="flex items-start gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <AlertTriangle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-blue-500">
+            <p className="font-medium">Backup codes will be generated</p>
+            <p className="mt-1 text-blue-500/80">
+              After verification, you'll receive 10 backup codes for account recovery.
             </p>
           </div>
         </div>
@@ -195,13 +216,13 @@ const MFASetup = ({ onComplete, onCancel }: MFASetupProps) => {
         <Button
           variant="vault"
           onClick={handleVerify}
-          disabled={verifying || verificationCode.length !== 6}
+          disabled={verifying || generatingCodes || verificationCode.length !== 6}
           className="flex-1"
         >
-          {verifying ? (
+          {verifying || generatingCodes ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              Verifying...
+              {generatingCodes ? "Generating Codes..." : "Verifying..."}
             </>
           ) : (
             "Enable 2FA"
