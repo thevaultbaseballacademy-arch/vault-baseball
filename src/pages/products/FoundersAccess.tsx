@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -354,6 +354,7 @@ const FoundersAccess = () => {
   // Video modal state
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [selectedTestimonialIndex, setSelectedTestimonialIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
 
   const selectedTestimonial = founderTestimonials[selectedTestimonialIndex];
 
@@ -364,12 +365,14 @@ const FoundersAccess = () => {
   };
 
   const goToPrevTestimonial = useCallback(() => {
+    setSlideDirection('left');
     setSelectedTestimonialIndex(prev => 
       prev === 0 ? founderTestimonials.length - 1 : prev - 1
     );
   }, []);
 
   const goToNextTestimonial = useCallback(() => {
+    setSlideDirection('right');
     setSelectedTestimonialIndex(prev => 
       prev === founderTestimonials.length - 1 ? 0 : prev + 1
     );
@@ -993,39 +996,50 @@ const FoundersAccess = () => {
               <ChevronRight className="w-5 h-5 text-white" />
             </button>
 
-            {/* Video Player */}
-            <div className="relative aspect-video bg-black">
-              <iframe
-                src={getVideoEmbedUrl(selectedTestimonial.videoId, selectedTestimonial.videoType)}
-                title={`${selectedTestimonial.name} testimonial`}
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-
-            {/* Testimonial Info */}
-            <div className="p-6 bg-gradient-to-br from-card to-card/80">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Crown className="w-4 h-4 text-amber-500" />
-                    <span className="text-xs text-amber-500 font-medium uppercase tracking-wider">Founder</span>
-                  </div>
-                  <div className="px-3 py-1 rounded-full bg-amber-500 text-black text-sm font-bold">
-                    {selectedTestimonial.metric}
-                  </div>
+            {/* Video Player with Slide Animation */}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={selectedTestimonialIndex}
+                initial={{ x: slideDirection === 'right' ? 100 : -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: slideDirection === 'right' ? -100 : 100, opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                {/* Video Player */}
+                <div className="relative aspect-video bg-black">
+                  <iframe
+                    src={getVideoEmbedUrl(selectedTestimonial.videoId, selectedTestimonial.videoType)}
+                    title={`${selectedTestimonial.name} testimonial`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {selectedTestimonialIndex + 1} / {founderTestimonials.length}
-                </span>
-              </div>
-              <h3 className="text-xl font-display text-foreground mb-1">{selectedTestimonial.name}</h3>
-              <p className="text-muted-foreground text-sm mb-3">{selectedTestimonial.role}</p>
-              <p className="text-amber-500 text-lg italic">"{selectedTestimonial.quote}"</p>
-              <p className="text-muted-foreground text-xs mt-4 hidden md:block">Use ← → arrow keys to navigate</p>
-              <p className="text-muted-foreground text-xs mt-4 md:hidden">Swipe left or right to navigate</p>
-            </div>
+
+                {/* Testimonial Info */}
+                <div className="p-6 bg-gradient-to-br from-card to-card/80">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Crown className="w-4 h-4 text-amber-500" />
+                        <span className="text-xs text-amber-500 font-medium uppercase tracking-wider">Founder</span>
+                      </div>
+                      <div className="px-3 py-1 rounded-full bg-amber-500 text-black text-sm font-bold">
+                        {selectedTestimonial.metric}
+                      </div>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {selectedTestimonialIndex + 1} / {founderTestimonials.length}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-display text-foreground mb-1">{selectedTestimonial.name}</h3>
+                  <p className="text-muted-foreground text-sm mb-3">{selectedTestimonial.role}</p>
+                  <p className="text-amber-500 text-lg italic">"{selectedTestimonial.quote}"</p>
+                  <p className="text-muted-foreground text-xs mt-4 hidden md:block">Use ← → arrow keys to navigate</p>
+                  <p className="text-muted-foreground text-xs mt-4 md:hidden">Swipe left or right to navigate</p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </DialogContent>
       </Dialog>
