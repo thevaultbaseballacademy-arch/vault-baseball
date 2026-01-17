@@ -20,6 +20,7 @@ import CertificationExpirationManager from "@/components/admin/CertificationExpi
 import AuditLogViewer from "@/components/admin/AuditLogViewer";
 import DataRetentionPanel from "@/components/admin/DataRetentionPanel";
 import DeletionRequestsManager from "@/components/admin/DeletionRequestsManager";
+import GDPRComplianceDashboard from "@/components/admin/GDPRComplianceDashboard";
 
 interface Profile {
   user_id: string;
@@ -283,7 +284,7 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-6xl grid-cols-10">
+              <TabsList className="grid w-full max-w-6xl grid-cols-11">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
                 <TabsTrigger value="certifications">Questions</TabsTrigger>
@@ -294,6 +295,7 @@ const Admin = () => {
                 <TabsTrigger value="audit">Audit</TabsTrigger>
                 <TabsTrigger value="retention">Retention</TabsTrigger>
                 <TabsTrigger value="deletion">Deletion</TabsTrigger>
+                <TabsTrigger value="gdpr">GDPR</TabsTrigger>
               </TabsList>
 
               <TabsContent value="users" className="mt-6 space-y-6">
@@ -421,6 +423,10 @@ const Admin = () => {
 
               <TabsContent value="deletion" className="mt-6">
                 <DeletionRequestsManager />
+              </TabsContent>
+
+              <TabsContent value="gdpr" className="mt-6">
+                <GDPRComplianceDashboard />
               </TabsContent>
             </Tabs>
           </motion.div>
