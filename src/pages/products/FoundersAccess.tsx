@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame } from "lucide-react";
+import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -13,6 +13,12 @@ import { useToast } from "@/hooks/use-toast";
 const FoundersAccess = () => {
   const { checkout, loading } = useProductCheckout();
   const [spotsTaken, setSpotsTaken] = useState(0);
+  const [recentFounders, setRecentFounders] = useState<Array<{
+    id: string;
+    displayName: string;
+    avatarUrl: string | null;
+    purchasedAt: string;
+  }>>([]);
   const TOTAL_SPOTS = 50;
   const { toast } = useToast();
   const initialLoadRef = useRef(true);
@@ -28,6 +34,37 @@ const FoundersAccess = () => {
   // Calculate countdown end date (30 days from component mount for demo)
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + 30);
+
+  // Fetch recent founders
+  const fetchRecentFounders = async () => {
+    const { data: purchases } = await supabase
+      .from('user_purchases')
+      .select('user_id, purchased_at')
+      .eq('product_key', 'founders_access')
+      .eq('status', 'completed')
+      .order('purchased_at', { ascending: false })
+      .limit(8);
+
+    if (purchases && purchases.length > 0) {
+      const userIds = purchases.map(p => p.user_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, display_name, avatar_url')
+        .in('user_id', userIds);
+
+      const foundersWithProfiles = purchases.map(purchase => {
+        const profile = profiles?.find(p => p.user_id === purchase.user_id);
+        return {
+          id: purchase.user_id,
+          displayName: profile?.display_name || 'Vault Founder',
+          avatarUrl: profile?.avatar_url || null,
+          purchasedAt: purchase.purchased_at,
+        };
+      });
+
+      setRecentFounders(foundersWithProfiles);
+    }
+  };
 
   // Fetch initial count and subscribe to realtime updates
   useEffect(() => {
@@ -46,6 +83,7 @@ const FoundersAccess = () => {
       }, 1000);
     };
     checkSpots();
+    fetchRecentFounders();
 
     // Subscribe to realtime updates for new purchases
     const channel = supabase
@@ -64,9 +102,11 @@ const FoundersAccess = () => {
             setSpotsTaken((prev) => {
               const newCount = prev + 1;
               const remaining = TOTAL_SPOTS - newCount;
-              
               // Only show toast after initial load
               if (!initialLoadRef.current) {
+                // Refresh recent founders list
+                fetchRecentFounders();
+                
                 toast({
                   title: "🔥 Spot Just Claimed!",
                   description: remaining > 0 
@@ -100,6 +140,9 @@ const FoundersAccess = () => {
               
               // Only show toast after initial load
               if (!initialLoadRef.current) {
+                // Refresh recent founders list
+                fetchRecentFounders();
+                
                 toast({
                   title: "🔥 Spot Just Claimed!",
                   description: remaining > 0 
@@ -167,6 +210,30 @@ const FoundersAccess = () => {
   ];
 
   const formatNumber = (num: number) => num.toString().padStart(2, '0');
+
+  const getTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -433,7 +500,84 @@ const FoundersAccess = () => {
           </motion.div>
         </section>
 
-        {/* Social Proof */}
+        {/* Recent Founders - Social Proof */}
+        {recentFounders.length > 0 && (
+          <section className="container mx-auto px-4 mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-8"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4">
+                <Users className="w-4 h-4 text-amber-500" />
+                <span className="text-sm font-medium text-amber-500">Recent Founders</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-display text-foreground">
+                Athletes Who Already Locked In
+              </h2>
+            </motion.div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+              {recentFounders.map((founder, index) => (
+                <motion.div
+                  key={founder.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className="relative"
+                >
+                  <Card className="p-4 text-center bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/20 hover:border-amber-500/40 transition-colors">
+                    {/* Avatar */}
+                    <div className="relative mx-auto mb-3">
+                      {founder.avatarUrl ? (
+                        <img 
+                          src={founder.avatarUrl} 
+                          alt={founder.displayName}
+                          className="w-14 h-14 rounded-full object-cover mx-auto border-2 border-amber-500/30"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto border-2 border-amber-500/30">
+                          <span className="text-amber-500 font-semibold text-lg">
+                            {getInitials(founder.displayName)}
+                          </span>
+                        </div>
+                      )}
+                      {/* Founder badge */}
+                      <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center">
+                        <Crown className="w-3 h-3 text-black" />
+                      </div>
+                    </div>
+                    
+                    {/* Name */}
+                    <p className="font-semibold text-foreground text-sm truncate">
+                      {founder.displayName}
+                    </p>
+                    
+                    {/* Time ago */}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {getTimeAgo(founder.purchasedAt)}
+                    </p>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            {spotsTaken > recentFounders.length && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="text-center text-muted-foreground text-sm mt-6"
+              >
+                +{spotsTaken - recentFounders.length} more founders have joined
+              </motion.p>
+            )}
+          </section>
+        )}
+
+        {/* Testimonial */}
         <section className="container mx-auto px-4 mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
