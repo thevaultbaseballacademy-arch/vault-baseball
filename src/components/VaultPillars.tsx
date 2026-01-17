@@ -15,6 +15,7 @@ const pillars: {
   focus: string[];
   metrics: string[];
   badge?: string;
+  preSale?: string;
   link?: string;
 }[] = [
   {
@@ -60,8 +61,9 @@ const pillars: {
     description: "Keep athletes healthy, available, and progressing over time. Availability is the most overlooked performance metric.",
     focus: ["Arm care systems", "Workload management", "Recovery protocols", "Tissue resilience"],
     metrics: ["Throw volume", "Recovery indicators", "Availability rate", "Injury risk markers"],
-    badge: "Beta Access",
-    link: "/products/longevity-beta",
+    badge: "Coming Soon",
+    preSale: "Founder's Access Pre-Sale: Get Lifetime Access to the full V-A-U-L-T suite for $499 (Limited to first 50 athletes).",
+    link: "/products/founders-access",
   },
   {
     letter: "T",
@@ -73,8 +75,9 @@ const pillars: {
     description: "Ensure training adaptations appear in competition. Training that does not show up in games fails its purpose.",
     focus: ["Practice design", "Decision-making under pressure", "Competitive execution", "Game realism"],
     metrics: ["Practice-to-game carryover", "Situational success", "Consistency under pressure"],
-    badge: "Beta Access",
-    link: "/products/transfer-beta",
+    badge: "Coming Soon",
+    preSale: "Founder's Access Pre-Sale: Get Lifetime Access to the full V-A-U-L-T suite for $499 (Limited to first 50 athletes).",
+    link: "/products/founders-access",
   },
 ];
 
@@ -132,10 +135,15 @@ const VaultPillars = () => {
                         </div>
                       </div>
                       <p className="text-muted-foreground">{pillar.description}</p>
+                      {pillar.preSale && (
+                        <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-amber-500/10 to-purple-500/10 border border-amber-500/20">
+                          <p className="text-sm text-foreground font-medium">{pillar.preSale}</p>
+                        </div>
+                      )}
                       {pillar.link && (
                         <Link to={pillar.link} className="inline-block mt-4">
                           <Button variant="vault" size="sm">
-                            Get Beta Access
+                            Get Founder's Access
                             <ArrowRight className="w-4 h-4 ml-2" />
                           </Button>
                         </Link>
