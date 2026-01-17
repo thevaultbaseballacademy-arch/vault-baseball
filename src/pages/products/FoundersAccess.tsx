@@ -242,60 +242,83 @@ const FoundersAccess = () => {
     {
       name: "Jake Morrison",
       role: "D1 Commit, Class of 2025",
-      videoUrl: "https://cdn.marblism.com/1NxauWxFGtn.webp",
+      thumbnailUrl: "https://cdn.marblism.com/1NxauWxFGtn.webp",
+      videoId: "dQw4w9WgXcQ",
+      videoType: "youtube" as const,
       quote: "Best investment I've ever made",
       metric: "+8 mph"
     },
     {
       name: "Ryan Chen",
       role: "High School Junior",
-      videoUrl: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
+      thumbnailUrl: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
+      videoId: "76979871",
+      videoType: "vimeo" as const,
       quote: "Completely transformed my game",
       metric: "3 Offers"
     },
     {
       name: "Mike Patterson",
       role: "Travel Ball Coach",
-      videoUrl: "https://cdn.marblism.com/e9fzmmT2o9Q.webp",
+      thumbnailUrl: "https://cdn.marblism.com/e9fzmmT2o9Q.webp",
+      videoId: "jNQXAC9IVRw",
+      videoType: "youtube" as const,
       quote: "Worth every penny for my son",
       metric: "Top 100"
     },
     {
       name: "Sarah Williams",
       role: "Parent of 2027 Prospect",
-      videoUrl: "https://cdn.marblism.com/nwf4_GebeVT.webp",
+      thumbnailUrl: "https://cdn.marblism.com/nwf4_GebeVT.webp",
+      videoId: "L_jWHffIx5E",
+      videoType: "youtube" as const,
       quote: "My son's development skyrocketed",
       metric: "+12 mph"
     },
     {
       name: "Bailey Ramirez",
       role: "JUCO Transfer",
-      videoUrl: "https://cdn.marblism.com/7oEYJwzA1AH.webp",
+      thumbnailUrl: "https://cdn.marblism.com/7oEYJwzA1AH.webp",
+      videoId: "148751763",
+      videoType: "vimeo" as const,
       quote: "Helped me get to the next level",
       metric: "D1 Offer"
     },
     {
       name: "Coach Eric Silva",
       role: "High School Head Coach",
-      videoUrl: "https://cdn.marblism.com/Aq6IXFkCdm5.webp",
+      thumbnailUrl: "https://cdn.marblism.com/Aq6IXFkCdm5.webp",
+      videoId: "ScMzIvxBSi4",
+      videoType: "youtube" as const,
       quote: "Game-changer for our program",
       metric: "State Champs"
     },
     {
       name: "Dylan Foster",
       role: "Class of 2026 Pitcher",
-      videoUrl: "https://cdn.marblism.com/1NxauWxFGtn.webp",
+      thumbnailUrl: "https://cdn.marblism.com/1NxauWxFGtn.webp",
+      videoId: "9bZkp7q19f0",
+      videoType: "youtube" as const,
       quote: "The velocity system is legit",
       metric: "+6 mph"
     },
     {
       name: "Marcus Johnson",
       role: "Travel Ball Parent",
-      videoUrl: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
+      thumbnailUrl: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
+      videoId: "kJQP7kiw5Fk",
+      videoType: "youtube" as const,
       quote: "Structured approach we needed",
       metric: "5 Camps"
     },
   ];
+
+  const getVideoEmbedUrl = (videoId: string, videoType: 'youtube' | 'vimeo') => {
+    if (videoType === 'youtube') {
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+    }
+    return `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+  };
 
   // Carousel setup with autoplay
   const autoplayPlugin = useRef(
@@ -792,7 +815,7 @@ const FoundersAccess = () => {
                       {/* Video Thumbnail */}
                       <div className="relative aspect-video overflow-hidden">
                         <img
-                          src={testimonial.videoUrl}
+                          src={testimonial.thumbnailUrl}
                           alt={`${testimonial.name} testimonial`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -970,24 +993,15 @@ const FoundersAccess = () => {
               <ChevronRight className="w-5 h-5 text-white" />
             </button>
 
-            {/* Video Player - Placeholder for actual video */}
+            {/* Video Player */}
             <div className="relative aspect-video bg-black">
-              <img
-                src={selectedTestimonial.videoUrl}
-                alt={`${selectedTestimonial.name} testimonial`}
-                className="w-full h-full object-cover"
+              <iframe
+                src={getVideoEmbedUrl(selectedTestimonial.videoId, selectedTestimonial.videoType)}
+                title={`${selectedTestimonial.name} testimonial`}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
               />
-              {/* Play overlay for demo - in production, replace with actual video player */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="w-20 h-20 rounded-full bg-amber-500 flex items-center justify-center shadow-2xl mb-4"
-                >
-                  <Play className="w-10 h-10 text-black ml-1" fill="currentColor" />
-                </motion.div>
-                <p className="text-white/80 text-sm">Video testimonial coming soon</p>
-              </div>
             </div>
 
             {/* Testimonial Info */}
