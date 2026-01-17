@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play, ChevronLeft, ChevronRight, X, Maximize, Minimize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -355,6 +355,8 @@ const FoundersAccess = () => {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [selectedTestimonialIndex, setSelectedTestimonialIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
   const selectedTestimonial = founderTestimonials[selectedTestimonialIndex];
 
@@ -383,6 +385,33 @@ const FoundersAccess = () => {
     setSlideDirection(index > selectedTestimonialIndex ? 'right' : 'left');
     setSelectedTestimonialIndex(index);
   }, [selectedTestimonialIndex]);
+
+  // Fullscreen toggle
+  const toggleFullscreen = useCallback(async () => {
+    if (!videoContainerRef.current) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await videoContainerRef.current.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (err) {
+      console.error('Fullscreen error:', err);
+    }
+  }, []);
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   // Keyboard navigation for video modal
   useEffect(() => {
@@ -1012,14 +1041,26 @@ const FoundersAccess = () => {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
                 {/* Video Player */}
-                <div className="relative aspect-video bg-black">
+                <div ref={videoContainerRef} className="relative aspect-video bg-black group">
                   <iframe
                     src={getVideoEmbedUrl(selectedTestimonial.videoId, selectedTestimonial.videoType)}
                     title={`${selectedTestimonial.name} testimonial`}
                     className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                     allowFullScreen
                   />
+                  {/* Fullscreen toggle button */}
+                  <button
+                    onClick={toggleFullscreen}
+                    className="absolute bottom-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100"
+                    title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                  >
+                    {isFullscreen ? (
+                      <Minimize className="w-5 h-5 text-white" />
+                    ) : (
+                      <Maximize className="w-5 h-5 text-white" />
+                    )}
+                  </button>
                 </div>
 
                 {/* Testimonial Info */}
