@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.data-retention-cleanup]
 verify_jwt = false
+
+[functions.export-user-data]
+verify_jwt = false

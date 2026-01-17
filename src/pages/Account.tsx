@@ -11,6 +11,7 @@ import NotificationSettings from "@/components/notifications/NotificationSetting
 import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequests";
 import MFASettings from "@/components/auth/MFASettings";
 import SessionManagement from "@/components/account/SessionManagement";
+import DataExportPanel from "@/components/account/DataExportPanel";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -274,6 +275,9 @@ const Account = () => {
 
             {/* Session Management */}
             <SessionManagement />
+
+            {/* Data Export (GDPR) */}
+            <DataExportPanel />
 
             {/* Coach Assignment Requests */}
             <CoachAssignmentRequests userId={user?.id} />
