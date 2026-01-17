@@ -330,12 +330,45 @@ const FoundersAccess = () => {
 
   // Video modal state
   const [videoModalOpen, setVideoModalOpen] = useState(false);
-  const [selectedTestimonial, setSelectedTestimonial] = useState<typeof founderTestimonials[0] | null>(null);
+  const [selectedTestimonialIndex, setSelectedTestimonialIndex] = useState(0);
+
+  const selectedTestimonial = founderTestimonials[selectedTestimonialIndex];
 
   const openVideoModal = (testimonial: typeof founderTestimonials[0]) => {
-    setSelectedTestimonial(testimonial);
+    const index = founderTestimonials.findIndex(t => t.name === testimonial.name);
+    setSelectedTestimonialIndex(index >= 0 ? index : 0);
     setVideoModalOpen(true);
   };
+
+  const goToPrevTestimonial = useCallback(() => {
+    setSelectedTestimonialIndex(prev => 
+      prev === 0 ? founderTestimonials.length - 1 : prev - 1
+    );
+  }, []);
+
+  const goToNextTestimonial = useCallback(() => {
+    setSelectedTestimonialIndex(prev => 
+      prev === founderTestimonials.length - 1 ? 0 : prev + 1
+    );
+  }, []);
+
+  // Keyboard navigation for video modal
+  useEffect(() => {
+    if (!videoModalOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goToPrevTestimonial();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goToNextTestimonial();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [videoModalOpen, goToPrevTestimonial, goToNextTestimonial]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -876,39 +909,55 @@ const FoundersAccess = () => {
       {/* Video Player Modal */}
       <Dialog open={videoModalOpen} onOpenChange={setVideoModalOpen}>
         <DialogContent className="max-w-4xl w-[95vw] p-0 bg-black border-amber-500/30 overflow-hidden">
-          {selectedTestimonial && (
-            <div className="relative">
-              {/* Close button */}
-              <button
-                onClick={() => setVideoModalOpen(false)}
-                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
-              >
-                <X className="w-5 h-5 text-white" />
-              </button>
+          <div className="relative">
+            {/* Close button */}
+            <button
+              onClick={() => setVideoModalOpen(false)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
 
-              {/* Video Player - Placeholder for actual video */}
-              <div className="relative aspect-video bg-black">
-                <img
-                  src={selectedTestimonial.videoUrl}
-                  alt={`${selectedTestimonial.name} testimonial`}
-                  className="w-full h-full object-cover"
-                />
-                {/* Play overlay for demo - in production, replace with actual video player */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="w-20 h-20 rounded-full bg-amber-500 flex items-center justify-center shadow-2xl mb-4"
-                  >
-                    <Play className="w-10 h-10 text-black ml-1" fill="currentColor" />
-                  </motion.div>
-                  <p className="text-white/80 text-sm">Video testimonial coming soon</p>
-                </div>
+            {/* Previous button */}
+            <button
+              onClick={goToPrevTestimonial}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-white" />
+            </button>
+
+            {/* Next button */}
+            <button
+              onClick={goToNextTestimonial}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              <ChevronRight className="w-5 h-5 text-white" />
+            </button>
+
+            {/* Video Player - Placeholder for actual video */}
+            <div className="relative aspect-video bg-black">
+              <img
+                src={selectedTestimonial.videoUrl}
+                alt={`${selectedTestimonial.name} testimonial`}
+                className="w-full h-full object-cover"
+              />
+              {/* Play overlay for demo - in production, replace with actual video player */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="w-20 h-20 rounded-full bg-amber-500 flex items-center justify-center shadow-2xl mb-4"
+                >
+                  <Play className="w-10 h-10 text-black ml-1" fill="currentColor" />
+                </motion.div>
+                <p className="text-white/80 text-sm">Video testimonial coming soon</p>
               </div>
+            </div>
 
-              {/* Testimonial Info */}
-              <div className="p-6 bg-gradient-to-br from-card to-card/80">
-                <div className="flex items-center gap-4 mb-3">
+            {/* Testimonial Info */}
+            <div className="p-6 bg-gradient-to-br from-card to-card/80">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Crown className="w-4 h-4 text-amber-500" />
                     <span className="text-xs text-amber-500 font-medium uppercase tracking-wider">Founder</span>
@@ -917,12 +966,16 @@ const FoundersAccess = () => {
                     {selectedTestimonial.metric}
                   </div>
                 </div>
-                <h3 className="text-xl font-display text-foreground mb-1">{selectedTestimonial.name}</h3>
-                <p className="text-muted-foreground text-sm mb-3">{selectedTestimonial.role}</p>
-                <p className="text-amber-500 text-lg italic">"{selectedTestimonial.quote}"</p>
+                <span className="text-xs text-muted-foreground">
+                  {selectedTestimonialIndex + 1} / {founderTestimonials.length}
+                </span>
               </div>
+              <h3 className="text-xl font-display text-foreground mb-1">{selectedTestimonial.name}</h3>
+              <p className="text-muted-foreground text-sm mb-3">{selectedTestimonial.role}</p>
+              <p className="text-amber-500 text-lg italic">"{selectedTestimonial.quote}"</p>
+              <p className="text-muted-foreground text-xs mt-4">Use ← → arrow keys to navigate</p>
             </div>
-          )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
