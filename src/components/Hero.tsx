@@ -94,9 +94,12 @@ const Hero = () => {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button variant="vaultOutline" size="xl" onClick={() => document.getElementById('pillars')?.scrollIntoView({ behavior: 'smooth' })}>
-              Explore the Framework
-            </Button>
+            <Link to="/products/org-starter-pack">
+              <Button variant="vaultOutline" size="xl">
+                Get the Org Starter Pack
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
           </motion.div>
 
           {/* Velocity Upsell CTA */}

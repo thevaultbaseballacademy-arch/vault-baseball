@@ -152,6 +152,22 @@ export const PRODUCT_PRICES = {
     price: 14900,
     type: 'payment' as const,
   },
+  
+  // High-Ticket & Limited Offers
+  org_starter_pack: {
+    price_id: 'price_1SqNiiPhXS410TO51M25fyJR',
+    product_id: 'prod_TnziXW8OZJVCKY',
+    name: 'Org Starter Pack',
+    price: 250000,
+    type: 'payment' as const,
+  },
+  founders_access: {
+    price_id: 'price_1SqNikPhXS410TO5rLuqRrBn',
+    product_id: 'prod_TnziXPd0kWbybf',
+    name: "Founder's Access - Lifetime V.A.U.L.T. Suite",
+    price: 49900,
+    type: 'payment' as const,
+  },
 } as const;
 
 export type ProductKey = keyof typeof PRODUCT_PRICES;
