@@ -378,6 +378,12 @@ const FoundersAccess = () => {
     );
   }, []);
 
+  const goToTestimonial = useCallback((index: number) => {
+    if (index === selectedTestimonialIndex) return;
+    setSlideDirection(index > selectedTestimonialIndex ? 'right' : 'left');
+    setSelectedTestimonialIndex(index);
+  }, [selectedTestimonialIndex]);
+
   // Keyboard navigation for video modal
   useEffect(() => {
     if (!videoModalOpen) return;
@@ -1035,11 +1041,41 @@ const FoundersAccess = () => {
                   <h3 className="text-xl font-display text-foreground mb-1">{selectedTestimonial.name}</h3>
                   <p className="text-muted-foreground text-sm mb-3">{selectedTestimonial.role}</p>
                   <p className="text-amber-500 text-lg italic">"{selectedTestimonial.quote}"</p>
-                  <p className="text-muted-foreground text-xs mt-4 hidden md:block">Use ← → arrow keys to navigate</p>
-                  <p className="text-muted-foreground text-xs mt-4 md:hidden">Swipe left or right to navigate</p>
                 </div>
               </motion.div>
             </AnimatePresence>
+
+            {/* Thumbnail Navigation */}
+            <div className="px-4 py-3 bg-black/90 border-t border-white/10">
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {founderTestimonials.map((testimonial, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToTestimonial(index)}
+                    className={`relative flex-shrink-0 w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden transition-all duration-200 ${
+                      selectedTestimonialIndex === index
+                        ? 'ring-2 ring-amber-500 scale-105'
+                        : 'opacity-60 hover:opacity-100 hover:scale-105'
+                    }`}
+                  >
+                    <img
+                      src={testimonial.thumbnailUrl}
+                      alt={testimonial.name}
+                      className="w-full h-full object-cover"
+                    />
+                    {selectedTestimonialIndex === index && (
+                      <div className="absolute inset-0 bg-amber-500/20" />
+                    )}
+                  </button>
+                ))}
+              </div>
+              <p className="text-muted-foreground text-xs mt-2 text-center hidden md:block">
+                Click thumbnails or use ← → keys to navigate
+              </p>
+              <p className="text-muted-foreground text-xs mt-2 text-center md:hidden">
+                Tap thumbnails or swipe to navigate
+              </p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
