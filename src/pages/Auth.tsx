@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import MFAVerify from "@/components/auth/MFAVerify";
 
 const authSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -23,6 +24,11 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
+  
+  // MFA state
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,11 +37,41 @@ const Auth = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        const from = (location.state as any)?.from?.pathname || "/";
-        navigate(from, { replace: true });
+        // Check if MFA is verified
+        checkMFAStatus(session);
       }
     });
   }, [navigate, location]);
+
+  const checkMFAStatus = async (session: any) => {
+    try {
+      const { data: { currentLevel } } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      
+      if (currentLevel === "aal2") {
+        // MFA verified, redirect
+        const from = (location.state as any)?.from?.pathname || "/";
+        navigate(from, { replace: true });
+      } else {
+        // Check if user has MFA enrolled
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const verifiedFactors = factors?.totp?.filter(f => f.status === "verified") || [];
+        
+        if (verifiedFactors.length > 0) {
+          // User has MFA, needs to verify
+          setMfaRequired(true);
+          setMfaFactorId(verifiedFactors[0].id);
+        } else {
+          // No MFA, redirect
+          const from = (location.state as any)?.from?.pathname || "/";
+          navigate(from, { replace: true });
+        }
+      }
+    } catch (error) {
+      console.error("Error checking MFA status:", error);
+      const from = (location.state as any)?.from?.pathname || "/";
+      navigate(from, { replace: true });
+    }
+  };
 
   const validateForm = () => {
     try {
@@ -64,17 +100,33 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        toast({
-          title: "Welcome back!",
-          description: "You have been signed in successfully.",
-        });
-        const from = (location.state as any)?.from?.pathname || "/";
-        navigate(from, { replace: true });
+        
+        // Check if MFA is required
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const verifiedFactors = factors?.totp?.filter(f => f.status === "verified") || [];
+        
+        if (verifiedFactors.length > 0) {
+          // User has MFA enabled, show verification screen
+          setMfaRequired(true);
+          setMfaFactorId(verifiedFactors[0].id);
+          toast({
+            title: "2FA Required",
+            description: "Please enter your authentication code.",
+          });
+        } else {
+          // No MFA, proceed to app
+          toast({
+            title: "Welcome back!",
+            description: "You have been signed in successfully.",
+          });
+          const from = (location.state as any)?.from?.pathname || "/";
+          navigate(from, { replace: true });
+        }
       } else {
         const redirectUrl = `${window.location.origin}/`;
         const { error } = await supabase.auth.signUp({
@@ -112,6 +164,52 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  const handleMFASuccess = () => {
+    toast({
+      title: "Welcome back!",
+      description: "You have been signed in successfully.",
+    });
+    const from = (location.state as any)?.from?.pathname || "/";
+    navigate(from, { replace: true });
+  };
+
+  const handleMFACancel = async () => {
+    await supabase.auth.signOut();
+    setMfaRequired(false);
+    setMfaFactorId(null);
+  };
+
+  // Show MFA verification screen
+  if (mfaRequired && mfaFactorId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        {/* Logo */}
+        <div className="absolute top-8 left-1/2 -translate-x-1/2">
+          <a href="/" className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center relative overflow-hidden">
+              <Shield className="w-6 h-6 text-primary-foreground" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-display text-3xl leading-none text-foreground tracking-wider">
+                VAULT
+              </span>
+              <span className="text-xs font-medium text-muted-foreground tracking-[0.2em] uppercase">
+                Baseball
+              </span>
+            </div>
+          </a>
+        </div>
+        
+        <MFAVerify
+          factorId={mfaFactorId}
+          onSuccess={handleMFASuccess}
+          onCancel={handleMFACancel}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -167,6 +265,7 @@ const Auth = () => {
                     required
                   />
                 </div>
+                {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
               </div>
             )}
 
@@ -184,6 +283,7 @@ const Auth = () => {
                   required
                 />
               </div>
+              {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
             </div>
 
             <div className="space-y-2">
@@ -208,6 +308,7 @@ const Auth = () => {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+              {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
 
             <Button

@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NotificationSettings from "@/components/notifications/NotificationSettings";
 import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequests";
+import MFASettings from "@/components/auth/MFASettings";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -266,6 +267,9 @@ const Account = () => {
                 </Button>
               </div>
             </div>
+
+            {/* Two-Factor Authentication (Admin Only) */}
+            <MFASettings userId={user?.id} />
 
             {/* Coach Assignment Requests */}
             <CoachAssignmentRequests userId={user?.id} />
