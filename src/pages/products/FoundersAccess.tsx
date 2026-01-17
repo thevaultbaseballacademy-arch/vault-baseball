@@ -10,6 +10,7 @@ import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 
 const FoundersAccess = () => {
   const { checkout, loading } = useProductCheckout();
@@ -295,12 +296,16 @@ const FoundersAccess = () => {
     },
   ];
 
-  // Carousel setup
+  // Carousel setup with autoplay
+  const autoplayPlugin = useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
+  );
+  
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true, 
     align: 'start',
     slidesToScroll: 1,
-  });
+  }, [autoplayPlugin.current]);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
