@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -326,6 +327,15 @@ const FoundersAccess = () => {
       emblaApi.off('reInit', onSelect);
     };
   }, [emblaApi, onSelect]);
+
+  // Video modal state
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [selectedTestimonial, setSelectedTestimonial] = useState<typeof founderTestimonials[0] | null>(null);
+
+  const openVideoModal = (testimonial: typeof founderTestimonials[0]) => {
+    setSelectedTestimonial(testimonial);
+    setVideoModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -725,14 +735,17 @@ const FoundersAccess = () => {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         
                         {/* Play button overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center">
+                        <button 
+                          className="absolute inset-0 flex items-center justify-center"
+                          onClick={() => openVideoModal(testimonial)}
+                        >
                           <motion.div
                             whileHover={{ scale: 1.1 }}
                             className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-amber-500 flex items-center justify-center shadow-lg cursor-pointer"
                           >
                             <Play className="w-5 h-5 md:w-6 md:h-6 text-black ml-1" fill="currentColor" />
                           </motion.div>
-                        </div>
+                        </button>
 
                         {/* Metric badge */}
                         <div className="absolute top-3 right-3 px-2 md:px-3 py-1 rounded-full bg-amber-500 text-black text-xs md:text-sm font-bold">
@@ -859,6 +872,59 @@ const FoundersAccess = () => {
       </main>
 
       <Footer />
+
+      {/* Video Player Modal */}
+      <Dialog open={videoModalOpen} onOpenChange={setVideoModalOpen}>
+        <DialogContent className="max-w-4xl w-[95vw] p-0 bg-black border-amber-500/30 overflow-hidden">
+          {selectedTestimonial && (
+            <div className="relative">
+              {/* Close button */}
+              <button
+                onClick={() => setVideoModalOpen(false)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+
+              {/* Video Player - Placeholder for actual video */}
+              <div className="relative aspect-video bg-black">
+                <img
+                  src={selectedTestimonial.videoUrl}
+                  alt={`${selectedTestimonial.name} testimonial`}
+                  className="w-full h-full object-cover"
+                />
+                {/* Play overlay for demo - in production, replace with actual video player */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="w-20 h-20 rounded-full bg-amber-500 flex items-center justify-center shadow-2xl mb-4"
+                  >
+                    <Play className="w-10 h-10 text-black ml-1" fill="currentColor" />
+                  </motion.div>
+                  <p className="text-white/80 text-sm">Video testimonial coming soon</p>
+                </div>
+              </div>
+
+              {/* Testimonial Info */}
+              <div className="p-6 bg-gradient-to-br from-card to-card/80">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-4 h-4 text-amber-500" />
+                    <span className="text-xs text-amber-500 font-medium uppercase tracking-wider">Founder</span>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-amber-500 text-black text-sm font-bold">
+                    {selectedTestimonial.metric}
+                  </div>
+                </div>
+                <h3 className="text-xl font-display text-foreground mb-1">{selectedTestimonial.name}</h3>
+                <p className="text-muted-foreground text-sm mb-3">{selectedTestimonial.role}</p>
+                <p className="text-amber-500 text-lg italic">"{selectedTestimonial.quote}"</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
