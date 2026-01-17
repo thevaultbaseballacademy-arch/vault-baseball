@@ -7,26 +7,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Cookie, Shield, BarChart3, Target, Settings, ArrowLeft, Check } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Cookie, Shield, BarChart3, Target, Cog, ArrowLeft, Check, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-
-const COOKIE_PREFERENCES_KEY = "vault_cookie_preferences";
-
-interface CookiePreferences {
-  essential: boolean;
-  analytics: boolean;
-  marketing: boolean;
-  functional: boolean;
-}
-
-const defaultPreferences: CookiePreferences = {
-  essential: true, // Always required
-  analytics: false,
-  marketing: false,
-  functional: false,
-};
+import { 
+  useCookieConsent, 
+  CookiePreferences, 
+  COOKIE_PREFERENCES_KEY,
+  defaultPreferences 
+} from "@/hooks/useCookieConsent";
 
 const CookieSettings = () => {
+  const { resetBanner } = useCookieConsent();
   const [preferences, setPreferences] = useState<CookiePreferences>(defaultPreferences);
   const [saved, setSaved] = useState(false);
 
@@ -95,7 +87,7 @@ const CookieSettings = () => {
       key: "functional" as const,
       title: "Functional Cookies",
       description: "These cookies enable personalized features and functionality. They may be set by us or by third-party providers whose services we have added to our pages. If you disable these cookies, some or all of these features may not function properly.",
-      icon: Settings,
+      icon: Cog,
       required: false,
     },
     {
