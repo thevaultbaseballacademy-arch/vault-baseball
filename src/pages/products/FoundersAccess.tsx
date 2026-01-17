@@ -370,6 +370,37 @@ const FoundersAccess = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [videoModalOpen, goToPrevTestimonial, goToNextTestimonial]);
 
+  // Swipe gesture handling for video modal
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNextTestimonial();
+    } else if (isRightSwipe) {
+      goToPrevTestimonial();
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -909,7 +940,12 @@ const FoundersAccess = () => {
       {/* Video Player Modal */}
       <Dialog open={videoModalOpen} onOpenChange={setVideoModalOpen}>
         <DialogContent className="max-w-4xl w-[95vw] p-0 bg-black border-amber-500/30 overflow-hidden">
-          <div className="relative">
+          <div 
+            className="relative"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {/* Close button */}
             <button
               onClick={() => setVideoModalOpen(false)}
@@ -973,7 +1009,8 @@ const FoundersAccess = () => {
               <h3 className="text-xl font-display text-foreground mb-1">{selectedTestimonial.name}</h3>
               <p className="text-muted-foreground text-sm mb-3">{selectedTestimonial.role}</p>
               <p className="text-amber-500 text-lg italic">"{selectedTestimonial.quote}"</p>
-              <p className="text-muted-foreground text-xs mt-4">Use ← → arrow keys to navigate</p>
+              <p className="text-muted-foreground text-xs mt-4 hidden md:block">Use ← → arrow keys to navigate</p>
+              <p className="text-muted-foreground text-xs mt-4 md:hidden">Swipe left or right to navigate</p>
             </div>
           </div>
         </DialogContent>
