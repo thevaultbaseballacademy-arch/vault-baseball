@@ -26,6 +26,7 @@ const FoundersAccess = () => {
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + 30);
 
+  // Fetch initial count and subscribe to realtime updates
   useEffect(() => {
     // Check how many Founder's Access purchases have been made
     const checkSpots = async () => {
@@ -38,6 +39,47 @@ const FoundersAccess = () => {
       setSpotsTaken(count || 0);
     };
     checkSpots();
+
+    // Subscribe to realtime updates for new purchases
+    const channel = supabase
+      .channel('founders-access-purchases')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'user_purchases',
+          filter: 'product_key=eq.founders_access',
+        },
+        (payload) => {
+          // When a new founders_access purchase is inserted, refresh the count
+          if (payload.new && (payload.new as any).status === 'completed') {
+            setSpotsTaken((prev) => prev + 1);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'user_purchases',
+          filter: 'product_key=eq.founders_access',
+        },
+        (payload) => {
+          // When a purchase status changes to completed, refresh the count
+          const oldStatus = (payload.old as any)?.status;
+          const newStatus = (payload.new as any)?.status;
+          if (oldStatus !== 'completed' && newStatus === 'completed') {
+            setSpotsTaken((prev) => prev + 1);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
