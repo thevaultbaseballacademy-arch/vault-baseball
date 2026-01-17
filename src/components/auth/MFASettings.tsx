@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Shield, Loader2, Check, X, AlertTriangle } from "lucide-react";
+import { Shield, Loader2, Check, X, AlertTriangle, Key, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useBackupCodes } from "@/hooks/useBackupCodes";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import MFASetup from "./MFASetup";
+import BackupCodesDisplay from "./BackupCodesDisplay";
 
 interface MFASettingsProps {
   userId: string;
@@ -41,8 +43,12 @@ const MFASettings = ({ userId }: MFASettingsProps) => {
   const [factors, setFactors] = useState<Factor[]>([]);
   const [showSetup, setShowSetup] = useState(false);
   const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
+  const [showBackupCodes, setShowBackupCodes] = useState(false);
   const [disablingFactor, setDisablingFactor] = useState<string | null>(null);
+  const [remainingCodes, setRemainingCodes] = useState<number>(0);
   const { toast } = useToast();
+  const { codes, generateBackupCodes, getRemainingCodesCount, loading: generatingCodes } = useBackupCodes();
 
   useEffect(() => {
     checkAdminAndFactors();
@@ -69,6 +75,12 @@ const MFASettings = ({ userId }: MFASettingsProps) => {
       // Filter to only verified TOTP factors
       const verifiedFactors = mfaData?.totp?.filter(f => f.status === "verified") || [];
       setFactors(verifiedFactors);
+
+      // Get remaining backup codes count
+      if (verifiedFactors.length > 0) {
+        const count = await getRemainingCodesCount(userId);
+        setRemainingCodes(count);
+      }
     } catch (error: any) {
       console.error("Error checking MFA status:", error);
     } finally {
@@ -86,12 +98,16 @@ const MFASettings = ({ userId }: MFASettingsProps) => {
 
       if (error) throw error;
 
+      // Delete backup codes
+      await supabase.from("mfa_backup_codes").delete().eq("user_id", userId);
+
       toast({
         title: "2FA Disabled",
         description: "Two-factor authentication has been disabled.",
       });
       
       setFactors(factors.filter(f => f.id !== disablingFactor));
+      setRemainingCodes(0);
       setShowDisableConfirm(false);
       setDisablingFactor(null);
     } catch (error: any) {
@@ -100,6 +116,15 @@ const MFASettings = ({ userId }: MFASettingsProps) => {
         description: error.message || "Failed to disable 2FA",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleRegenerateCodes = async () => {
+    const newCodes = await generateBackupCodes(userId);
+    if (newCodes.length > 0) {
+      setShowRegenerateConfirm(false);
+      setShowBackupCodes(true);
+      setRemainingCodes(newCodes.length);
     }
   };
 
@@ -184,6 +209,49 @@ const MFASettings = ({ userId }: MFASettingsProps) => {
                   </div>
                 ))}
               </div>
+
+              {/* Backup Codes Section */}
+              <div className="p-4 bg-secondary/50 rounded-lg border border-border">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Key className="w-4 h-4 text-muted-foreground" />
+                    <p className="text-sm font-medium text-foreground">Backup Codes</p>
+                  </div>
+                  <span className={`text-sm font-medium ${
+                    remainingCodes <= 2 ? "text-yellow-500" : "text-muted-foreground"
+                  }`}>
+                    {remainingCodes} remaining
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Use these codes if you lose access to your authenticator app
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowRegenerateConfirm(true)}
+                  className="w-full"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Regenerate Backup Codes
+                </Button>
+              </div>
+
+              {remainingCodes <= 2 && remainingCodes > 0 && (
+                <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-yellow-500">
+                      <p className="font-medium">Low Backup Codes</p>
+                      <p className="mt-1 text-yellow-500/80">
+                        You only have {remainingCodes} backup code{remainingCodes !== 1 ? "s" : ""} left. 
+                        Consider regenerating new codes.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <p className="text-sm text-muted-foreground">
                 Your admin account is protected with two-factor authentication. You'll need to enter
                 a code from your authenticator app when signing in.
@@ -230,14 +298,59 @@ const MFASettings = ({ userId }: MFASettingsProps) => {
         </DialogContent>
       </Dialog>
 
+      {/* Backup Codes Dialog */}
+      <Dialog open={showBackupCodes} onOpenChange={setShowBackupCodes}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>New Backup Codes</DialogTitle>
+            <DialogDescription>
+              Your previous codes have been invalidated.
+            </DialogDescription>
+          </DialogHeader>
+          <BackupCodesDisplay
+            codes={codes}
+            onContinue={() => setShowBackupCodes(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Regenerate Confirmation */}
+      <AlertDialog open={showRegenerateConfirm} onOpenChange={setShowRegenerateConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Regenerate Backup Codes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will invalidate all your existing backup codes and generate new ones.
+              Make sure to save the new codes in a safe place.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRegenerateCodes}
+              disabled={generatingCodes}
+            >
+              {generatingCodes ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Generating...
+                </>
+              ) : (
+                "Regenerate Codes"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Disable Confirmation */}
       <AlertDialog open={showDisableConfirm} onOpenChange={setShowDisableConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Disable Two-Factor Authentication?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove the extra security layer from your admin account. You can always
-              enable it again later.
+              This will remove the extra security layer from your admin account and delete all
+              your backup codes. You can always enable it again later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
