@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Cookie, X, Settings, Shield, BarChart3, Target, Cog } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -13,6 +13,11 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useCookieConsent, CookiePreferences } from "@/hooks/useCookieConsent";
 import { toast } from "sonner";
 
@@ -53,17 +58,29 @@ const cookieCategories = [
 
 export const CookieConsent = () => {
   const {
+    consentStatus,
     showBanner,
     setShowBanner,
     preferences,
     acceptAll,
     declineAll,
     saveCustomPreferences,
-    updatePreference,
   } = useCookieConsent();
 
   const [showPreferences, setShowPreferences] = useState(false);
   const [localPrefs, setLocalPrefs] = useState<CookiePreferences>(preferences);
+  const [showFloatingButton, setShowFloatingButton] = useState(false);
+
+  // Show floating button after consent has been given
+  useEffect(() => {
+    if (consentStatus !== "pending" && !showBanner) {
+      // Small delay to avoid appearing immediately after consent
+      const timer = setTimeout(() => setShowFloatingButton(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowFloatingButton(false);
+    }
+  }, [consentStatus, showBanner]);
 
   const handleOpenPreferences = () => {
     setLocalPrefs(preferences);
@@ -91,10 +108,26 @@ export const CookieConsent = () => {
     toast.success("Only essential cookies enabled");
   };
 
-  if (!showBanner && !showPreferences) return null;
-
   return (
     <>
+      {/* Floating Cookie Settings Button */}
+      {showFloatingButton && !showPreferences && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={handleOpenPreferences}
+              className="fixed bottom-4 left-4 z-40 p-3 bg-card border border-border rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 group"
+              aria-label="Cookie settings"
+            >
+              <Cookie className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>Cookie Settings</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
+
       {/* Cookie Banner */}
       {showBanner && (
         <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-in slide-in-from-bottom-5 duration-300">
