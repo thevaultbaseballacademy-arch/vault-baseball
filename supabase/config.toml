@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.process-exam-submission]
 verify_jwt = false
+
+[functions.data-retention-cleanup]
+verify_jwt = false
