@@ -1764,6 +1764,10 @@ export type Database = {
         Args: { retention_days?: number }
         Returns: number
       }
+      purge_old_user_sessions: {
+        Args: { retention_days?: number }
+        Returns: number
+      }
       search_public_profiles: {
         Args: { result_limit?: number; search_term: string }
         Returns: {
