@@ -6,17 +6,118 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Validation constants
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_TITLE_LENGTH = 200;
+const MAX_BODY_LENGTH = 1000;
+const MAX_TARGET_USERS = 1000;
+const VALID_TYPES = ["course_update", "community_mention", "community_like", "community_comment", "coach_message"] as const;
+
+type NotificationType = typeof VALID_TYPES[number];
+
 interface PushNotificationPayload {
-  type: "course_update" | "community_mention" | "community_like" | "community_comment" | "coach_message";
+  type: NotificationType;
   title: string;
   body: string;
   data?: Record<string, string>;
   targetUserIds?: string[];
-  // For broadcast to all users with specific preferences
   broadcast?: boolean;
 }
 
-const logStep = (step: string, details?: any) => {
+function validatePushPayload(payload: unknown): { valid: boolean; error?: string; payload?: PushNotificationPayload } {
+  if (typeof payload !== "object" || payload === null) {
+    return { valid: false, error: "Payload must be an object" };
+  }
+
+  const p = payload as Record<string, unknown>;
+
+  // Validate type
+  if (typeof p.type !== "string" || !VALID_TYPES.includes(p.type as NotificationType)) {
+    return { valid: false, error: `type must be one of: ${VALID_TYPES.join(", ")}` };
+  }
+
+  // Validate title
+  if (typeof p.title !== "string") {
+    return { valid: false, error: "title must be a string" };
+  }
+  const title = p.title.trim();
+  if (title.length === 0) {
+    return { valid: false, error: "title cannot be empty" };
+  }
+  if (title.length > MAX_TITLE_LENGTH) {
+    return { valid: false, error: `title must be ${MAX_TITLE_LENGTH} characters or less` };
+  }
+
+  // Validate body
+  if (typeof p.body !== "string") {
+    return { valid: false, error: "body must be a string" };
+  }
+  const body = p.body.trim();
+  if (body.length === 0) {
+    return { valid: false, error: "body cannot be empty" };
+  }
+  if (body.length > MAX_BODY_LENGTH) {
+    return { valid: false, error: `body must be ${MAX_BODY_LENGTH} characters or less` };
+  }
+
+  // Validate data (optional)
+  let data: Record<string, string> | undefined;
+  if (p.data !== undefined) {
+    if (typeof p.data !== "object" || p.data === null || Array.isArray(p.data)) {
+      return { valid: false, error: "data must be an object" };
+    }
+    data = {};
+    for (const [key, value] of Object.entries(p.data as Record<string, unknown>)) {
+      if (typeof key !== "string" || key.length > 100) {
+        return { valid: false, error: "data keys must be strings (max 100 characters)" };
+      }
+      if (typeof value !== "string" || value.length > 500) {
+        return { valid: false, error: "data values must be strings (max 500 characters)" };
+      }
+      data[key] = value;
+    }
+  }
+
+  // Validate targetUserIds (optional)
+  let targetUserIds: string[] | undefined;
+  if (p.targetUserIds !== undefined) {
+    if (!Array.isArray(p.targetUserIds)) {
+      return { valid: false, error: "targetUserIds must be an array" };
+    }
+    if (p.targetUserIds.length > MAX_TARGET_USERS) {
+      return { valid: false, error: `Maximum ${MAX_TARGET_USERS} target users allowed` };
+    }
+    for (const id of p.targetUserIds) {
+      if (typeof id !== "string" || !UUID_REGEX.test(id)) {
+        return { valid: false, error: "Each targetUserId must be a valid UUID" };
+      }
+    }
+    targetUserIds = p.targetUserIds as string[];
+  }
+
+  // Validate broadcast (optional)
+  let broadcast: boolean | undefined;
+  if (p.broadcast !== undefined) {
+    if (typeof p.broadcast !== "boolean") {
+      return { valid: false, error: "broadcast must be a boolean" };
+    }
+    broadcast = p.broadcast;
+  }
+
+  return {
+    valid: true,
+    payload: {
+      type: p.type as NotificationType,
+      title,
+      body,
+      data,
+      targetUserIds,
+      broadcast,
+    }
+  };
+}
+
+const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
   console.log(`[SEND-PUSH] ${step}${detailsStr}`);
 };
@@ -66,8 +167,28 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const payload: PushNotificationPayload = await req.json();
-    logStep("Received payload", payload);
+    // Parse and validate payload
+    let rawPayload: unknown;
+    try {
+      rawPayload = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const validation = validatePushPayload(rawPayload);
+    if (!validation.valid) {
+      logStep("Validation failed", { error: validation.error });
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const payload = validation.payload!;
+    logStep("Received validated payload", { type: payload.type, broadcast: payload.broadcast });
 
     // For broadcast notifications, check if user is admin
     if (payload.broadcast) {
@@ -102,7 +223,7 @@ serve(async (req) => {
       if (prefError) {
         logStep("Error fetching preferences", prefError);
       } else if (preferences) {
-        userIds = preferences.map((p: any) => p.user_id);
+        userIds = preferences.map((p: { user_id: string }) => p.user_id);
       }
     } else if (userIds.length > 0) {
       // Filter by user preferences for targeted notifications
@@ -115,7 +236,7 @@ serve(async (req) => {
         .eq(preferenceColumn, true);
 
       if (preferences) {
-        userIds = preferences.map((p: any) => p.user_id);
+        userIds = preferences.map((p: { user_id: string }) => p.user_id);
       }
     }
 
@@ -147,7 +268,7 @@ serve(async (req) => {
       title: payload.title,
       message: payload.body,
       type: payload.type,
-      actor_id: payload.data?.actorId || authenticatedUserId, // Use authenticated user as actor
+      actor_id: payload.data?.actorId || authenticatedUserId,
       post_id: payload.data?.postId || null,
       is_read: false,
     }));
@@ -164,7 +285,7 @@ serve(async (req) => {
 
     // Track delivered analytics events
     if (insertedNotifications && insertedNotifications.length > 0) {
-      const analyticsEvents = insertedNotifications.map((notification: any) => ({
+      const analyticsEvents = insertedNotifications.map((notification: { id: string; user_id: string }) => ({
         notification_id: notification.id,
         user_id: notification.user_id,
         event_type: "delivered",

@@ -6,6 +6,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Validation constants
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_QUESTIONS = 200;
+const VALID_CERT_TYPES = ['foundations', 'performance', 'catcher_specialist', 'infield_specialist', 'outfield_specialist'];
+
 interface ExamSubmission {
   attemptId: string;
   answers: Record<string, number>;
@@ -14,8 +19,97 @@ interface ExamSubmission {
   passingScore: number;
   validityMonths: number;
   certificationName: string;
-  coachId?: string; // For admin exam system
-  orgId?: string;   // For admin exam system
+  coachId?: string;
+  orgId?: string;
+}
+
+function validateExamSubmission(body: unknown): { valid: boolean; error?: string; submission?: ExamSubmission } {
+  if (typeof body !== "object" || body === null) {
+    return { valid: false, error: "Request body must be an object" };
+  }
+
+  const b = body as Record<string, unknown>;
+
+  // Validate attemptId (UUID)
+  if (typeof b.attemptId !== "string" || !UUID_REGEX.test(b.attemptId)) {
+    return { valid: false, error: "attemptId must be a valid UUID" };
+  }
+
+  // Validate answers (Record<string, number>)
+  if (typeof b.answers !== "object" || b.answers === null || Array.isArray(b.answers)) {
+    return { valid: false, error: "answers must be an object" };
+  }
+  const answers: Record<string, number> = {};
+  for (const [key, value] of Object.entries(b.answers as Record<string, unknown>)) {
+    if (!UUID_REGEX.test(key)) {
+      return { valid: false, error: `Answer key "${key}" must be a valid UUID` };
+    }
+    if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > 10) {
+      return { valid: false, error: `Answer value for "${key}" must be an integer between 0 and 10` };
+    }
+    answers[key] = value;
+  }
+
+  // Validate questionIds (array of UUIDs)
+  if (!Array.isArray(b.questionIds)) {
+    return { valid: false, error: "questionIds must be an array" };
+  }
+  if (b.questionIds.length === 0) {
+    return { valid: false, error: "questionIds cannot be empty" };
+  }
+  if (b.questionIds.length > MAX_QUESTIONS) {
+    return { valid: false, error: `Maximum ${MAX_QUESTIONS} questions allowed` };
+  }
+  for (const qId of b.questionIds) {
+    if (typeof qId !== "string" || !UUID_REGEX.test(qId)) {
+      return { valid: false, error: "Each questionId must be a valid UUID" };
+    }
+  }
+
+  // Validate certType
+  if (typeof b.certType !== "string" || !VALID_CERT_TYPES.includes(b.certType)) {
+    return { valid: false, error: `certType must be one of: ${VALID_CERT_TYPES.join(", ")}` };
+  }
+
+  // Validate passingScore
+  if (typeof b.passingScore !== "number" || b.passingScore < 0 || b.passingScore > 100) {
+    return { valid: false, error: "passingScore must be a number between 0 and 100" };
+  }
+
+  // Validate validityMonths
+  if (typeof b.validityMonths !== "number" || !Number.isInteger(b.validityMonths) || b.validityMonths < 1 || b.validityMonths > 120) {
+    return { valid: false, error: "validityMonths must be an integer between 1 and 120" };
+  }
+
+  // Validate certificationName
+  if (typeof b.certificationName !== "string" || b.certificationName.length === 0 || b.certificationName.length > 200) {
+    return { valid: false, error: "certificationName must be a non-empty string (max 200 characters)" };
+  }
+
+  // Optional: coachId (UUID)
+  if (b.coachId !== undefined && (typeof b.coachId !== "string" || !UUID_REGEX.test(b.coachId))) {
+    return { valid: false, error: "coachId must be a valid UUID if provided" };
+  }
+
+  // Optional: orgId (UUID)
+  if (b.orgId !== undefined && (typeof b.orgId !== "string" || !UUID_REGEX.test(b.orgId))) {
+    return { valid: false, error: "orgId must be a valid UUID if provided" };
+  }
+
+  return {
+    valid: true,
+    submission: {
+      attemptId: b.attemptId,
+      answers,
+      questionIds: b.questionIds as string[],
+      certType: b.certType,
+      passingScore: b.passingScore,
+      validityMonths: b.validityMonths,
+      certificationName: b.certificationName,
+      coachId: b.coachId as string | undefined,
+      orgId: b.orgId as string | undefined,
+    }
+  };
 }
 
 serve(async (req) => {
@@ -47,12 +141,27 @@ serve(async (req) => {
 
     console.log(`Processing exam submission for user: ${user.id}`);
 
-    const body: ExamSubmission = await req.json();
-    const { attemptId, answers, questionIds, certType, passingScore, validityMonths, certificationName, coachId, orgId } = body;
-
-    if (!attemptId || !answers || !questionIds || !certType) {
-      throw new Error('Missing required fields');
+    // Parse and validate request body
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    const validation = validateExamSubmission(rawBody);
+    if (!validation.valid) {
+      console.error("Validation failed:", validation.error);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { attemptId, answers, questionIds, certType, passingScore, validityMonths, certificationName, coachId, orgId } = validation.submission!;
 
     // Use service role client for grading (access to correct answers)
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
