@@ -5,7 +5,8 @@ import {
   FileCheck, 
   ClipboardList,
   ChevronLeft,
-  Shield
+  Shield,
+  DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,11 @@ const navItems = [
     label: "Coaches",
     path: "/admin/coaches",
     icon: Users,
+  },
+  {
+    label: "Payouts",
+    path: "/admin/payouts",
+    icon: DollarSign,
   },
   {
     label: "Exams",

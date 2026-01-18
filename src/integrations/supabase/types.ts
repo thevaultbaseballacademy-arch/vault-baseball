@@ -585,6 +585,56 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_payouts: {
+        Row: {
+          amount_cents: number
+          coach_id: string
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          stripe_transfer_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          coach_id: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          stripe_transfer_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          coach_id?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          stripe_transfer_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_payouts_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coaches: {
         Row: {
           created_at: string
@@ -594,6 +644,7 @@ export type Database = {
           org_id: string
           role: Database["public"]["Enums"]["coach_role"]
           status: Database["public"]["Enums"]["coach_status"]
+          stripe_account_id: string | null
           team_id: string | null
           user_id: string | null
         }
@@ -605,6 +656,7 @@ export type Database = {
           org_id: string
           role?: Database["public"]["Enums"]["coach_role"]
           status?: Database["public"]["Enums"]["coach_status"]
+          stripe_account_id?: string | null
           team_id?: string | null
           user_id?: string | null
         }
@@ -616,6 +668,7 @@ export type Database = {
           org_id?: string
           role?: Database["public"]["Enums"]["coach_role"]
           status?: Database["public"]["Enums"]["coach_status"]
+          stripe_account_id?: string | null
           team_id?: string | null
           user_id?: string | null
         }

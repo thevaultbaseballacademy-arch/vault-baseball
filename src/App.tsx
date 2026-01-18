@@ -33,6 +33,7 @@ import CertificationAnalytics from "./pages/admin/CertificationAnalytics";
 import AdminCoaches from "./pages/admin/AdminCoaches";
 import AdminExams from "./pages/admin/AdminExams";
 import AdminCertifications from "./pages/admin/AdminCertifications";
+import AdminPayouts from "./pages/admin/AdminPayouts";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import LongevityBeta from "./pages/products/LongevityBeta";
@@ -90,6 +91,7 @@ const App = () => (
             <Route path="/admin/coaches" element={<AdminCoaches />} />
             <Route path="/admin/exams" element={<AdminExams />} />
             <Route path="/admin/certifications" element={<AdminCertifications />} />
+            <Route path="/admin/payouts" element={<AdminPayouts />} />
             <Route path="/community" element={<Community />} />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/courses" element={<Courses />} />
