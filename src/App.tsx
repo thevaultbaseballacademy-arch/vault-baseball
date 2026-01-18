@@ -50,6 +50,7 @@ import ShowcasePrep from "./pages/products/ShowcasePrep";
 import VideoAnalysis from "./pages/products/VideoAnalysis";
 import OrgStarterPack from "./pages/products/OrgStarterPack";
 import FoundersAccess from "./pages/products/FoundersAccess";
+import PartnerClaim from "./pages/PartnerClaim";
 import Products from "./pages/Products";
 import FindCoach from "./pages/FindCoach";
 import SharedProfile from "./pages/SharedProfile";
@@ -122,6 +123,7 @@ const App = () => (
             <Route path="/products/video-analysis" element={<VideoAnalysis />} />
             <Route path="/products/org-starter-pack" element={<OrgStarterPack />} />
             <Route path="/products/founders-access" element={<FoundersAccess />} />
+            <Route path="/partner-claim" element={<PartnerClaim />} />
             <Route path="/find-coach" element={<FindCoach />} />
             <Route path="/shared/:token" element={<SharedProfile />} />
             <Route path="/verify-course-certificate" element={<VerifyCourseCertificate />} />
