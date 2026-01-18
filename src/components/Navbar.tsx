@@ -63,6 +63,7 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Courses", href: "/courses" },
+    { name: "Wall of Wins", href: "/wall-of-wins" },
     { 
       name: "The Framework", 
       href: "/#pillars",
