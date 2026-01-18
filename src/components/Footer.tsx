@@ -1,6 +1,6 @@
 import { Instagram, Twitter, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
-import vaultLogo from "@/assets/vault-logo.png";
+import vaultLogo from "@/assets/vault-logo-new.webp";
 
 const Footer = () => {
   return (

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
-import vaultLogo from "@/assets/vault-logo.png";
+import vaultLogo from "@/assets/vault-logo-new.webp";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
 const Navbar = () => {
