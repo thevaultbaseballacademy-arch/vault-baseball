@@ -7,49 +7,56 @@
 
 @layer base {
   :root {
-    /* Vault Baseball - Silver/White/Black Premium Palette */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 8%;
+    /* VAULT Baseball - Matte Black / Off-White / Steel Grey Industrial Palette */
+    --background: 0 0% 96%; /* Off-White #F5F5F5 */
+    --foreground: 0 0% 9%; /* Matte Black #181818 */
 
-    --card: 0 0% 98%;
-    --card-foreground: 0 0% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 0 0% 15%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 9%; /* Matte Black #181818 */
+    --primary-foreground: 0 0% 96%;
 
-    --secondary: 220 10% 96%;
-    --secondary-foreground: 0 0% 15%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 220 10% 94%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 29%; /* Steel Grey #4A4A4A */
 
-    --accent: 220 15% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 29%; /* Steel Grey */
+    --accent-foreground: 0 0% 96%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 10% 90%;
-    --input: 220 10% 90%;
-    --ring: 0 0% 15%;
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 0 0% 9%;
 
-    --radius: 0.5rem;
+    --radius: 0px; /* No rounded edges - rectangular */
+
+    /* VAULT Pillar Accent Colors */
+    --vault-velocity: 0 70% 54%; /* Red #DF3232 */
+    --vault-athleticism: 220 92% 52%; /* Blue #155FF6 */
+    --vault-utility: 44 100% 59%; /* Gold #FFC32E */
+    --vault-longevity: 150 75% 53%; /* Green #2AE685 */
+    --vault-transfer: 0 0% 73%; /* Silver #B9B9B9 */
 
     /* Vault Custom tokens */
-    --metallic: 220 10% 75%;
-    --steel: 220 15% 50%;
-    --chrome: 220 10% 85%;
+    --metallic: 0 0% 73%;
+    --steel: 0 0% 29%;
+    --chrome: 0 0% 85%;
     
-    --glow-primary: 0 0 60px hsl(220 15% 50% / 0.3);
-    --glow-subtle: 0 0 40px hsl(220 15% 50% / 0.15);
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(220 10% 96%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 10% 98%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(220 15% 30%) 0%, hsl(220 20% 15%) 100%);
-    --gradient-metallic: linear-gradient(135deg, hsl(220 10% 85%) 0%, hsl(220 15% 50%) 50%, hsl(220 10% 70%) 100%);
-    --gradient-text: linear-gradient(135deg, hsl(0 0% 8%) 0%, hsl(220 15% 35%) 100%);
+    --glow-primary: 0 0 60px hsl(0 0% 9% / 0.15);
+    --glow-subtle: 0 0 40px hsl(0 0% 9% / 0.08);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 96%) 0%, hsl(0 0% 92%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 15%) 100%);
+    --gradient-metallic: linear-gradient(135deg, hsl(0 0% 85%) 0%, hsl(0 0% 60%) 50%, hsl(0 0% 75%) 100%);
+    --gradient-text: linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 29%) 100%);
 
     /* Typography */
     --font-display: "Bebas Neue", sans-serif;
@@ -61,65 +68,65 @@
     --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 8%;
-    --sidebar-primary: 0 0% 15%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 10% 96%;
-    --sidebar-accent-foreground: 0 0% 15%;
-    --sidebar-border: 220 10% 90%;
-    --sidebar-ring: 0 0% 15%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 0 0% 9%;
+    --sidebar-primary-foreground: 0 0% 96%;
+    --sidebar-accent: 0 0% 92%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 0 0% 9%;
   }
 
   .dark {
-    --background: 0 0% 5%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 6%; /* Dark matte black */
+    --foreground: 0 0% 96%; /* Off-white */
 
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 220 10% 85%;
-    --primary-foreground: 0 0% 8%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 9%;
 
     --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 0 0% 96%;
 
     --muted: 0 0% 15%;
-    --muted-foreground: 220 10% 60%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 220 15% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 65%;
+    --accent-foreground: 0 0% 9%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 18%;
     --input: 0 0% 18%;
-    --ring: 220 10% 85%;
+    --ring: 0 0% 96%;
 
     /* Dark mode custom tokens */
-    --metallic: 220 10% 60%;
-    --steel: 220 15% 45%;
-    --chrome: 220 10% 70%;
+    --metallic: 0 0% 60%;
+    --steel: 0 0% 45%;
+    --chrome: 0 0% 70%;
     
-    --glow-primary: 0 0 60px hsl(220 15% 60% / 0.4);
-    --glow-subtle: 0 0 40px hsl(220 15% 60% / 0.2);
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 5%) 0%, hsl(0 0% 8%) 100%);
+    --glow-primary: 0 0 60px hsl(0 0% 96% / 0.1);
+    --glow-subtle: 0 0 40px hsl(0 0% 96% / 0.05);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 6%) 0%, hsl(0 0% 9%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 10%) 0%, hsl(0 0% 6%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(220 15% 60%) 0%, hsl(220 10% 45%) 100%);
-    --gradient-metallic: linear-gradient(135deg, hsl(220 10% 45%) 0%, hsl(220 15% 60%) 50%, hsl(220 10% 50%) 100%);
-    --gradient-text: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(220 10% 70%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(0 0% 96%) 0%, hsl(0 0% 80%) 100%);
+    --gradient-metallic: linear-gradient(135deg, hsl(0 0% 45%) 0%, hsl(0 0% 60%) 50%, hsl(0 0% 50%) 100%);
+    --gradient-text: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 70%) 100%);
 
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 220 10% 85%;
-    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-background: 0 0% 9%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 0 0% 96%;
+    --sidebar-primary-foreground: 0 0% 9%;
     --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-accent-foreground: 0 0% 96%;
     --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 220 10% 85%;
+    --sidebar-ring: 0 0% 96%;
   }
 }
 
@@ -137,13 +144,14 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-wide;
+    @apply font-display tracking-wider uppercase;
   }
 }
 
 @layer utilities {
   .font-display {
     font-family: var(--font-display);
+    letter-spacing: 0.05em;
   }
 
   .font-body {
@@ -182,17 +190,36 @@
   }
 
   .text-glow {
-    text-shadow: 0 0 40px hsl(220 15% 50% / 0.4);
+    text-shadow: 0 0 40px hsl(0 0% 9% / 0.2);
   }
 
   .metallic-text {
-    background: linear-gradient(135deg, hsl(220 10% 40%) 0%, hsl(220 15% 60%) 50%, hsl(220 10% 45%) 100%);
+    background: linear-gradient(135deg, hsl(0 0% 20%) 0%, hsl(0 0% 45%) 50%, hsl(0 0% 25%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .steel-border {
-    border-image: linear-gradient(135deg, hsl(220 10% 70%), hsl(220 15% 50%), hsl(220 10% 65%)) 1;
+    border-image: linear-gradient(135deg, hsl(0 0% 70%), hsl(0 0% 50%), hsl(0 0% 65%)) 1;
   }
+
+  /* Pillar accent utilities */
+  .text-velocity { color: hsl(var(--vault-velocity)); }
+  .text-athleticism { color: hsl(var(--vault-athleticism)); }
+  .text-utility { color: hsl(var(--vault-utility)); }
+  .text-longevity { color: hsl(var(--vault-longevity)); }
+  .text-transfer { color: hsl(var(--vault-transfer)); }
+
+  .bg-velocity { background-color: hsl(var(--vault-velocity)); }
+  .bg-athleticism { background-color: hsl(var(--vault-athleticism)); }
+  .bg-utility { background-color: hsl(var(--vault-utility)); }
+  .bg-longevity { background-color: hsl(var(--vault-longevity)); }
+  .bg-transfer { background-color: hsl(var(--vault-transfer)); }
+
+  .border-velocity { border-color: hsl(var(--vault-velocity)); }
+  .border-athleticism { border-color: hsl(var(--vault-athleticism)); }
+  .border-utility { border-color: hsl(var(--vault-utility)); }
+  .border-longevity { border-color: hsl(var(--vault-longevity)); }
+  .border-transfer { border-color: hsl(var(--vault-transfer)); }
 }
