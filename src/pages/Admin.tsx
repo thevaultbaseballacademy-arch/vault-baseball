@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database, Trash2
+  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database, Trash2, Lightbulb
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +21,7 @@ import AuditLogViewer from "@/components/admin/AuditLogViewer";
 import DataRetentionPanel from "@/components/admin/DataRetentionPanel";
 import DeletionRequestsManager from "@/components/admin/DeletionRequestsManager";
 import GDPRComplianceDashboard from "@/components/admin/GDPRComplianceDashboard";
+import WeeklyTipsManager from "@/components/admin/WeeklyTipsManager";
 
 interface Profile {
   user_id: string;
@@ -284,9 +285,10 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-6xl grid-cols-11">
+              <TabsList className="grid w-full max-w-6xl grid-cols-12">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
+                <TabsTrigger value="tips">Tips</TabsTrigger>
                 <TabsTrigger value="certifications">Questions</TabsTrigger>
                 <TabsTrigger value="expirations">Expirations</TabsTrigger>
                 <TabsTrigger value="videos">Videos</TabsTrigger>
@@ -391,6 +393,10 @@ const Admin = () => {
 
               <TabsContent value="assignments" className="mt-6">
                 <CoachAthleteAssignments />
+              </TabsContent>
+
+              <TabsContent value="tips" className="mt-6">
+                <WeeklyTipsManager />
               </TabsContent>
 
               <TabsContent value="certifications" className="mt-6">
