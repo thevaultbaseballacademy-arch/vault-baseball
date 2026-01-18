@@ -6,10 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface LegalAgreementsProps {
   onAgreementChange: (allAgreed: boolean) => void;
-  showMinorGuardian?: boolean;
 }
 
-const LegalAgreements = ({ onAgreementChange, showMinorGuardian = false }: LegalAgreementsProps) => {
+const LegalAgreements = ({ onAgreementChange }: LegalAgreementsProps) => {
   const [agreements, setAgreements] = useState({
     terms: false,
     waiver: false,

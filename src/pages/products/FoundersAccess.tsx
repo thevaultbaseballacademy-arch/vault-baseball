@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Star, Lock, Users, CheckCircle, Zap, Crown, Clock, AlertTriangle, Timer, Flame, UserCircle, Play, ChevronLeft, ChevronRight, X, Maximize, Minimize } from "lucide-react";
+import { ArrowRight, Star, Lock, Users, CheckCircle, Crown, AlertTriangle, Timer, Play, ChevronLeft, ChevronRight, X, Maximize, Minimize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
