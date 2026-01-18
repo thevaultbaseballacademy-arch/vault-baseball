@@ -8,6 +8,7 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 import { CourseCertificate as CertificateType } from "@/hooks/useCourseCertificates";
+import vaultLogo from "@/assets/vault-logo-new.webp";
 
 interface CourseCertificateProps {
   certificate: CertificateType;
@@ -146,6 +147,15 @@ const CourseCertificate = ({ certificate, onShare }: CourseCertificateProps) => 
         
         {/* Content */}
         <div className="relative text-center space-y-6">
+          {/* VAULT Logo Watermark */}
+          <div className="flex justify-center mb-4">
+            <img 
+              src={vaultLogo} 
+              alt="VAULT" 
+              className="h-16 md:h-20 object-contain opacity-90"
+            />
+          </div>
+          
           {/* Header */}
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-2">
