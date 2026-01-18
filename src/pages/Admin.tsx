@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database, Trash2, Lightbulb
+  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database, Trash2, Lightbulb, Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +22,7 @@ import DataRetentionPanel from "@/components/admin/DataRetentionPanel";
 import DeletionRequestsManager from "@/components/admin/DeletionRequestsManager";
 import GDPRComplianceDashboard from "@/components/admin/GDPRComplianceDashboard";
 import WeeklyTipsManager from "@/components/admin/WeeklyTipsManager";
+import { SystemHealthDashboard } from "@/components/admin/SystemHealthDashboard";
 
 interface Profile {
   user_id: string;
@@ -285,7 +286,7 @@ const Admin = () => {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-6xl grid-cols-12">
+              <TabsList className="flex flex-wrap w-full max-w-6xl gap-1">
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
                 <TabsTrigger value="tips">Tips</TabsTrigger>
@@ -298,6 +299,10 @@ const Admin = () => {
                 <TabsTrigger value="retention">Retention</TabsTrigger>
                 <TabsTrigger value="deletion">Deletion</TabsTrigger>
                 <TabsTrigger value="gdpr">GDPR</TabsTrigger>
+                <TabsTrigger value="health" className="flex items-center gap-1">
+                  <Activity className="w-3 h-3" />
+                  Health
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="users" className="mt-6 space-y-6">
@@ -433,6 +438,10 @@ const Admin = () => {
 
               <TabsContent value="gdpr" className="mt-6">
                 <GDPRComplianceDashboard />
+              </TabsContent>
+
+              <TabsContent value="health" className="mt-6">
+                <SystemHealthDashboard />
               </TabsContent>
             </Tabs>
           </motion.div>
