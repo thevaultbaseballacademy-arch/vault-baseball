@@ -176,6 +176,14 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-2">
+            <Button 
+              variant="vault" 
+              size="sm" 
+              onClick={() => navigate("/products/org-starter-pack")}
+              className="mr-2"
+            >
+              Get the Org Starter Pack
+            </Button>
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
@@ -226,7 +234,7 @@ const Navbar = () => {
                 <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
                   Log In
                 </Button>
-                <Button variant="vault" size="sm" onClick={() => navigate("/auth")}>
+                <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
                   Join Vault
                 </Button>
               </>
@@ -281,6 +289,13 @@ const Navbar = () => {
                   </div>
                 ))}
                 <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
+                  <Button 
+                    variant="vault" 
+                    className="justify-center" 
+                    onClick={() => { navigate("/products/org-starter-pack"); setIsOpen(false); }}
+                  >
+                    Get the Org Starter Pack
+                  </Button>
                   {user ? (
                     <>
                       {isAdmin && (
@@ -325,7 +340,7 @@ const Navbar = () => {
                       <Button variant="ghost" className="justify-center" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
                         Log In
                       </Button>
-                      <Button variant="vault" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                      <Button variant="outline" className="justify-center" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
                         Join Vault
                       </Button>
                     </>
