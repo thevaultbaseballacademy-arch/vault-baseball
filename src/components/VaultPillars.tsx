@@ -62,7 +62,7 @@ const pillars: {
     focus: ["Arm care systems", "Workload management", "Recovery protocols", "Tissue resilience"],
     metrics: ["Throw volume", "Recovery indicators", "Availability rate", "Injury risk markers"],
     badge: "Founder's Pre-Sale Access",
-    preSale: "Get Lifetime Access to the full V-A-U-L-T suite for $499 (Limited to first 50 athletes).",
+    preSale: "Get Lifetime Access to the full V-A-U-L-T suite for $499 — Limited Time Founder's Window.",
     link: "/products/founders-access",
   },
   {
@@ -76,7 +76,7 @@ const pillars: {
     focus: ["Practice design", "Decision-making under pressure", "Competitive execution", "Game realism"],
     metrics: ["Practice-to-game carryover", "Situational success", "Consistency under pressure"],
     badge: "Founder's Pre-Sale Access",
-    preSale: "Get Lifetime Access to the full V-A-U-L-T suite for $499 (Limited to first 50 athletes).",
+    preSale: "Get Lifetime Access to the full V-A-U-L-T suite for $499 — Limited Time Founder's Window.",
     link: "/products/founders-access",
   },
 ];

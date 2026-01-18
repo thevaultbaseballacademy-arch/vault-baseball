@@ -22,7 +22,7 @@ const FoundersAccess = () => {
     avatarUrl: string | null;
     purchasedAt: string;
   }>>([]);
-  const TOTAL_SPOTS = 50;
+  const TOTAL_SPOTS = 1000;
   const { toast } = useToast();
   const initialLoadRef = useRef(true);
   
@@ -477,7 +477,7 @@ const FoundersAccess = () => {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
                 <Crown className="w-4 h-4 text-amber-500" />
-                <span className="text-sm font-medium text-amber-500">Limited to {TOTAL_SPOTS} Athletes Only</span>
+                <span className="text-sm font-medium text-amber-500">Limited Time Founder's Window</span>
               </div>
               
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-display leading-[0.9] mb-6">
