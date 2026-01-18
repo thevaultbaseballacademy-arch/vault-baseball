@@ -110,6 +110,11 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/athlete-waiver" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Athlete Waiver
+                  </Link>
+                </li>
+                <li>
                   <Link to="/cookie-settings" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                     Cookie Settings
                   </Link>

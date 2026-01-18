@@ -60,6 +60,7 @@ import CertificateLeaderboard from "./pages/CertificateLeaderboard";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
+import AthleteWaiver from "./pages/AthleteWaiver";
 import CookieSettings from "./pages/CookieSettings";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
@@ -131,8 +132,11 @@ const App = () => (
             <Route path="/verify-course-certificate" element={<VerifyCourseCertificate />} />
             <Route path="/certificate-leaderboard" element={<CertificateLeaderboard />} />
             <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/refunds" element={<RefundPolicy />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/athlete-waiver" element={<AthleteWaiver />} />
             <Route path="/cookie-settings" element={<CookieSettings />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />

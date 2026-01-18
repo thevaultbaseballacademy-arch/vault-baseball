@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import MFAVerify from "@/components/auth/MFAVerify";
+import LegalAgreements from "@/components/auth/LegalAgreements";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
 
 const authSchema = z.object({
@@ -25,6 +26,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
+  const [legalAgreed, setLegalAgreed] = useState(false);
   
   // MFA state
   const [mfaRequired, setMfaRequired] = useState(false);
@@ -321,12 +323,19 @@ const Auth = () => {
               {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
 
+            {/* Legal Agreements - Only show on signup */}
+            {!isLogin && (
+              <div className="pt-2 border-t border-border/50">
+                <LegalAgreements onAgreementChange={setLegalAgreed} />
+              </div>
+            )}
+
             <Button
               type="submit"
               variant="vault"
               size="lg"
               className="w-full"
-              disabled={loading}
+              disabled={loading || (!isLogin && !legalAgreed)}
             >
               {loading ? (
                 <>
