@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Plus, Trash2, Edit2, Save, X, Lightbulb, 
-  Eye, EyeOff, GripVertical, Loader2 
+  Eye, EyeOff, GripVertical, Loader2, Search 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,7 @@ const WeeklyTipsManager = () => {
   const [editingTip, setEditingTip] = useState<WeeklyTip | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
 
   // Form state
@@ -216,10 +217,14 @@ const WeeklyTipsManager = () => {
     }
   };
 
-  // Filter tips by category
-  const filteredTips = categoryFilter === 'all' 
-    ? tips 
-    : tips.filter(tip => tip.category === categoryFilter);
+  // Filter tips by category and search query
+  const filteredTips = tips.filter(tip => {
+    const matchesCategory = categoryFilter === 'all' || tip.category === categoryFilter;
+    const matchesSearch = searchQuery === '' || 
+      tip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tip.content.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   // Get counts per category
   const categoryCounts = CATEGORIES.reduce((acc, cat) => {
@@ -347,18 +352,40 @@ const WeeklyTipsManager = () => {
         </motion.div>
       )}
 
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setCategoryFilter('all')}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-            categoryFilter === 'all'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
-          }`}
-        >
-          All ({tips.length})
-        </button>
+      {/* Search and Category Filter */}
+      <div className="space-y-4">
+        {/* Search Input */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search tips by title or content..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setCategoryFilter('all')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              categoryFilter === 'all'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+            }`}
+          >
+            All ({tips.length})
+          </button>
         {CATEGORIES.map(cat => (
           <button
             key={cat.value}
@@ -372,6 +399,7 @@ const WeeklyTipsManager = () => {
             {cat.label} ({categoryCounts[cat.value] || 0})
           </button>
         ))}
+        </div>
       </div>
 
       {/* Tips List */}
