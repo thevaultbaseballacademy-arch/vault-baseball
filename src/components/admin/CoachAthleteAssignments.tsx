@@ -14,7 +14,7 @@ import {
 
 interface Profile {
   user_id: string;
-  email: string;
+  email?: string; // Optional - not fetched to minimize data exposure
   display_name: string;
 }
 
@@ -55,7 +55,8 @@ const CoachAthleteAssignments = () => {
   const fetchData = async () => {
     try {
       const [profilesRes, rolesRes, assignmentsRes] = await Promise.all([
-        supabase.from('profiles').select('user_id, email, display_name').order('display_name'),
+        // Only select user_id and display_name - email is not needed for coach/athlete assignment display
+        supabase.from('profiles').select('user_id, display_name').order('display_name'),
         supabase.from('user_roles').select('user_id, role'),
         supabase.from('coach_athlete_assignments').select('*').order('created_at', { ascending: false }),
       ]);

@@ -26,7 +26,7 @@ import { SystemHealthDashboard } from "@/components/admin/SystemHealthDashboard"
 
 interface Profile {
   user_id: string;
-  email: string;
+  email?: string; // Optional - not fetched to minimize data exposure
   display_name: string;
 }
 
@@ -95,7 +95,8 @@ const Admin = () => {
   const fetchData = async () => {
     try {
       const [profilesRes, rolesRes] = await Promise.all([
-        supabase.from('profiles').select('user_id, email, display_name').order('display_name'),
+        // Only select user_id and display_name - email is not needed for admin user list display
+        supabase.from('profiles').select('user_id, display_name').order('display_name'),
         supabase.from('user_roles').select('id, user_id, role'),
       ]);
 
