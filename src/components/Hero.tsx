@@ -1,132 +1,173 @@
 import { motion } from "framer-motion";
-import { Zap, Dumbbell, Shuffle, Heart, Target, ArrowRight, Activity, Shield, BarChart3 } from "lucide-react";
+import { Zap, Dumbbell, Shuffle, Heart, Target, ArrowRight, Power, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const Hero = () => {
+  const [hoveredPillar, setHoveredPillar] = useState<number | null>(null);
+
   const pillars = [
-    { letter: "V", name: "Velocity", icon: Zap, color: "from-red-500 to-orange-500", bgColor: "bg-red-500/10", textColor: "text-red-500" },
-    { letter: "A", name: "Athleticism", icon: Dumbbell, color: "from-blue-500 to-cyan-500", bgColor: "bg-blue-500/10", textColor: "text-blue-500" },
-    { letter: "U", name: "Utility", icon: Shuffle, color: "from-green-500 to-emerald-500", bgColor: "bg-green-500/10", textColor: "text-green-500" },
-    { letter: "L", name: "Longevity", icon: Heart, color: "from-amber-500 to-yellow-500", bgColor: "bg-amber-500/10", textColor: "text-amber-500" },
-    { letter: "T", name: "Transfer", icon: Target, color: "from-purple-500 to-pink-500", bgColor: "bg-purple-500/10", textColor: "text-purple-500" },
+    { 
+      letter: "V", 
+      name: "Velocity", 
+      icon: Zap, 
+      color: "bg-velocity", 
+      textColor: "text-velocity",
+      borderColor: "border-velocity",
+      metric: "95+ MPH" 
+    },
+    { 
+      letter: "A", 
+      name: "Athleticism", 
+      icon: Dumbbell, 
+      color: "bg-athleticism", 
+      textColor: "text-athleticism",
+      borderColor: "border-athleticism",
+      metric: "6.8s 60yd" 
+    },
+    { 
+      letter: "U", 
+      name: "Utility", 
+      icon: Shuffle, 
+      color: "bg-utility", 
+      textColor: "text-utility",
+      borderColor: "border-utility",
+      metric: "5+ Positions" 
+    },
+    { 
+      letter: "L", 
+      name: "Longevity", 
+      icon: Heart, 
+      color: "bg-longevity", 
+      textColor: "text-longevity",
+      borderColor: "border-longevity",
+      metric: "Zero DL Days" 
+    },
+    { 
+      letter: "T", 
+      name: "Transfer", 
+      icon: Target, 
+      color: "bg-transfer", 
+      textColor: "text-transfer",
+      borderColor: "border-transfer",
+      metric: "Game-Ready" 
+    },
   ];
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-background via-background to-secondary/30">
-      {/* Dashboard-style grid background */}
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-background">
+      {/* Matte black overlay with accent streaks */}
       <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#181818] via-[#181818]/95 to-[#181818]/90" />
+        
+        {/* Pillar accent streaks */}
+        <div className="absolute top-0 left-[10%] w-px h-full bg-gradient-to-b from-transparent via-velocity/30 to-transparent" />
+        <div className="absolute top-0 left-[30%] w-px h-full bg-gradient-to-b from-transparent via-athleticism/20 to-transparent" />
+        <div className="absolute top-0 left-[50%] w-px h-full bg-gradient-to-b from-transparent via-utility/20 to-transparent" />
+        <div className="absolute top-0 left-[70%] w-px h-full bg-gradient-to-b from-transparent via-longevity/20 to-transparent" />
+        <div className="absolute top-0 left-[90%] w-px h-full bg-gradient-to-b from-transparent via-transfer/20 to-transparent" />
+        
+        {/* Grid overlay */}
         <div className="absolute inset-0 opacity-[0.03]" style={{
           backgroundImage: `
-            linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-            linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)
+            linear-gradient(#F5F5F5 1px, transparent 1px),
+            linear-gradient(90deg, #F5F5F5 1px, transparent 1px)
           `,
-          backgroundSize: '40px 40px'
+          backgroundSize: '60px 60px'
         }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/80" />
       </div>
-
-      {/* Glowing orbs for depth */}
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-red-500/5 rounded-full blur-3xl" />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-24 md:py-32">
-        {/* Top System Badge */}
+        {/* System Status */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex justify-center mb-8"
+          className="flex justify-center mb-10"
         >
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-card/80 backdrop-blur-sm border border-border shadow-lg">
+          <div className="inline-flex items-center gap-4 px-6 py-3 border border-[#4A4A4A]/50 bg-[#181818]/80 backdrop-blur-sm">
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-accent animate-pulse" />
-              <span className="text-xs uppercase tracking-widest text-muted-foreground">System Status</span>
+              <div className="w-2 h-2 bg-longevity animate-pulse" />
+              <span className="text-xs uppercase tracking-[0.2em] text-[#B9B9B9]">System Active</span>
             </div>
-            <div className="w-px h-4 bg-border" />
-            <span className="text-xs font-medium text-green-500">OPERATIONAL</span>
+            <div className="w-px h-4 bg-[#4A4A4A]" />
+            <span className="text-xs uppercase tracking-[0.2em] text-[#F5F5F5]">V.A.U.L.T. OS v2.0</span>
           </div>
         </motion.div>
 
-        {/* Main OS Heading */}
+        {/* Main Headline */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-center mb-6"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/50 border border-border mb-6">
-            <Shield className="w-4 h-4 text-accent" />
-            <span className="text-sm font-medium text-foreground">THE STANDARDIZED OPERATING SYSTEM FOR BASEBALL</span>
-          </div>
+          <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-display leading-[0.85] tracking-wider text-[#F5F5F5]">
+            VAULT<span className="text-[#4A4A4A]">™</span>
+          </h1>
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-center text-6xl md:text-8xl lg:text-9xl font-display leading-[0.85] mb-4"
+          className="text-center text-lg md:text-xl font-display tracking-[0.3em] text-[#B9B9B9] mb-3"
         >
-          <span className="metallic-text">VAULT</span>
-          <span className="text-foreground/20">™</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center text-xl md:text-2xl font-display text-muted-foreground tracking-wide mb-4"
-        >
-          PERFORMANCE OPERATING SYSTEM
+          THE BASEBALL OPERATING SYSTEM
         </motion.p>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
-          className="text-center text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-12"
+          transition={{ duration: 0.6, delay: 0.25 }}
+          className="text-center text-base md:text-lg text-[#B9B9B9] max-w-2xl mx-auto mb-12 font-body"
         >
-          A framework-based development system built on five interconnected performance pillars.
-          Development should not depend on who is coaching that day.
+          5 Pillars. Game-Ready Transfers. Standardized for Next-Level Athletes.
         </motion.p>
 
-        {/* 5 PILLARS Dashboard Cards */}
+        {/* 5 Pillars - Horizontal Dashboard Modules */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mb-12"
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-6">
-            <BarChart3 className="w-5 h-5 text-accent" />
-            <span className="text-sm uppercase tracking-widest text-muted-foreground font-medium">The 5 Pillars</span>
+            <Activity className="w-4 h-4 text-[#B9B9B9]" />
+            <span className="text-xs uppercase tracking-[0.25em] text-[#B9B9B9]">The 5 Pillars</span>
           </div>
           
-          <div className="grid grid-cols-5 gap-2 md:gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-5 gap-1 md:gap-3 max-w-5xl mx-auto">
             {pillars.map((pillar, index) => {
               const Icon = pillar.icon;
+              const isHovered = hoveredPillar === index;
+              
               return (
                 <motion.div
                   key={pillar.letter}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.5 + index * 0.08 }}
-                  whileHover={{ y: -4, scale: 1.02 }}
-                  className="group relative bg-card/80 backdrop-blur-sm border border-border rounded-xl p-3 md:p-5 hover:border-accent/50 transition-all cursor-pointer overflow-hidden"
+                  transition={{ duration: 0.4, delay: 0.4 + index * 0.08 }}
+                  onMouseEnter={() => setHoveredPillar(index)}
+                  onMouseLeave={() => setHoveredPillar(null)}
+                  className={`group relative bg-[#181818] border-2 ${isHovered ? pillar.borderColor : 'border-[#4A4A4A]/30'} p-3 md:p-5 cursor-pointer transition-all duration-200`}
                 >
-                  {/* Gradient accent bar */}
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${pillar.color}`} />
-                  
-                  {/* Hover glow effect */}
-                  <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-b ${pillar.bgColor}`} />
+                  {/* Top accent bar */}
+                  <div className={`absolute top-0 left-0 right-0 h-1 ${pillar.color} transition-all duration-200 ${isHovered ? 'opacity-100' : 'opacity-50'}`} />
                   
                   <div className="relative flex flex-col items-center text-center">
-                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg ${pillar.bgColor} flex items-center justify-center mb-2 md:mb-3`}>
-                      <Icon className={`w-5 h-5 md:w-6 md:h-6 ${pillar.textColor}`} />
+                    <div className={`w-10 h-10 md:w-14 md:h-14 border ${isHovered ? pillar.borderColor : 'border-[#4A4A4A]/50'} flex items-center justify-center mb-2 md:mb-3 transition-colors`}>
+                      <Icon className={`w-5 h-5 md:w-7 md:h-7 ${pillar.textColor}`} />
                     </div>
-                    <span className={`text-2xl md:text-4xl font-display ${pillar.textColor} mb-1`}>{pillar.letter}</span>
-                    <span className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">{pillar.name}</span>
+                    <span className={`text-3xl md:text-5xl font-display ${pillar.textColor} mb-1`}>{pillar.letter}</span>
+                    <span className="text-[9px] md:text-xs text-[#B9B9B9] uppercase tracking-[0.15em]">{pillar.name}</span>
+                    
+                    {/* Metric badge */}
+                    <div className={`mt-2 px-2 py-1 border ${isHovered ? pillar.borderColor : 'border-[#4A4A4A]/30'} transition-colors`}>
+                      <span className="text-[8px] md:text-[10px] text-[#F5F5F5] uppercase tracking-wider">{pillar.metric}</span>
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -134,17 +175,20 @@ const Hero = () => {
           </div>
         </motion.div>
 
-        {/* One System Promise */}
+        {/* Founder's Window CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center mb-10"
         >
-          <div className="inline-block p-6 rounded-2xl bg-card/60 backdrop-blur-sm border border-border">
-            <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">The VAULT™ Standard</p>
-            <p className="text-lg md:text-xl font-display text-foreground">
-              "If it does not transfer to the game, it does not matter."
+          <div className="inline-block p-6 border border-utility/30 bg-[#181818]/80 backdrop-blur-sm mb-8">
+            <p className="text-xs uppercase tracking-[0.2em] text-utility mb-2">Founder's Window</p>
+            <p className="text-lg md:text-xl font-display text-[#F5F5F5] tracking-wide">
+              Lifetime Access for Founding Members until Monday.
+            </p>
+            <p className="text-sm text-[#B9B9B9] mt-2 font-body">
+              Join the first generation of VAULT™ OS—founders get lifetime suite access.
             </p>
           </div>
         </motion.div>
@@ -153,59 +197,27 @@ const Hero = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link to="/auth">
-            <Button variant="vault" size="xl" className="w-full sm:w-auto">
-              Access Dashboard
-              <ArrowRight className="w-5 h-5 ml-2" />
+          <Link to="/products/founders-access">
+            <Button variant="activate" size="xl" className="w-full sm:w-auto group">
+              <Power className="w-5 h-5 mr-2 animate-os-toggle" />
+              Secure Founder's Access
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
           <Link to="/products/org-starter-pack">
-            <Button variant="vaultOutline" size="xl" className="w-full sm:w-auto">
+            <Button variant="vaultOutline" size="xl" className="w-full sm:w-auto border-[#F5F5F5]/30 text-[#F5F5F5] hover:bg-[#F5F5F5] hover:text-[#181818]">
               Get the Org Starter Pack
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
         </motion.div>
-
-        {/* Quick Links */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1 }}
-          className="flex flex-wrap justify-center gap-4 mt-8"
-        >
-          <Link 
-            to="/products/velocity-system" 
-            className="group inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Zap className="w-4 h-4 text-red-500" />
-            12-Week Velocity System
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link 
-            to="/products/founders-access" 
-            className="group inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Shield className="w-4 h-4 text-amber-500" />
-            Founder's Access
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link 
-            to="/wall-of-wins" 
-            className="group inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Target className="w-4 h-4 text-purple-500" />
-            Wall of Wins
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </motion.div>
       </div>
 
       {/* Bottom gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent z-10" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10" />
     </section>
   );
 };

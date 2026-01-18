@@ -61,6 +61,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // VAULT Pillar Colors
+        vault: {
+          velocity: "hsl(var(--vault-velocity))",
+          athleticism: "hsl(var(--vault-athleticism))",
+          utility: "hsl(var(--vault-utility))",
+          longevity: "hsl(var(--vault-longevity))",
+          transfer: "hsl(var(--vault-transfer))",
+          black: "#181818",
+          white: "#F5F5F5",
+          steel: "#4A4A4A",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -89,12 +100,17 @@ export default {
           to: { opacity: "1", transform: "scale(1)" },
         },
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 40px hsl(220 15% 50% / 0.2)" },
-          "50%": { boxShadow: "0 0 60px hsl(220 15% 50% / 0.4)" },
+          "0%, 100%": { boxShadow: "0 0 40px hsl(0 0% 9% / 0.1)" },
+          "50%": { boxShadow: "0 0 60px hsl(0 0% 9% / 0.2)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
+        },
+        "os-toggle": {
+          "0%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(4px)" },
+          "100%": { transform: "translateX(0)" },
         },
       },
       animation: {
@@ -105,6 +121,7 @@ export default {
         "scale-in": "scale-in 0.5s ease-out forwards",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
         float: "float 6s ease-in-out infinite",
+        "os-toggle": "os-toggle 1s ease-in-out infinite",
       },
     },
   },
