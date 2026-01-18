@@ -7,7 +7,7 @@ interface UserSession {
   user_id: string;
   session_token: string;
   device_info: string | null;
-  ip_address: string | null;
+  ip_address_masked: string | null; // IP is masked for privacy (e.g., 192.168.1.xxx)
   user_agent: string | null;
   browser: string | null;
   os: string | null;
@@ -74,8 +74,9 @@ export const useSessionManagement = () => {
       const token = generateSessionToken(session.access_token);
       setCurrentSessionToken(token);
 
+      // Use the safe view that masks IP addresses for privacy
       const { data, error } = await supabase
-        .from("user_sessions")
+        .from("user_sessions_safe")
         .select("*")
         .eq("user_id", session.user.id)
         .order("last_active_at", { ascending: false });
