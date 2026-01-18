@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LiveActivityFeed from "@/components/dashboard/LiveActivityFeed";
+import WeeklyTipCard from "@/components/dashboard/WeeklyTipCard";
 import {
   LineChart,
   Line,
@@ -170,6 +171,9 @@ const Dashboard = () => {
                 ))}
               </div>
             </div>
+
+            {/* Weekly Tip Card */}
+            <WeeklyTipCard />
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
