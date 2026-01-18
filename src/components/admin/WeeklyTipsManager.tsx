@@ -45,6 +45,7 @@ const WeeklyTipsManager = () => {
   const [saving, setSaving] = useState(false);
   const [editingTip, setEditingTip] = useState<WeeklyTip | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const { toast } = useToast();
 
   // Form state
@@ -215,6 +216,17 @@ const WeeklyTipsManager = () => {
     }
   };
 
+  // Filter tips by category
+  const filteredTips = categoryFilter === 'all' 
+    ? tips 
+    : tips.filter(tip => tip.category === categoryFilter);
+
+  // Get counts per category
+  const categoryCounts = CATEGORIES.reduce((acc, cat) => {
+    acc[cat.value] = tips.filter(t => t.category === cat.value).length;
+    return acc;
+  }, {} as Record<string, number>);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -335,24 +347,71 @@ const WeeklyTipsManager = () => {
         </motion.div>
       )}
 
+      {/* Category Filter */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setCategoryFilter('all')}
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+            categoryFilter === 'all'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+          }`}
+        >
+          All ({tips.length})
+        </button>
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.value}
+            onClick={() => setCategoryFilter(cat.value)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              categoryFilter === cat.value
+                ? getCategoryColor(cat.value) + ' ring-1 ring-current'
+                : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+            }`}
+          >
+            {cat.label} ({categoryCounts[cat.value] || 0})
+          </button>
+        ))}
+      </div>
+
       {/* Tips List */}
       <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-border">
-          <h3 className="font-display text-foreground">All Tips ({tips.length})</h3>
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <h3 className="font-display text-foreground">
+            {categoryFilter === 'all' ? 'All Tips' : `${CATEGORIES.find(c => c.value === categoryFilter)?.label} Tips`} ({filteredTips.length})
+          </h3>
+          {categoryFilter !== 'all' && (
+            <button
+              onClick={() => setCategoryFilter('all')}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              Clear filter
+            </button>
+          )}
         </div>
 
-        {tips.length === 0 ? (
+        {filteredTips.length === 0 ? (
           <div className="p-8 text-center">
             <Lightbulb className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">No tips created yet</p>
-            <Button variant="outline" className="mt-4" onClick={handleCreate}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Your First Tip
-            </Button>
+            <p className="text-muted-foreground">
+              {categoryFilter === 'all' 
+                ? 'No tips created yet' 
+                : `No ${CATEGORIES.find(c => c.value === categoryFilter)?.label.toLowerCase()} tips found`}
+            </p>
+            {categoryFilter === 'all' ? (
+              <Button variant="outline" className="mt-4" onClick={handleCreate}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Tip
+              </Button>
+            ) : (
+              <Button variant="outline" className="mt-4" onClick={() => setCategoryFilter('all')}>
+                View All Tips
+              </Button>
+            )}
           </div>
         ) : (
           <div className="divide-y divide-border">
-            {tips.map((tip) => (
+            {filteredTips.map((tip) => (
               <div
                 key={tip.id}
                 className={`p-4 flex items-start gap-4 ${!tip.is_active ? 'opacity-50' : ''}`}
