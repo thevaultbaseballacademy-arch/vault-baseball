@@ -7,9 +7,27 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 
+interface SharedMetricsData {
+  error?: string;
+  profile?: {
+    avatar_url?: string;
+    display_name?: string;
+    position?: string;
+    graduation_year?: number;
+    height_inches?: number;
+    weight_lbs?: number;
+    throwing_arm?: string;
+    batting_side?: string;
+  };
+  pitching_metrics?: Array<{ velocity_mph?: number; spin_rate_rpm?: number }>;
+  hitting_metrics?: Array<{ exit_velocity_mph?: number; bat_speed_mph?: number }>;
+  throwing_metrics?: Array<{ measured_velocity_mph?: number }>;
+}
+
 const SharedMetricsView = () => {
   const { token } = useParams<{ token: string }>();
-  const { data, isLoading, error } = useSharedMetrics(token);
+  const { data: rawData, isLoading, error } = useSharedMetrics(token);
+  const data = rawData as SharedMetricsData | null;
 
   if (isLoading) {
     return (

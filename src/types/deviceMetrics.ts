@@ -52,7 +52,7 @@ export interface DeviceMetric {
   
   notes?: string;
   import_source: string;
-  raw_data?: unknown;
+  raw_data?: Record<string, unknown> | null;
   created_at: string;
 }
 
