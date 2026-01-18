@@ -6,6 +6,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const logStep = (step: string, details?: unknown) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
+  console.log(`[PROCESS-DELETION-REQUESTS] ${step}${detailsStr}`);
+};
+
 interface DeletionRequest {
   id: string;
   user_id: string;
@@ -18,6 +23,55 @@ serve(async (req) => {
   }
 
   try {
+    logStep("Function started");
+
+    // Security: Validate request comes from authorized source
+    const authHeader = req.headers.get("Authorization");
+    const cronSecret = Deno.env.get("CRON_SECRET");
+    
+    // Allow if valid cron secret OR valid admin JWT
+    let isAuthorized = false;
+    
+    if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+      logStep("Authorized via cron secret");
+      isAuthorized = true;
+    } else if (authHeader?.startsWith("Bearer ")) {
+      // Check if it's a valid admin user
+      const supabaseAuth = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      );
+      const token = authHeader.replace("Bearer ", "");
+      const { data: userData } = await supabaseAuth.auth.getUser(token);
+      
+      if (userData?.user) {
+        const supabaseService = createClient(
+          Deno.env.get("SUPABASE_URL") ?? "",
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+          { auth: { persistSession: false } }
+        );
+        const { data: roleData } = await supabaseService
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userData.user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        
+        if (roleData) {
+          logStep("Authorized via admin JWT", { userId: userData.user.id });
+          isAuthorized = true;
+        }
+      }
+    }
+    
+    if (!isAuthorized) {
+      logStep("Unauthorized access attempt");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
     // Use service role key for admin operations
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -25,7 +79,7 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    console.log('Starting data purge for approved deletion requests...');
+    logStep('Starting data purge for approved deletion requests...');
 
     // Fetch all approved deletion requests
     const { data: requests, error: fetchError } = await supabaseAdmin
@@ -34,24 +88,24 @@ serve(async (req) => {
       .eq('status', 'approved');
 
     if (fetchError) {
-      console.error('Error fetching requests:', fetchError);
+      logStep('Error fetching requests', fetchError);
       throw fetchError;
     }
 
     if (!requests || requests.length === 0) {
-      console.log('No approved deletion requests to process');
+      logStep('No approved deletion requests to process');
       return new Response(
         JSON.stringify({ message: 'No approved requests to process', processed: 0 }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Processing ${requests.length} approved deletion requests`);
+    logStep(`Processing approved deletion requests`, { count: requests.length });
 
     const results: { userId: string; success: boolean; error?: string }[] = [];
 
     for (const request of requests as DeletionRequest[]) {
-      console.log(`Processing deletion for user: ${request.user_id}`);
+      logStep(`Processing deletion for user`, { userId: request.user_id });
       
       try {
         // Delete data from all user-related tables in order (respecting foreign keys)
@@ -98,15 +152,15 @@ serve(async (req) => {
               .eq(column, request.user_id);
 
             if (deleteError) {
-              console.warn(`Warning: Could not delete from ${table}:`, deleteError.message);
+              logStep(`Warning: Could not delete from ${table}`, { error: deleteError.message });
             } else {
               deletedCount += count || 0;
               if (count && count > 0) {
-                console.log(`Deleted ${count} records from ${table}`);
+                logStep(`Deleted records from ${table}`, { count });
               }
             }
           } catch (tableError) {
-            console.warn(`Warning: Error deleting from ${table}:`, tableError);
+            logStep(`Warning: Error deleting from ${table}`, { error: tableError });
           }
         }
 
@@ -126,10 +180,10 @@ serve(async (req) => {
               .eq(column, request.user_id);
 
             if (deleteError) {
-              console.warn(`Warning: Could not delete coach data from ${table}:`, deleteError.message);
+              logStep(`Warning: Could not delete coach data from ${table}`, { error: deleteError.message });
             }
           } catch (tableError) {
-            console.warn(`Warning: Error deleting coach data from ${table}:`, tableError);
+            logStep(`Warning: Error deleting coach data from ${table}`, { error: tableError });
           }
         }
 
@@ -144,7 +198,7 @@ serve(async (req) => {
           .eq('changed_by', request.user_id);
 
         if (auditError) {
-          console.warn('Warning: Could not anonymize audit logs:', auditError.message);
+          logStep('Warning: Could not anonymize audit logs', { error: auditError.message });
         }
 
         // Mark the deletion request as completed
@@ -158,26 +212,27 @@ serve(async (req) => {
           .eq('id', request.id);
 
         if (updateError) {
-          console.error('Error updating request status:', updateError);
+          logStep('Error updating request status', updateError);
           throw updateError;
         }
 
-        console.log(`Successfully purged data for user: ${request.user_id}`);
+        logStep(`Successfully purged data for user`, { userId: request.user_id });
         results.push({ userId: request.user_id, success: true });
 
-      } catch (userError: any) {
-        console.error(`Error processing user ${request.user_id}:`, userError);
+      } catch (userError: unknown) {
+        const errorMessage = userError instanceof Error ? userError.message : String(userError);
+        logStep(`Error processing user`, { userId: request.user_id, error: errorMessage });
         results.push({ 
           userId: request.user_id, 
           success: false, 
-          error: userError.message 
+          error: errorMessage 
         });
 
         // Update request with error note
         await supabaseAdmin
           .from('data_deletion_requests')
           .update({
-            admin_notes: `Automated purge failed: ${userError.message}. Manual intervention required.`,
+            admin_notes: `Automated purge failed: ${errorMessage}. Manual intervention required.`,
           })
           .eq('id', request.id);
       }
@@ -186,7 +241,7 @@ serve(async (req) => {
     const successCount = results.filter(r => r.success).length;
     const failCount = results.filter(r => !r.success).length;
 
-    console.log(`Purge complete. Success: ${successCount}, Failed: ${failCount}`);
+    logStep(`Purge complete`, { success: successCount, failed: failCount });
 
     return new Response(
       JSON.stringify({
@@ -198,10 +253,11 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error: any) {
-    console.error('Data purge error:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to process deletion requests';
+    logStep('Data purge error', { error: errorMessage });
     return new Response(
-      JSON.stringify({ error: error.message || 'Failed to process deletion requests' }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
