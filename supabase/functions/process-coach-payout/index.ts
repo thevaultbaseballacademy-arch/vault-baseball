@@ -108,13 +108,14 @@ serve(async (req) => {
         status: 200,
       }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Payout error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: error.message === "Unauthorized" ? 401 : 400,
+        status: errorMessage === "Unauthorized" ? 401 : 400,
       }
     );
   }
