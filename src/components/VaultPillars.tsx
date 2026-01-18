@@ -61,8 +61,8 @@ const pillars: {
     description: "Keep athletes healthy, available, and progressing over time. Availability is the most overlooked performance metric.",
     focus: ["Arm care systems", "Workload management", "Recovery protocols", "Tissue resilience"],
     metrics: ["Throw volume", "Recovery indicators", "Availability rate", "Injury risk markers"],
-    badge: "Coming Soon",
-    preSale: "Founder's Access Pre-Sale: Get Lifetime Access to the full V-A-U-L-T suite for $499 (Limited to first 50 athletes).",
+    badge: "Founder's Pre-Sale Access",
+    preSale: "Get Lifetime Access to the full V-A-U-L-T suite for $499 (Limited to first 50 athletes).",
     link: "/products/founders-access",
   },
   {
@@ -75,8 +75,8 @@ const pillars: {
     description: "Ensure training adaptations appear in competition. Training that does not show up in games fails its purpose.",
     focus: ["Practice design", "Decision-making under pressure", "Competitive execution", "Game realism"],
     metrics: ["Practice-to-game carryover", "Situational success", "Consistency under pressure"],
-    badge: "Coming Soon",
-    preSale: "Founder's Access Pre-Sale: Get Lifetime Access to the full V-A-U-L-T suite for $499 (Limited to first 50 athletes).",
+    badge: "Founder's Pre-Sale Access",
+    preSale: "Get Lifetime Access to the full V-A-U-L-T suite for $499 (Limited to first 50 athletes).",
     link: "/products/founders-access",
   },
 ];

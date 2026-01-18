@@ -300,7 +300,7 @@ const Pricing = () => {
             <p className="text-muted-foreground text-sm mb-2">
               Complete VAULT™ system for your organization. 25 athletes, coach certification included.
             </p>
-            <p className="text-2xl font-display text-foreground mb-4">$2,500 <span className="text-sm text-muted-foreground font-normal">one-time</span></p>
+            <p className="text-2xl font-display text-foreground mb-4">$2,500 <span className="text-sm text-muted-foreground font-normal">/year</span></p>
             <Button variant="vault" className="w-full" onClick={() => window.location.href = '/products/org-starter-pack'}>
               Buy Now
             </Button>
