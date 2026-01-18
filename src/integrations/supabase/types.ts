@@ -1730,12 +1730,60 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_sessions_safe: {
+        Row: {
+          browser: string | null
+          created_at: string | null
+          device_info: string | null
+          id: string | null
+          ip_address_masked: string | null
+          is_current: boolean | null
+          last_active_at: string | null
+          location: string | null
+          os: string | null
+          session_token: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          browser?: string | null
+          created_at?: string | null
+          device_info?: string | null
+          id?: string | null
+          ip_address_masked?: never
+          is_current?: boolean | null
+          last_active_at?: string | null
+          location?: string | null
+          os?: string | null
+          session_token?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          browser?: string | null
+          created_at?: string | null
+          device_info?: string | null
+          id?: string | null
+          ip_address_masked?: never
+          is_current?: boolean | null
+          last_active_at?: string | null
+          location?: string | null
+          os?: string | null
+          session_token?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       anonymize_old_audit_ips: {
         Args: { days_threshold?: number }
         Returns: number
+      }
+      can_create_activity: {
+        Args: { target_user_id: string }
+        Returns: boolean
       }
       check_exam_answer: {
         Args: { question_id: string; selected_answer: number }
@@ -1900,6 +1948,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      obfuscate_ip: { Args: { ip_address: string }; Returns: string }
       purge_old_audit_logs: {
         Args: { retention_days?: number }
         Returns: number
