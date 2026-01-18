@@ -5,6 +5,29 @@ import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 import { getCertificationDisplayName, type CertificationType } from "@/lib/certificationPricing";
 import { format } from "date-fns";
+import vaultLogo from "@/assets/vault-logo-new.webp";
+
+// Helper function to load image as base64
+const loadImageAsBase64 = (src: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+      } else {
+        reject(new Error("Could not get canvas context"));
+      }
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+};
 
 interface CertificateGeneratorProps {
   coachName: string;
@@ -70,76 +93,87 @@ export const CertificateGenerator = ({
       doc.line(pageWidth - 10, pageHeight - 25, pageWidth - 25, pageHeight - 25);
       doc.line(pageWidth - 25, pageHeight - 10, pageWidth - 25, pageHeight - 25);
 
-      // VAULT Logo/Brand
+      // Add VAULT Logo watermark in center (semi-transparent effect)
+      try {
+        const logoBase64 = await loadImageAsBase64(vaultLogo);
+        // Center watermark - semi-transparent effect achieved by using it with low opacity background
+        const logoWidth = 60;
+        const logoHeight = 60;
+        doc.addImage(logoBase64, 'PNG', pageWidth / 2 - logoWidth / 2, 30, logoWidth, logoHeight);
+      } catch (logoError) {
+        console.log('Could not add logo to PDF:', logoError);
+      }
+
+      // VAULT Logo/Brand text (moved down to accommodate logo)
       doc.setTextColor(212, 175, 55);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(16);
-      doc.text("THE VAULT", pageWidth / 2, 30, { align: "center" });
+      doc.text("THE VAULT", pageWidth / 2, 100, { align: "center" });
       
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
-      doc.text("BASEBALL ACADEMY", pageWidth / 2, 36, { align: "center" });
+      doc.text("BASEBALL ACADEMY", pageWidth / 2, 106, { align: "center" });
 
       // Decorative line
       doc.setLineWidth(0.5);
-      doc.line(pageWidth / 2 - 40, 42, pageWidth / 2 + 40, 42);
+      doc.line(pageWidth / 2 - 40, 112, pageWidth / 2 + 40, 112);
 
       // Certificate Title
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(36);
-      doc.setFont("helvetica", "bold");
-      doc.text("CERTIFICATE", pageWidth / 2, 60, { align: "center" });
-      
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(180, 180, 180);
-      doc.text("OF ACHIEVEMENT", pageWidth / 2, 68, { align: "center" });
-
-      // Presented to text
-      doc.setFontSize(12);
-      doc.setTextColor(180, 180, 180);
-      doc.text("This is to certify that", pageWidth / 2, 85, { align: "center" });
-
-      // Coach Name
       doc.setFontSize(32);
       doc.setFont("helvetica", "bold");
+      doc.text("CERTIFICATE", pageWidth / 2, 125, { align: "center" });
+      
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(180, 180, 180);
+      doc.text("OF ACHIEVEMENT", pageWidth / 2, 132, { align: "center" });
+
+      // Presented to text
+      doc.setFontSize(11);
+      doc.setTextColor(180, 180, 180);
+      doc.text("This is to certify that", pageWidth / 2, 145, { align: "center" });
+
+      // Coach Name
+      doc.setFontSize(28);
+      doc.setFont("helvetica", "bold");
       doc.setTextColor(212, 175, 55);
-      doc.text(coachName.toUpperCase(), pageWidth / 2, 100, { align: "center" });
+      doc.text(coachName.toUpperCase(), pageWidth / 2, 158, { align: "center" });
 
       // Underline for name
       const nameWidth = doc.getTextWidth(coachName.toUpperCase());
       doc.setDrawColor(212, 175, 55);
       doc.setLineWidth(0.5);
-      doc.line(pageWidth / 2 - nameWidth / 2 - 10, 104, pageWidth / 2 + nameWidth / 2 + 10, 104);
+      doc.line(pageWidth / 2 - nameWidth / 2 - 10, 162, pageWidth / 2 + nameWidth / 2 + 10, 162);
 
       // Achievement text
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(255, 255, 255);
-      doc.text("has successfully completed the", pageWidth / 2, 118, { align: "center" });
+      doc.text("has successfully completed the", pageWidth / 2, 172, { align: "center" });
 
       // Certification Name
-      doc.setFontSize(24);
+      doc.setFontSize(20);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(255, 255, 255);
       const certName = getCertificationDisplayName(certificationType);
-      doc.text(certName.toUpperCase(), pageWidth / 2, 132, { align: "center" });
+      doc.text(certName.toUpperCase(), pageWidth / 2, 182, { align: "center" });
 
       // Score badge
-      doc.setFontSize(11);
-      doc.setTextColor(180, 180, 180);
-      doc.text(`Achieved Score: ${score}%`, pageWidth / 2, 145, { align: "center" });
-
-      // Dates section
-      const dateY = 165;
       doc.setFontSize(10);
+      doc.setTextColor(180, 180, 180);
+      doc.text(`Achieved Score: ${score}%`, pageWidth / 2, 192, { align: "center" });
+
+      // Dates section (adjusted to bottom)
+      const dateY = pageHeight - 40;
+      doc.setFontSize(9);
       doc.setTextColor(180, 180, 180);
       
       // Issue date
       doc.text("DATE ISSUED", pageWidth / 2 - 50, dateY, { align: "center" });
       doc.setTextColor(255, 255, 255);
       doc.setFont("helvetica", "bold");
-      doc.text(format(new Date(issuedAt), "MMMM d, yyyy"), pageWidth / 2 - 50, dateY + 6, { align: "center" });
+      doc.text(format(new Date(issuedAt), "MMMM d, yyyy"), pageWidth / 2 - 50, dateY + 5, { align: "center" });
 
       // Expiration date
       doc.setFont("helvetica", "normal");
@@ -147,7 +181,7 @@ export const CertificateGenerator = ({
       doc.text("VALID UNTIL", pageWidth / 2 + 50, dateY, { align: "center" });
       doc.setTextColor(255, 255, 255);
       doc.setFont("helvetica", "bold");
-      doc.text(format(new Date(expiresAt), "MMMM d, yyyy"), pageWidth / 2 + 50, dateY + 6, { align: "center" });
+      doc.text(format(new Date(expiresAt), "MMMM d, yyyy"), pageWidth / 2 + 50, dateY + 5, { align: "center" });
 
       // Signature line
       doc.setDrawColor(212, 175, 55);

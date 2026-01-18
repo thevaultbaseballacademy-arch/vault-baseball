@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getCertificationDisplayName, type CertificationType } from "@/lib/certificationPricing";
+import vaultLogo from "@/assets/vault-logo-new.webp";
 
 interface CertificateVerificationResponse {
   found: boolean;
@@ -158,6 +159,14 @@ const VerifyCertification = () => {
           >
             {/* Header */}
             <div className="text-center space-y-4">
+              {/* VAULT Logo */}
+              <div className="flex justify-center mb-4">
+                <img 
+                  src={vaultLogo} 
+                  alt="VAULT" 
+                  className="h-16 md:h-20 object-contain"
+                />
+              </div>
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
                 <Shield className="w-5 h-5" />
                 <span className="font-medium">Certificate Verification</span>

@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { useVerifyCertificate } from "@/hooks/useCourseCertificates";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import vaultLogo from "@/assets/vault-logo-new.webp";
 
 const VerifyCourseCertificate = () => {
   const [searchParams] = useSearchParams();
@@ -60,6 +61,14 @@ const VerifyCourseCertificate = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
+          {/* VAULT Logo */}
+          <div className="flex justify-center mb-6">
+            <img 
+              src={vaultLogo} 
+              alt="VAULT" 
+              className="h-16 md:h-20 object-contain"
+            />
+          </div>
           <div className="flex items-center justify-center gap-2 mb-4">
             <Award className="w-10 h-10 text-primary" />
           </div>
