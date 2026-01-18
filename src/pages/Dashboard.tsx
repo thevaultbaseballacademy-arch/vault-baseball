@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import LiveActivityFeed from "@/components/dashboard/LiveActivityFeed";
 import {
   LineChart,
   Line,
@@ -132,11 +133,16 @@ const Dashboard = () => {
       <Navbar />
 
       <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-7xl">
           <Button variant="ghost" className="mb-6" onClick={() => navigate("/")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
+
+          {/* Main Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Content - 2 columns */}
+            <div className="lg:col-span-2">
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -392,6 +398,15 @@ const Dashboard = () => {
               </>
             )}
           </motion.div>
+            </div>
+
+            {/* Sidebar - Live Activity Feed */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-24">
+                <LiveActivityFeed />
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 
