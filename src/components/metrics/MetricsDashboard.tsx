@@ -1,28 +1,36 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Activity, TrendingUp, Target, Zap } from "lucide-react";
+import { Activity, TrendingUp, Target, Zap, Shield } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useDeviceMetrics } from "@/hooks/useDeviceMetrics";
 import { DEVICE_CONFIG, type DeviceType, type DeviceMetric } from "@/types/deviceMetrics";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { VaultPowerMetricCard } from "./VaultPowerMetricCard";
+import { VerifiedBadge } from "./VerifiedBadge";
 
 interface MetricsDashboardProps {
   userId: string;
 }
 
-function MetricCard({ label, value, unit, trend, color }: {
+function MetricCard({ label, value, unit, trend, color, verified }: {
   label: string;
   value: number | string;
   unit?: string;
   trend?: number;
   color?: string;
+  verified?: boolean;
 }) {
   return (
     <Card className="bg-card border-border">
       <CardContent className="pt-4">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{label}</p>
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">{label}</p>
+          {verified && (
+            <Shield className="w-3 h-3 text-velocity" />
+          )}
+        </div>
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-display font-bold" style={{ color }}>
             {value}
@@ -30,7 +38,7 @@ function MetricCard({ label, value, unit, trend, color }: {
           {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
         </div>
         {trend !== undefined && (
-          <div className={`flex items-center gap-1 mt-1 text-xs ${trend >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+          <div className={`flex items-center gap-1 mt-1 text-xs ${trend >= 0 ? 'text-longevity' : 'text-velocity'}`}>
             <TrendingUp className={`w-3 h-3 ${trend < 0 ? 'rotate-180' : ''}`} />
             <span>{Math.abs(trend).toFixed(1)}% from last session</span>
           </div>
@@ -144,6 +152,9 @@ export function MetricsDashboard({ userId }: MetricsDashboardProps) {
         </TabsList>
       </Tabs>
       
+      {/* VAULT Power Metrics */}
+      <VaultPowerMetricCard metrics={metrics} />
+      
       {/* Quick stats */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -153,6 +164,7 @@ export function MetricsDashboard({ userId }: MetricsDashboardProps) {
               value={stats.maxVelo} 
               unit="mph"
               color="hsl(var(--vault-velocity))"
+              verified={metrics.some(m => m.import_source === 'api' && m.velocity_mph)}
             />
           )}
           {stats.avgSpinRate && (
@@ -161,6 +173,7 @@ export function MetricsDashboard({ userId }: MetricsDashboardProps) {
               value={stats.avgSpinRate} 
               unit="rpm"
               color="hsl(var(--vault-athleticism))"
+              verified={metrics.some(m => m.import_source === 'api' && m.spin_rate_rpm)}
             />
           )}
           {stats.maxExitVelo && (
@@ -169,6 +182,7 @@ export function MetricsDashboard({ userId }: MetricsDashboardProps) {
               value={stats.maxExitVelo} 
               unit="mph"
               color="hsl(var(--vault-utility))"
+              verified={metrics.some(m => m.import_source === 'api' && m.exit_velocity_mph)}
             />
           )}
           {stats.avgBatSpeed && (
@@ -177,6 +191,7 @@ export function MetricsDashboard({ userId }: MetricsDashboardProps) {
               value={stats.avgBatSpeed} 
               unit="mph"
               color="hsl(var(--vault-longevity))"
+              verified={metrics.some(m => m.import_source === 'api' && m.bat_speed_mph)}
             />
           )}
         </div>
@@ -277,9 +292,7 @@ export function MetricsDashboard({ userId }: MetricsDashboardProps) {
                       {metric.measured_velocity_mph && `${metric.measured_velocity_mph} mph`}
                     </td>
                     <td className="py-2 px-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {metric.import_source}
-                      </Badge>
+                      <VerifiedBadge source={metric.import_source} showLabel />
                     </td>
                   </tr>
                 ))}
