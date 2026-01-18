@@ -135,7 +135,7 @@ const PartnerClaim = () => {
                   Claim Your Partner Discount
                 </h2>
                 <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-                  Enter your organization's promo code at checkout to unlock your exclusive 50% partner discount.
+                  Enter your organization's referral code at checkout to unlock your exclusive 50% partner discount.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
@@ -161,8 +161,17 @@ const PartnerClaim = () => {
                   </Button>
                 </div>
 
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-4 max-w-md mx-auto">
+                  <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-1">
+                    💰 Partner Referral Fee
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Your org earns a <span className="font-semibold text-foreground">$100 Partner Referral Fee</span> for each family signup with your code
+                  </p>
+                </div>
+
                 <p className="text-sm text-muted-foreground">
-                  💡 Use your org code (e.g., CANES50, TIGERS50) at checkout for 50% off
+                  💡 Use your org's referral code (e.g., TIGERS100, CANES100) at checkout for 50% off
                 </p>
 
                 {!isSoldOut && spotsRemaining <= 20 && (
@@ -340,7 +349,7 @@ const PartnerClaim = () => {
               </Button>
 
               <p className="text-sm text-muted-foreground mt-4">
-                Enter your org promo code at checkout • Secure payment via Stripe
+                Enter your org's referral code at checkout • Secure payment via Stripe
               </p>
             </motion.div>
           </div>

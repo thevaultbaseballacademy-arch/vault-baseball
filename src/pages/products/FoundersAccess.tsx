@@ -652,7 +652,7 @@ const FoundersAccess = () => {
                 </Button>
               </motion.div>
               <p className="text-sm text-muted-foreground">
-                Secure checkout • Instant access • No recurring fees
+                💡 Have a referral code? Enter it at checkout • Secure payment via Stripe
               </p>
             </motion.div>
           </div>
