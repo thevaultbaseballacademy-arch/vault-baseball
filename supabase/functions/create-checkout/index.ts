@@ -7,6 +7,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Whitelist of valid Stripe price IDs for subscriptions
+const VALID_SUBSCRIPTION_PRICE_IDS = [
+  'price_1SjGMKPhXS410TO5XQcZm9fZ', // basic
+  'price_1SjGMYPhXS410TO5bGu1kSSZ', // performance
+  'price_1SjGMhPhXS410TO59WKiE81b', // elite
+  'price_1SqEGEPhXS410TO5DeHOuqVH', // small_org_license
+  'price_1SqEGIPhXS410TO5JUNSsTCq', // org_quick_start
+  'price_1SqEGOPhXS410TO5XtSbPx0v', // certified_coach
+];
+
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
@@ -21,8 +31,19 @@ serve(async (req) => {
     logStep("Function started");
 
     const { priceId } = await req.json();
-    if (!priceId) throw new Error("Price ID is required");
-    logStep("Price ID received", { priceId });
+    
+    // Validate priceId is a non-empty string
+    if (!priceId || typeof priceId !== 'string') {
+      throw new Error("Invalid price ID format");
+    }
+    
+    // Validate priceId is in the whitelist
+    if (!VALID_SUBSCRIPTION_PRICE_IDS.includes(priceId)) {
+      logStep("Unauthorized price ID attempted", { priceId });
+      throw new Error("Price ID not authorized for purchase");
+    }
+    
+    logStep("Price ID validated", { priceId });
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",

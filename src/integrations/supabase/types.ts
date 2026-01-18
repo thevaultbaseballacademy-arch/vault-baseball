@@ -1785,6 +1785,10 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: boolean
       }
+      can_view_profile: {
+        Args: { _profile_user_id: string; _viewer_id: string }
+        Returns: boolean
+      }
       check_exam_answer: {
         Args: { question_id: string; selected_answer: number }
         Returns: boolean
