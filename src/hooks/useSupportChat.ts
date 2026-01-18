@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/support-chat`;
 
@@ -9,6 +10,11 @@ export const useSupportChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const getAuthToken = async (): Promise<string | null> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token || null;
+  };
+
   const streamChat = async ({
     messages,
     onDelta,
@@ -18,11 +24,18 @@ export const useSupportChat = () => {
     onDelta: (deltaText: string) => void;
     onDone: () => void;
   }) => {
+    // Get the user's session token for authenticated requests
+    const token = await getAuthToken();
+    
+    if (!token) {
+      throw new Error("Please sign in to use the chat support");
+    }
+
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ messages }),
     });
