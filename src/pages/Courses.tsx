@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NewThisWeekBadge from "@/components/ui/NewThisWeekBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { useCourseEnrollments, useEnrollInCourse } from "@/hooks/useCourseEnrollment";
 import { Link } from "react-router-dom";
@@ -99,6 +100,7 @@ export const allCourses = [
     ],
     instructor: "Vault Performance",
     students: 1340,
+    isNew: true, // New content added this week
   },
   {
     id: "pitching-velocity-8week",
@@ -345,6 +347,7 @@ export const allCourses = [
     ],
     instructor: "Vault Performance",
     students: 2340,
+    isNew: true, // New content added this week
   },
   {
     id: "arm-care-complete",
@@ -645,6 +648,11 @@ const CourseCard = ({ course, index, isEnrolled, enrollment, onEnroll, isEnrolli
             {enrollment?.status === "completed" ? "Completed" : "Enrolled"}
           </div>
         </div>
+      )}
+
+      {/* New This Week Badge */}
+      {(course as any).isNew && !isEnrolled && (
+        <NewThisWeekBadge variant="floating" forceShow={true} size="sm" className="!top-2 !left-2 !right-auto" />
       )}
 
       <div className="relative h-44 overflow-hidden">

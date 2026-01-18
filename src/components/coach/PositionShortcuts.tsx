@@ -7,6 +7,7 @@ import {
   Zap // Hitting
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import NewThisWeekBadge from "@/components/ui/NewThisWeekBadge";
 
 interface PositionData {
   id: string;
@@ -15,6 +16,7 @@ interface PositionData {
   color: string;
   courseId: string;
   description: string;
+  hasNewContent?: boolean;
 }
 
 const positions: PositionData[] = [
@@ -24,7 +26,8 @@ const positions: PositionData[] = [
     icon: Target,
     color: "#ef4444",
     courseId: "velocity-system",
-    description: "Velocity, arm care, mechanics"
+    description: "Velocity, arm care, mechanics",
+    hasNewContent: true, // New drills added
   },
   {
     id: "catching",
@@ -32,7 +35,8 @@ const positions: PositionData[] = [
     icon: Shield,
     color: "#8b5cf6",
     courseId: "catcher-training",
-    description: "Receiving, blocking, throws"
+    description: "Receiving, blocking, throws",
+    hasNewContent: false,
   },
   {
     id: "infield",
@@ -40,7 +44,8 @@ const positions: PositionData[] = [
     icon: Diamond,
     color: "#f59e0b",
     courseId: "infield-training",
-    description: "Footwork, transfers, throws"
+    description: "Footwork, transfers, throws",
+    hasNewContent: true, // New drills added
   },
   {
     id: "outfield",
@@ -48,7 +53,8 @@ const positions: PositionData[] = [
     icon: Circle,
     color: "#22c55e",
     courseId: "outfield-training",
-    description: "Routes, jumps, arm strength"
+    description: "Routes, jumps, arm strength",
+    hasNewContent: false,
   },
   {
     id: "hitting",
@@ -56,7 +62,8 @@ const positions: PositionData[] = [
     icon: Zap,
     color: "#3b82f6",
     courseId: "elite-hitting",
-    description: "Swing mechanics, approach"
+    description: "Swing mechanics, approach",
+    hasNewContent: false,
   }
 ];
 
@@ -85,8 +92,18 @@ const PositionShortcuts = () => {
             whileHover={{ scale: 1.05, y: -4 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handlePositionClick(position)}
-            className="flex flex-col items-center p-4 bg-card border border-border rounded-2xl hover:border-accent/50 hover:shadow-lg transition-all group"
+            className="relative flex flex-col items-center p-4 bg-card border border-border rounded-2xl hover:border-accent/50 hover:shadow-lg transition-all group"
           >
+            {/* New badge */}
+            {position.hasNewContent && (
+              <NewThisWeekBadge 
+                variant="floating" 
+                forceShow={true} 
+                size="sm" 
+                className="!top-1 !right-1"
+              />
+            )}
+            
             <div 
               className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-all group-hover:scale-110"
               style={{ backgroundColor: `${position.color}15` }}
