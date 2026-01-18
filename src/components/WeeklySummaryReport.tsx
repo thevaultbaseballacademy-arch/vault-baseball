@@ -88,7 +88,8 @@ export function WeeklySummaryReport() {
 
     try {
       const [athletesResult, checkinsResult] = await Promise.all([
-        supabase.from('profiles').select('user_id, display_name, email'),
+        // Only select user_id and display_name - email is not needed for weekly summary display
+        supabase.from('profiles').select('user_id, display_name'),
         supabase
           .from('athlete_checkins')
           .select('user_id, checkin_date, mood, energy_level, stress_level, sleep_quality, sleep_hours, training_completed, training_duration_minutes')

@@ -58,8 +58,9 @@ export function useCoachAlerts(coachUserId: string | null) {
     if (!coachUserId) return;
 
     // Fetch all athletes and their check-ins
+    // Only select user_id and display_name - email is not needed for coach alerts
     const [athletesResult, checkinsResult] = await Promise.all([
-      supabase.from('profiles').select('user_id, display_name, email'),
+      supabase.from('profiles').select('user_id, display_name'),
       supabase
         .from('athlete_checkins')
         .select('user_id, checkin_date, mood, energy_level, stress_level, sleep_quality')
