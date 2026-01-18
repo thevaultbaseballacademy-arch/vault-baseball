@@ -1074,6 +1074,162 @@ export type Database = {
         }
         Relationships: []
       }
+      device_integrations: {
+        Row: {
+          access_token: string | null
+          api_key: string | null
+          api_secret: string | null
+          created_at: string
+          device_type: Database["public"]["Enums"]["device_type"]
+          id: string
+          is_connected: boolean | null
+          last_sync_at: string | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          api_key?: string | null
+          api_secret?: string | null
+          created_at?: string
+          device_type: Database["public"]["Enums"]["device_type"]
+          id?: string
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          api_key?: string | null
+          api_secret?: string | null
+          created_at?: string
+          device_type?: Database["public"]["Enums"]["device_type"]
+          id?: string
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      device_metrics: {
+        Row: {
+          attack_angle: number | null
+          bat_speed_mph: number | null
+          body_rotation: number | null
+          connection_score: number | null
+          created_at: string
+          device_type: Database["public"]["Enums"]["device_type"]
+          distance_ft: number | null
+          exit_velocity_mph: number | null
+          horizontal_break: number | null
+          id: string
+          import_source: string | null
+          launch_angle: number | null
+          measured_velocity_mph: number | null
+          metric_category: string
+          notes: string | null
+          on_plane_efficiency: number | null
+          peak_hand_speed: number | null
+          pitch_type: string | null
+          power_index: number | null
+          raw_data: Json | null
+          recorded_at: string
+          release_extension: number | null
+          release_height: number | null
+          rotation_score: number | null
+          session_id: string | null
+          spin_axis: number | null
+          spin_efficiency: number | null
+          spin_rate_rpm: number | null
+          time_to_contact: number | null
+          updated_at: string
+          user_id: string
+          velocity_mph: number | null
+          velocity_type: string | null
+          vertical_break: number | null
+        }
+        Insert: {
+          attack_angle?: number | null
+          bat_speed_mph?: number | null
+          body_rotation?: number | null
+          connection_score?: number | null
+          created_at?: string
+          device_type: Database["public"]["Enums"]["device_type"]
+          distance_ft?: number | null
+          exit_velocity_mph?: number | null
+          horizontal_break?: number | null
+          id?: string
+          import_source?: string | null
+          launch_angle?: number | null
+          measured_velocity_mph?: number | null
+          metric_category: string
+          notes?: string | null
+          on_plane_efficiency?: number | null
+          peak_hand_speed?: number | null
+          pitch_type?: string | null
+          power_index?: number | null
+          raw_data?: Json | null
+          recorded_at?: string
+          release_extension?: number | null
+          release_height?: number | null
+          rotation_score?: number | null
+          session_id?: string | null
+          spin_axis?: number | null
+          spin_efficiency?: number | null
+          spin_rate_rpm?: number | null
+          time_to_contact?: number | null
+          updated_at?: string
+          user_id: string
+          velocity_mph?: number | null
+          velocity_type?: string | null
+          vertical_break?: number | null
+        }
+        Update: {
+          attack_angle?: number | null
+          bat_speed_mph?: number | null
+          body_rotation?: number | null
+          connection_score?: number | null
+          created_at?: string
+          device_type?: Database["public"]["Enums"]["device_type"]
+          distance_ft?: number | null
+          exit_velocity_mph?: number | null
+          horizontal_break?: number | null
+          id?: string
+          import_source?: string | null
+          launch_angle?: number | null
+          measured_velocity_mph?: number | null
+          metric_category?: string
+          notes?: string | null
+          on_plane_efficiency?: number | null
+          peak_hand_speed?: number | null
+          pitch_type?: string | null
+          power_index?: number | null
+          raw_data?: Json | null
+          recorded_at?: string
+          release_extension?: number | null
+          release_height?: number | null
+          rotation_score?: number | null
+          session_id?: string | null
+          spin_axis?: number | null
+          spin_efficiency?: number | null
+          spin_rate_rpm?: number | null
+          time_to_contact?: number | null
+          updated_at?: string
+          user_id?: string
+          velocity_mph?: number | null
+          velocity_type?: string | null
+          vertical_break?: number | null
+        }
+        Relationships: []
+      }
       exam_questions: {
         Row: {
           cert_type: Database["public"]["Enums"]["admin_cert_type"]
@@ -1190,6 +1346,63 @@ export type Database = {
           include_stats?: boolean | null
           include_videos?: boolean | null
           label?: string | null
+          token?: string
+          updated_at?: string
+          user_id?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
+      metric_share_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          include_hitting: boolean | null
+          include_pitching: boolean | null
+          include_throwing: boolean | null
+          include_trends: boolean | null
+          is_public: boolean | null
+          label: string | null
+          last_viewed_at: string | null
+          recipient_email: string | null
+          recipient_name: string | null
+          token: string
+          updated_at: string
+          user_id: string
+          view_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          include_hitting?: boolean | null
+          include_pitching?: boolean | null
+          include_throwing?: boolean | null
+          include_trends?: boolean | null
+          is_public?: boolean | null
+          label?: string | null
+          last_viewed_at?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          token: string
+          updated_at?: string
+          user_id: string
+          view_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          include_hitting?: boolean | null
+          include_pitching?: boolean | null
+          include_throwing?: boolean | null
+          include_trends?: boolean | null
+          is_public?: boolean | null
+          label?: string | null
+          last_viewed_at?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
           token?: string
           updated_at?: string
           user_id?: string
@@ -1957,6 +2170,7 @@ export type Database = {
         }[]
       }
       get_shared_kpi_profile: { Args: { share_token: string }; Returns: Json }
+      get_shared_metrics: { Args: { share_token: string }; Returns: Json }
       get_user_purchase_for_admin: {
         Args: { purchase_id: string }
         Returns: {
@@ -2052,6 +2266,12 @@ export type Database = {
         | "outfield_specialist"
       coach_role: "Coach" | "Director" | "OrgAdmin" | "VAULTHQ"
       coach_status: "Active" | "Suspended"
+      device_type:
+        | "rapsodo"
+        | "hittrax"
+        | "blast_motion"
+        | "trackman"
+        | "pocket_radar"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2198,6 +2418,13 @@ export const Constants = {
       ],
       coach_role: ["Coach", "Director", "OrgAdmin", "VAULTHQ"],
       coach_status: ["Active", "Suspended"],
+      device_type: [
+        "rapsodo",
+        "hittrax",
+        "blast_motion",
+        "trackman",
+        "pocket_radar",
+      ],
     },
   },
 } as const
