@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { TrendingUp, Target, Zap, Shield, ArrowRight } from "lucide-react";
+import { TrendingUp, Target, Zap, Shield, ArrowRight, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/vault-hero.jpg";
@@ -107,13 +107,19 @@ const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.55 }}
-            className="mb-12"
+            className="flex flex-col sm:flex-row gap-3 mb-12"
           >
             <Link to="/products/velocity-system" className="group inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 hover:border-red-500/40 transition-all">
               <Zap className="w-5 h-5 text-red-500" />
               <span className="text-foreground font-medium">12-Week Velocity System</span>
               <span className="text-muted-foreground">$299 one-time</span>
               <ArrowRight className="w-4 h-4 text-red-500 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link to="/wall-of-wins" className="group inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 hover:border-amber-500/40 transition-all">
+              <Trophy className="w-5 h-5 text-amber-500" />
+              <span className="text-foreground font-medium">Wall of Wins</span>
+              <span className="text-muted-foreground">See Real Results</span>
+              <ArrowRight className="w-4 h-4 text-amber-500 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
 
