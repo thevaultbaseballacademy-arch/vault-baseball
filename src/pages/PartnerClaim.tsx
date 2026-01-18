@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 const PartnerClaim = () => {
   const { checkout, loading } = useProductCheckout();
   const [spotsTaken, setSpotsTaken] = useState(0);
-  const TOTAL_SPOTS = 50;
+  const TOTAL_SPOTS = 1000;
 
   useEffect(() => {
     const checkSpots = async () => {
