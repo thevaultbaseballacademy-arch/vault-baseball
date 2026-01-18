@@ -103,9 +103,15 @@ export function useAddMetric() {
   
   return useMutation({
     mutationFn: async (metric: Omit<DeviceMetric, 'id' | 'created_at'>) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { raw_data, ...rest } = metric;
+      const insertPayload = {
+        ...rest,
+        raw_data: raw_data ? JSON.parse(JSON.stringify(raw_data)) : null
+      };
       const { data, error } = await supabase
         .from('device_metrics')
-        .insert(metric)
+        .insert(insertPayload)
         .select()
         .single();
       
@@ -127,9 +133,14 @@ export function useBulkAddMetrics() {
   
   return useMutation({
     mutationFn: async (metrics: Omit<DeviceMetric, 'id' | 'created_at'>[]) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const insertData = metrics.map(({ raw_data, ...rest }) => ({
+        ...rest,
+        raw_data: raw_data ? JSON.parse(JSON.stringify(raw_data)) : null
+      }));
       const { data, error } = await supabase
         .from('device_metrics')
-        .insert(metrics)
+        .insert(insertData)
         .select();
       
       if (error) throw error;
