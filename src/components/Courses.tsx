@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Clock, Zap, Dumbbell, Shuffle, Heart, Target, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import NewThisWeekBadge from "@/components/ui/NewThisWeekBadge";
 import courseHitting from "@/assets/course-hitting.jpg";
 import coursePitching from "@/assets/course-pitching.jpg";
 import courseFielding from "@/assets/course-fielding.jpg";
@@ -20,6 +21,7 @@ const trainingSystems = [
     bgColor: "bg-red-500/10",
     textColor: "text-red-500",
     metrics: ["Exit Velocity", "Bat Speed", "Throwing Velo", "Rotational Power"],
+    isNew: true, // Mark as new for demo
   },
   {
     id: "athleticism",
@@ -34,6 +36,7 @@ const trainingSystems = [
     bgColor: "bg-blue-500/10",
     textColor: "text-blue-500",
     metrics: ["Sprint Times", "Strength Ratios", "Jump Metrics", "Agility"],
+    isNew: false,
   },
   {
     id: "utility",
@@ -48,6 +51,7 @@ const trainingSystems = [
     bgColor: "bg-green-500/10",
     textColor: "text-green-500",
     metrics: ["Positional Flex", "Skill Transfer", "Baseball IQ", "Adaptability"],
+    isNew: false,
   },
 ];
 
@@ -83,6 +87,11 @@ const SystemCard = ({ system, index }: { system: typeof trainingSystems[0]; inde
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group relative bg-card rounded-2xl overflow-hidden border border-border hover:border-foreground/20 transition-all duration-500 hover:shadow-xl"
     >
+      {/* New This Week Badge */}
+      {system.isNew && (
+        <NewThisWeekBadge variant="floating" forceShow={true} size="sm" />
+      )}
+
       {/* Image */}
       <div className="relative h-56 overflow-hidden">
         <img
