@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, TrendingUp, Calendar, 
-  ChevronDown, ChevronUp, Search, Activity, Trophy
+  ChevronDown, ChevronUp, Search, Activity, Trophy,
+  BookOpen, Target, BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +17,10 @@ import { useCoachAlerts } from "@/hooks/useCoachAlerts";
 import { WeeklySummaryReport } from "@/components/WeeklySummaryReport";
 import { CoachScheduleManager } from "@/components/coach/CoachScheduleManager";
 import { KPILeaderboards } from "@/components/coach/KPILeaderboards";
+import GlobalSearch from "@/components/coach/GlobalSearch";
+import PositionShortcuts from "@/components/coach/PositionShortcuts";
+import FavoritesQuickStart from "@/components/coach/FavoritesQuickStart";
+import QuickAccessCard from "@/components/coach/QuickAccessCard";
 import {
   LineChart,
   Line,
@@ -55,7 +60,7 @@ const CoachDashboard = () => {
   const [athletes, setAthletes] = useState<AthleteProfile[]>([]);
   const [checkins, setCheckins] = useState<CheckinData[]>([]);
   const [expandedAthlete, setExpandedAthlete] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [athleteSearchTerm, setAthleteSearchTerm] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -112,7 +117,6 @@ const CoachDashboard = () => {
     }
   };
 
-  // Generate alerts when data is loaded
   useEffect(() => {
     if (isCoach && user?.id && athletes.length > 0) {
       generateAlerts();
@@ -191,8 +195,8 @@ const CoachDashboard = () => {
   };
 
   const filteredAthletes = athletes.filter(a => 
-    a.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    a.display_name?.toLowerCase().includes(athleteSearchTerm.toLowerCase()) ||
+    a.email?.toLowerCase().includes(athleteSearchTerm.toLowerCase())
   );
 
   const athletesWithRecentActivity = filteredAthletes.filter(a => {
@@ -236,7 +240,7 @@ const CoachDashboard = () => {
       <Navbar />
 
       <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-7xl">
           <Button variant="ghost" className="mb-6" onClick={() => navigate("/")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
@@ -245,17 +249,18 @@ const CoachDashboard = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
+            className="space-y-8"
           >
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Header with Global Search */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl md:text-4xl font-display text-foreground mb-1">
-                  COACH DASHBOARD
+                  COACH COMMAND CENTER
                 </h1>
-                <p className="text-muted-foreground">Monitor your athletes' progress</p>
+                <p className="text-muted-foreground">Find any drill in 3 clicks or less</p>
               </div>
               <div className="flex items-center gap-3">
+                <GlobalSearch />
                 <WeeklySummaryReport />
                 <CoachAlerts
                   alerts={alerts}
@@ -268,28 +273,66 @@ const CoachDashboard = () => {
                     fetchAlerts();
                   }}
                 />
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search athletes..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full md:w-64"
-                  />
-                </div>
               </div>
+            </div>
+
+            {/* Position Shortcuts - 1 Click Access */}
+            <PositionShortcuts />
+
+            {/* Favorites Quick Start */}
+            <FavoritesQuickStart />
+
+            {/* Quick Access Cards Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <QuickAccessCard
+                title="Courses"
+                description="All training programs"
+                icon={BookOpen}
+                href="/courses"
+                color="#3b82f6"
+                delay={0.1}
+              />
+              <QuickAccessCard
+                title="Certifications"
+                description="Coach credentials"
+                icon={Target}
+                href="/certifications"
+                color="#22c55e"
+                delay={0.15}
+              />
+              <QuickAccessCard
+                title="Leaderboards"
+                description="Top performers"
+                icon={Trophy}
+                href="/certificate-leaderboard"
+                color="#f59e0b"
+                delay={0.2}
+              />
+              <QuickAccessCard
+                title="Analytics"
+                description="Performance data"
+                icon={BarChart3}
+                href="/longevity-dashboard"
+                color="#8b5cf6"
+                delay={0.25}
+              />
             </div>
 
             {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
               <TabsList className="grid w-full max-w-lg grid-cols-3">
-                <TabsTrigger value="athletes">Athletes</TabsTrigger>
+                <TabsTrigger value="athletes" className="flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  Athletes
+                </TabsTrigger>
                 <TabsTrigger value="leaderboards" className="flex items-center gap-1">
                   <Trophy className="w-3 h-3" />
                   Leaderboards
                 </TabsTrigger>
-                <TabsTrigger value="schedules">Schedules</TabsTrigger>
+                <TabsTrigger value="schedules" className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  Schedules
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="leaderboards" className="space-y-6">
@@ -331,184 +374,194 @@ const CoachDashboard = () => {
                   </div>
                 </div>
 
-            {/* Athletes List */}
-            <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              <div className="p-4 border-b border-border">
-                <h2 className="text-lg font-display text-foreground">Athletes</h2>
-              </div>
+                {/* Athletes List with Search */}
+                <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                  <div className="p-4 border-b border-border flex items-center justify-between">
+                    <h2 className="text-lg font-display text-foreground">Athletes</h2>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        placeholder="Search athletes..."
+                        value={athleteSearchTerm}
+                        onChange={(e) => setAthleteSearchTerm(e.target.value)}
+                        className="pl-10 pr-4 py-2 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full md:w-64 text-sm"
+                      />
+                    </div>
+                  </div>
 
-              {filteredAthletes.length === 0 ? (
-                <div className="p-8 text-center">
-                  <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">No athletes found</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {filteredAthletes.map((athlete) => {
-                    const latest = getLatestCheckin(athlete.user_id);
-                    const stats = getAthleteStats(athlete.user_id);
-                    const isExpanded = expandedAthlete === athlete.user_id;
-                    const athleteCheckins = getAthleteCheckins(athlete.user_id);
+                  {filteredAthletes.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                      <p className="text-muted-foreground">No athletes found</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-border">
+                      {filteredAthletes.map((athlete) => {
+                        const latest = getLatestCheckin(athlete.user_id);
+                        const stats = getAthleteStats(athlete.user_id);
+                        const isExpanded = expandedAthlete === athlete.user_id;
+                        const athleteCheckins = getAthleteCheckins(athlete.user_id);
 
-                    return (
-                      <div key={athlete.user_id}>
-                        <button
-                          onClick={() => setExpandedAthlete(isExpanded ? null : athlete.user_id)}
-                          className="w-full p-4 flex items-center justify-between hover:bg-secondary/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                              <span className="text-sm font-medium text-accent">
-                                {athlete.display_name?.charAt(0).toUpperCase() || '?'}
-                              </span>
-                            </div>
-                            <div className="text-left">
-                              <p className="font-medium text-foreground">
-                                {athlete.display_name || 'Unknown'}
-                              </p>
-                              <p className="text-sm text-muted-foreground">{athlete.email}</p>
-                            </div>
-                          </div>
+                        return (
+                          <div key={athlete.user_id}>
+                            <button
+                              onClick={() => setExpandedAthlete(isExpanded ? null : athlete.user_id)}
+                              className="w-full p-4 flex items-center justify-between hover:bg-secondary/50 transition-colors"
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                                  <span className="text-sm font-medium text-accent">
+                                    {athlete.display_name?.charAt(0).toUpperCase() || '?'}
+                                  </span>
+                                </div>
+                                <div className="text-left">
+                                  <p className="font-medium text-foreground">
+                                    {athlete.display_name || 'Unknown'}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">{athlete.email}</p>
+                                </div>
+                              </div>
 
-                          <div className="flex items-center gap-6">
-                            {latest ? (
-                              <>
-                                <div className="hidden md:flex items-center gap-4">
-                                  <div className="text-right">
-                                    <p className="text-xs text-muted-foreground">Last Check-in</p>
-                                    <p className="text-sm text-foreground">{formatDate(latest.checkin_date)}</p>
-                                  </div>
-                                  <div className="text-right">
-                                    <p className="text-xs text-muted-foreground">Mood</p>
-                                    <div className="flex items-center gap-1">
-                                      <div className={`w-2 h-2 rounded-full ${getMoodColor(latest.mood)}`} />
-                                      <span className="text-sm text-foreground">{latest.mood || '—'}/5</span>
+                              <div className="flex items-center gap-6">
+                                {latest ? (
+                                  <>
+                                    <div className="hidden md:flex items-center gap-4">
+                                      <div className="text-right">
+                                        <p className="text-xs text-muted-foreground">Last Check-in</p>
+                                        <p className="text-sm text-foreground">{formatDate(latest.checkin_date)}</p>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="text-xs text-muted-foreground">Mood</p>
+                                        <div className="flex items-center gap-1">
+                                          <div className={`w-2 h-2 rounded-full ${getMoodColor(latest.mood)}`} />
+                                          <span className="text-sm text-foreground">{latest.mood || '—'}/5</span>
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="text-xs text-muted-foreground">Energy</p>
+                                        <p className="text-sm text-foreground">{latest.energy_level || '—'}/5</p>
+                                      </div>
                                     </div>
+                                    {isExpanded ? (
+                                      <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                                    ) : (
+                                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="text-sm text-muted-foreground">No check-ins</span>
+                                )}
+                              </div>
+                            </button>
+
+                            {/* Expanded Detail */}
+                            {isExpanded && athleteCheckins.length > 0 && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                className="p-4 bg-secondary/30 border-t border-border"
+                              >
+                                <div className="grid md:grid-cols-4 gap-4 mb-6">
+                                  <div className="bg-card rounded-xl p-3">
+                                    <p className="text-xs text-muted-foreground mb-1">Check-ins (14d)</p>
+                                    <p className="text-lg font-display text-foreground">{stats?.checkinCount || 0}</p>
                                   </div>
-                                  <div className="text-right">
-                                    <p className="text-xs text-muted-foreground">Energy</p>
-                                    <p className="text-sm text-foreground">{latest.energy_level || '—'}/5</p>
+                                  <div className="bg-card rounded-xl p-3">
+                                    <p className="text-xs text-muted-foreground mb-1">Training Days</p>
+                                    <p className="text-lg font-display text-foreground">{stats?.trainingDays || 0}</p>
+                                  </div>
+                                  <div className="bg-card rounded-xl p-3">
+                                    <p className="text-xs text-muted-foreground mb-1">Avg Mood</p>
+                                    <p className="text-lg font-display text-foreground">{stats?.avgMood || '—'}/5</p>
+                                  </div>
+                                  <div className="bg-card rounded-xl p-3">
+                                    <p className="text-xs text-muted-foreground mb-1">Avg Energy</p>
+                                    <p className="text-lg font-display text-foreground">{stats?.avgEnergy || '—'}/5</p>
                                   </div>
                                 </div>
-                                {isExpanded ? (
-                                  <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                                ) : (
-                                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                                )}
-                              </>
-                            ) : (
-                              <span className="text-sm text-muted-foreground">No check-ins</span>
+
+                                {/* Trend Chart */}
+                                <div className="bg-card rounded-xl p-4">
+                                  <h4 className="text-sm font-medium text-foreground mb-4">Mood & Energy Trend</h4>
+                                  <div className="h-48">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                      <LineChart 
+                                        data={[...athleteCheckins].reverse().map(c => ({
+                                          date: formatDate(c.checkin_date),
+                                          mood: c.mood,
+                                          energy: c.energy_level,
+                                        }))}
+                                      >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                                        <YAxis domain={[1, 5]} stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                                        <Tooltip
+                                          contentStyle={{
+                                            backgroundColor: "hsl(var(--card))",
+                                            border: "1px solid hsl(var(--border))",
+                                            borderRadius: "8px",
+                                            fontSize: "12px",
+                                          }}
+                                        />
+                                        <Line type="monotone" dataKey="mood" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ r: 3 }} name="Mood" />
+                                        <Line type="monotone" dataKey="energy" stroke="hsl(220 70% 50%)" strokeWidth={2} dot={{ r: 3 }} name="Energy" />
+                                      </LineChart>
+                                    </ResponsiveContainer>
+                                  </div>
+                                </div>
+
+                                {/* Recent Check-ins Table */}
+                                <div className="mt-4">
+                                  <h4 className="text-sm font-medium text-foreground mb-3">Recent Check-ins</h4>
+                                  <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                      <thead>
+                                        <tr className="border-b border-border">
+                                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Date</th>
+                                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Training</th>
+                                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Mood</th>
+                                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Energy</th>
+                                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Sleep</th>
+                                          <th className="text-left py-2 px-2 text-muted-foreground font-medium">Notes</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {athleteCheckins.slice(0, 7).map((c) => (
+                                          <tr key={c.id} className="border-b border-border/50">
+                                            <td className="py-2 px-2 text-foreground">{formatDate(c.checkin_date)}</td>
+                                            <td className="py-2 px-2">
+                                              {c.training_completed ? (
+                                                <span className="text-green-600">{c.training_type || 'Yes'}</span>
+                                              ) : (
+                                                <span className="text-muted-foreground">Rest</span>
+                                              )}
+                                            </td>
+                                            <td className="py-2 px-2">
+                                              <div className="flex items-center gap-1">
+                                                <div className={`w-2 h-2 rounded-full ${getMoodColor(c.mood)}`} />
+                                                <span className="text-foreground">{c.mood || '—'}</span>
+                                              </div>
+                                            </td>
+                                            <td className="py-2 px-2 text-foreground">{c.energy_level || '—'}</td>
+                                            <td className="py-2 px-2 text-foreground">{c.sleep_hours ? `${c.sleep_hours}h` : '—'}</td>
+                                            <td className="py-2 px-2 text-muted-foreground truncate max-w-[150px]">
+                                              {c.notes || '—'}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </motion.div>
                             )}
                           </div>
-                        </button>
-
-                        {/* Expanded Detail */}
-                        {isExpanded && athleteCheckins.length > 0 && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            className="p-4 bg-secondary/30 border-t border-border"
-                          >
-                            <div className="grid md:grid-cols-4 gap-4 mb-6">
-                              <div className="bg-card rounded-xl p-3">
-                                <p className="text-xs text-muted-foreground mb-1">Check-ins (14d)</p>
-                                <p className="text-lg font-display text-foreground">{stats?.checkinCount || 0}</p>
-                              </div>
-                              <div className="bg-card rounded-xl p-3">
-                                <p className="text-xs text-muted-foreground mb-1">Training Days</p>
-                                <p className="text-lg font-display text-foreground">{stats?.trainingDays || 0}</p>
-                              </div>
-                              <div className="bg-card rounded-xl p-3">
-                                <p className="text-xs text-muted-foreground mb-1">Avg Mood</p>
-                                <p className="text-lg font-display text-foreground">{stats?.avgMood || '—'}/5</p>
-                              </div>
-                              <div className="bg-card rounded-xl p-3">
-                                <p className="text-xs text-muted-foreground mb-1">Avg Energy</p>
-                                <p className="text-lg font-display text-foreground">{stats?.avgEnergy || '—'}/5</p>
-                              </div>
-                            </div>
-
-                            {/* Trend Chart */}
-                            <div className="bg-card rounded-xl p-4">
-                              <h4 className="text-sm font-medium text-foreground mb-4">Mood & Energy Trend</h4>
-                              <div className="h-48">
-                                <ResponsiveContainer width="100%" height="100%">
-                                  <LineChart 
-                                    data={[...athleteCheckins].reverse().map(c => ({
-                                      date: formatDate(c.checkin_date),
-                                      mood: c.mood,
-                                      energy: c.energy_level,
-                                    }))}
-                                  >
-                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                                    <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                                    <YAxis domain={[1, 5]} stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                                    <Tooltip
-                                      contentStyle={{
-                                        backgroundColor: "hsl(var(--card))",
-                                        border: "1px solid hsl(var(--border))",
-                                        borderRadius: "8px",
-                                        fontSize: "12px",
-                                      }}
-                                    />
-                                    <Line type="monotone" dataKey="mood" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ r: 3 }} name="Mood" />
-                                    <Line type="monotone" dataKey="energy" stroke="hsl(220 70% 50%)" strokeWidth={2} dot={{ r: 3 }} name="Energy" />
-                                  </LineChart>
-                                </ResponsiveContainer>
-                              </div>
-                            </div>
-
-                            {/* Recent Check-ins Table */}
-                            <div className="mt-4">
-                              <h4 className="text-sm font-medium text-foreground mb-3">Recent Check-ins</h4>
-                              <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
-                                  <thead>
-                                    <tr className="border-b border-border">
-                                      <th className="text-left py-2 px-2 text-muted-foreground font-medium">Date</th>
-                                      <th className="text-left py-2 px-2 text-muted-foreground font-medium">Training</th>
-                                      <th className="text-left py-2 px-2 text-muted-foreground font-medium">Mood</th>
-                                      <th className="text-left py-2 px-2 text-muted-foreground font-medium">Energy</th>
-                                      <th className="text-left py-2 px-2 text-muted-foreground font-medium">Sleep</th>
-                                      <th className="text-left py-2 px-2 text-muted-foreground font-medium">Notes</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {athleteCheckins.slice(0, 7).map((c) => (
-                                      <tr key={c.id} className="border-b border-border/50">
-                                        <td className="py-2 px-2 text-foreground">{formatDate(c.checkin_date)}</td>
-                                        <td className="py-2 px-2">
-                                          {c.training_completed ? (
-                                            <span className="text-green-600">{c.training_type || 'Yes'}</span>
-                                          ) : (
-                                            <span className="text-muted-foreground">Rest</span>
-                                          )}
-                                        </td>
-                                        <td className="py-2 px-2">
-                                          <div className="flex items-center gap-1">
-                                            <div className={`w-2 h-2 rounded-full ${getMoodColor(c.mood)}`} />
-                                            <span className="text-foreground">{c.mood || '—'}</span>
-                                          </div>
-                                        </td>
-                                        <td className="py-2 px-2 text-foreground">{c.energy_level || '—'}</td>
-                                        <td className="py-2 px-2 text-foreground">{c.sleep_hours ? `${c.sleep_hours}h` : '—'}</td>
-                                        <td className="py-2 px-2 text-muted-foreground truncate max-w-[150px]">
-                                          {c.notes || '—'}
-                                        </td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </div>
-                    );
-                  })}
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
               </TabsContent>
 
               <TabsContent value="schedules">
