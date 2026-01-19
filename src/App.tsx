@@ -69,7 +69,8 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { FloatingChatWidget } from "@/components/FloatingChatWidget";
 import DeviceMetrics from "./pages/DeviceMetrics";
 import SharedMetricsView from "./pages/SharedMetricsView";
-
+import Trial from "./pages/Trial";
+import VelocityBaseline from "./pages/VelocityBaseline";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -146,7 +147,10 @@ const App = () => (
             <Route path="/faq" element={<FAQ />} />
             <Route path="/device-metrics" element={<DeviceMetrics />} />
             <Route path="/shared-metrics/:token" element={<SharedMetricsView />} />
+            <Route path="/trial" element={<Trial />} />
+            <Route path="/velocity-baseline" element={<VelocityBaseline />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <CookieConsent />
