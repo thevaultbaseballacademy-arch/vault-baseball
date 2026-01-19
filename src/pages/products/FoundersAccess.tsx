@@ -34,9 +34,24 @@ const FoundersAccess = () => {
     seconds: 0,
   });
 
-  // Calculate countdown end date (30 days from component mount for demo)
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 30);
+  // Calculate countdown end date - next Wednesday at 11:59:59 PM (EOD)
+  const getNextWednesdayEOD = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 3 = Wednesday
+    const daysUntilWednesday = (3 - dayOfWeek + 7) % 7;
+    // If today is Wednesday, set to this Wednesday EOD if before midnight, otherwise next Wednesday
+    const targetDate = new Date(now);
+    targetDate.setDate(now.getDate() + (daysUntilWednesday === 0 ? 0 : daysUntilWednesday));
+    targetDate.setHours(23, 59, 59, 999);
+    
+    // If we're past this Wednesday's EOD, go to next Wednesday
+    if (targetDate <= now) {
+      targetDate.setDate(targetDate.getDate() + 7);
+    }
+    return targetDate;
+  };
+  
+  const endDate = getNextWednesdayEOD();
 
   // Fetch recent founders
   const fetchRecentFounders = async () => {
