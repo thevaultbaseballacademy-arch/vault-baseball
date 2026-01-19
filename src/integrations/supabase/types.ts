@@ -2029,6 +2029,120 @@ export type Database = {
       }
     }
     Views: {
+      device_integrations_safe: {
+        Row: {
+          created_at: string | null
+          device_type: Database["public"]["Enums"]["device_type"] | null
+          id: string | null
+          is_connected: boolean | null
+          last_sync_at: string | null
+          token_expires_at: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          device_type?: Database["public"]["Enums"]["device_type"] | null
+          id?: string | null
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          device_type?: Database["public"]["Enums"]["device_type"] | null
+          id?: string | null
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles_public: {
+        Row: {
+          avatar_url: string | null
+          batting_side: string | null
+          bio: string | null
+          bio_privacy: string | null
+          contact_privacy: string | null
+          cover_url: string | null
+          created_at: string | null
+          display_name: string | null
+          email: string | null
+          graduation_year: number | null
+          height_inches: number | null
+          hudl_url: string | null
+          id: string | null
+          instagram_url: string | null
+          physical_stats_privacy: string | null
+          position: string | null
+          sixty_yard_dash: number | null
+          target_schools: string[] | null
+          throwing_arm: string | null
+          twitter_url: string | null
+          updated_at: string | null
+          user_id: string | null
+          weight_lbs: number | null
+          youtube_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          batting_side?: string | null
+          bio?: string | null
+          bio_privacy?: string | null
+          contact_privacy?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          email?: never
+          graduation_year?: number | null
+          height_inches?: number | null
+          hudl_url?: string | null
+          id?: string | null
+          instagram_url?: string | null
+          physical_stats_privacy?: string | null
+          position?: string | null
+          sixty_yard_dash?: number | null
+          target_schools?: string[] | null
+          throwing_arm?: string | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          weight_lbs?: number | null
+          youtube_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          batting_side?: string | null
+          bio?: string | null
+          bio_privacy?: string | null
+          contact_privacy?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          email?: never
+          graduation_year?: number | null
+          height_inches?: number | null
+          hudl_url?: string | null
+          id?: string | null
+          instagram_url?: string | null
+          physical_stats_privacy?: string | null
+          position?: string | null
+          sixty_yard_dash?: number | null
+          target_schools?: string[] | null
+          throwing_arm?: string | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          weight_lbs?: number | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       user_sessions_safe: {
         Row: {
           browser: string | null
@@ -2168,6 +2282,35 @@ export type Database = {
           options: Json
           question_text: string
           section: string
+        }[]
+      }
+      get_profile_safe: {
+        Args: { target_user_id: string }
+        Returns: {
+          avatar_url: string
+          batting_side: string
+          bio: string
+          bio_privacy: string
+          contact_privacy: string
+          cover_url: string
+          created_at: string
+          display_name: string
+          email: string
+          graduation_year: number
+          height_inches: number
+          hudl_url: string
+          id: string
+          instagram_url: string
+          physical_stats_privacy: string
+          position: string
+          sixty_yard_dash: number
+          target_schools: string[]
+          throwing_arm: string
+          twitter_url: string
+          updated_at: string
+          user_id: string
+          weight_lbs: number
+          youtube_url: string
         }[]
       }
       get_profile_with_privacy: {
