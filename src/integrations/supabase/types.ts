@@ -2092,54 +2092,54 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           batting_side?: string | null
-          bio?: string | null
-          bio_privacy?: string | null
-          contact_privacy?: string | null
+          bio?: never
+          bio_privacy?: never
+          contact_privacy?: never
           cover_url?: string | null
           created_at?: string | null
           display_name?: string | null
           email?: never
           graduation_year?: number | null
-          height_inches?: number | null
-          hudl_url?: string | null
+          height_inches?: never
+          hudl_url?: never
           id?: string | null
-          instagram_url?: string | null
-          physical_stats_privacy?: string | null
+          instagram_url?: never
+          physical_stats_privacy?: never
           position?: string | null
-          sixty_yard_dash?: number | null
-          target_schools?: string[] | null
+          sixty_yard_dash?: never
+          target_schools?: never
           throwing_arm?: string | null
-          twitter_url?: string | null
+          twitter_url?: never
           updated_at?: string | null
           user_id?: string | null
-          weight_lbs?: number | null
-          youtube_url?: string | null
+          weight_lbs?: never
+          youtube_url?: never
         }
         Update: {
           avatar_url?: string | null
           batting_side?: string | null
-          bio?: string | null
-          bio_privacy?: string | null
-          contact_privacy?: string | null
+          bio?: never
+          bio_privacy?: never
+          contact_privacy?: never
           cover_url?: string | null
           created_at?: string | null
           display_name?: string | null
           email?: never
           graduation_year?: number | null
-          height_inches?: number | null
-          hudl_url?: string | null
+          height_inches?: never
+          hudl_url?: never
           id?: string | null
-          instagram_url?: string | null
-          physical_stats_privacy?: string | null
+          instagram_url?: never
+          physical_stats_privacy?: never
           position?: string | null
-          sixty_yard_dash?: number | null
-          target_schools?: string[] | null
+          sixty_yard_dash?: never
+          target_schools?: never
           throwing_arm?: string | null
-          twitter_url?: string | null
+          twitter_url?: never
           updated_at?: string | null
           user_id?: string | null
-          weight_lbs?: number | null
-          youtube_url?: string | null
+          weight_lbs?: never
+          youtube_url?: never
         }
         Relationships: []
       }
