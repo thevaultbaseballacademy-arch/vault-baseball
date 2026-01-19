@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
+import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Account from "./pages/Account";
@@ -71,6 +73,8 @@ import DeviceMetrics from "./pages/DeviceMetrics";
 import SharedMetricsView from "./pages/SharedMetricsView";
 import Trial from "./pages/Trial";
 import VelocityBaseline from "./pages/VelocityBaseline";
+import TrialExpired from "./pages/TrialExpired";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -80,14 +84,27 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          {/* Site-wide Founder's Pricing Urgency Banner */}
+          <FoundersPricingBanner />
+          
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/account" element={<Account />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/checkin" element={<Checkin />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/vault" element={<VaultDashboard />} />
+            
+            {/* Protected app routes with trial check */}
+            <Route path="/dashboard" element={
+              <TrialProtectedRoute>
+                <Dashboard />
+              </TrialProtectedRoute>
+            } />
+            <Route path="/vault" element={
+              <TrialProtectedRoute>
+                <VaultDashboard />
+              </TrialProtectedRoute>
+            } />
             <Route path="/coach" element={<CoachDashboard />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/certification-analytics" element={<CertificationAnalytics />} />
@@ -95,16 +112,36 @@ const App = () => (
             <Route path="/admin/exams" element={<AdminExams />} />
             <Route path="/admin/certifications" element={<AdminCertifications />} />
             <Route path="/admin/payouts" element={<AdminPayouts />} />
-            <Route path="/community" element={<Community />} />
+            <Route path="/community" element={
+              <TrialProtectedRoute>
+                <Community />
+              </TrialProtectedRoute>
+            } />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/courses" element={<Courses />} />
-            <Route path="/course/:courseId" element={<CourseDetail />} />
-            <Route path="/my-programs" element={<MyPrograms />} />
+            <Route path="/course/:courseId" element={
+              <TrialProtectedRoute>
+                <CourseDetail />
+              </TrialProtectedRoute>
+            } />
+            <Route path="/my-programs" element={
+              <TrialProtectedRoute>
+                <MyPrograms />
+              </TrialProtectedRoute>
+            } />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/pathway/youth" element={<YouthPathway />} />
             <Route path="/pathway/academy" element={<AcademyPathway />} />
-            <Route path="/longevity" element={<LongevityDashboard />} />
-            <Route path="/calendar" element={<WeeklyCalendar />} />
+            <Route path="/longevity" element={
+              <TrialProtectedRoute>
+                <LongevityDashboard />
+              </TrialProtectedRoute>
+            } />
+            <Route path="/calendar" element={
+              <TrialProtectedRoute>
+                <WeeklyCalendar />
+              </TrialProtectedRoute>
+            } />
             <Route path="/certifications" element={<Certifications />} />
             <Route path="/certifications/exam/:certType" element={<CertificationExam />} />
             <Route path="/certifications/leaderboard" element={<CertificationLeaderboard />} />
@@ -145,12 +182,23 @@ const App = () => (
             <Route path="/cookie-settings" element={<CookieSettings />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
-            <Route path="/device-metrics" element={<DeviceMetrics />} />
+            <Route path="/device-metrics" element={
+              <TrialProtectedRoute allowTrialAccess>
+                <DeviceMetrics />
+              </TrialProtectedRoute>
+            } />
             <Route path="/shared-metrics/:token" element={<SharedMetricsView />} />
+            
+            {/* Trial System Routes */}
             <Route path="/trial" element={<Trial />} />
-            <Route path="/velocity-baseline" element={<VelocityBaseline />} />
+            <Route path="/velocity-baseline" element={
+              <TrialProtectedRoute allowTrialAccess>
+                <VelocityBaseline />
+              </TrialProtectedRoute>
+            } />
+            <Route path="/trial-expired" element={<TrialExpired />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <CookieConsent />

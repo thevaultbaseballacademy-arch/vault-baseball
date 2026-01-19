@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   Zap, Target, TrendingUp, Clock, Activity, 
-  ArrowRight, CheckCircle2, AlertCircle, Calendar 
+  ArrowRight, CheckCircle2, AlertCircle, Calendar,
+  Upload, Video, ChevronRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { format, differenceInDays, differenceInHours } from "date-fns";
+import { useProductCheckout } from "@/hooks/useProductCheckout";
 
 interface TrialData {
   id: string;
@@ -29,6 +31,7 @@ const VelocityBaseline = () => {
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { checkout, loading: checkoutLoading } = useProductCheckout();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -78,6 +81,10 @@ const VelocityBaseline = () => {
     };
   };
 
+  const handleUpgrade = () => {
+    checkout('founders_access', `${window.location.origin}/payment-success`, `${window.location.origin}/velocity-baseline`);
+  };
+
   const timeRemaining = getTrialTimeRemaining();
 
   const baselineMetrics = [
@@ -88,12 +95,12 @@ const VelocityBaseline = () => {
   ];
 
   const checklistItems = [
-    { id: 1, text: "Complete profile setup", done: false },
-    { id: 2, text: "Connect your training device", done: false },
-    { id: 3, text: "Record 10+ fastball throws", done: false },
-    { id: 4, text: "Record 5+ changeup throws", done: false },
-    { id: 5, text: "Record 5+ breaking ball throws", done: false },
-    { id: 6, text: "Complete baseline assessment", done: false },
+    { id: 1, text: "Complete profile setup", done: false, action: () => navigate('/account') },
+    { id: 2, text: "Connect your training device", done: false, action: () => navigate('/device-metrics') },
+    { id: 3, text: "Record 10+ fastball throws", done: false, action: () => navigate('/device-metrics') },
+    { id: 4, text: "Record 5+ changeup throws", done: false, action: () => navigate('/device-metrics') },
+    { id: 5, text: "Record 5+ breaking ball throws", done: false, action: () => navigate('/device-metrics') },
+    { id: 6, text: "Complete baseline assessment", done: false, action: () => {} },
   ];
 
   const completedCount = checklistItems.filter(item => item.done).length;
@@ -118,16 +125,28 @@ const VelocityBaseline = () => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 p-4 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-xl border border-primary/20 flex items-center justify-between"
+              className="mb-8 p-4 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-xl border border-primary/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
             >
               <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-primary" />
-                <span className="text-foreground font-medium">
-                  Free Trial: <span className="text-primary">{timeRemaining.text}</span>
-                </span>
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-foreground font-medium">
+                    Free Trial: <span className="text-primary font-bold">{timeRemaining.text}</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Complete your baseline before your trial ends
+                  </p>
+                </div>
               </div>
-              <Button variant="vault" size="sm">
-                Upgrade to Full Access
+              <Button 
+                variant="vault" 
+                size="sm"
+                onClick={handleUpgrade}
+                disabled={checkoutLoading === 'founders_access'}
+              >
+                {checkoutLoading === 'founders_access' ? "Processing..." : "Upgrade to Full Access — $499"}
               </Button>
             </motion.div>
           )}
@@ -188,7 +207,12 @@ const VelocityBaseline = () => {
                             {item.text}
                           </span>
                           {!item.done && (
-                            <Button variant="ghost" size="sm" className="ml-auto">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="ml-auto"
+                              onClick={item.action}
+                            >
                               Start <ArrowRight className="w-4 h-4 ml-1" />
                             </Button>
                           )}
@@ -236,6 +260,32 @@ const VelocityBaseline = () => {
                   </CardContent>
                 </Card>
               </motion.div>
+
+              {/* Video Upload Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+              >
+                <Card className="border-primary/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Video className="w-5 h-5 text-primary" />
+                      Upload Your Pitching Videos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">
+                      Upload videos of your pitching sessions to get AI-powered analysis and track your mechanics.
+                    </p>
+                    <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                      <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-foreground font-medium mb-1">Drop videos here or click to upload</p>
+                      <p className="text-sm text-muted-foreground">MP4, MOV up to 500MB</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
 
             {/* Sidebar */}
@@ -251,11 +301,19 @@ const VelocityBaseline = () => {
                     <CardTitle className="text-lg">Quick Actions</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <Button variant="vault" className="w-full justify-start">
+                    <Button 
+                      variant="vault" 
+                      className="w-full justify-start"
+                      onClick={() => navigate('/device-metrics')}
+                    >
                       <Target className="w-4 h-4 mr-2" />
                       Connect Device
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => navigate('/device-metrics')}
+                    >
                       <Activity className="w-4 h-4 mr-2" />
                       Manual Entry
                     </Button>
@@ -302,6 +360,42 @@ const VelocityBaseline = () => {
                   </Card>
                 </motion.div>
               )}
+
+              {/* Upgrade CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-card border-primary/30">
+                  <CardContent className="p-6">
+                    <h3 className="font-display text-lg text-foreground mb-2">
+                      UNLOCK FULL VAULT™ OS
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Get lifetime access to all training systems, unlimited tracking, and personalized coaching.
+                    </p>
+                    <Button 
+                      variant="vault" 
+                      className="w-full"
+                      onClick={handleUpgrade}
+                      disabled={checkoutLoading === 'founders_access'}
+                    >
+                      {checkoutLoading === 'founders_access' ? (
+                        "Processing..."
+                      ) : (
+                        <>
+                          Upgrade — $499 Founder's Price
+                          <ChevronRight className="w-4 h-4 ml-1" />
+                        </>
+                      )}
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground mt-3">
+                      Limited time • Lifetime access
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
           </div>
         </div>
