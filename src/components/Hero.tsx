@@ -184,8 +184,8 @@ const Hero = () => {
         >
           <div className="inline-block p-6 border border-utility/30 bg-[#181818]/80 backdrop-blur-sm mb-8">
             <p className="text-xs uppercase tracking-[0.2em] text-utility mb-2">Founder's Window</p>
-            <p className="text-lg md:text-xl font-display text-[#F5F5F5] tracking-wide">
-              Lifetime Access for Founding Members until Monday.
+          <p className="text-lg md:text-xl font-display text-[#F5F5F5] tracking-wide">
+              Lifetime Access for Founding Members until Wednesday EOD.
             </p>
             <p className="text-sm text-[#B9B9B9] mt-2 font-body">
               Join the first generation of VAULT™ OS—founders get lifetime suite access.
