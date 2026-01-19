@@ -2190,10 +2190,9 @@ export type Database = {
       }
     }
     Functions: {
-      anonymize_old_audit_ips: {
-        Args: { days_threshold?: number }
-        Returns: number
-      }
+      anonymize_old_audit_ips:
+        | { Args: never; Returns: number }
+        | { Args: { days_threshold?: number }; Returns: number }
       can_create_activity: {
         Args: { target_user_id: string }
         Returns: boolean
@@ -2202,10 +2201,23 @@ export type Database = {
         Args: { _profile_user_id: string; _viewer_id: string }
         Returns: boolean
       }
-      check_exam_answer: {
-        Args: { question_id: string; selected_answer: number }
-        Returns: boolean
-      }
+      check_exam_answer:
+        | {
+            Args: {
+              p_attempt_id: string
+              p_question_id: string
+              p_selected_answer: number
+            }
+            Returns: {
+              correct_answer: number
+              explanation: string
+              is_correct: boolean
+            }[]
+          }
+        | {
+            Args: { question_id: string; selected_answer: number }
+            Returns: boolean
+          }
       generate_certificate_number: { Args: never; Returns: string }
       get_assigned_athlete_profiles: {
         Args: { coach_id: string }
@@ -2272,11 +2284,10 @@ export type Database = {
       }
       get_exam_questions: {
         Args: {
-          cert_type: Database["public"]["Enums"]["certification_type"]
-          question_limit?: number
+          p_certification_type: Database["public"]["Enums"]["certification_type"]
+          p_limit?: number
         }
         Returns: {
-          display_order: number
           id: string
           is_scenario: boolean
           options: Json
@@ -2396,10 +2407,9 @@ export type Database = {
         }[]
       }
       obfuscate_ip: { Args: { ip_address: string }; Returns: string }
-      purge_old_audit_logs: {
-        Args: { retention_days?: number }
-        Returns: number
-      }
+      purge_old_audit_logs:
+        | { Args: never; Returns: number }
+        | { Args: { retention_days?: number }; Returns: number }
       purge_old_user_sessions: {
         Args: { retention_days?: number }
         Returns: number
