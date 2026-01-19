@@ -1955,6 +1955,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_trials: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          started_at: string
+          status: string
+          trial_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          started_at?: string
+          status?: string
+          trial_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          started_at?: string
+          status?: string
+          trial_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       weekly_tips: {
         Row: {
           category: string
