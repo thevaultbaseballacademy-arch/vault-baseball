@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Shield, Mail, Lock, User, Loader2, Eye, EyeOff, Zap, Target, TrendingUp, Clock } from "lucide-react";
+import { Shield, Mail, Lock, User, Loader2, Eye, EyeOff, Zap, Target, TrendingUp, Clock, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import LegalAgreements from "@/components/auth/LegalAgreements";
+
+const VAULT_TRIAL_PRICE_ID = 'price_1SrNRkPhXS410TO5vvzFSpNX';
 
 const trialSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -99,12 +101,41 @@ const Trial = () => {
           // Continue anyway - user is created
         }
         
-        toast({
-          title: "Welcome to VAULT!",
-          description: "Your 7-day trial has started. Let's establish your velocity baseline!",
-        });
+        // Redirect to Stripe checkout for the trial subscription
+        const { data: { session } } = await supabase.auth.getSession();
         
-        navigate("/velocity-baseline", { replace: true });
+        if (session) {
+          const { data, error } = await supabase.functions.invoke('create-checkout', {
+            body: { priceId: VAULT_TRIAL_PRICE_ID },
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          });
+          
+          if (error) throw error;
+          
+          if (data?.url) {
+            // Open Stripe checkout in new tab
+            window.open(data.url, '_blank');
+            
+            toast({
+              title: "Account Created!",
+              description: "Complete your subscription in the new tab to start your 7-day trial.",
+            });
+            
+            // Navigate to velocity baseline after a moment
+            setTimeout(() => {
+              navigate("/velocity-baseline", { replace: true });
+            }, 1000);
+          }
+        } else {
+          // Fallback: redirect to velocity baseline if no session
+          toast({
+            title: "Welcome to VAULT!",
+            description: "Your account has been created. Please sign in to continue.",
+          });
+          navigate("/auth", { replace: true });
+        }
       }
     } catch (error: any) {
       let message = error.message || "An error occurred";
@@ -166,9 +197,15 @@ const Trial = () => {
           </div>
           
           <div className="mt-12 p-6 bg-card/50 rounded-xl border border-border/50">
-            <p className="text-sm text-muted-foreground">
-              <span className="text-primary font-semibold">No credit card required.</span> Start your trial instantly and see results within your first session.
-            </p>
+            <div className="flex items-start gap-3">
+              <CreditCard className="w-5 h-5 text-primary mt-0.5" />
+              <div>
+                <p className="font-semibold text-foreground mb-1">$499/month after trial</p>
+                <p className="text-sm text-muted-foreground">
+                  Try free for 7 days. Cancel anytime before the trial ends and you won't be charged.
+                </p>
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -206,6 +243,7 @@ const Trial = () => {
             </div>
             <h2 className="font-display text-2xl text-foreground mb-2">VELOCITY BASELINE</h2>
             <p className="text-muted-foreground text-sm">Discover your true pitching potential</p>
+            <p className="text-primary font-semibold text-sm mt-2">$499/month after trial</p>
           </div>
 
           {/* Trial Signup Card */}
@@ -215,7 +253,7 @@ const Trial = () => {
                 START YOUR FREE TRIAL
               </h1>
               <p className="text-muted-foreground">
-                No credit card required • Cancel anytime
+                7 days free • Then $499/month • Cancel anytime
               </p>
             </div>
 
@@ -294,7 +332,7 @@ const Trial = () => {
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Creating Your Trial...
+                    Creating Your Account...
                   </>
                 ) : (
                   <>

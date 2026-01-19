@@ -15,6 +15,12 @@ const VALID_SUBSCRIPTION_PRICE_IDS = [
   'price_1SqEGEPhXS410TO5DeHOuqVH', // small_org_license
   'price_1SqEGIPhXS410TO5JUNSsTCq', // org_quick_start
   'price_1SqEGOPhXS410TO5XtSbPx0v', // certified_coach
+  'price_1SrNRkPhXS410TO5vvzFSpNX', // vault_trial - 7-day trial then $499/month
+];
+
+// Price IDs that should have a 7-day trial period
+const TRIAL_PRICE_IDS = [
+  'price_1SrNRkPhXS410TO5vvzFSpNX', // vault_trial
 ];
 
 const logStep = (step: string, details?: any) => {
@@ -71,6 +77,10 @@ serve(async (req) => {
     }
 
     const origin = req.headers.get("origin") || "http://localhost:3000";
+    
+    // Check if this price should have a trial period
+    const hasTrial = TRIAL_PRICE_IDS.includes(priceId);
+    
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -81,8 +91,15 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/?subscription=success`,
-      cancel_url: `${origin}/?subscription=canceled`,
+      subscription_data: hasTrial ? {
+        trial_period_days: 7,
+      } : undefined,
+      success_url: hasTrial 
+        ? `${origin}/velocity-baseline?subscription=success` 
+        : `${origin}/?subscription=success`,
+      cancel_url: hasTrial 
+        ? `${origin}/trial?subscription=canceled`
+        : `${origin}/?subscription=canceled`,
     });
 
     logStep("Checkout session created", { sessionId: session.id });
