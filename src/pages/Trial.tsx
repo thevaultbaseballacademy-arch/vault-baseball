@@ -176,7 +176,7 @@ const Trial = () => {
             VELOCITY BASELINE
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-md">
-            Discover your true pitching potential. Our AI-powered analysis establishes your baseline and creates a personalized development path.
+            Discover your true Baseball Performance & Velocity potential. Our AI-powered analysis establishes your baseline and creates a personalized development path.
           </p>
           
           <div className="space-y-6">
@@ -200,12 +200,19 @@ const Trial = () => {
             <div className="flex items-start gap-3">
               <CreditCard className="w-5 h-5 text-primary mt-0.5" />
               <div>
-                <p className="font-semibold text-foreground mb-1">$499/month after trial</p>
+                <p className="font-semibold text-foreground mb-1">$499 for Lifetime Founder's Access</p>
                 <p className="text-sm text-muted-foreground">
-                  Try free for 7 days. Cancel anytime before the trial ends and you won't be charged.
+                  7 Days Free • Then one-time payment for lifetime access (Limited Window)
                 </p>
               </div>
             </div>
+          </div>
+          
+          <div className="mt-8 p-4 border-l-4 border-primary bg-primary/5 rounded-r-lg">
+            <p className="text-muted-foreground italic text-sm">
+              "If it doesn't transfer to the game, it doesn't matter."
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-1">— VAULT™ Core Philosophy</p>
           </div>
         </motion.div>
       </div>
@@ -242,8 +249,8 @@ const Trial = () => {
               <span className="text-primary font-semibold text-sm">7-DAY FREE TRIAL</span>
             </div>
             <h2 className="font-display text-2xl text-foreground mb-2">VELOCITY BASELINE</h2>
-            <p className="text-muted-foreground text-sm">Discover your true pitching potential</p>
-            <p className="text-primary font-semibold text-sm mt-2">$499/month after trial</p>
+            <p className="text-muted-foreground text-sm">Discover your Baseball Performance & Velocity potential</p>
+            <p className="text-primary font-semibold text-sm mt-2">$499 Lifetime Founder's Access</p>
           </div>
 
           {/* Trial Signup Card */}
@@ -253,7 +260,7 @@ const Trial = () => {
                 START YOUR FREE TRIAL
               </h1>
               <p className="text-muted-foreground">
-                7 days free • Then $499/month • Cancel anytime
+                7 Days Free • Then $499 for Lifetime Founder's Access (Limited Window)
               </p>
             </div>
 
