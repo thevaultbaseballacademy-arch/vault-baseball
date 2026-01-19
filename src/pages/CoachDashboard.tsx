@@ -125,8 +125,9 @@ const CoachDashboard = () => {
 
   const fetchAthletes = async () => {
     try {
+      // Use profiles_public view to respect email privacy - coaches don't need emails
       const { data, error } = await supabase
-        .from('profiles')
+        .from('profiles_public')
         .select('user_id, email, display_name')
         .order('display_name');
 

@@ -8,13 +8,21 @@ export function useDeviceIntegrations(userId?: string) {
     queryKey: ['device-integrations', userId],
     queryFn: async () => {
       if (!userId) return [];
+      // Use the safe view that excludes sensitive credentials (api_key, api_secret, tokens)
       const { data, error } = await supabase
-        .from('device_integrations')
+        .from('device_integrations_safe')
         .select('*')
         .eq('user_id', userId);
       
       if (error) throw error;
-      return data as DeviceIntegration[];
+      // Map to DeviceIntegration type (credentials will be undefined)
+      return (data as Array<Omit<DeviceIntegration, 'api_key' | 'api_secret' | 'access_token' | 'refresh_token'>>).map(d => ({
+        ...d,
+        api_key: undefined,
+        api_secret: undefined,
+        access_token: undefined,
+        refresh_token: undefined
+      })) as DeviceIntegration[];
     },
     enabled: !!userId
   });

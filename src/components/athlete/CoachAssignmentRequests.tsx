@@ -44,10 +44,10 @@ export const CoachAssignmentRequests = ({ userId }: { userId: string }) => {
         return;
       }
 
-      // Fetch coach profiles
+      // Fetch coach profiles - use profiles_public view to respect email privacy
       const coachIds = assignments.map(a => a.coach_user_id);
       const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
+        .from('profiles_public')
         .select('user_id, display_name, email')
         .in('user_id', coachIds);
 
