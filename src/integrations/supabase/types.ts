@@ -2212,6 +2212,8 @@ export type Database = {
             Args: { question_id: string; selected_answer: number }
             Returns: boolean
           }
+      decrypt_credential: { Args: { ciphertext: string }; Returns: string }
+      encrypt_credential: { Args: { plaintext: string }; Returns: string }
       generate_certificate_number: { Args: never; Returns: string }
       get_assigned_athlete_profiles: {
         Args: { coach_id: string }
@@ -2275,6 +2277,16 @@ export type Database = {
       get_coach_user_id_by_name: {
         Args: { _coach_name: string }
         Returns: string
+      }
+      get_device_credentials_secure: {
+        Args: { p_device_type: string; p_user_id: string }
+        Returns: {
+          access_token: string
+          api_key: string
+          api_secret: string
+          refresh_token: string
+          token_expires_at: string
+        }[]
       }
       get_exam_questions: {
         Args: {

@@ -58,7 +58,18 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
-// Sanitize CSS color values to prevent injection attacks
+/**
+ * SECURITY: Sanitize CSS color values to prevent CSS injection attacks.
+ * This function is critical for preventing XSS through dangerouslySetInnerHTML.
+ * 
+ * Allowed patterns:
+ * - Hex colors: #RGB, #RGBA, #RRGGBB, #RRGGBBAA
+ * - Safe keywords: transparent, currentColor
+ * - Design tokens: hsl(var(--token-name)) with optional opacity
+ * 
+ * Any modifications must be reviewed for security implications.
+ * @see https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+ */
 const sanitizeColor = (color: string | undefined): string | null => {
   if (!color) return null;
 
@@ -89,7 +100,10 @@ const sanitizeColorFromUnknown = (value: unknown): string | null => {
   return typeof value === "string" ? sanitizeColor(value) : null;
 };
 
-// Sanitize ID to prevent CSS selector injection
+/**
+ * SECURITY: Sanitize ID to prevent CSS selector injection.
+ * Only allows alphanumeric characters, hyphens, and underscores.
+ */
 const sanitizeId = (id: string): string => {
   return id.replace(/[^a-zA-Z0-9-_]/g, '');
 };
