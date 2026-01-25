@@ -74,6 +74,7 @@ import SharedMetricsView from "./pages/SharedMetricsView";
 import Trial from "./pages/Trial";
 import VelocityBaseline from "./pages/VelocityBaseline";
 import TrialExpired from "./pages/TrialExpired";
+import WhitePaper from "./pages/WhitePaper";
 
 const queryClient = new QueryClient();
 
@@ -197,6 +198,7 @@ const App = () => (
               </TrialProtectedRoute>
             } />
             <Route path="/trial-expired" element={<TrialExpired />} />
+            <Route path="/white-paper" element={<WhitePaper />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

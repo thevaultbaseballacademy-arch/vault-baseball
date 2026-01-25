@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import VaultPillars from "@/components/VaultPillars";
 import Courses from "@/components/Courses";
+import OrgDashboard from "@/components/OrgDashboard";
 import Testimonials from "@/components/Testimonials";
 import Pricing from "@/components/Pricing";
 import Footer from "@/components/Footer";
@@ -13,6 +14,7 @@ const Index = () => {
       <Hero />
       <VaultPillars />
       <Courses />
+      <OrgDashboard />
       <Testimonials />
       <Pricing />
       <Footer />
