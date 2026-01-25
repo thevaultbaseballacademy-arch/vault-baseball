@@ -106,30 +106,22 @@ export const useSessionManagement = () => {
       const { browser, os } = parseUserAgent(userAgent);
       const token = generateSessionToken(session.access_token);
 
-      // Check if session already exists
-      const { data: existing } = await supabase
-        .from("user_sessions")
-        .select("id")
-        .eq("session_token", token)
-        .maybeSingle();
-
-      if (existing) {
-        // Update last active
-        await supabase
-          .from("user_sessions")
-          .update({ last_active_at: new Date().toISOString() })
-          .eq("id", existing.id);
-      } else {
-        // Insert new session
-        await supabase.from("user_sessions").insert({
+      // SECURITY: Avoid reading the full sessions table; use an upsert keyed by session_token.
+      // This records activity without requiring a prior SELECT.
+      const { error } = await supabase.from("user_sessions").upsert(
+        {
           user_id: session.user.id,
           session_token: token,
           user_agent: userAgent,
           browser,
           os,
           device_info: `${browser} on ${os}`,
-        });
-      }
+          last_active_at: new Date().toISOString(),
+        },
+        { onConflict: "session_token" },
+      );
+
+      if (error) throw error;
     } catch (error) {
       console.error("Error recording session:", error);
     }

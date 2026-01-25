@@ -1916,10 +1916,8 @@ export type Database = {
           created_at: string
           device_info: string | null
           id: string
-          ip_address: string | null
           is_current: boolean | null
           last_active_at: string
-          location: string | null
           os: string | null
           session_token: string
           user_agent: string | null
@@ -1930,10 +1928,8 @@ export type Database = {
           created_at?: string
           device_info?: string | null
           id?: string
-          ip_address?: string | null
           is_current?: boolean | null
           last_active_at?: string
-          location?: string | null
           os?: string | null
           session_token: string
           user_agent?: string | null
@@ -1944,10 +1940,8 @@ export type Database = {
           created_at?: string
           device_info?: string | null
           id?: string
-          ip_address?: string | null
           is_current?: boolean | null
           last_active_at?: string
-          location?: string | null
           os?: string | null
           session_token?: string
           user_agent?: string | null
@@ -2160,7 +2154,7 @@ export type Database = {
           ip_address_masked?: never
           is_current?: boolean | null
           last_active_at?: string | null
-          location?: string | null
+          location?: never
           os?: string | null
           session_token?: string | null
           user_agent?: string | null
@@ -2174,7 +2168,7 @@ export type Database = {
           ip_address_masked?: never
           is_current?: boolean | null
           last_active_at?: string | null
-          location?: string | null
+          location?: never
           os?: string | null
           session_token?: string | null
           user_agent?: string | null

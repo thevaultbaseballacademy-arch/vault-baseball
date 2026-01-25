@@ -82,19 +82,17 @@ export function useAddDeviceIntegration() {
       deviceType: DeviceType; 
       apiKey?: string 
     }) => {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('device_integrations')
         .upsert({
           user_id: userId,
           device_type: deviceType,
           api_key: apiKey,
           is_connected: !!apiKey
-        }, { onConflict: 'user_id,device_type' })
-        .select()
-        .single();
+        }, { onConflict: 'user_id,device_type' });
       
       if (error) throw error;
-      return data;
+      return { ok: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['device-integrations'] });
