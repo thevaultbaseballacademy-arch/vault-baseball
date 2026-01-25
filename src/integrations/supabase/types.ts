@@ -2076,7 +2076,6 @@ export type Database = {
           graduation_year: number | null
           height_inches: number | null
           hudl_url: string | null
-          id: string | null
           instagram_url: string | null
           physical_stats_privacy: string | null
           position: string | null
@@ -2093,8 +2092,8 @@ export type Database = {
           avatar_url?: string | null
           batting_side?: string | null
           bio?: never
-          bio_privacy?: never
-          contact_privacy?: never
+          bio_privacy?: string | null
+          contact_privacy?: string | null
           cover_url?: string | null
           created_at?: string | null
           display_name?: string | null
@@ -2102,12 +2101,11 @@ export type Database = {
           graduation_year?: number | null
           height_inches?: never
           hudl_url?: never
-          id?: string | null
           instagram_url?: never
-          physical_stats_privacy?: never
+          physical_stats_privacy?: string | null
           position?: string | null
           sixty_yard_dash?: never
-          target_schools?: never
+          target_schools?: string[] | null
           throwing_arm?: string | null
           twitter_url?: never
           updated_at?: string | null
@@ -2119,8 +2117,8 @@ export type Database = {
           avatar_url?: string | null
           batting_side?: string | null
           bio?: never
-          bio_privacy?: never
-          contact_privacy?: never
+          bio_privacy?: string | null
+          contact_privacy?: string | null
           cover_url?: string | null
           created_at?: string | null
           display_name?: string | null
@@ -2128,12 +2126,11 @@ export type Database = {
           graduation_year?: number | null
           height_inches?: never
           hudl_url?: never
-          id?: string | null
           instagram_url?: never
-          physical_stats_privacy?: never
+          physical_stats_privacy?: string | null
           position?: string | null
           sixty_yard_dash?: never
-          target_schools?: never
+          target_schools?: string[] | null
           throwing_arm?: string | null
           twitter_url?: never
           updated_at?: string | null

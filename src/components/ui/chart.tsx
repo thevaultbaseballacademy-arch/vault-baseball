@@ -61,9 +61,32 @@ ChartContainer.displayName = "Chart";
 // Sanitize CSS color values to prevent injection attacks
 const sanitizeColor = (color: string | undefined): string | null => {
   if (!color) return null;
-  // Only allow valid CSS color formats: hex, rgb, hsl, or named colors
-  const validColorRegex = /^(#[0-9A-Fa-f]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\)|[a-z]+)$/i;
-  return validColorRegex.test(color.trim()) ? color.trim() : null;
+
+  const trimmed = color.trim();
+
+  // Allow hex colors (#RGB/#RGBA/#RRGGBB/#RRGGBBAA)
+  if (/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  // Allow safe keywords
+  if (/^(transparent|currentColor)$/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  // Allow design-system tokens like: hsl(var(--primary)) or hsl(var(--primary) / 0.8)
+  // NOTE: We intentionally do NOT allow arbitrary rgb()/hsl() strings to avoid CSS injection.
+  const hslVarRegex =
+    /^hsl\(\s*var\(--[a-zA-Z0-9_-]+\)\s*(\/\s*(0|0?\.\d+|1(\.0+)?)\s*)?\)$/;
+  if (hslVarRegex.test(trimmed)) {
+    return trimmed;
+  }
+
+  return null;
+};
+
+const sanitizeColorFromUnknown = (value: unknown): string | null => {
+  return typeof value === "string" ? sanitizeColor(value) : null;
 };
 
 // Sanitize ID to prevent CSS selector injection
@@ -86,7 +109,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
         __html: Object.entries(THEMES)
           .map(
             ([theme, prefix]) => `
-${prefix} [data-chart=${sanitizedId}] {
+${prefix} [data-chart="${sanitizedId}"] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const rawColor = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
@@ -181,6 +204,7 @@ const ChartTooltipContent = React.forwardRef<
             const key = `${nameKey || item.name || item.dataKey || "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
             const indicatorColor = color || item.payload.fill || item.color;
+            const safeIndicatorColor = sanitizeColorFromUnknown(indicatorColor) ?? "currentColor";
 
             return (
               <div
@@ -207,8 +231,8 @@ const ChartTooltipContent = React.forwardRef<
                           })}
                           style={
                             {
-                              "--color-bg": indicatorColor,
-                              "--color-border": indicatorColor,
+                              "--color-bg": safeIndicatorColor,
+                              "--color-border": safeIndicatorColor,
                             } as React.CSSProperties
                           }
                         />
