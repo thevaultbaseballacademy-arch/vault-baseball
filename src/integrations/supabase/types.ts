@@ -2036,7 +2036,6 @@ export type Database = {
           id: string | null
           is_connected: boolean | null
           last_sync_at: string | null
-          token_expires_at: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -2046,7 +2045,6 @@ export type Database = {
           id?: string | null
           is_connected?: boolean | null
           last_sync_at?: string | null
-          token_expires_at?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -2056,7 +2054,6 @@ export type Database = {
           id?: string | null
           is_connected?: boolean | null
           last_sync_at?: string | null
-          token_expires_at?: string | null
           updated_at?: string | null
           user_id?: string | null
         }

@@ -38,6 +38,7 @@ interface HighlightVideo {
   duration_seconds: number | null;
   privacy_level: PrivacyLevel;
   created_at: string;
+  signedUrl?: string;
 }
 
 interface HighlightVideosProps {
@@ -50,6 +51,17 @@ const privacyOptions: { value: PrivacyLevel; label: string; icon: React.ReactNod
   { value: 'coaches_only', label: 'Coaches Only', icon: <Users className="w-4 h-4" />, description: 'Only your assigned coaches' },
   { value: 'private', label: 'Private', icon: <Lock className="w-4 h-4" />, description: 'Only you can view' },
 ];
+
+/**
+ * Helper: extract the storage path from a video_url that was created using getPublicUrl.
+ * Example URL: https://<project>.supabase.co/storage/v1/object/public/highlight-videos/<user_id>/<file>
+ */
+const extractStoragePath = (publicUrl: string): string | null => {
+  const bucketMarker = "/highlight-videos/";
+  const idx = publicUrl.indexOf(bucketMarker);
+  if (idx === -1) return null;
+  return publicUrl.slice(idx + bucketMarker.length);
+};
 
 const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -72,11 +84,27 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      // Map data to include privacy_level with fallback for type safety
-      return (data || []).map(video => ({
+
+      const videosRaw = (data || []).map(video => ({
         ...video,
         privacy_level: (video as any).privacy_level || 'public'
       })) as HighlightVideo[];
+
+      // Fetch signed URLs for each video (1-hour expiry)
+      const videosWithSignedUrls: HighlightVideo[] = await Promise.all(
+        videosRaw.map(async (video) => {
+          const storagePath = extractStoragePath(video.video_url);
+          if (!storagePath) return video;
+
+          const { data: signedData } = await supabase.storage
+            .from('highlight-videos')
+            .createSignedUrl(storagePath, 3600);
+
+          return { ...video, signedUrl: signedData?.signedUrl ?? undefined };
+        })
+      );
+
+      return videosWithSignedUrls;
     }
   });
 
@@ -353,7 +381,7 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
                 >
                   <div className="aspect-video bg-black relative">
                     <video
-                      src={video.video_url}
+                      src={video.signedUrl || video.video_url}
                       className="w-full h-full object-contain"
                       controls={playingVideo === video.id}
                       poster={video.thumbnail_url || undefined}
@@ -441,7 +469,7 @@ const HighlightVideos = ({ userId, isOwnProfile }: HighlightVideosProps) => {
               <X className="w-6 h-6" />
             </Button>
             <video
-              src={videos.find(v => v.id === playingVideo)?.video_url}
+              src={videos.find(v => v.id === playingVideo)?.signedUrl || videos.find(v => v.id === playingVideo)?.video_url}
               className="w-full rounded-lg"
               controls
               autoPlay
