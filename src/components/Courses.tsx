@@ -60,19 +60,23 @@ const additionalSystems = [
     pillar: "L",
     title: "Longevity & Arm Care",
     description: "Arm care systems, workload management, and recovery protocols to keep athletes available.",
+    subtext: "Weekly updates to drill libraries, arm care protocols, and game-transfer tracking. Part of the core Vault OS.",
     icon: Heart,
     color: "from-amber-500 to-yellow-500",
     bgColor: "bg-amber-500/10",
     textColor: "text-amber-500",
+    status: "V1 PROTOCOLS ACTIVE",
   },
   {
     pillar: "T",
     title: "Transfer Training",
     description: "Practice design that ensures training adaptations appear in competition.",
+    subtext: "Weekly updates to drill libraries, arm care protocols, and game-transfer tracking. Part of the core Vault OS.",
     icon: Target,
     color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-500/10",
     textColor: "text-purple-500",
+    status: "V1 PROTOCOLS ACTIVE",
   },
 ];
 
@@ -195,19 +199,26 @@ const Courses = () => {
             return (
               <div 
                 key={system.pillar}
-                className="p-6 rounded-2xl border border-border bg-card flex items-center gap-6 hover:border-foreground/20 transition-colors"
+                className="p-6 rounded-2xl border border-border bg-card hover:border-foreground/20 transition-colors"
               >
-                <div className={`w-14 h-14 rounded-xl ${system.bgColor} flex items-center justify-center flex-shrink-0`}>
-                  <Icon className={`w-7 h-7 ${system.textColor}`} />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-lg font-display ${system.textColor}`}>{system.pillar}</span>
-                    <h3 className="font-display text-lg text-foreground">{system.title}</h3>
+                <div className="flex items-center gap-6 mb-3">
+                  <div className={`w-14 h-14 rounded-xl ${system.bgColor} flex items-center justify-center flex-shrink-0`}>
+                    <Icon className={`w-7 h-7 ${system.textColor}`} />
                   </div>
-                  <p className="text-sm text-muted-foreground">{system.description}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-lg font-display ${system.textColor}`}>{system.pillar}</span>
+                      <h3 className="font-display text-lg text-foreground">{system.title}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{system.description}</p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-green-500/20 text-xs text-green-400 font-medium whitespace-nowrap">
+                    {system.status}
+                  </span>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-secondary text-xs text-muted-foreground">Coming Soon</span>
+                <p className="text-xs text-muted-foreground/80 italic pl-20">
+                  {system.subtext}
+                </p>
               </div>
             );
           })}
