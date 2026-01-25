@@ -161,6 +161,13 @@ export const PRODUCT_PRICES = {
     price: 250000,
     type: 'payment' as const,
   },
+  performance_blueprint: {
+    price_id: 'price_1StVz1PhXS410TO5hktrpoe1',
+    product_id: 'prod_TrER8mB9wvHWZy',
+    name: 'VAULT™ Performance Blueprint',
+    price: 4700,
+    type: 'payment' as const,
+  },
   founders_access: {
     price_id: 'price_1SqNikPhXS410TO5rLuqRrBn',
     product_id: 'prod_TnziXPd0kWbybf',
