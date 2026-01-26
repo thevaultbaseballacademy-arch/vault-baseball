@@ -65,7 +65,7 @@ const additionalSystems = [
     color: "from-amber-500 to-yellow-500",
     bgColor: "bg-amber-500/10",
     textColor: "text-amber-500",
-    status: "V1 PROTOCOLS ACTIVE",
+    status: "V1 Protocols Active • Full Module Launch Q2 2026",
   },
   {
     pillar: "T",
@@ -76,7 +76,7 @@ const additionalSystems = [
     color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-500/10",
     textColor: "text-purple-500",
-    status: "V1 PROTOCOLS ACTIVE",
+    status: "V1 Protocols Active • Full Module Launch Q2 2026",
   },
 ];
 
