@@ -37,6 +37,7 @@ const plans = [
     ],
     popular: false,
     tier: "basic" as const,
+    postLaunchLabel: "Standard Pricing Post-Launch",
   },
   {
     id: 2,
@@ -55,6 +56,9 @@ const plans = [
     ],
     popular: true,
     tier: "performance" as const,
+    postLaunchLabel: "Standard Pricing Post-Launch",
+    bestValue: true,
+    lifetimeUpsell: "OR: Get Lifetime Access for $499 (Save $1,000+ over time)",
   },
   {
     id: 3,
@@ -73,6 +77,7 @@ const plans = [
     ],
     popular: false,
     tier: "elite" as const,
+    postLaunchLabel: "Standard Pricing Post-Launch",
   },
 ];
 
@@ -228,6 +233,18 @@ const Pricing = () => {
                     : "border-border"
                 } ${isCurrentPlan(plan.tier) ? "ring-2 ring-longevity" : ""}`}
               >
+                {/* Launch Special Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent pointer-events-none rounded-lg" />
+                
+                {/* Best Value Ribbon for $59 tier */}
+                {(plan as any).bestValue && (
+                  <div className="absolute -top-3 -right-3 z-20">
+                    <div className="bg-amber-500 text-[#181818] px-3 py-1 text-xs font-bold uppercase tracking-wider transform rotate-12 shadow-lg">
+                      Best Value
+                    </div>
+                  </div>
+                )}
+
                 {plan.popular && (
                   <div className="absolute -top-px left-0 right-0">
                     <div className="h-1 bg-foreground" />
@@ -250,7 +267,7 @@ const Pricing = () => {
                   </div>
                 )}
 
-                <div className="mb-8">
+                <div className="mb-8 relative z-10">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 border border-border flex items-center justify-center">
                       <Icon className="w-6 h-6 text-foreground" />
@@ -264,9 +281,28 @@ const Pricing = () => {
                     <span className="text-5xl font-display text-foreground">${plan.price}</span>
                     <span className="text-muted-foreground text-sm">{plan.period}</span>
                   </div>
+                  {/* Post-Launch Label */}
+                  <p className="text-xs text-muted-foreground mt-2 italic">{(plan as any).postLaunchLabel}</p>
+                  
+                  {/* Lifetime Upsell for $59 tier */}
+                  {(plan as any).lifetimeUpsell && (
+                    <a 
+                      href="/products/founders-access" 
+                      className="block mt-3 text-xs text-amber-500 hover:text-amber-400 underline"
+                    >
+                      {(plan as any).lifetimeUpsell}
+                    </a>
+                  )}
                 </div>
 
-                <ul className="space-y-3 mb-8">
+                {/* Launch Special Banner */}
+                <div className="mb-4 p-3 bg-amber-500/20 border border-amber-500/40 rounded-lg relative z-10">
+                  <p className="text-xs text-amber-500 font-bold uppercase tracking-wide text-center">
+                    🚀 LAUNCH SPECIAL: Get Lifetime Access to ALL Tiers for $499
+                  </p>
+                </div>
+
+                <ul className="space-y-3 mb-8 relative z-10">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <div className="w-5 h-5 border border-border flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -277,35 +313,17 @@ const Pricing = () => {
                   ))}
                 </ul>
 
-                {isCurrentPlan(plan.tier) ? (
+                <div className="relative z-10">
                   <Button
-                    variant="outline"
+                    variant="vault"
                     size="lg"
-                    className="w-full"
-                    onClick={handleManageSubscription}
-                    disabled={loadingTier === 'manage'}
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-[#181818]"
+                    onClick={() => window.location.href = '/products/founders-access'}
                   >
-                    {loadingTier === 'manage' ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : null}
-                    Manage Subscription
+                    <Power className="w-4 h-4 mr-2" />
+                    Get Lifetime Access - $499
                   </Button>
-                ) : (
-                  <Button
-                    variant={plan.popular ? "vault" : "outline"}
-                    size="lg"
-                    className="w-full"
-                    onClick={() => handleSubscribe(plan.tier)}
-                    disabled={loadingTier === plan.tier}
-                  >
-                    {loadingTier === plan.tier ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : (
-                      <Power className="w-4 h-4 mr-2" />
-                    )}
-                    Activate Membership
-                  </Button>
-                )}
+                </div>
               </motion.div>
             );
           })}
