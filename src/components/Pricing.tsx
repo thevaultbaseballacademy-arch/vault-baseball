@@ -58,7 +58,9 @@ const plans = [
     tier: "performance" as const,
     postLaunchLabel: "Standard Pricing Post-Launch",
     bestValue: true,
-    lifetimeUpsell: "OR: Get Lifetime Access for $499 (Save $1,000+ over time)",
+    d1Badge: true,
+    annualAnchor: "(Standard Rate: $708/yr)",
+    hasFreeTrial: true,
   },
   {
     id: 3,
@@ -214,6 +216,9 @@ const Pricing = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Select the membership level that matches your training commitment and performance goals.
           </p>
+          <p className="text-sm text-muted-foreground max-w-xl mx-auto mt-4 italic">
+            VAULT™ is a complete OS. We don't sell pieces; we build athletes. Choose Monthly for flexibility or Founder's for Lifetime ownership.
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -235,6 +240,15 @@ const Pricing = () => {
               >
                 {/* Launch Special Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent pointer-events-none rounded-lg" />
+                
+                {/* D1 Prospect Standard Badge for $59 tier */}
+                {(plan as any).d1Badge && (
+                  <div className="absolute -top-3 -left-3 z-20">
+                    <div className="bg-utility text-[#181818] px-3 py-1 text-xs font-bold uppercase tracking-wider shadow-lg">
+                      D1 Prospect Standard
+                    </div>
+                  </div>
+                )}
                 
                 {/* Best Value Ribbon for $59 tier */}
                 {(plan as any).bestValue && (
@@ -281,6 +295,10 @@ const Pricing = () => {
                     <span className="text-5xl font-display text-foreground">${plan.price}</span>
                     <span className="text-muted-foreground text-sm">{plan.period}</span>
                   </div>
+                  {/* Annual Anchor Text for $59 tier */}
+                  {(plan as any).annualAnchor && (
+                    <p className="text-xs text-muted-foreground mt-1">{(plan as any).annualAnchor}</p>
+                  )}
                   {/* Post-Launch Label */}
                   <p className="text-xs text-muted-foreground mt-2 italic">{(plan as any).postLaunchLabel}</p>
                   
@@ -313,16 +331,36 @@ const Pricing = () => {
                   ))}
                 </ul>
 
-                <div className="relative z-10">
-                  <Button
-                    variant="vault"
-                    size="lg"
-                    className="w-full bg-amber-500 hover:bg-amber-600 text-[#181818]"
-                    onClick={() => window.location.href = '/products/founders-access'}
-                  >
-                    <Power className="w-4 h-4 mr-2" />
-                    Get Lifetime Access - $499
-                  </Button>
+                <div className="relative z-10 space-y-3">
+                  {(plan as any).hasFreeTrial ? (
+                    <>
+                      <Button
+                        variant="vault"
+                        size="lg"
+                        className="w-full"
+                        onClick={() => window.location.href = '/trial'}
+                      >
+                        <Power className="w-4 h-4 mr-2" />
+                        Start 7-Day Free Trial
+                      </Button>
+                      <a 
+                        href="/products/founders-access" 
+                        className="block text-center text-sm text-amber-500 hover:text-amber-400 underline"
+                      >
+                        Wait, I want the $499 Lifetime Deal instead.
+                      </a>
+                    </>
+                  ) : (
+                    <Button
+                      variant="vault"
+                      size="lg"
+                      className="w-full bg-amber-500 hover:bg-amber-600 text-[#181818]"
+                      onClick={() => window.location.href = '/products/founders-access'}
+                    >
+                      <Power className="w-4 h-4 mr-2" />
+                      Get Lifetime Access - $499
+                    </Button>
+                  )}
                 </div>
               </motion.div>
             );
