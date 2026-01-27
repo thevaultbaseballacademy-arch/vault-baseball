@@ -178,12 +178,11 @@ const Navbar = () => {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-2">
             <Button 
-              variant="vault" 
               size="sm" 
-              onClick={() => navigate("/products/org-starter-pack")}
-              className="mr-2"
+              onClick={() => navigate("/products/founders-access")}
+              className="mr-2 bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold"
             >
-              Get the Org Starter Pack
+              🔥 $499 Lifetime - Limited Window
             </Button>
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
@@ -291,11 +290,10 @@ const Navbar = () => {
                 ))}
                 <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
                   <Button 
-                    variant="vault" 
-                    className="justify-center" 
-                    onClick={() => { navigate("/products/org-starter-pack"); setIsOpen(false); }}
+                    className="justify-center bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold" 
+                    onClick={() => { navigate("/products/founders-access"); setIsOpen(false); }}
                   >
-                    Get the Org Starter Pack
+                    🔥 $499 Lifetime - Limited Window
                   </Button>
                   {user ? (
                     <>
