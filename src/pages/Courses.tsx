@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Clock, PlayCircle, Star, Zap, Target, Dumbbell, Wind, Brain, CheckCircle, Lock, Users, Calendar, Shield, Crosshair, TrendingUp, Sparkles, BookOpen, LogIn, Heart, ArrowRight, Flame } from "lucide-react";
+import { Clock, PlayCircle, Star, Zap, Target, Dumbbell, Wind, Brain, CheckCircle, Lock, Users, Calendar, Shield, Crosshair, TrendingUp, Sparkles, BookOpen, Heart, ArrowRight, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
