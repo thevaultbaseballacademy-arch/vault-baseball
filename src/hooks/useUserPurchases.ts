@@ -13,15 +13,45 @@ export interface UserPurchase {
 }
 
 // Map product keys to course IDs they grant access to
+// IMPORTANT: Keep this in sync with supabase/functions/verify-purchase/index.ts
 const PRODUCT_TO_COURSES: Record<string, string[]> = {
+  // Subscriptions
+  'basic': ['speed-agility'],
+  'performance': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload'],
+  'elite': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
+  'vault_trial': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
+  // Org licenses
+  'small_org_license': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload'],
+  'org_quick_start': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
+  'org_starter_pack': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
+  // Stand-alone products
   'velocity_12week': ['velocity-system'],
   'velocity_accelerator': ['velocity-system'],
   'longevity_beta': ['arm-health-workload'],
   'transfer_beta': ['transfer-system'],
-  'velocity_max_pack': ['velocity-system', 'speed-agility'],
-  'basic': ['speed-agility'],
-  'performance': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload'],
-  'elite': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
+  'transfer_intensive': ['transfer-system'],
+  // Bundles
+  'velocity_max_pack': ['velocity-system', 'speed-agility', 'strength-conditioning'],
+  'recruiting_edge_pack': ['velocity-system'],
+  'coach_authority_pack': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload'],
+  // Founder's Access - ALL courses
+  'founders_access': [
+    'velocity-system', 
+    'strength-conditioning', 
+    'speed-agility', 
+    'arm-health-workload', 
+    'strength-power-system', 
+    'organizational-development',
+    'transfer-system'
+  ],
+  // Services (no course access but still tracked)
+  'velo_check': [],
+  'recruitment_audit': [],
+  'certified_coach': [],
+  'vault_verified_coach': [],
+  'showcase_prep': [],
+  'video_analysis_5pack': [],
+  'performance_blueprint': [],
 };
 
 export function useUserPurchases(userId: string | undefined) {

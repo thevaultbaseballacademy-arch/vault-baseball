@@ -212,8 +212,8 @@ const FoundersAccess = () => {
     { name: "Velocity", letter: "V", status: "Available Now", color: "text-red-500", bg: "bg-red-500/10", borderColor: "border-red-500/30" },
     { name: "Athleticism", letter: "A", status: "Available Now", color: "text-blue-500", bg: "bg-blue-500/10", borderColor: "border-blue-500/30" },
     { name: "Utility", letter: "U", status: "Available Now", color: "text-green-500", bg: "bg-green-500/10", borderColor: "border-green-500/30" },
-    { name: "Longevity", letter: "L", status: "Coming Q2 2026", color: "text-amber-500", bg: "bg-amber-500/10", borderColor: "border-amber-500/30" },
-    { name: "Transfer", letter: "T", status: "Coming Q3 2026", color: "text-purple-500", bg: "bg-purple-500/10", borderColor: "border-purple-500/30" },
+    { name: "Longevity", letter: "L", status: "V1 Protocols Active • Full Launch Q2 2026", color: "text-amber-500", bg: "bg-amber-500/10", borderColor: "border-amber-500/30" },
+    { name: "Transfer", letter: "T", status: "V1 Protocols Active • Full Launch Q2 2026", color: "text-purple-500", bg: "bg-purple-500/10", borderColor: "border-purple-500/30" },
   ];
 
   const benefits = [
