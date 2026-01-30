@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // Whitelist of valid Stripe price IDs for subscriptions
@@ -23,7 +23,7 @@ const TRIAL_PRICE_IDS = [
   'price_1SrNRkPhXS410TO5vvzFSpNX', // vault_trial
 ];
 
-const logStep = (step: string, details?: any) => {
+const logStep = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
@@ -36,17 +36,69 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { priceId } = await req.json();
+    // Validate Stripe key first
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) {
+      logStep("ERROR: STRIPE_SECRET_KEY not configured");
+      return new Response(JSON.stringify({ 
+        error: "Payment system not configured. Please contact support.",
+        code: "STRIPE_NOT_CONFIGURED"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
+    // Validate key type
+    if (stripeKey.startsWith("pk_")) {
+      logStep("ERROR: Invalid key type - using publishable key instead of secret key");
+      return new Response(JSON.stringify({ 
+        error: "Payment system misconfigured. Please contact support.",
+        code: "INVALID_KEY_TYPE"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (parseError) {
+      logStep("ERROR: Invalid request body", { error: String(parseError) });
+      return new Response(JSON.stringify({ 
+        error: "Invalid request format",
+        code: "INVALID_REQUEST"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    const { priceId } = requestBody;
     
     // Validate priceId is a non-empty string
     if (!priceId || typeof priceId !== 'string') {
-      throw new Error("Invalid price ID format");
+      logStep("ERROR: Invalid price ID format", { priceId });
+      return new Response(JSON.stringify({ 
+        error: "Invalid price ID format",
+        code: "INVALID_PRICE_ID"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
     
     // Validate priceId is in the whitelist
     if (!VALID_SUBSCRIPTION_PRICE_IDS.includes(priceId)) {
-      logStep("Unauthorized price ID attempted", { priceId });
-      throw new Error("Price ID not authorized for purchase");
+      logStep("ERROR: Unauthorized price ID attempted", { priceId });
+      return new Response(JSON.stringify({ 
+        error: "This product requires a different checkout process",
+        code: "PRICE_NOT_AUTHORIZED"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
     
     logStep("Price ID validated", { priceId });
@@ -57,26 +109,62 @@ serve(async (req) => {
     );
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    if (!authHeader) {
+      logStep("ERROR: No authorization header");
+      return new Response(JSON.stringify({ 
+        error: "Please sign in to subscribe",
+        code: "AUTH_REQUIRED"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
+    }
 
     const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
+    const { data, error: authError } = await supabaseClient.auth.getUser(token);
+    
+    if (authError) {
+      logStep("ERROR: Auth validation failed", { error: authError.message });
+      return new Response(JSON.stringify({ 
+        error: "Session expired. Please sign in again.",
+        code: "AUTH_FAILED"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
+    }
+    
     const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    if (!user?.email) {
+      logStep("ERROR: User email not available");
+      return new Response(JSON.stringify({ 
+        error: "User email not available",
+        code: "EMAIL_REQUIRED"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
     });
 
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Existing customer found", { customerId });
+    // Find or create Stripe customer
+    let customerId: string | undefined;
+    try {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
+        logStep("Existing customer found", { customerId });
+      }
+    } catch (stripeError) {
+      logStep("WARN: Failed to lookup customer", { error: String(stripeError) });
+      // Continue without customer ID - Stripe will create one
     }
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    const origin = req.headers.get("origin") || "https://vault-baseball.lovable.app";
     
     // Check if this price should have a trial period
     const hasTrial = TRIAL_PRICE_IDS.includes(priceId);
@@ -100,9 +188,10 @@ serve(async (req) => {
       cancel_url: hasTrial 
         ? `${origin}/trial?subscription=canceled`
         : `${origin}/?subscription=canceled`,
+      allow_promotion_codes: true,
     });
 
-    logStep("Checkout session created", { sessionId: session.id });
+    logStep("Checkout session created", { sessionId: session.id, url: session.url });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -110,8 +199,24 @@ serve(async (req) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    logStep("ERROR: Unexpected error", { message: errorMessage });
+    
+    // Check for specific Stripe errors
+    if (errorMessage.includes("No such price")) {
+      return new Response(JSON.stringify({ 
+        error: "Product pricing configuration error. Please contact support.",
+        code: "INVALID_PRICE"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    return new Response(JSON.stringify({ 
+      error: "An error occurred during checkout. Please try again.",
+      code: "CHECKOUT_ERROR",
+      details: errorMessage
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
