@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, ArrowRight, Loader2, BookOpen, Zap, Crown } from "lucide-react";
+import { CheckCircle, ArrowRight, Loader2, BookOpen, Zap, Crown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -9,12 +9,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import confetti from "canvas-confetti";
 
+interface VerifyPurchaseResponse {
+  verified: boolean;
+  products?: string[];
+  productKey?: string;
+  coursesUnlocked?: string[];
+  isFoundersAccess?: boolean;
+  alreadyProcessed?: boolean;
+  message?: string;
+  warnings?: string[];
+  error?: string;
+  code?: string;
+}
+
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
   const [unlockedCourses, setUnlockedCourses] = useState<string[]>([]);
   const [isFoundersAccess, setIsFoundersAccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fireConfetti = useCallback(() => {
@@ -61,9 +75,10 @@ const PaymentSuccess = () => {
       const sessionId = searchParams.get('session_id');
       
       if (!sessionId) {
-        // No session ID means direct navigation or already processed
+        // No session ID means direct navigation - still show success
         setVerifying(false);
         setVerified(true);
+        fireConfetti();
         return;
       }
 
@@ -71,48 +86,74 @@ const PaymentSuccess = () => {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-          // User not logged in, still show success but note they should log in
+          // User not logged in - prompt them to log in
           setVerifying(false);
           setVerified(true);
+          setErrorMessage("Please sign in to access your purchased content.");
           return;
         }
 
-        const { data, error } = await supabase.functions.invoke('verify-purchase', {
+        const { data, error } = await supabase.functions.invoke<VerifyPurchaseResponse>('verify-purchase', {
           body: { sessionId },
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Verification function error:', error);
+          // Still show success since payment went through
+          setVerified(true);
+          setErrorMessage("Your payment was successful, but we couldn't verify your access. Please contact support if you don't see your content.");
+          fireConfetti();
+          return;
+        }
 
-        setVerified(data.verified);
-        setUnlockedCourses(data.coursesUnlocked || []);
+        if (data?.error) {
+          console.error('Verification error:', data.error);
+          setVerified(false);
+          setErrorMessage(data.error);
+          return;
+        }
+
+        setVerified(data?.verified ?? false);
+        setUnlockedCourses(data?.coursesUnlocked || []);
+        setIsFoundersAccess(data?.isFoundersAccess || false);
         
-        // Check if this was a Founder's Access purchase
-        const isFounders = data.productKey === 'founders_access' || 
-                          data.coursesUnlocked?.includes('founders_access');
-        setIsFoundersAccess(isFounders);
-        
-        if (data.verified && !data.alreadyProcessed) {
+        if (data?.verified) {
           // Fire confetti for successful purchases
           fireConfetti();
           
           // Extra confetti for Founder's Access
-          if (isFounders) {
+          if (data.isFoundersAccess) {
             setTimeout(() => fireConfetti(), 600);
             setTimeout(() => fireConfetti(), 1200);
           }
           
-          toast({
-            title: isFounders ? "Welcome, Founder! 👑" : "Access Granted! 🎉",
-            description: isFounders 
-              ? "You now have lifetime access to the complete V.A.U.L.T. suite!"
-              : `You now have access to ${data.coursesUnlocked?.length || 0} training programs.`,
-          });
+          if (!data.alreadyProcessed) {
+            toast({
+              title: data.isFoundersAccess ? "Welcome, Founder! 👑" : "Access Granted! 🎉",
+              description: data.isFoundersAccess 
+                ? "You now have lifetime access to the complete V.A.U.L.T. suite!"
+                : `You now have access to ${data.coursesUnlocked?.length || 0} training programs.`,
+            });
+          }
+          
+          // Show warnings if any
+          if (data.warnings && data.warnings.length > 0) {
+            toast({
+              title: "Note",
+              description: "Some items may require additional setup. Check your dashboard.",
+              variant: "default",
+            });
+          }
         }
       } catch (error) {
         console.error('Verification error:', error);
-        // Still show success - payment went through, verification is secondary
+        // Still show success - payment went through
         setVerified(true);
-        fireConfetti(); // Still celebrate!
+        fireConfetti();
+        toast({
+          title: "Payment Successful! 🎉",
+          description: "Your access is being set up. Check your dashboard in a moment.",
+        });
       } finally {
         setVerifying(false);
       }
@@ -153,7 +194,7 @@ const PaymentSuccess = () => {
                   Please wait while we unlock your content.
                 </p>
               </>
-            ) : (
+            ) : verified ? (
               <>
                 <motion.div 
                   className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
@@ -195,6 +236,20 @@ const PaymentSuccess = () => {
                   }
                 </motion.p>
                 
+                {errorMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-6 text-left"
+                  >
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-amber-200">{errorMessage}</p>
+                    </div>
+                  </motion.div>
+                )}
+                
                 {unlockedCourses.length > 0 && (
                   <div className="bg-card border border-border rounded-xl p-6 mb-8 text-left">
                     <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -217,6 +272,45 @@ const PaymentSuccess = () => {
                     <Button variant="vault" size="lg">
                       Start Training Now
                       <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                  <Link to="/dashboard">
+                    <Button variant="outline" size="lg">
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <motion.div 
+                  className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-500/10"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                >
+                  <AlertTriangle className="w-10 h-10 text-red-500" />
+                </motion.div>
+                <motion.h1 
+                  className="text-4xl md:text-5xl font-display text-foreground mb-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  VERIFICATION ISSUE
+                </motion.h1>
+                <motion.p 
+                  className="text-lg text-muted-foreground mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  {errorMessage || "We couldn't verify your purchase. Please contact support."}
+                </motion.p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link to="/contact">
+                    <Button variant="vault" size="lg">
+                      Contact Support
                     </Button>
                   </Link>
                   <Link to="/dashboard">
