@@ -12,6 +12,7 @@ interface SubscriptionContextType {
   subscriptionTier: SubscriptionTier;
   subscriptionEnd: string | null;
   isLoading: boolean;
+  hasTeamAccess: boolean;
   refreshSubscription: () => Promise<void>;
 }
 
@@ -30,12 +31,36 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>(null);
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasTeamAccess, setHasTeamAccess] = useState(false);
 
   // Initialize push notifications when user is logged in
   usePushNotifications(user?.id);
 
-  const checkSubscription = async (accessToken: string) => {
+  const checkTeamAccess = async (email: string | undefined) => {
+    if (!email) {
+      setHasTeamAccess(false);
+      return;
+    }
+    
     try {
+      const { data } = await supabase
+        .from("team_whitelist")
+        .select("full_access")
+        .eq("email", email.toLowerCase())
+        .maybeSingle();
+      
+      setHasTeamAccess(data?.full_access ?? false);
+    } catch (error) {
+      console.error("Error checking team access:", error);
+      setHasTeamAccess(false);
+    }
+  };
+
+  const checkSubscription = async (accessToken: string, userEmail?: string) => {
+    try {
+      // Check team whitelist first
+      await checkTeamAccess(userEmail);
+      
       const { data, error } = await supabase.functions.invoke("check-subscription", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -57,7 +82,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshSubscription = async () => {
     if (session?.access_token) {
-      await checkSubscription(session.access_token);
+      await checkSubscription(session.access_token, user?.email);
     }
   };
 
@@ -71,12 +96,13 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         if (session?.access_token) {
           // Defer subscription check to avoid deadlock
           setTimeout(() => {
-            checkSubscription(session.access_token);
+            checkSubscription(session.access_token, session.user?.email);
           }, 0);
         } else {
           setIsSubscribed(false);
           setSubscriptionTier(null);
           setSubscriptionEnd(null);
+          setHasTeamAccess(false);
         }
         setIsLoading(false);
       }
@@ -88,7 +114,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       
       if (session?.access_token) {
-        checkSubscription(session.access_token);
+        checkSubscription(session.access_token, session.user?.email);
       }
       setIsLoading(false);
     });
@@ -96,7 +122,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     // Auto-refresh subscription every minute
     const interval = setInterval(() => {
       if (session?.access_token) {
-        checkSubscription(session.access_token);
+        checkSubscription(session.access_token, user?.email);
       }
     }, 60000);
 
@@ -111,10 +137,11 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       value={{
         user,
         session,
-        isSubscribed,
-        subscriptionTier,
+        isSubscribed: isSubscribed || hasTeamAccess, // Team access = full subscription
+        subscriptionTier: hasTeamAccess ? "elite" : subscriptionTier, // Team gets elite tier
         subscriptionEnd,
         isLoading,
+        hasTeamAccess,
         refreshSubscription,
       }}
     >
