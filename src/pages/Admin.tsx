@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database, Trash2, Lightbulb, Activity
+  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database, Trash2, Lightbulb, Activity, UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +23,7 @@ import DeletionRequestsManager from "@/components/admin/DeletionRequestsManager"
 import GDPRComplianceDashboard from "@/components/admin/GDPRComplianceDashboard";
 import WeeklyTipsManager from "@/components/admin/WeeklyTipsManager";
 import { SystemHealthDashboard } from "@/components/admin/SystemHealthDashboard";
+import TeamWhitelistManager from "@/components/admin/TeamWhitelistManager";
 
 interface Profile {
   user_id: string;
@@ -289,6 +290,10 @@ const Admin = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="flex flex-wrap w-full max-w-6xl gap-1">
                 <TabsTrigger value="users">Users</TabsTrigger>
+                <TabsTrigger value="team" className="flex items-center gap-1">
+                  <UserPlus className="w-3 h-3" />
+                  Team
+                </TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
                 <TabsTrigger value="tips">Tips</TabsTrigger>
                 <TabsTrigger value="certifications">Questions</TabsTrigger>
@@ -395,6 +400,10 @@ const Admin = () => {
                     <li><span className="text-green-600 font-medium">Athlete</span> — Standard user access (for tagging purposes)</li>
                   </ul>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="team" className="mt-6">
+                <TeamWhitelistManager />
               </TabsContent>
 
               <TabsContent value="assignments" className="mt-6">

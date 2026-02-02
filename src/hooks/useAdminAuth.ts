@@ -51,9 +51,21 @@ export const useAdminAuth = () => {
         const hasCoachAdminRole = coachData && 
           ["OrgAdmin", "Director", "VAULTHQ"].includes(coachData.role);
 
+        // Check team whitelist for admin access
+        let hasTeamAdminAccess = false;
+        if (user.email) {
+          const { data: teamData } = await supabase
+            .from("team_whitelist")
+            .select("admin_access")
+            .eq("email", user.email.toLowerCase())
+            .maybeSingle();
+          
+          hasTeamAdminAccess = teamData?.admin_access ?? false;
+        }
+
         setState({
           user,
-          isAdmin: hasSystemAdmin || hasCoachAdminRole,
+          isAdmin: hasSystemAdmin || hasCoachAdminRole || hasTeamAdminAccess,
           isLoading: false,
           coachProfile: coachData as AdminAuthState["coachProfile"],
         });

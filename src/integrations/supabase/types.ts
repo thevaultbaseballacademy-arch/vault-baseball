@@ -1790,6 +1790,39 @@ export type Database = {
         }
         Relationships: []
       }
+      team_whitelist: {
+        Row: {
+          added_by: string | null
+          admin_access: boolean | null
+          created_at: string | null
+          email: string
+          full_access: boolean | null
+          id: string
+          notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          added_by?: string | null
+          admin_access?: boolean | null
+          created_at?: string | null
+          email: string
+          full_access?: boolean | null
+          id?: string
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          added_by?: string | null
+          admin_access?: boolean | null
+          created_at?: string | null
+          email?: string
+          full_access?: boolean | null
+          id?: string
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_certifications: {
         Row: {
           attempt_id: string | null
@@ -2382,6 +2415,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_team_access: { Args: { _user_id: string }; Returns: boolean }
+      has_team_admin_access: { Args: { _user_id: string }; Returns: boolean }
       has_valid_certification: {
         Args: {
           _cert_type: Database["public"]["Enums"]["certification_type"]
