@@ -115,18 +115,8 @@ const Trial = () => {
           if (error) throw error;
           
           if (data?.url) {
-            // Open Stripe checkout in new tab
-            window.open(data.url, '_blank');
-            
-            toast({
-              title: "Account Created!",
-              description: "Complete your subscription in the new tab to start your 7-day trial.",
-            });
-            
-            // Navigate to velocity baseline after a moment
-            setTimeout(() => {
-              navigate("/velocity-baseline", { replace: true });
-            }, 1000);
+            // Redirect to Stripe checkout (avoid popup blockers)
+            window.location.href = data.url;
           }
         } else {
           // Fallback: redirect to velocity baseline if no session
