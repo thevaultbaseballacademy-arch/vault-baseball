@@ -110,8 +110,17 @@ const Navbar = () => {
         { name: "Academy (Ages 13-18)", href: "/pathway/academy" },
       ]
     },
-    { name: "Find a Coach", href: "/find-coach" },
-    { name: "Become a Coach", href: "/coach-register" },
+    { 
+      name: "Coaching", 
+      href: "/find-coach",
+      dropdown: [
+        { name: "Find a Coach", href: "/find-coach" },
+        { name: "Lesson Packages", href: "/lesson-packages" },
+        { name: "Remote Lessons", href: "/remote-lessons" },
+        { name: "Group Sessions", href: "/group-sessions" },
+        { name: "Become a Coach", href: "/coach-register" },
+      ]
+    },
     { name: "About", href: "#about" },
   ];
 
