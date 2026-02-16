@@ -175,20 +175,21 @@ const Hero = () => {
           </div>
         </motion.div>
 
-        {/* Founder's Window CTA */}
+        {/* Free Trial CTA — Primary */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center mb-10"
         >
-          <div className="inline-block p-6 border border-utility/30 bg-[#181818]/80 backdrop-blur-sm mb-8">
-            <p className="text-xs uppercase tracking-[0.2em] text-utility mb-2">Founder's Window</p>
-          <p className="text-lg md:text-xl font-display text-[#F5F5F5] tracking-wide">
-              Lifetime Access for Founding Members until Wednesday EOD.
+          <div className="inline-block p-6 md:p-8 border-2 border-velocity/50 bg-[#181818]/80 backdrop-blur-sm mb-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-velocity via-athleticism to-transfer" />
+            <p className="text-xs uppercase tracking-[0.25em] text-velocity mb-2 font-display">Start Free — No Card Required</p>
+            <p className="text-xl md:text-2xl font-display text-[#F5F5F5] tracking-wide mb-1">
+              7-Day Velocity Baseline Trial
             </p>
-            <p className="text-sm text-[#B9B9B9] mt-2 font-body">
-              Join the first generation of VAULT™ OS—founders get lifetime suite access.
+            <p className="text-sm text-[#B9B9B9] mt-2 font-body max-w-md mx-auto">
+              Get your baseline scores across all 5 pillars. See exactly where you stand — and what it takes to play at the next level.
             </p>
           </div>
         </motion.div>
@@ -200,16 +201,16 @@ const Hero = () => {
           transition={{ duration: 0.6, delay: 0.7 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link to="/products/founders-access">
+          <Link to="/trial">
             <Button variant="activate" size="xl" className="w-full sm:w-auto group">
               <Power className="w-5 h-5 mr-2 animate-os-toggle" />
-              Secure Founder's Access
+              Start Your Free Trial
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
-          <Link to="/products/org-starter-pack">
+          <Link to="/products/founders-access">
             <Button variant="vaultOutline" size="xl" className="w-full sm:w-auto border-[#F5F5F5]/30 text-[#F5F5F5] hover:bg-[#F5F5F5] hover:text-[#181818]">
-              Get the Org Starter Pack
+              Secure Founder's Access — $499 Lifetime
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
