@@ -1954,6 +1954,33 @@ export type Database = {
         }
         Relationships: []
       }
+      trial_feedback: {
+        Row: {
+          created_at: string
+          favorite_feature: string | null
+          feedback: string | null
+          id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          favorite_feature?: string | null
+          feedback?: string | null
+          id?: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          favorite_feature?: string | null
+          feedback?: string | null
+          id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_certifications: {
         Row: {
           attempt_id: string | null
