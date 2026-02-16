@@ -552,6 +552,42 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_invite_tokens: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          label: string | null
+          max_uses: number | null
+          token: string
+          used_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string | null
+          max_uses?: number | null
+          token?: string
+          used_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string | null
+          max_uses?: number | null
+          token?: string
+          used_count?: number | null
+        }
+        Relationships: []
+      }
       coach_kpi_comments: {
         Row: {
           athlete_user_id: string
@@ -582,6 +618,42 @@ export type Database = {
           kpi_category?: string
           kpi_name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      coach_onboarding: {
+        Row: {
+          completed_at: string | null
+          connected_athletes: boolean | null
+          created_at: string
+          created_schedule: boolean | null
+          id: string
+          reviewed_dashboard: boolean | null
+          setup_profile: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          connected_athletes?: boolean | null
+          created_at?: string
+          created_schedule?: boolean | null
+          id?: string
+          reviewed_dashboard?: boolean | null
+          setup_profile?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          connected_athletes?: boolean | null
+          created_at?: string
+          created_schedule?: boolean | null
+          id?: string
+          reviewed_dashboard?: boolean | null
+          setup_profile?: boolean | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -631,6 +703,65 @@ export type Database = {
             columns: ["coach_id"]
             isOneToOne: false
             referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_registration_requests: {
+        Row: {
+          created_at: string
+          email: string
+          experience_years: number | null
+          full_name: string
+          id: string
+          invite_token_id: string | null
+          message: string | null
+          organization: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          specialization: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          experience_years?: number | null
+          full_name: string
+          id?: string
+          invite_token_id?: string | null
+          message?: string | null
+          organization?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          specialization?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          experience_years?: number | null
+          full_name?: string
+          id?: string
+          invite_token_id?: string | null
+          message?: string | null
+          organization?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          specialization?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_registration_requests_invite_token_id_fkey"
+            columns: ["invite_token_id"]
+            isOneToOne: false
+            referencedRelation: "coach_invite_tokens"
             referencedColumns: ["id"]
           },
         ]
@@ -2424,6 +2555,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_invite_usage: { Args: { token_id: string }; Returns: undefined }
       is_active_coach_for_athlete: {
         Args: { _athlete_id: string; _coach_id: string }
         Returns: boolean

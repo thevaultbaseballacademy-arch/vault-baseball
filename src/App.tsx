@@ -77,6 +77,8 @@ import TrialExpired from "./pages/TrialExpired";
 import WhitePaper from "./pages/WhitePaper";
 import BaselineAudit from "./pages/BaselineAudit";
 import PerformanceBlueprint from "./pages/PerformanceBlueprint";
+import CoachRegister from "./pages/CoachRegister";
+import CoachOnboarding from "./pages/CoachOnboarding";
 
 const queryClient = new QueryClient();
 
@@ -203,6 +205,8 @@ const App = () => (
             <Route path="/white-paper" element={<WhitePaper />} />
             <Route path="/baseline-audit" element={<BaselineAudit />} />
             <Route path="/performance-blueprint" element={<PerformanceBlueprint />} />
+            <Route path="/coach-register" element={<CoachRegister />} />
+            <Route path="/coach-onboarding" element={<CoachOnboarding />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
