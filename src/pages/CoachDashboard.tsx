@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, TrendingUp, Calendar, 
   ChevronDown, ChevronUp, Search, Activity, Trophy,
-  BookOpen, Target, BarChart3
+  BookOpen, Target, BarChart3, Video
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +17,7 @@ import { useCoachAlerts } from "@/hooks/useCoachAlerts";
 import { WeeklySummaryReport } from "@/components/WeeklySummaryReport";
 import { CoachScheduleManager } from "@/components/coach/CoachScheduleManager";
 import { KPILeaderboards } from "@/components/coach/KPILeaderboards";
+import { CoachLessonMonitor } from "@/components/coach/CoachLessonMonitor";
 import GlobalSearch from "@/components/coach/GlobalSearch";
 import PositionShortcuts from "@/components/coach/PositionShortcuts";
 import FavoritesQuickStart from "@/components/coach/FavoritesQuickStart";
@@ -321,10 +322,14 @@ const CoachDashboard = () => {
 
             {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="grid w-full max-w-lg grid-cols-3">
+              <TabsList className="grid w-full max-w-2xl grid-cols-4">
                 <TabsTrigger value="athletes" className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Athletes
+                </TabsTrigger>
+                <TabsTrigger value="lessons" className="flex items-center gap-1">
+                  <Video className="w-3 h-3" />
+                  Lessons
                 </TabsTrigger>
                 <TabsTrigger value="leaderboards" className="flex items-center gap-1">
                   <Trophy className="w-3 h-3" />
@@ -335,6 +340,10 @@ const CoachDashboard = () => {
                   Schedules
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="lessons" className="space-y-6">
+                <CoachLessonMonitor coachUserId={user?.id || ''} />
+              </TabsContent>
 
               <TabsContent value="leaderboards" className="space-y-6">
                 <KPILeaderboards coachUserId={user?.id || ''} />

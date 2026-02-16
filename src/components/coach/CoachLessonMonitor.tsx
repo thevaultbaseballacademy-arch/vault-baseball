@@ -1,0 +1,530 @@
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  Video, Users, Calendar, Clock, FileText, MessageSquare,
+  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from "@/components/ui/select";
+
+interface Lesson {
+  id: string;
+  athlete_user_id: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  status: string;
+  notes: string | null;
+  coach_notes: string | null;
+  video_call_link: string | null;
+  athlete_name?: string;
+}
+
+interface GroupSessionRow {
+  id: string;
+  title: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  max_participants: number;
+  status: string;
+  focus_area: string | null;
+  video_call_link: string | null;
+  enrolled_count: number;
+}
+
+interface CourseProgressRow {
+  user_id: string;
+  course_id: string;
+  progress_percent: number;
+  status: string;
+  enrolled_at: string;
+  completed_at: string | null;
+  athlete_name?: string;
+}
+
+const statusColors: Record<string, string> = {
+  scheduled: "bg-yellow-500/10 text-yellow-600",
+  confirmed: "bg-blue-500/10 text-blue-600",
+  completed: "bg-green-500/10 text-green-600",
+  cancelled: "bg-destructive/10 text-destructive",
+};
+
+export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => {
+  const [loading, setLoading] = useState(true);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [groupSessions, setGroupSessions] = useState<GroupSessionRow[]>([]);
+  const [courseProgress, setCourseProgress] = useState<CourseProgressRow[]>([]);
+  const [editingNotes, setEditingNotes] = useState<string | null>(null);
+  const [coachNotes, setCoachNotes] = useState("");
+  const [videoLink, setVideoLink] = useState("");
+  const [editingLink, setEditingLink] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (coachUserId) fetchAll();
+  }, [coachUserId]);
+
+  const fetchAll = async () => {
+    setLoading(true);
+    await Promise.all([fetchLessons(), fetchGroupSessions(), fetchCourseProgress()]);
+    setLoading(false);
+  };
+
+  const fetchLessons = async () => {
+    const { data } = await (supabase.from("remote_lessons" as any) as any)
+      .select("*")
+      .eq("coach_user_id", coachUserId)
+      .order("scheduled_at", { ascending: false });
+
+    if (!data?.length) { setLessons([]); return; }
+
+    const athleteIds = [...new Set((data as any[]).map((l: any) => l.athlete_user_id))];
+    const { data: profiles } = await supabase.rpc("get_public_profiles_by_ids", { user_ids: athleteIds });
+    const nameMap = new Map((profiles || []).map((p: any) => [p.user_id, p.display_name]));
+
+    setLessons((data as any[]).map((l: any) => ({
+      ...l,
+      athlete_name: nameMap.get(l.athlete_user_id) || "Athlete",
+    })));
+  };
+
+  const fetchGroupSessions = async () => {
+    const { data: sessionsData } = await (supabase.from("group_sessions" as any) as any)
+      .select("*")
+      .eq("coach_user_id", coachUserId)
+      .order("scheduled_at", { ascending: false });
+
+    if (!sessionsData?.length) { setGroupSessions([]); return; }
+
+    const { data: enrollments } = await (supabase.from("group_session_enrollments" as any) as any)
+      .select("session_id");
+
+    const countMap = new Map<string, number>();
+    (enrollments || []).forEach((e: any) => {
+      countMap.set(e.session_id, (countMap.get(e.session_id) || 0) + 1);
+    });
+
+    setGroupSessions((sessionsData as any[]).map((s: any) => ({
+      ...s,
+      enrolled_count: countMap.get(s.id) || 0,
+    })));
+  };
+
+  const fetchCourseProgress = async () => {
+    // Get assigned athletes
+    const { data: assignments } = await supabase
+      .from("coach_athlete_assignments")
+      .select("athlete_user_id")
+      .eq("coach_user_id", coachUserId)
+      .eq("is_active", true)
+      .eq("athlete_approved", true);
+
+    const athleteIds = assignments?.map((a) => a.athlete_user_id) || [];
+    if (!athleteIds.length) { setCourseProgress([]); return; }
+
+    const { data: enrollments } = await supabase
+      .from("course_enrollments")
+      .select("*")
+      .in("user_id", athleteIds)
+      .order("enrolled_at", { ascending: false });
+
+    if (!enrollments?.length) { setCourseProgress([]); return; }
+
+    const { data: profiles } = await supabase.rpc("get_public_profiles_by_ids", { user_ids: athleteIds });
+    const nameMap = new Map((profiles || []).map((p: any) => [p.user_id, p.display_name]));
+
+    setCourseProgress(enrollments.map((e) => ({
+      ...e,
+      athlete_name: nameMap.get(e.user_id) || "Athlete",
+    })));
+  };
+
+  const handleSaveNotes = async (lessonId: string) => {
+    await (supabase.from("remote_lessons" as any) as any)
+      .update({ coach_notes: coachNotes })
+      .eq("id", lessonId);
+    toast({ title: "Notes saved" });
+    setEditingNotes(null);
+    setCoachNotes("");
+    fetchLessons();
+  };
+
+  const handleUpdateStatus = async (lessonId: string, newStatus: string) => {
+    await (supabase.from("remote_lessons" as any) as any)
+      .update({ status: newStatus })
+      .eq("id", lessonId);
+    toast({ title: `Lesson marked as ${newStatus}` });
+    fetchLessons();
+  };
+
+  const handleAddVideoLink = async (lessonId: string) => {
+    await (supabase.from("remote_lessons" as any) as any)
+      .update({ video_call_link: videoLink, status: "confirmed" })
+      .eq("id", lessonId);
+    toast({ title: "Video link added & lesson confirmed" });
+    setEditingLink(null);
+    setVideoLink("");
+    fetchLessons();
+  };
+
+  const handleGroupStatus = async (sessionId: string, newStatus: string) => {
+    await (supabase.from("group_sessions" as any) as any)
+      .update({ status: newStatus })
+      .eq("id", sessionId);
+    toast({ title: `Session marked as ${newStatus}` });
+    fetchGroupSessions();
+  };
+
+  const filteredLessons = statusFilter === "all"
+    ? lessons
+    : lessons.filter((l) => l.status === statusFilter);
+
+  const upcomingLessons = lessons.filter((l) => l.status !== "cancelled" && l.status !== "completed" && new Date(l.scheduled_at) >= new Date());
+  const completedLessons = lessons.filter((l) => l.status === "completed");
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Video className="w-4 h-4 text-accent" />
+              <span className="text-sm text-muted-foreground">Total Lessons</span>
+            </div>
+            <p className="text-2xl font-display text-foreground">{lessons.length}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="w-4 h-4 text-accent" />
+              <span className="text-sm text-muted-foreground">Upcoming</span>
+            </div>
+            <p className="text-2xl font-display text-foreground">{upcomingLessons.length}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-muted-foreground">Completed</span>
+            </div>
+            <p className="text-2xl font-display text-foreground">{completedLessons.length}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="w-4 h-4 text-accent" />
+              <span className="text-sm text-muted-foreground">Group Sessions</span>
+            </div>
+            <p className="text-2xl font-display text-foreground">{groupSessions.length}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="lessons" className="space-y-4">
+        <TabsList className="grid w-full max-w-lg grid-cols-3">
+          <TabsTrigger value="lessons">1-on-1 Lessons</TabsTrigger>
+          <TabsTrigger value="groups">Group Sessions</TabsTrigger>
+          <TabsTrigger value="courses">Course Progress</TabsTrigger>
+        </TabsList>
+
+        {/* 1-on-1 Lessons Tab */}
+        <TabsContent value="lessons" className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40 bg-card border-border">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-sm text-muted-foreground">{filteredLessons.length} lessons</span>
+          </div>
+
+          {filteredLessons.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Video className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-display text-foreground mb-2">No Lessons Yet</h3>
+                <p className="text-sm text-muted-foreground">When athletes book lessons with you, they'll appear here.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {filteredLessons.map((lesson, idx) => (
+                <motion.div
+                  key={lesson.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.03 }}
+                >
+                  <Card className="overflow-hidden">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-sm font-medium text-accent">
+                              {lesson.athlete_name?.charAt(0).toUpperCase() || "?"}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{lesson.athlete_name}</p>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(lesson.scheduled_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {new Date(lesson.scheduled_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                              </span>
+                              <span>{lesson.duration_minutes} min</span>
+                            </div>
+                            {lesson.notes && <p className="text-xs text-muted-foreground mt-1 italic">Athlete: "{lesson.notes}"</p>}
+                            {lesson.coach_notes && (
+                              <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                                <FileText className="w-3 h-3" /> Coach notes: {lesson.coach_notes}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge className={statusColors[lesson.status] || "bg-muted text-muted-foreground"}>
+                            {lesson.status}
+                          </Badge>
+
+                          {!lesson.video_call_link && lesson.status !== "cancelled" && (
+                            <Button variant="outline" size="sm" onClick={() => { setEditingLink(lesson.id); setVideoLink(""); }}>
+                              Add Link
+                            </Button>
+                          )}
+
+                          {lesson.video_call_link && (
+                            <Button variant="vault" size="sm" asChild>
+                              <a href={lesson.video_call_link} target="_blank" rel="noopener noreferrer">
+                                <Video className="w-3 h-3 mr-1" /> Join
+                              </a>
+                            </Button>
+                          )}
+
+                          <Button variant="outline" size="sm" onClick={() => { setEditingNotes(lesson.id); setCoachNotes(lesson.coach_notes || ""); }}>
+                            <MessageSquare className="w-3 h-3 mr-1" /> Notes
+                          </Button>
+
+                          {lesson.status === "confirmed" && new Date(lesson.scheduled_at) < new Date() && (
+                            <Button variant="outline" size="sm" onClick={() => handleUpdateStatus(lesson.id, "completed")} className="text-green-600">
+                              <CheckCircle2 className="w-3 h-3 mr-1" /> Complete
+                            </Button>
+                          )}
+
+                          {lesson.status === "scheduled" && (
+                            <Button variant="outline" size="sm" onClick={() => handleUpdateStatus(lesson.id, "confirmed")} className="text-blue-600">
+                              Confirm
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Group Sessions Tab */}
+        <TabsContent value="groups" className="space-y-4">
+          {groupSessions.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-display text-foreground mb-2">No Group Sessions</h3>
+                <p className="text-sm text-muted-foreground">Create group sessions from the Group Sessions page.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {groupSessions.map((session, idx) => (
+                <motion.div key={session.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.03 }}>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-medium text-foreground">{session.title}</h4>
+                            {session.focus_area && (
+                              <Badge variant="secondary" className="capitalize">{session.focus_area}</Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(session.scheduled_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {new Date(session.scheduled_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                            </span>
+                            <span>{session.duration_minutes} min</span>
+                            <span className="flex items-center gap-1">
+                              <Users className="w-3 h-3" />
+                              {session.enrolled_count}/{session.max_participants}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={statusColors[session.status] || "bg-muted text-muted-foreground"}>
+                            {session.status}
+                          </Badge>
+                          {session.video_call_link && (
+                            <Button variant="vault" size="sm" asChild>
+                              <a href={session.video_call_link} target="_blank" rel="noopener noreferrer">
+                                <Video className="w-3 h-3 mr-1" /> Join
+                              </a>
+                            </Button>
+                          )}
+                          {session.status === "scheduled" && new Date(session.scheduled_at) < new Date() && (
+                            <Button variant="outline" size="sm" onClick={() => handleGroupStatus(session.id, "completed")} className="text-green-600">
+                              <CheckCircle2 className="w-3 h-3 mr-1" /> Complete
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Course Progress Monitoring */}
+        <TabsContent value="courses" className="space-y-4">
+          {courseProgress.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-display text-foreground mb-2">No Course Data</h3>
+                <p className="text-sm text-muted-foreground">Assigned athletes' course enrollments will appear here.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {courseProgress.map((cp, idx) => (
+                <motion.div key={`${cp.user_id}-${cp.course_id}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.03 }}>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                            <BookOpen className="w-4 h-4 text-accent" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{cp.athlete_name}</p>
+                            <p className="text-sm text-muted-foreground capitalize">{cp.course_id.replace(/-/g, " ")}</p>
+                            <p className="text-xs text-muted-foreground">Enrolled {new Date(cp.enrolled_at).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2 min-w-[140px]">
+                            <Progress value={cp.progress_percent} className="w-24 h-2" />
+                            <span className={`text-sm font-medium ${cp.progress_percent >= 100 ? "text-green-500" : "text-foreground"}`}>
+                              {cp.progress_percent}%
+                            </span>
+                          </div>
+                          <Badge className={cp.status === "completed" ? "bg-green-500/10 text-green-600" : cp.status === "active" ? "bg-blue-500/10 text-blue-600" : "bg-muted text-muted-foreground"}>
+                            {cp.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Coach Notes Dialog */}
+      <Dialog open={!!editingNotes} onOpenChange={() => setEditingNotes(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Lesson Notes</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Your notes about this lesson</Label>
+              <Textarea
+                value={coachNotes}
+                onChange={(e) => setCoachNotes(e.target.value)}
+                placeholder="Development observations, areas to improve, follow-up plans..."
+                rows={4}
+                className="mt-1"
+              />
+            </div>
+            <Button variant="vault" className="w-full" onClick={() => editingNotes && handleSaveNotes(editingNotes)}>
+              <Send className="w-4 h-4 mr-2" /> Save Notes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Video Link Dialog */}
+      <Dialog open={!!editingLink} onOpenChange={() => setEditingLink(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Video Call Link</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Video Call URL (Zoom, Google Meet, etc.)</Label>
+              <Input
+                value={videoLink}
+                onChange={(e) => setVideoLink(e.target.value)}
+                placeholder="https://zoom.us/j/..."
+                className="mt-1"
+              />
+            </div>
+            <Button variant="vault" className="w-full" onClick={() => editingLink && handleAddVideoLink(editingLink)} disabled={!videoLink}>
+              Save & Confirm Lesson
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default CoachLessonMonitor;
