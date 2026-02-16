@@ -79,6 +79,9 @@ import BaselineAudit from "./pages/BaselineAudit";
 import PerformanceBlueprint from "./pages/PerformanceBlueprint";
 import CoachRegister from "./pages/CoachRegister";
 import CoachOnboarding from "./pages/CoachOnboarding";
+import LessonPackages from "./pages/LessonPackages";
+import RemoteLessons from "./pages/RemoteLessons";
+import GroupSessions from "./pages/GroupSessions";
 
 const queryClient = new QueryClient();
 
@@ -207,6 +210,9 @@ const App = () => (
             <Route path="/performance-blueprint" element={<PerformanceBlueprint />} />
             <Route path="/coach-register" element={<CoachRegister />} />
             <Route path="/coach-onboarding" element={<CoachOnboarding />} />
+            <Route path="/lesson-packages" element={<LessonPackages />} />
+            <Route path="/remote-lessons" element={<RemoteLessons />} />
+            <Route path="/group-sessions" element={<GroupSessions />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -552,6 +552,36 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_availability: {
+        Row: {
+          coach_user_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          is_active: boolean
+          start_time: string
+        }
+        Insert: {
+          coach_user_id: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_active?: boolean
+          start_time: string
+        }
+        Update: {
+          coach_user_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          start_time?: string
+        }
+        Relationships: []
+      }
       coach_invite_tokens: {
         Row: {
           created_at: string
@@ -1403,6 +1433,99 @@ export type Database = {
         }
         Relationships: []
       }
+      group_session_enrollments: {
+        Row: {
+          athlete_user_id: string
+          credit_id: string | null
+          enrolled_at: string
+          id: string
+          session_id: string
+          status: string
+        }
+        Insert: {
+          athlete_user_id: string
+          credit_id?: string | null
+          enrolled_at?: string
+          id?: string
+          session_id: string
+          status?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          credit_id?: string | null
+          enrolled_at?: string
+          id?: string
+          session_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_session_enrollments_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_credits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_session_enrollments_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_sessions: {
+        Row: {
+          coach_user_id: string
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          focus_area: string | null
+          id: string
+          max_participants: number
+          price_credits: number
+          scheduled_at: string
+          skill_level: string | null
+          status: string
+          title: string
+          updated_at: string
+          video_call_link: string | null
+        }
+        Insert: {
+          coach_user_id: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          focus_area?: string | null
+          id?: string
+          max_participants?: number
+          price_credits?: number
+          scheduled_at: string
+          skill_level?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          video_call_link?: string | null
+        }
+        Update: {
+          coach_user_id?: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          focus_area?: string | null
+          id?: string
+          max_participants?: number
+          price_credits?: number
+          scheduled_at?: string
+          skill_level?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          video_call_link?: string | null
+        }
+        Relationships: []
+      }
       highlight_videos: {
         Row: {
           created_at: string
@@ -1481,6 +1604,89 @@ export type Database = {
           updated_at?: string
           user_id?: string
           view_count?: number | null
+        }
+        Relationships: []
+      }
+      lesson_credits: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          package_id: string | null
+          purchased_at: string
+          stripe_session_id: string | null
+          total_lessons: number
+          used_lessons: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          package_id?: string | null
+          purchased_at?: string
+          stripe_session_id?: string | null
+          total_lessons: number
+          used_lessons?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          package_id?: string | null
+          purchased_at?: string
+          stripe_session_id?: string | null
+          total_lessons?: number
+          used_lessons?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_credits_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lesson_packages: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          lesson_count: number
+          name: string
+          package_type: string
+          price_cents: number
+          stripe_price_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          lesson_count: number
+          name: string
+          package_type?: string
+          price_cents: number
+          stripe_price_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          lesson_count?: number
+          name?: string
+          package_type?: string
+          price_cents?: number
+          stripe_price_id?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1828,6 +2034,65 @@ export type Database = {
             columns: ["attempt_id"]
             isOneToOne: false
             referencedRelation: "admin_exam_attempts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      remote_lessons: {
+        Row: {
+          athlete_feedback: string | null
+          athlete_rating: number | null
+          athlete_user_id: string
+          coach_notes: string | null
+          coach_user_id: string
+          created_at: string
+          credit_id: string | null
+          duration_minutes: number
+          id: string
+          notes: string | null
+          scheduled_at: string
+          status: string
+          updated_at: string
+          video_call_link: string | null
+        }
+        Insert: {
+          athlete_feedback?: string | null
+          athlete_rating?: number | null
+          athlete_user_id: string
+          coach_notes?: string | null
+          coach_user_id: string
+          created_at?: string
+          credit_id?: string | null
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          scheduled_at: string
+          status?: string
+          updated_at?: string
+          video_call_link?: string | null
+        }
+        Update: {
+          athlete_feedback?: string | null
+          athlete_rating?: number | null
+          athlete_user_id?: string
+          coach_notes?: string | null
+          coach_user_id?: string
+          created_at?: string
+          credit_id?: string | null
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          scheduled_at?: string
+          status?: string
+          updated_at?: string
+          video_call_link?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remote_lessons_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_credits"
             referencedColumns: ["id"]
           },
         ]
