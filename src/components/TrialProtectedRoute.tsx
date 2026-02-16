@@ -43,14 +43,9 @@ const TrialProtectedRoute = ({
     return <>{children}</>;
   }
 
-  // Trial user with active trial
+  // Trial user with active trial — grant full access to all core features
   if (isTrialUser && !isTrialExpired) {
-    // Allow access if page permits trial users
-    if (allowTrialAccess) {
-      return <>{children}</>;
-    }
-    // Otherwise redirect to velocity baseline (trial dashboard)
-    return <Navigate to="/velocity-baseline" replace />;
+    return <>{children}</>;
   }
 
   // Trial expired - redirect to expired page

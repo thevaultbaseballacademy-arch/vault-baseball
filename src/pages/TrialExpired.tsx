@@ -1,13 +1,16 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Shield, AlertTriangle, Lock, Database, TrendingUp, Zap, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
+import TrialFeedbackForm from "@/components/trial/TrialFeedbackForm";
 
 const TrialExpired = () => {
   const navigate = useNavigate();
   const { checkout, loading } = useProductCheckout();
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const handleUpgrade = () => {
     checkout('founders_access', `${window.location.origin}/payment-success`, `${window.location.origin}/trial-expired`);
@@ -75,62 +78,73 @@ const TrialExpired = () => {
               </p>
             </motion.div>
 
-            {/* Data at Risk */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mb-8 p-4 bg-destructive/5 rounded-xl border border-destructive/20"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <AlertTriangle className="w-5 h-5 text-destructive" />
-                <span className="font-semibold text-foreground">Data at Risk</span>
-              </div>
-              <div className="space-y-3">
-                {dataPoints.map((point, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                      <point.icon className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <span className="text-muted-foreground">{point.label}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="space-y-4"
-            >
-              <Button
-                onClick={handleUpgrade}
-                variant="vault"
-                size="lg"
-                className="w-full h-14 text-lg"
-                disabled={loading === 'founders_access'}
+            {/* Feedback Form (shown first) or Upgrade CTA */}
+            {!showUpgrade ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
               >
-                {loading === 'founders_access' ? (
-                  "Processing..."
-                ) : (
-                  <>
-                    Upgrade to Full VAULT™ OS — $499
-                    <ChevronRight className="w-5 h-5 ml-2" />
-                  </>
-                )}
-              </Button>
-              
-              <div className="text-center">
-                <p className="text-sm text-primary font-semibold mb-1">
-                  🚀 Founder's Price — Limited Time Only
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Lifetime access • All future updates included • No recurring fees
-                </p>
-              </div>
-            </motion.div>
+                <TrialFeedbackForm onComplete={() => setShowUpgrade(true)} />
+              </motion.div>
+            ) : (
+              <>
+                {/* Data at Risk */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-8 p-4 bg-destructive/5 rounded-xl border border-destructive/20"
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlertTriangle className="w-5 h-5 text-destructive" />
+                    <span className="font-semibold text-foreground">Data at Risk</span>
+                  </div>
+                  <div className="space-y-3">
+                    {dataPoints.map((point, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                          <point.icon className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <span className="text-muted-foreground">{point.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* CTA */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-4"
+                >
+                  <Button
+                    onClick={handleUpgrade}
+                    variant="vault"
+                    size="lg"
+                    className="w-full h-14 text-lg"
+                    disabled={loading === 'founders_access'}
+                  >
+                    {loading === 'founders_access' ? (
+                      "Processing..."
+                    ) : (
+                      <>
+                        Upgrade to Full VAULT™ OS — $499
+                        <ChevronRight className="w-5 h-5 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-primary font-semibold mb-1">
+                      🚀 Founder's Price — Limited Time Only
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Lifetime access • All future updates included • No recurring fees
+                    </p>
+                  </div>
+                </motion.div>
+              </>
+            )}
 
             {/* Secondary Actions */}
             <motion.div
