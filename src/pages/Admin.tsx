@@ -24,6 +24,7 @@ import GDPRComplianceDashboard from "@/components/admin/GDPRComplianceDashboard"
 import WeeklyTipsManager from "@/components/admin/WeeklyTipsManager";
 import { SystemHealthDashboard } from "@/components/admin/SystemHealthDashboard";
 import TeamWhitelistManager from "@/components/admin/TeamWhitelistManager";
+import { CoachInviteManager } from "@/components/admin/CoachInviteManager";
 
 interface Profile {
   user_id: string;
@@ -294,6 +295,10 @@ const Admin = () => {
                   <UserPlus className="w-3 h-3" />
                   Team
                 </TabsTrigger>
+                <TabsTrigger value="coach-invites" className="flex items-center gap-1">
+                  <Link2 className="w-3 h-3" />
+                  Coach Invites
+                </TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
                 <TabsTrigger value="tips">Tips</TabsTrigger>
                 <TabsTrigger value="certifications">Questions</TabsTrigger>
@@ -404,6 +409,10 @@ const Admin = () => {
 
               <TabsContent value="team" className="mt-6">
                 <TeamWhitelistManager />
+              </TabsContent>
+
+              <TabsContent value="coach-invites" className="mt-6">
+                <CoachInviteManager />
               </TabsContent>
 
               <TabsContent value="assignments" className="mt-6">

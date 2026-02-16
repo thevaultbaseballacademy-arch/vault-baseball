@@ -111,6 +111,7 @@ const Navbar = () => {
       ]
     },
     { name: "Find a Coach", href: "/find-coach" },
+    { name: "Become a Coach", href: "/coach-register" },
     { name: "About", href: "#about" },
   ];
 
