@@ -132,6 +132,42 @@ export type Database = {
           },
         ]
       }
+      athlete_22m_invite_tokens: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          label: string | null
+          max_uses: number | null
+          token: string
+          used_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string | null
+          max_uses?: number | null
+          token?: string
+          used_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string | null
+          max_uses?: number | null
+          token?: string
+          used_count?: number | null
+        }
+        Relationships: []
+      }
       athlete_checkins: {
         Row: {
           checkin_date: string
@@ -335,6 +371,65 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      athlete_trials: {
+        Row: {
+          converted_at: string | null
+          converted_product: string | null
+          created_at: string
+          extended_at: string | null
+          extended_by: string | null
+          id: string
+          invite_token_id: string | null
+          notes: string | null
+          trial_active: boolean | null
+          trial_end_date: string
+          trial_start_date: string
+          trial_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          converted_at?: string | null
+          converted_product?: string | null
+          created_at?: string
+          extended_at?: string | null
+          extended_by?: string | null
+          id?: string
+          invite_token_id?: string | null
+          notes?: string | null
+          trial_active?: boolean | null
+          trial_end_date?: string
+          trial_start_date?: string
+          trial_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          converted_at?: string | null
+          converted_product?: string | null
+          created_at?: string
+          extended_at?: string | null
+          extended_by?: string | null
+          id?: string
+          invite_token_id?: string | null
+          notes?: string | null
+          trial_active?: boolean | null
+          trial_end_date?: string
+          trial_start_date?: string
+          trial_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "athlete_trials_invite_token_id_fkey"
+            columns: ["invite_token_id"]
+            isOneToOne: false
+            referencedRelation: "athlete_22m_invite_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       athletic_stats: {
         Row: {
@@ -3245,6 +3340,7 @@ export type Database = {
           youtube_url: string
         }[]
       }
+      get_athlete_trial_status: { Args: { p_user_id: string }; Returns: Json }
       get_certificate_leaderboard: {
         Args: { result_limit?: number; time_filter?: string }
         Returns: {
@@ -3378,6 +3474,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_22m_invite_usage: {
+        Args: { token_id: string }
+        Returns: undefined
       }
       increment_invite_usage: { Args: { token_id: string }; Returns: undefined }
       is_active_coach_for_athlete: {
