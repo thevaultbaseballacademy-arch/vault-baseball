@@ -68,7 +68,7 @@ import CookieSettings from "./pages/CookieSettings";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import { CookieConsent } from "@/components/CookieConsent";
-import { FloatingChatWidget } from "@/components/FloatingChatWidget";
+import { EddieAIChat } from "@/components/EddieAIChat";
 import DeviceMetrics from "./pages/DeviceMetrics";
 import SharedMetricsView from "./pages/SharedMetricsView";
 import Trial from "./pages/Trial";
@@ -82,6 +82,8 @@ import CoachOnboarding from "./pages/CoachOnboarding";
 import LessonPackages from "./pages/LessonPackages";
 import RemoteLessons from "./pages/RemoteLessons";
 import GroupSessions from "./pages/GroupSessions";
+import FreeVelocityGuide from "./pages/FreeVelocityGuide";
+import AthleteOnboarding from "./pages/AthleteOnboarding";
 
 const queryClient = new QueryClient();
 
@@ -213,12 +215,14 @@ const App = () => (
             <Route path="/lesson-packages" element={<LessonPackages />} />
             <Route path="/remote-lessons" element={<RemoteLessons />} />
             <Route path="/group-sessions" element={<GroupSessions />} />
+            <Route path="/free-velocity-guide" element={<FreeVelocityGuide />} />
+            <Route path="/athlete-onboarding" element={<AthleteOnboarding />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
           <CookieConsent />
-          <FloatingChatWidget />
+          <EddieAIChat />
         </BrowserRouter>
       </TooltipProvider>
     </SubscriptionProvider>
