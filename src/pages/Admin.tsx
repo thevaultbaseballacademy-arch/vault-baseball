@@ -266,6 +266,10 @@ const Admin = () => {
                         <button
                           key={item.id}
                           onClick={() => {
+                            if (item.id === "coach-mgmt") {
+                              navigate("/admin/coach-management");
+                              return;
+                            }
                             setActiveSection(item.id);
                             setSidebarOpen(false);
                           }}
