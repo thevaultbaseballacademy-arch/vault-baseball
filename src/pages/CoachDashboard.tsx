@@ -346,6 +346,25 @@ const CoachDashboard = () => {
                 </TabsTrigger>
               </TabsList>
 
+              <TabsContent value="motion" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">VAULT AI MOTION ANALYSIS</h2>
+                <p className="text-sm text-muted-foreground">Review AI-generated biomechanics reports. Add notes and mark key points for live sessions.</p>
+                {athletes.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No assigned athletes yet.</p>
+                ) : (
+                  <div className="space-y-6">
+                    {athletes.map((a: any) => (
+                      <CoachAnalysisReview
+                        key={a.user_id}
+                        coachUserId={user?.id || ''}
+                        athleteUserId={a.user_id}
+                        athleteName={a.display_name}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+
               <TabsContent value="lessons" className="space-y-6">
                 <CoachLessonMonitor coachUserId={user?.id || ''} />
               </TabsContent>
