@@ -182,11 +182,35 @@ const RemoteTrainingHub = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="w-full justify-start">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                {activeSessionId && <TabsTrigger value="live">Live Session</TabsTrigger>}
                 <TabsTrigger value="sessions">Sessions</TabsTrigger>
                 <TabsTrigger value="recordings">Recordings</TabsTrigger>
                 <TabsTrigger value="messages">Messages</TabsTrigger>
                 <TabsTrigger value="progress">Progress</TabsTrigger>
               </TabsList>
+
+              {/* LIVE SESSION */}
+              <TabsContent value="live" className="mt-6 space-y-4">
+                {activeSessionId && user && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-display text-xl text-foreground">LIVE COACHING SESSION</h2>
+                      <Button variant="outline" size="sm" onClick={() => { setActiveSessionId(null); setActiveTab("sessions"); }}>
+                        <ArrowLeft className="w-3 h-3 mr-1" /> Back
+                      </Button>
+                    </div>
+                    <LiveVideoCall
+                      sessionId={activeSessionId}
+                      userId={user.id}
+                      isCoach={false}
+                      onEnd={() => { setActiveSessionId(null); setActiveTab("sessions"); }}
+                    />
+                    <p className="text-xs text-muted-foreground text-center">
+                      Position your camera so your coach can see your full mechanics. Use a tripod for best results.
+                    </p>
+                  </>
+                )}
+              </TabsContent>
 
               {/* OVERVIEW */}
               <TabsContent value="overview" className="mt-6 space-y-6">
