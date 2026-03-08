@@ -25,6 +25,7 @@ import WeeklyTipsManager from "@/components/admin/WeeklyTipsManager";
 import { SystemHealthDashboard } from "@/components/admin/SystemHealthDashboard";
 import TeamWhitelistManager from "@/components/admin/TeamWhitelistManager";
 import { CoachInviteManager } from "@/components/admin/CoachInviteManager";
+import LeadsCustomersPanel from "@/components/admin/LeadsCustomersPanel";
 
 interface Profile {
   user_id: string;
@@ -314,6 +315,10 @@ const Admin = () => {
                   <Activity className="w-3 h-3" />
                   Health
                 </TabsTrigger>
+                <TabsTrigger value="leads" className="flex items-center gap-1">
+                  <UserPlus className="w-3 h-3" />
+                  Leads & CRM
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="users" className="mt-6 space-y-6">
@@ -461,6 +466,10 @@ const Admin = () => {
 
               <TabsContent value="health" className="mt-6">
                 <SystemHealthDashboard />
+              </TabsContent>
+
+              <TabsContent value="leads" className="mt-6">
+                <LeadsCustomersPanel />
               </TabsContent>
             </Tabs>
           </motion.div>
