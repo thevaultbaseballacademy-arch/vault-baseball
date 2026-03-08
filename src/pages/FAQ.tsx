@@ -177,11 +177,11 @@ const FAQ = () => {
             <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
               <HelpCircle className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold text-foreground mb-3">
-              Frequently Asked Questions
+            <h1 className="text-4xl md:text-5xl font-display text-foreground mb-3 tracking-wider">
+              FREQUENTLY ASKED QUESTIONS
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Find answers to common questions about our courses, certifications, subscriptions, and platform.
+              Find answers to common questions about our programs, certifications, subscriptions, and platform.
             </p>
           </div>
 
