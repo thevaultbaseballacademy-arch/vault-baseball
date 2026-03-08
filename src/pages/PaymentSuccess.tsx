@@ -268,15 +268,15 @@ const PaymentSuccess = () => {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to="/my-programs">
+                  <Link to="/athlete-onboarding">
                     <Button variant="vault" size="lg">
-                      Start Training Now
+                      Complete Your Onboarding
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   </Link>
-                  <Link to="/dashboard">
+                  <Link to="/my-programs">
                     <Button variant="outline" size="lg">
-                      Go to Dashboard
+                      Start Training Now
                     </Button>
                   </Link>
                 </div>
