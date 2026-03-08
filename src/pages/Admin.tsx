@@ -315,6 +315,17 @@ const Admin = () => {
                 {/* ── LEADS & CRM ── */}
                 {activeSection === "leads" && <LeadsCustomersPanel />}
 
+                {/* ── 22M TRIALS ── */}
+                {activeSection === "22m-trials" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h1 className="text-2xl font-display text-foreground mb-1">22M FOUNDING ATHLETE TRIALS</h1>
+                      <p className="text-sm text-muted-foreground">Manage 22M athlete invites and trial access.</p>
+                    </div>
+                    <Admin22MTrialsPanel />
+                  </div>
+                )}
+
                 {/* ── USER ROLES ── */}
                 {activeSection === "users" && (
                   <div className="space-y-6">
