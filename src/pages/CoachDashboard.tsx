@@ -114,6 +114,13 @@ const CoachDashboard = () => {
         setIsCoach(true);
         fetchAthletes();
         fetchAllCheckins();
+        // Fetch coach record ID for marketplace
+        const { data: coachData } = await supabase
+          .from('coaches')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle();
+        if (coachData) setCoachRecordId(coachData.id);
       }
       setLoading(false);
     } catch (error) {
