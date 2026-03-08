@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, MessageCircle, Download, Check, Zap, Target, Shield,
   TrendingUp, Users, Star, ChevronDown, X, AlertTriangle, Gauge,
-  Dumbbell, Heart, Shuffle, BarChart3, BookOpen, Clock
+  Dumbbell, Heart, Shuffle, BarChart3, BookOpen, Clock, ArrowDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -11,11 +11,13 @@ import Footer from "@/components/Footer";
 import { useState } from "react";
 
 const fadeUp = {
-  initial: { opacity: 0, y: 30 },
+  initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
+  viewport: { once: true, margin: "-60px" },
   transition: { duration: 0.5 },
 };
+
+const stagger = (i: number, base = 0.06) => ({ delay: i * base });
 
 const Index = () => {
   const navigate = useNavigate();
@@ -29,30 +31,74 @@ const Index = () => {
     <main className="min-h-screen bg-background">
       <Navbar />
 
-      {/* ── HERO ── */}
-      <section className="pt-28 pb-20 md:pt-40 md:pb-32 relative overflow-hidden">
+      {/* ═══════════ HERO ═══════════ */}
+      <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
+        {/* BG */}
         <div className="absolute inset-0 bg-foreground" />
-        {/* subtle grid */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: "linear-gradient(hsl(var(--background)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--background)) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(hsl(var(--background)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--background)) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+          }}
+        />
+        {/* Diagonal accent line */}
+        <div className="absolute top-0 right-0 w-1/2 h-full opacity-[0.04]" style={{
+          background: "linear-gradient(135deg, transparent 30%, hsl(var(--background)) 100%)",
         }} />
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <span className="inline-block px-5 py-1.5 border border-primary-foreground/20 text-primary-foreground/60 text-xs font-display tracking-[0.3em] mb-8">
-                BASEBALL DEVELOPMENT — SYSTEMATIZED
-              </span>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-display text-primary-foreground leading-[0.9] mb-6">
-                BUILD A REAL BASEBALL<br />DEVELOPMENT SYSTEM
-              </h1>
-              <p className="text-lg md:text-xl text-primary-foreground/60 max-w-2xl mx-auto mb-12 font-body">
-                Stop guessing. Vault gives athletes a structured plan for velocity, strength, arm care, and long-term development.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+        <div className="container mx-auto px-4 relative z-10 py-32 md:py-0">
+          <div className="max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-8"
+            >
+              {/* Tag */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <span className="inline-block px-4 py-1.5 border border-primary-foreground/15 text-primary-foreground/50 text-[11px] font-display tracking-[0.35em]">
+                  BASEBALL DEVELOPMENT — SYSTEMATIZED
+                </span>
+              </motion.div>
+
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.6 }}
+                className="text-[clamp(2.8rem,8vw,7rem)] font-display text-primary-foreground leading-[0.88] tracking-tight"
+              >
+                STOP GUESSING.
+                <br />
+                <span className="text-primary-foreground/40">START DEVELOPING.</span>
+              </motion.h1>
+
+              {/* Sub */}
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-base md:text-lg text-primary-foreground/50 max-w-xl font-body leading-relaxed"
+              >
+                Vault gives baseball athletes a structured system for velocity, arm care, strength, and long-term performance development. No hype. No guesswork. Just results.
+              </motion.p>
+
+              {/* CTAs */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.65 }}
+                className="flex flex-col sm:flex-row gap-3 pt-2"
+              >
                 <Button
-                  size="lg"
-                  className="text-lg px-10 py-6 font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
+                  size="xl"
+                  className="font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
                   onClick={openEddie}
                 >
                   <MessageCircle className="w-5 h-5 mr-2" />
@@ -61,54 +107,111 @@ const Index = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="text-lg px-10 py-6 font-display tracking-wide border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
+                  className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
                   onClick={() => navigate("/free-velocity-guide")}
                 >
                   <Download className="w-5 h-5 mr-2" />
-                  GET THE FREE VELOCITY GUIDE
+                  FREE VELOCITY GUIDE
                 </Button>
-              </div>
-              {/* trust line */}
-              <p className="mt-8 text-xs text-primary-foreground/30 font-display tracking-widest">
-                TRUSTED BY 500+ ATHLETES &nbsp;·&nbsp; AGES 12-18 &nbsp;·&nbsp; NO CARD REQUIRED
-              </p>
+              </motion.div>
+
+              {/* Trust */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9 }}
+                className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-4"
+              >
+                {["500+ Athletes", "Ages 12–18", "No Card Required"].map((t, i) => (
+                  <span key={i} className="text-[11px] text-primary-foreground/25 font-display tracking-[0.2em] flex items-center gap-2">
+                    <span className="w-1 h-1 bg-primary-foreground/20 rounded-full" />
+                    {t}
+                  </span>
+                ))}
+              </motion.div>
             </motion.div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <span className="text-[10px] text-primary-foreground/20 font-display tracking-[0.3em]">SCROLL</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.8 }}
+          >
+            <ArrowDown className="w-4 h-4 text-primary-foreground/20" />
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ═══════════ STAT BAR ═══════════ */}
+      <section className="border-b border-border bg-card">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border">
+            {[
+              { value: "6+", label: "AVG MPH GAINED" },
+              { value: "500+", label: "ATHLETES TRAINED" },
+              { value: "12", label: "WEEK SYSTEM" },
+              { value: "5", label: "DEVELOPMENT PILLARS" },
+            ].map((s, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={stagger(i)}
+                className="py-6 md:py-8 text-center"
+              >
+                <p className="text-3xl md:text-4xl font-display text-foreground">{s.value}</p>
+                <p className="text-[10px] md:text-[11px] text-muted-foreground font-display tracking-[0.2em] mt-1">{s.label}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── PROBLEM: COMMON ATHLETE STRUGGLES ── */}
+      {/* ═══════════ PROBLEM: PAIN POINTS ═══════════ */}
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="max-w-4xl mx-auto">
-            <div className="text-center mb-14">
-              <span className="text-xs font-display tracking-[0.25em] text-muted-foreground mb-3 block">THE PROBLEM</span>
-              <h2 className="text-4xl md:text-5xl font-display text-foreground mb-4">DOES THIS SOUND LIKE YOU?</h2>
-              <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-                Most athletes are working hard — but not getting results. Here's why.
-              </p>
+            <div className="mb-12 md:mb-16">
+              <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-4 block">THE PROBLEM</span>
+              <h2 className="text-3xl md:text-5xl font-display text-foreground leading-[0.95]">
+                HARD WORK WITHOUT A SYSTEM
+                <br className="hidden md:block" />
+                <span className="text-muted-foreground"> IS JUST WASTED EFFORT</span>
+              </h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-3">
               {[
-                { icon: Gauge, text: "You're throwing hard in practice but your velocity won't climb" },
-                { icon: AlertTriangle, text: "You've had arm soreness and don't know if you're training safely" },
-                { icon: Clock, text: "You're spending money on lessons but nothing feels structured" },
-                { icon: X, text: "You get conflicting advice from every coach, trainer, and YouTube video" },
-                { icon: BarChart3, text: "You have no way to measure if you're actually improving" },
-                { icon: Target, text: "College showcase is coming and you don't know if you're ready" },
+                { icon: Gauge, title: "Velocity plateau", text: "Throwing hard in practice, but your numbers won't move. You don't know what's holding you back." },
+                { icon: AlertTriangle, title: "Arm soreness ignored", text: "Something doesn't feel right, but there's no protocol — just 'rest and come back.'" },
+                { icon: Clock, title: "Money without structure", text: "Spending on lessons, camps, and gear — but nobody can show you the plan." },
+                { icon: X, title: "Conflicting advice", text: "Every coach says something different. YouTube drills contradict your trainer. Nothing connects." },
+                { icon: BarChart3, title: "No way to measure", text: "You're working, but you can't prove it. No data. No benchmarks. No trajectory." },
+                { icon: Target, title: "Showcase anxiety", text: "College timeline is ticking. You don't know if you're on track or falling behind." },
               ].map((item, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 15 }}
+                  initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.06 }}
-                  className="flex items-start gap-4 p-5 bg-card border border-border"
+                  transition={stagger(i)}
+                  className="flex items-start gap-4 p-5 bg-card border border-border group hover:border-foreground/20 transition-colors"
                 >
-                  <div className="w-10 h-10 bg-destructive/10 flex items-center justify-center shrink-0">
-                    <item.icon className="w-5 h-5 text-destructive" />
+                  <div className="w-9 h-9 bg-destructive/8 flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 text-destructive" />
                   </div>
-                  <p className="text-sm text-foreground font-body leading-relaxed">{item.text}</p>
+                  <div>
+                    <p className="text-sm font-display text-foreground tracking-wide mb-1">{item.title}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{item.text}</p>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -116,91 +219,94 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ── WHY RANDOM TRAINING FAILS ── */}
-      <section className="py-20 md:py-28 bg-muted">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeUp} className="max-w-4xl mx-auto">
-            <div className="text-center mb-14">
-              <span className="text-xs font-display tracking-[0.25em] text-muted-foreground mb-3 block">THE ROOT CAUSE</span>
-              <h2 className="text-4xl md:text-5xl font-display text-foreground mb-4">RANDOM TRAINING PRODUCES RANDOM RESULTS</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Without a system, athletes plateau. Here's the pattern we see over and over.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  num: "01",
-                  title: "No baseline",
-                  desc: "Athletes train without knowing their current velocity, movement quality, or physical benchmarks. If you can't measure it, you can't improve it.",
-                },
-                {
-                  num: "02",
-                  title: "No structure",
-                  desc: "Jumping between drills, programs, and trainers creates gaps. Development requires progressive overload across every pillar — not random workouts.",
-                },
-                {
-                  num: "03",
-                  title: "No accountability",
-                  desc: "Without tracking and coaching, athletes lose momentum. The best gains come from consistent, monitored, data-backed development.",
-                },
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.12 }}
-                  className="bg-card border border-border p-8"
-                >
-                  <span className="text-4xl font-display text-border">{item.num}</span>
-                  <h3 className="font-display text-xl text-foreground mt-3 mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── HOW VAULT SOLVES IT — THE SYSTEM ── */}
+      {/* ═══════════ ROOT CAUSE ═══════════ */}
       <section className="py-20 md:py-28 bg-foreground text-primary-foreground">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
-              <span className="text-xs font-display tracking-[0.25em] text-primary-foreground/40 mb-3 block">THE SOLUTION</span>
-              <h2 className="text-4xl md:text-6xl font-display mb-4">THE V.A.U.L.T. SYSTEM</h2>
-              <p className="text-lg text-primary-foreground/50 max-w-2xl mx-auto">
-                Five pillars. One system. Every drill, metric, and coaching decision maps to measurable development.
-              </p>
+            <div className="mb-12 md:mb-16 max-w-2xl">
+              <span className="text-[11px] font-display tracking-[0.3em] text-primary-foreground/30 mb-4 block">THE ROOT CAUSE</span>
+              <h2 className="text-3xl md:text-5xl font-display leading-[0.95]">
+                RANDOM TRAINING
+                <br />
+                PRODUCES RANDOM RESULTS.
+              </h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid md:grid-cols-3 gap-px bg-primary-foreground/10">
               {[
-                { letter: "V", name: "Velocity", icon: Zap, color: "var(--vault-velocity)", desc: "Arm speed & exit velo" },
-                { letter: "A", name: "Athleticism", icon: Dumbbell, color: "var(--vault-athleticism)", desc: "Speed, power, agility" },
-                { letter: "U", name: "Utility", icon: Shuffle, color: "var(--vault-utility)", desc: "Game IQ & versatility" },
-                { letter: "L", name: "Longevity", icon: Heart, color: "var(--vault-longevity)", desc: "Arm care & durability" },
-                { letter: "T", name: "Transfer", icon: Target, color: "var(--vault-transfer)", desc: "Practice → game results" },
-              ].map((p, i) => (
+                {
+                  num: "01",
+                  title: "NO BASELINE",
+                  desc: "You're training without knowing your current velocity, movement quality, or benchmarks. You can't improve what you can't measure.",
+                },
+                {
+                  num: "02",
+                  title: "NO STRUCTURE",
+                  desc: "Jumping between drills, programs, and trainers. Development requires progressive overload across every pillar — not random workouts.",
+                },
+                {
+                  num: "03",
+                  title: "NO ACCOUNTABILITY",
+                  desc: "Without tracking and coaching checkpoints, momentum dies. The best gains come from consistent, monitored, data-backed work.",
+                },
+              ].map((item, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="text-center p-6 border border-primary-foreground/10 hover:border-primary-foreground/25 transition-colors"
+                  transition={stagger(i, 0.12)}
+                  className="bg-foreground p-8 md:p-10"
                 >
-                  <p.icon className="w-6 h-6 mx-auto mb-3" style={{ color: `hsl(${p.color})` }} />
-                  <div className="text-5xl font-display mb-1" style={{ color: `hsl(${p.color})` }}>{p.letter}</div>
-                  <p className="font-display text-sm tracking-wide mb-1">{p.name}</p>
-                  <p className="text-[11px] text-primary-foreground/40">{p.desc}</p>
+                  <span className="text-6xl font-display text-primary-foreground/8">{item.num}</span>
+                  <h3 className="font-display text-xl tracking-wide mt-2 mb-3">{item.title}</h3>
+                  <p className="text-sm text-primary-foreground/45 leading-relaxed">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
-            <div className="text-center mt-12">
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ THE V.A.U.L.T. SYSTEM ═══════════ */}
+      <section className="py-20 md:py-28">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeUp} className="max-w-5xl mx-auto">
+            <div className="text-center mb-12 md:mb-16">
+              <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-4 block">THE SOLUTION</span>
+              <h2 className="text-4xl md:text-6xl font-display text-foreground mb-3">THE V.A.U.L.T. SYSTEM</h2>
+              <p className="text-sm md:text-base text-muted-foreground max-w-lg mx-auto">
+                Five pillars. One system. Every drill, metric, and coaching decision maps to measurable development.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-0 border border-border">
+              {[
+                { letter: "V", name: "Velocity", icon: Zap, cssVar: "--vault-velocity", desc: "Arm speed & exit velo programming" },
+                { letter: "A", name: "Athleticism", icon: Dumbbell, cssVar: "--vault-athleticism", desc: "Speed, power, agility development" },
+                { letter: "U", name: "Utility", icon: Shuffle, cssVar: "--vault-utility", desc: "Game IQ & positional versatility" },
+                { letter: "L", name: "Longevity", icon: Heart, cssVar: "--vault-longevity", desc: "Arm care & injury prevention" },
+                { letter: "T", name: "Transfer", icon: Target, cssVar: "--vault-transfer", desc: "Practice → game performance" },
+              ].map((p, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={stagger(i, 0.08)}
+                  className="text-center p-6 md:p-8 border-b sm:border-b-0 sm:border-r last:border-r-0 last:border-b-0 border-border group hover:bg-card transition-colors"
+                >
+                  <div className="text-5xl md:text-6xl font-display mb-2 transition-colors" style={{ color: `hsl(var(${p.cssVar}))` }}>
+                    {p.letter}
+                  </div>
+                  <p className="font-display text-sm tracking-wider text-foreground mb-1">{p.name}</p>
+                  <p className="text-[11px] text-muted-foreground leading-snug">{p.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+            <div className="text-center mt-10">
               <Button
                 size="lg"
-                className="text-lg px-10 py-6 font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
+                variant="vault"
+                className="font-display tracking-wide"
                 onClick={openEddie}
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
@@ -211,27 +317,38 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ── WHO THIS IS FOR ── */}
-      <section className="py-20 md:py-28">
+      {/* ═══════════ WHO IT'S FOR ═══════════ */}
+      <section className="py-20 md:py-28 bg-muted">
         <div className="container mx-auto px-4">
-          <motion.div {...fadeUp} className="max-w-4xl mx-auto">
-            <div className="text-center mb-14">
-              <span className="text-xs font-display tracking-[0.25em] text-muted-foreground mb-3 block">WHO IT'S FOR</span>
-              <h2 className="text-4xl md:text-5xl font-display text-foreground mb-4">BUILT FOR SERIOUS BASEBALL FAMILIES</h2>
+          <motion.div {...fadeUp} className="max-w-5xl mx-auto">
+            <div className="mb-12 md:mb-16">
+              <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-4 block">WHO IT'S FOR</span>
+              <h2 className="text-3xl md:text-5xl font-display text-foreground leading-[0.95]">
+                BUILT FOR SERIOUS
+                <br className="hidden md:block" />
+                BASEBALL FAMILIES.
+              </h2>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-4">
               {[
-                { icon: Zap, title: "Athletes (12-18)", points: ["Want to throw harder and hit farther", "Need a plan — not random drills", "Preparing for showcases or tryouts", "Want to know if they're college-ready"] },
-                { icon: Users, title: "Parents", points: ["Want to see measurable improvement", "Tired of paying for lessons with no plan", "Worried about arm health and overuse", "Need a system they can trust"] },
-                { icon: BookOpen, title: "Coaches", points: ["Need a development curriculum that works", "Want metrics to track athlete progress", "Building programs across age groups", "Looking for coach certification"] },
+                { icon: Zap, title: "ATHLETES (12–18)", points: ["Want to throw harder and hit farther", "Need a plan — not random drills", "Preparing for showcases or tryouts", "Want college-ready benchmarks"] },
+                { icon: Users, title: "PARENTS", points: ["Want measurable improvement proof", "Done paying for lessons with no plan", "Worried about arm health and overuse", "Need a system they can trust"] },
+                { icon: BookOpen, title: "COACHES", points: ["Need a development curriculum", "Want metrics to track each athlete", "Building programs across age groups", "Looking for coach certification"] },
               ].map((group, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }} className="bg-card border border-border p-8">
-                  <group.icon className="w-8 h-8 text-foreground mb-4" />
-                  <h3 className="font-display text-xl text-foreground mb-5">{group.title}</h3>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={stagger(i, 0.1)}
+                  className="bg-card border border-border p-7 md:p-8"
+                >
+                  <group.icon className="w-7 h-7 text-foreground mb-5" />
+                  <h3 className="font-display text-lg tracking-wide text-foreground mb-5">{group.title}</h3>
                   <ul className="space-y-3">
                     {group.points.map((p, j) => (
-                      <li key={j} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <Check className="w-4 h-4 text-foreground shrink-0 mt-0.5" />
+                      <li key={j} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                        <Check className="w-3.5 h-3.5 text-foreground shrink-0 mt-0.5" />
                         {p}
                       </li>
                     ))}
@@ -243,37 +360,41 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ── PRODUCT LADDER ── */}
-      <section className="py-20 md:py-28 bg-muted">
+      {/* ═══════════ OFFER LADDER ═══════════ */}
+      <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
-              <span className="text-xs font-display tracking-[0.25em] text-muted-foreground mb-3 block">THE PATH</span>
-              <h2 className="text-4xl md:text-5xl font-display text-foreground mb-4">START FREE. GO AS FAR AS YOUR GOALS DEMAND.</h2>
-              <p className="text-lg text-muted-foreground">Every level builds on the last. Pick your entry point.</p>
+            <div className="text-center mb-12 md:mb-16">
+              <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-4 block">THE PATH</span>
+              <h2 className="text-3xl md:text-5xl font-display text-foreground mb-3">
+                START FREE. GO AS FAR AS
+                <br className="hidden md:block" />
+                YOUR GOALS DEMAND.
+              </h2>
+              <p className="text-sm text-muted-foreground">Every level builds on the last. Pick your entry point.</p>
             </div>
-            <div className="grid md:grid-cols-4 gap-5">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { step: "01", name: "Free Velocity Guide", price: "FREE", desc: "Learn the 5 mistakes that kill pitch velocity — and how to fix them. Instant download.", cta: "Download Now", href: "/free-velocity-guide", highlight: false },
+                { step: "01", name: "Free Velocity Guide", price: "FREE", desc: "Learn the 5 mistakes killing your pitch velocity. Instant download, no card required.", cta: "Download Now", href: "/free-velocity-guide", highlight: false },
                 { step: "02", name: "Velo-Check Assessment", price: "$97", desc: "Upload your video. Get 3 specific mechanical fixes from Vault coaches within 48 hours.", cta: "Get Velo-Check", href: "/products/velo-check", highlight: false },
-                { step: "03", name: "Vault Velocity System", price: "$397", desc: "The complete 12-week self-guided velocity program. Drills, metrics, and progressive overload built in.", cta: "Start the System", href: "/products/velocity-system", highlight: true },
+                { step: "03", name: "Vault Velocity System", price: "$397", desc: "Complete 12-week self-guided velocity program. Drills, metrics, progressive overload — all built in.", cta: "Start the System", href: "/products/velocity-system", highlight: true },
                 { step: "04", name: "Remote Training", price: "$199/mo", desc: "Monthly coaching, weekly programming, metrics tracking, and direct coach access. Cancel anytime.", cta: "Join Now", href: "/products/remote-training", highlight: false },
               ].map((offer, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className={`relative p-6 border flex flex-col ${offer.highlight ? "bg-foreground text-primary-foreground border-foreground" : "bg-card text-foreground border-border"}`}
+                  transition={stagger(i, 0.08)}
+                  className={`relative p-6 md:p-7 border flex flex-col ${offer.highlight ? "bg-foreground text-primary-foreground border-foreground ring-1 ring-foreground" : "bg-card text-foreground border-border"}`}
                 >
                   {offer.highlight && (
                     <span className="absolute -top-3 left-4 px-3 py-1 bg-destructive text-destructive-foreground text-[10px] font-display tracking-widest">MOST POPULAR</span>
                   )}
-                  <span className={`text-xs font-display tracking-widest mb-3 ${offer.highlight ? "text-primary-foreground/40" : "text-muted-foreground"}`}>STEP {offer.step}</span>
-                  <h3 className="font-display text-lg mb-1">{offer.name}</h3>
+                  <span className={`text-[10px] font-display tracking-[0.25em] mb-4 ${offer.highlight ? "text-primary-foreground/30" : "text-muted-foreground"}`}>STEP {offer.step}</span>
+                  <h3 className="font-display text-lg tracking-wide mb-1">{offer.name}</h3>
                   <p className="text-3xl font-display mb-3">{offer.price}</p>
-                  <p className={`text-sm mb-6 flex-1 leading-relaxed ${offer.highlight ? "text-primary-foreground/50" : "text-muted-foreground"}`}>{offer.desc}</p>
+                  <p className={`text-xs mb-6 flex-1 leading-relaxed ${offer.highlight ? "text-primary-foreground/45" : "text-muted-foreground"}`}>{offer.desc}</p>
                   <Button
                     variant={offer.highlight ? "secondary" : "vault"}
                     className="w-full"
@@ -293,37 +414,73 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
+      {/* ═══════════ PHILOSOPHY ═══════════ */}
+      <section className="py-20 md:py-28 bg-foreground text-primary-foreground">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeUp} className="max-w-3xl mx-auto">
+            <span className="text-[11px] font-display tracking-[0.3em] text-primary-foreground/30 mb-4 block">PHILOSOPHY</span>
+            <h2 className="text-3xl md:text-5xl font-display leading-[0.95] mb-8">
+              DEVELOPMENT OVER HYPE.
+              <br />
+              <span className="text-primary-foreground/35">ALWAYS.</span>
+            </h2>
+            <div className="space-y-6 text-sm md:text-base text-primary-foreground/50 leading-relaxed">
+              <p>
+                Vault doesn't sell quick fixes, magic drills, or "secret velocity hacks." We build athletes through structured, measurable, progressive development — the same way every elite program operates.
+              </p>
+              <p>
+                Every protocol in the Vault system is rooted in biomechanics, strength science, and real coaching experience. If it doesn't produce results, it doesn't make the cut.
+              </p>
+              <p>
+                We don't chase trends. We build systems. That's the difference between athletes who plateau and athletes who develop year over year.
+              </p>
+            </div>
+            <div className="mt-10 pt-8 border-t border-primary-foreground/10">
+              <p className="font-display text-lg tracking-wide text-primary-foreground/70">
+                — Eddie Mejia, Founder & Development Architect
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ TESTIMONIALS ═══════════ */}
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
-              <span className="text-xs font-display tracking-[0.25em] text-muted-foreground mb-3 block">RESULTS</span>
-              <h2 className="text-4xl md:text-5xl font-display text-foreground mb-4">ATHLETES ARE GAINING REAL VELOCITY</h2>
-              <p className="text-lg text-muted-foreground">Measurable results from athletes using the Vault system.</p>
+            <div className="text-center mb-12 md:mb-16">
+              <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-4 block">RESULTS</span>
+              <h2 className="text-3xl md:text-5xl font-display text-foreground">ATHLETES ARE GAINING REAL VELOCITY</h2>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-4">
               {[
-                { name: "Jake M.", detail: "16 · RHP · Texas", quote: "I gained 6 mph in 8 weeks on the Velocity System. The drills are structured and they actually make sense. My coach could see the difference immediately.", stat: "+6 MPH", label: "Pitching Velo" },
-                { name: "Sarah T.", detail: "Parent · Son age 14", quote: "As a parent, I finally feel like we're investing in something real. We can see his metrics, track his progress, and know exactly what he's working on every week.", stat: "5-PILLAR", label: "Full Tracking" },
-                { name: "Dylan R.", detail: "17 · RHP/1B · Florida", quote: "The Performance membership keeps me accountable. I know exactly where I stand for D1 benchmarks and what I need to work on. It's not guessing anymore.", stat: "+8 MPH", label: "Pitching Velo" },
-                { name: "Marcus W.", detail: "14 · IF/P · California", quote: "Vault showed me exactly where I was losing velocity in my mechanics. In two months I went from 62 to 66 and I'm still climbing.", stat: "+4 MPH", label: "Pitching Velo" },
-                { name: "Ryan K.", detail: "Coach · Travel Ball", quote: "I put my entire 14U team on Vault. The system gives me a framework for developing each player individually while running the same program. Game changer for coaches.", stat: "12", label: "Athletes Coached" },
-                { name: "Mike D.", detail: "Parent · Son age 16", quote: "We spent $3,000 on private lessons last year with no real plan. Vault gave us more structure in one month than a year of random training.", stat: "$397", label: "Full System" },
+                { name: "Jake M.", detail: "16 · RHP · Texas", quote: "I gained 6 mph in 8 weeks on the Velocity System. The drills are structured and they actually make sense.", stat: "+6 MPH", label: "Pitching Velo" },
+                { name: "Sarah T.", detail: "Parent · Son age 14", quote: "We finally feel like we're investing in something real. We can see his metrics and know exactly what he's working on.", stat: "5-PILLAR", label: "Full Tracking" },
+                { name: "Dylan R.", detail: "17 · RHP/1B · Florida", quote: "The Remote Training keeps me accountable. I know exactly where I stand for D1 benchmarks.", stat: "+8 MPH", label: "Pitching Velo" },
+                { name: "Marcus W.", detail: "14 · IF/P · California", quote: "Vault showed me exactly where I was losing velocity. In two months I went from 62 to 66.", stat: "+4 MPH", label: "Pitching Velo" },
+                { name: "Ryan K.", detail: "Coach · Travel Ball", quote: "I put my entire 14U team on Vault. The system gives me a framework for developing each player individually.", stat: "12", label: "Athletes Coached" },
+                { name: "Mike D.", detail: "Parent · Son age 16", quote: "We spent $3K on private lessons last year with no plan. Vault gave us more structure in one month.", stat: "$397", label: "Full System" },
               ].map((t, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="bg-card border border-border p-6 flex flex-col">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-foreground text-foreground" />)}
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={stagger(i, 0.06)}
+                  className="bg-card border border-border p-6 flex flex-col"
+                >
+                  <div className="flex items-center gap-0.5 mb-4">
+                    {[...Array(5)].map((_, j) => <Star key={j} className="w-3 h-3 fill-foreground text-foreground" />)}
                   </div>
-                  <p className="text-sm text-muted-foreground mb-5 italic leading-relaxed flex-1">"{t.quote}"</p>
+                  <p className="text-xs text-muted-foreground mb-5 italic leading-relaxed flex-1">"{t.quote}"</p>
                   <div className="flex items-end justify-between pt-4 border-t border-border">
                     <div>
                       <p className="text-sm font-medium text-foreground">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.detail}</p>
+                      <p className="text-[11px] text-muted-foreground">{t.detail}</p>
                     </div>
                     <div className="text-right">
                       <span className="block text-lg font-display text-foreground">{t.stat}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{t.label}</span>
+                      <span className="text-[10px] text-muted-foreground tracking-wider font-display">{t.label}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -333,31 +490,41 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ── FAQ ── */}
+      {/* ═══════════ FAQ ═══════════ */}
       <section className="py-20 md:py-28 bg-muted">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="max-w-3xl mx-auto">
-            <div className="text-center mb-14">
-              <span className="text-xs font-display tracking-[0.25em] text-muted-foreground mb-3 block">FAQ</span>
-              <h2 className="text-4xl md:text-5xl font-display text-foreground mb-4">COMMON QUESTIONS</h2>
+            <div className="mb-12">
+              <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-4 block">FAQ</span>
+              <h2 className="text-3xl md:text-5xl font-display text-foreground">COMMON QUESTIONS</h2>
             </div>
             <FAQSection />
           </motion.div>
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
-      <section className="py-24 md:py-32 bg-foreground text-primary-foreground">
-        <div className="container mx-auto px-4">
+      {/* ═══════════ FINAL CTA ═══════════ */}
+      <section className="py-24 md:py-36 bg-foreground text-primary-foreground relative overflow-hidden">
+        {/* BG accent */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage:
+            "linear-gradient(hsl(var(--background)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--background)) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }} />
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div {...fadeUp} className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl md:text-6xl font-display mb-4">STOP GUESSING. START DEVELOPING.</h2>
-            <p className="text-lg text-primary-foreground/50 mb-10 max-w-xl mx-auto">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-display leading-[0.88] mb-5">
+              YOUR DEVELOPMENT
+              <br />
+              STARTS NOW.
+            </h2>
+            <p className="text-base md:text-lg text-primary-foreground/45 mb-10 max-w-lg mx-auto">
               Join the athletes and families who replaced random training with a real system — and started seeing results.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button
-                size="lg"
-                className="text-lg px-10 py-6 font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
+                size="xl"
+                className="font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
                 onClick={openEddie}
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
@@ -366,16 +533,18 @@ const Index = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="text-lg px-10 py-6 font-display tracking-wide border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
+                className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
                 onClick={() => navigate("/free-velocity-guide")}
               >
                 <Download className="w-5 h-5 mr-2" />
                 FREE VELOCITY GUIDE
               </Button>
             </div>
-            <p className="mt-8 text-xs text-primary-foreground/25 font-display tracking-widest">
-              NO CREDIT CARD REQUIRED &nbsp;·&nbsp; INSTANT ACCESS &nbsp;·&nbsp; AGES 12-18
-            </p>
+            <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-8">
+              {["No Credit Card", "Instant Access", "Ages 12–18"].map((t, i) => (
+                <span key={i} className="text-[10px] text-primary-foreground/20 font-display tracking-[0.2em]">{t}</span>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
@@ -389,28 +558,41 @@ const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const faqs = [
-    { q: "What age group is Vault designed for?", a: "Vault is built for baseball athletes ages 12-18. Our system scales to any skill level — from first-year travel ball players to pre-college showcase athletes. Coaches and parents also use the platform for team development." },
-    { q: "Do I need special equipment?", a: "No. A ball, glove, and access to a field or cage is all you need to start. For advanced metrics tracking, Vault integrates with devices like Rapsodo and Blast Motion — but they're optional." },
-    { q: "How is this different from private lessons?", a: "Private lessons give you one coach's opinion for one hour a week. Vault gives you a complete system: structured programming, measurable benchmarks, arm care protocols, and ongoing tracking across all 5 development pillars. It's the plan between lessons." },
-    { q: "I'm not sure which product to start with.", a: "Ask Eddie AI — our development advisor. He'll ask about your goals, age, position, and current level, then recommend exactly where to start. Most athletes begin with the free guide or Velo-Check." },
+    { q: "What age group is Vault designed for?", a: "Vault is built for baseball athletes ages 12–18. The system scales to any skill level — from first-year travel ball to pre-college showcase athletes." },
+    { q: "Do I need special equipment?", a: "No. A ball, glove, and access to a field or cage is all you need. For advanced metrics, Vault integrates with Rapsodo and Blast Motion — but they're optional." },
+    { q: "How is this different from private lessons?", a: "Private lessons give you one coach's opinion for one hour a week. Vault gives you a complete system: structured programming, measurable benchmarks, arm care protocols, and ongoing tracking across all 5 pillars." },
+    { q: "I'm not sure which product to start with.", a: "Ask Eddie AI. He'll ask about your goals, age, position, and current level, then recommend exactly where to start. Most athletes begin with the free guide or Velo-Check." },
     { q: "Is there a money-back guarantee?", a: "Yes. If you complete the work and don't see measurable improvement, contact us. We stand behind the system because the system works when you follow it." },
-    { q: "Can coaches use Vault for their teams?", a: "Absolutely. We offer team licenses, coach certification programs, and organizational dashboards. Check out our Team Licenses or Org Starter Pack pages for details." },
-    { q: "How quickly will I see results?", a: "Most athletes on the Velocity System see measurable velocity gains within 4-6 weeks. The full 12-week program is designed for sustained improvement, not quick fixes that fade." },
+    { q: "Can coaches use Vault for their teams?", a: "Absolutely. We offer team licenses, coach certification programs, and organizational dashboards." },
+    { q: "How quickly will I see results?", a: "Most athletes see measurable velocity gains within 4–6 weeks. The full 12-week program is designed for sustained improvement, not quick fixes." },
   ];
 
   return (
     <div className="space-y-2">
       {faqs.map((faq, i) => (
         <div key={i} className="border border-border bg-card">
-          <button className="w-full flex items-center justify-between p-5 text-left" onClick={() => setOpenIndex(openIndex === i ? null : i)}>
-            <span className="font-display text-foreground text-sm">{faq.q}</span>
-            <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform shrink-0 ml-4 ${openIndex === i ? "rotate-180" : ""}`} />
+          <button
+            className="w-full flex items-center justify-between p-5 text-left"
+            onClick={() => setOpenIndex(openIndex === i ? null : i)}
+          >
+            <span className="font-display text-foreground text-sm tracking-wide">{faq.q}</span>
+            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform shrink-0 ml-4 ${openIndex === i ? "rotate-180" : ""}`} />
           </button>
-          {openIndex === i && (
-            <div className="px-5 pb-5">
-              <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
-            </div>
-          )}
+          <AnimatePresence>
+            {openIndex === i && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="px-5 pb-5">
+                  <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       ))}
     </div>
