@@ -112,8 +112,9 @@ const Navbar = () => {
     },
     { 
       name: "Coaching", 
-      href: "/find-coach",
+      href: "/marketplace",
       dropdown: [
+        { name: "Coach Marketplace", href: "/marketplace" },
         { name: "Find a Coach", href: "/find-coach" },
         { name: "Lesson Packages", href: "/lesson-packages" },
         { name: "Remote Lessons", href: "/remote-lessons" },
