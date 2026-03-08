@@ -111,11 +111,12 @@ serve(async (req) => {
   } catch (error) {
     console.error("Payout error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const isAuthError = errorMessage === "Unauthorized" || errorMessage === "Admin access required";
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: isAuthError ? errorMessage : "An error occurred. Please try again." }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: errorMessage === "Unauthorized" ? 401 : 400,
+        status: isAuthError ? 401 : 500,
       }
     );
   }
