@@ -18,6 +18,7 @@ const PRICE_TO_PRODUCT_KEY: Record<string, string> = {
   'price_1SjGMKPhXS410TO5XQcZm9fZ': 'basic',
   'price_1SjGMYPhXS410TO5bGu1kSSZ': 'performance',
   'price_1SjGMhPhXS410TO59WKiE81b': 'elite',
+  'price_1T8ckaPhXS410TO57tcuh1nv': 'remote_training',
   'price_1SqEGEPhXS410TO5DeHOuqVH': 'small_org_license',
   'price_1SqEGIPhXS410TO5JUNSsTCq': 'org_quick_start',
   'price_1SqEGOPhXS410TO5XtSbPx0v': 'certified_coach',
@@ -25,7 +26,10 @@ const PRICE_TO_PRODUCT_KEY: Record<string, string> = {
   // Beta Systems
   'price_1SqEGAPhXS410TO5ZIx2g0RZ': 'longevity_beta',
   'price_1SqEGCPhXS410TO5iCsokNpV': 'transfer_beta',
-  // Stand-alone Products
+  // Stand-alone Products (new prices)
+  'price_1T8ckXPhXS410TO5tYyygmol': 'velo_check',
+  'price_1T8ckYPhXS410TO5WkQI2EpC': 'velocity_12week',
+  // Stand-alone Products (legacy prices)
   'price_1SqEGGPhXS410TO52G0rlmEk': 'velocity_12week',
   'price_1SqEW4PhXS410TO51a1fzsw1': 'velocity_accelerator',
   'price_1SqEGKPhXS410TO5JALh4Imp': 'velo_check',
@@ -45,38 +49,54 @@ const PRICE_TO_PRODUCT_KEY: Record<string, string> = {
   'price_1SqNikPhXS410TO5rLuqRrBn': 'founders_access',
 };
 
+// All course IDs in the platform
+const ALL_COURSES = [
+  'velocity-system', 'hitting-velocity-12week', 'pitching-velocity-8week', 'elite-pitching-12week',
+  'elite-speed-agility-12week', 'youth-vertical-6week', 'elite-vertical-12week',
+  'strength-conditioning-12week', 'youth-catcher-8week', 'elite-catcher-12week',
+  'vault-catcher-complete', 'arm-health-workload', 'arm-care-complete',
+  'pitcher-catcher-overlap', 'mobility-durability', 'transfer-system',
+  'competitive-execution', 'elite-mindset-10week', 'winning-mindset-10week',
+  'organizational-development', 'strength-power-system', 'annual-development-calendar',
+  'infield-development', 'outfield-development',
+];
+
 // Complete map of product keys to course IDs they grant access to
 const PRODUCT_TO_COURSES: Record<string, string[]> = {
-  // Subscriptions
-  'basic': ['speed-agility'],
-  'performance': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload'],
-  'elite': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
-  'vault_trial': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
-  // Org licenses
-  'small_org_license': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload'],
-  'org_quick_start': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
-  'org_starter_pack': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload', 'strength-power-system', 'organizational-development'],
-  // Stand-alone products
-  'velocity_12week': ['velocity-system'],
-  'velocity_accelerator': ['velocity-system'],
-  'longevity_beta': ['arm-health-workload'],
-  'transfer_beta': ['transfer-system'],
-  'transfer_intensive': ['transfer-system'],
-  // Bundles
-  'velocity_max_pack': ['velocity-system', 'speed-agility', 'strength-conditioning'],
-  'recruiting_edge_pack': ['velocity-system'],
-  'coach_authority_pack': ['velocity-system', 'strength-conditioning', 'speed-agility', 'arm-health-workload'],
-  // Founder's Access - ALL courses
-  'founders_access': [
-    'velocity-system', 
-    'strength-conditioning', 
-    'speed-agility', 
-    'arm-health-workload', 
-    'strength-power-system', 
-    'organizational-development',
-    'transfer-system'
+  // Subscriptions — tiered access
+  'basic': [
+    'elite-speed-agility-12week', 'youth-vertical-6week', 'elite-mindset-10week',
+    'arm-care-complete', 'mobility-durability',
   ],
-  // Services (no course access but still recorded)
+  'performance': [
+    'velocity-system', 'hitting-velocity-12week', 'pitching-velocity-8week',
+    'strength-conditioning-12week', 'elite-speed-agility-12week', 'youth-vertical-6week',
+    'elite-vertical-12week', 'arm-health-workload', 'arm-care-complete', 'mobility-durability',
+    'elite-mindset-10week', 'competitive-execution',
+  ],
+  'remote_training': ALL_COURSES,
+  'elite': ALL_COURSES,
+  'vault_trial': ALL_COURSES,
+  // Org licenses — full access
+  'small_org_license': ALL_COURSES,
+  'org_quick_start': ALL_COURSES,
+  'org_starter_pack': ALL_COURSES,
+  // Stand-alone products
+  'velocity_12week': ['velocity-system', 'hitting-velocity-12week', 'pitching-velocity-8week', 'elite-pitching-12week'],
+  'velocity_accelerator': ['velocity-system', 'hitting-velocity-12week'],
+  'longevity_beta': ['arm-health-workload', 'arm-care-complete', 'mobility-durability', 'pitcher-catcher-overlap'],
+  'transfer_beta': ['transfer-system', 'competitive-execution'],
+  'transfer_intensive': ['transfer-system', 'competitive-execution'],
+  // Bundles
+  'velocity_max_pack': [
+    'velocity-system', 'hitting-velocity-12week', 'pitching-velocity-8week',
+    'elite-speed-agility-12week', 'strength-conditioning-12week',
+  ],
+  'recruiting_edge_pack': ['velocity-system', 'hitting-velocity-12week', 'elite-mindset-10week'],
+  'coach_authority_pack': ALL_COURSES,
+  // Founder's Access — EVERYTHING, lifetime
+  'founders_access': ALL_COURSES,
+  // Services (no course access but still tracked)
   'velo_check': [],
   'recruitment_audit': [],
   'certified_coach': [],
