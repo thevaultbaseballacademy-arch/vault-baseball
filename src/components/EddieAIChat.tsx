@@ -54,9 +54,11 @@ const TypingIndicator = () => (
 );
 
 // ── Eddie's pre-loaded greeting (no API call needed) ──
-const EDDIE_GREETING = `I'm Eddie. I run the development side at Vault Baseball.
+const EDDIE_GREETING = `Welcome to Vault Baseball. I'm Eddie AI.
 
-Are you an athlete, a parent, or a coach? Tell me a little about the situation and I'll point you to the right thing.`;
+I help athletes and parents figure out the right next step for velocity, arm care, and long-term baseball development.
+
+Let's start with a few quick questions so I can point you in the right direction.`;
 
 export const EddieAIChat = () => {
   const [isOpen, setIsOpen] = useState(false);
