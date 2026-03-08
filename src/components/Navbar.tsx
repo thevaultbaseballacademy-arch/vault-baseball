@@ -71,8 +71,8 @@ const Navbar = () => {
         { name: "Velocity", href: "/#pillars" },
         { name: "Athleticism", href: "/#pillars" },
         { name: "Utility", href: "/#pillars" },
-        { name: "Longevity (Beta)", href: "/products/longevity" },
-        { name: "Transfer (Beta)", href: "/products/transfer" },
+        { name: "Longevity", href: "/products/longevity" },
+        { name: "Transfer", href: "/products/transfer" },
       ]
     },
     { 
@@ -84,8 +84,8 @@ const Navbar = () => {
         { name: "Velocity Accelerator", href: "/products/velocity-accelerator" },
         { name: "Velo-Check Analysis", href: "/products/velo-check" },
         { name: "Recruitment Audit", href: "/products/recruitment" },
-        { name: "Longevity System (Beta)", href: "/products/longevity" },
-        { name: "Transfer System (Beta)", href: "/products/transfer" },
+        { name: "Longevity System", href: "/products/longevity" },
+        { name: "Transfer System", href: "/products/transfer" },
         { name: "Team Licenses", href: "/products/teams" },
         { name: "Coach Certification", href: "/products/certified-coach" },
         { name: "Bundles", href: "/products/bundles" },

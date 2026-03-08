@@ -94,26 +94,26 @@ const Products = () => {
       badgeColor: "bg-green-500",
       category: "entry" as Category,
     },
-    // Beta Systems
+    // Core Systems
     {
       key: "longevity_beta",
       icon: Shield,
       title: "Longevity System",
-      subtitle: "Beta Access",
-      description: "Arm health monitoring and workload management to maximize availability.",
-      href: "/products/longevity-beta",
+      subtitle: "Full Release",
+      description: "Arm health monitoring, workload management, and recovery protocols to maximize availability.",
+      href: "/products/longevity",
       price: PRODUCT_PRICES.longevity_beta.price,
-      category: "beta" as Category,
+      category: "flagship" as Category,
     },
     {
       key: "transfer_beta",
       icon: Target,
       title: "Transfer System",
-      subtitle: "Beta Access",
-      description: "Bridge practice performance to game-day execution.",
-      href: "/products/transfer-beta",
+      subtitle: "Full Release",
+      description: "Bridge practice performance to game-day execution with competition-focused training.",
+      href: "/products/transfer",
       price: PRODUCT_PRICES.transfer_beta.price,
-      category: "beta" as Category,
+      category: "flagship" as Category,
     },
     // Featured Products
     {
