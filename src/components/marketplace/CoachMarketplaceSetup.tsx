@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Plus, Trash2, Award } from "lucide-react";
+import { Save, Plus, Trash2, Award, ShieldCheck, Shield, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -185,6 +185,47 @@ const CoachMarketplaceSetup = ({ userId }: Props) => {
       <div className="text-center py-12">
         <Award className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
         <p className="text-muted-foreground">You must be a registered coach to access marketplace settings.</p>
+      </div>
+    );
+  }
+
+  // Gate: Coach must be marketplace approved
+  const isApproved = coachRecord.is_marketplace_approved === true;
+  const isCertified = coachRecord.is_certified || coachRecord.is_bypass_certified;
+
+  if (!isApproved) {
+    return (
+      <div className="text-center py-12 space-y-4">
+        <Lock className="w-12 h-12 text-muted-foreground mx-auto" />
+        <h3 className="font-display text-lg text-foreground">MARKETPLACE ACCESS RESTRICTED</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          {!isCertified
+            ? "You must complete Vault Certification before accessing the marketplace. Complete your certification and wait for admin approval."
+            : "Your profile is pending admin approval. Once approved, you'll be able to set up your marketplace profile and accept bookings."}
+        </p>
+        <div className="flex items-center justify-center gap-2 pt-2">
+          {coachRecord.is_bypass_certified && (
+            <Badge className="bg-purple-600 text-white gap-1">
+              <ShieldCheck className="w-3 h-3" />
+              In-Person Certified
+            </Badge>
+          )}
+          {coachRecord.is_staff && (
+            <Badge className="bg-foreground text-background gap-1">
+              <Shield className="w-3 h-3" />
+              Staff
+            </Badge>
+          )}
+          {coachRecord.is_certified && !coachRecord.is_bypass_certified && (
+            <Badge className="bg-accent text-accent-foreground gap-1">
+              <Award className="w-3 h-3" />
+              Vault Certified
+            </Badge>
+          )}
+          <Badge variant="outline">
+            Status: {coachRecord.marketplace_status || "applied"}
+          </Badge>
+        </div>
       </div>
     );
   }

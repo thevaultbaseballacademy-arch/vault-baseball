@@ -23,6 +23,11 @@ export interface MarketplaceCoach {
   coach_name?: string;
   coach_email?: string;
   coach_status?: string;
+  is_certified?: boolean;
+  is_bypass_certified?: boolean;
+  is_staff?: boolean;
+  is_marketplace_approved?: boolean;
+  marketplace_status?: string;
 }
 
 export interface CoachService {
@@ -71,7 +76,7 @@ export const useMarketplaceCoaches = (filters?: { specialty?: string; search?: s
   return useQuery({
     queryKey: ["marketplace-coaches", filters],
     queryFn: async () => {
-      // Query marketplace profiles joined with coaches
+      // Query marketplace profiles joined with coaches — only approved coaches
       let query = supabase
         .from("coach_marketplace_profiles")
         .select(`
@@ -79,7 +84,12 @@ export const useMarketplaceCoaches = (filters?: { specialty?: string; search?: s
           coaches:coach_id (
             name,
             email,
-            status
+            status,
+            is_certified,
+            is_bypass_certified,
+            is_staff,
+            is_marketplace_approved,
+            marketplace_status
           )
         `)
         .eq("is_marketplace_active", true);
@@ -87,12 +97,24 @@ export const useMarketplaceCoaches = (filters?: { specialty?: string; search?: s
       const { data, error } = await query.order("avg_rating", { ascending: false });
       if (error) throw error;
 
-      let results = (data || []).map((item: any) => ({
-        ...item,
-        coach_name: item.coaches?.name,
-        coach_email: item.coaches?.email,
-        coach_status: item.coaches?.status,
-      }));
+      let results = (data || [])
+        .map((item: any) => ({
+          ...item,
+          coach_name: item.coaches?.name,
+          coach_email: item.coaches?.email,
+          coach_status: item.coaches?.status,
+          is_certified: item.coaches?.is_certified,
+          is_bypass_certified: item.coaches?.is_bypass_certified,
+          is_staff: item.coaches?.is_staff,
+          is_marketplace_approved: item.coaches?.is_marketplace_approved,
+          marketplace_status: item.coaches?.marketplace_status,
+        }))
+        // CRITICAL: Only show approved coaches with active status
+        .filter((c: any) =>
+          c.is_marketplace_approved === true &&
+          c.marketplace_status === "approved" &&
+          c.coach_status === "Active"
+        );
 
       // Client-side filtering
       if (filters?.specialty) {
@@ -129,18 +151,29 @@ export const useCoachProfile = (coachId: string) => {
           coaches:coach_id (
             name,
             email,
-            status
+            status,
+            is_certified,
+            is_bypass_certified,
+            is_staff,
+            is_marketplace_approved,
+            marketplace_status
           )
         `)
         .eq("coach_id", coachId)
         .single();
 
       if (error) throw error;
+      const coach = data as any;
       return {
         ...data,
-        coach_name: (data as any).coaches?.name,
-        coach_email: (data as any).coaches?.email,
-        coach_status: (data as any).coaches?.status,
+        coach_name: coach.coaches?.name,
+        coach_email: coach.coaches?.email,
+        coach_status: coach.coaches?.status,
+        is_certified: coach.coaches?.is_certified,
+        is_bypass_certified: coach.coaches?.is_bypass_certified,
+        is_staff: coach.coaches?.is_staff,
+        is_marketplace_approved: coach.coaches?.is_marketplace_approved,
+        marketplace_status: coach.coaches?.marketplace_status,
       } as MarketplaceCoach;
     },
     enabled: !!coachId,

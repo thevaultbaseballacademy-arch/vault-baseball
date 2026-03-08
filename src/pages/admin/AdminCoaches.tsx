@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { Loader2, Plus, Users } from "lucide-react";
+import { Loader2, Plus, Users, Shield } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useCoachManagement, type Coach } from "@/hooks/useCoachManagement";
 import { AdminSidebar } from "@/components/admin-analytics/AdminSidebar";
 import { CoachesTable } from "@/components/admin/CoachesTable";
 import { CoachForm } from "@/components/admin/CoachForm";
+import CoachApprovalPanel from "@/components/admin/CoachApprovalPanel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -72,7 +74,7 @@ const AdminCoaches = () => {
             <div>
               <h1 className="text-4xl font-display">Coaches</h1>
               <p className="text-muted-foreground mt-1">
-                Manage coach accounts, roles, and access status
+                Manage coach accounts, approvals, and marketplace access
               </p>
             </div>
             <Button onClick={handleAddCoach}>
@@ -81,62 +83,81 @@ const AdminCoaches = () => {
             </Button>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Coaches</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{coaches?.length || 0}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active</CardTitle>
-                <Users className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">
-                  {coaches?.filter((c) => c.status === "Active").length || 0}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Suspended</CardTitle>
-                <Users className="h-4 w-4 text-destructive" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-destructive">
-                  {coaches?.filter((c) => c.status === "Suspended").length || 0}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Tabs defaultValue="approval" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="approval" className="gap-1.5">
+                <Shield className="w-3.5 h-3.5" />
+                Marketplace Approval
+              </TabsTrigger>
+              <TabsTrigger value="all" className="gap-1.5">
+                <Users className="w-3.5 h-3.5" />
+                All Coaches
+              </TabsTrigger>
+            </TabsList>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>All Coaches</CardTitle>
-              <CardDescription>
-                View and manage all coaches in your organization
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <CoachesTable
-                  coaches={coaches || []}
-                  onEdit={handleEditCoach}
-                  onToggleStatus={handleToggleStatus}
-                  onDelete={handleDeleteCoach}
-                />
-              )}
-            </CardContent>
-          </Card>
+            <TabsContent value="approval">
+              <CoachApprovalPanel />
+            </TabsContent>
+
+            <TabsContent value="all" className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-3">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Coaches</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{coaches?.length || 0}</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Active</CardTitle>
+                    <Users className="h-4 w-4 text-green-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">
+                      {coaches?.filter((c) => c.status === "Active").length || 0}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Suspended</CardTitle>
+                    <Users className="h-4 w-4 text-destructive" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-destructive">
+                      {coaches?.filter((c) => c.status === "Suspended").length || 0}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Coaches</CardTitle>
+                  <CardDescription>
+                    View and manage all coaches in your organization
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : (
+                    <CoachesTable
+                      coaches={coaches || []}
+                      onEdit={handleEditCoach}
+                      onToggleStatus={handleToggleStatus}
+                      onDelete={handleDeleteCoach}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
 

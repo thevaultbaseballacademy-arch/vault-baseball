@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMarketplaceCoaches, type MarketplaceCoach } from "@/hooks/useMarketplace";
 import { Skeleton } from "@/components/ui/skeleton";
+import CoachBadges from "@/components/marketplace/CoachBadges";
 
 const SPECIALTIES = ["Pitching", "Hitting", "Fielding", "Catching", "Strength", "Youth Development", "College Prep"];
 
@@ -199,13 +200,17 @@ const Marketplace = () => {
                         )}
                       </div>
 
+                      {/* Badges */}
+                      <CoachBadges
+                        isCertified={coach.is_certified}
+                        isBypassCertified={coach.is_bypass_certified}
+                        isStaff={coach.is_staff}
+                        compact
+                      />
+
                       {/* Footer */}
                       <div className="mt-auto flex items-center justify-between pt-4 border-t border-border">
                         <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Award className="w-3.5 h-3.5" />
-                            Certified
-                          </div>
                           {coach.total_sessions > 0 && (
                             <div className="flex items-center gap-1">
                               <Clock className="w-3.5 h-3.5" />
