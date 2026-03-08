@@ -325,7 +325,7 @@ const CoachDashboard = () => {
                 title="Analytics"
                 description="Performance data"
                 icon={BarChart3}
-                href="/longevity-dashboard"
+                href="/longevity"
                 color="#8b5cf6"
                 delay={0.25}
               />

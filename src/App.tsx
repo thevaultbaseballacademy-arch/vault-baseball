@@ -90,6 +90,7 @@ import Marketplace from "./pages/Marketplace";
 import CoachMarketplaceProfile from "./pages/CoachMarketplaceProfile";
 import Claim22MAccess from "./pages/Claim22MAccess";
 import ShortRedirect from "./pages/ShortRedirect";
+import CoachManagement from "./pages/CoachManagement";
 
 const queryClient = new QueryClient();
 
@@ -128,6 +129,7 @@ const App = () => (
             <Route path="/admin/exams" element={<AdminExams />} />
             <Route path="/admin/certifications" element={<AdminCertifications />} />
             <Route path="/admin/payouts" element={<AdminPayouts />} />
+            <Route path="/admin/coach-management" element={<CoachManagement />} />
             <Route path="/community" element={
               <TrialProtectedRoute>
                 <Community />

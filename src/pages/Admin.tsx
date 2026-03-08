@@ -4,7 +4,7 @@ import {
   ArrowLeft, Loader2, Users, Shield, UserCheck,
   Search, Plus, Check, BarChart3, Link2, Video, Award, Clock,
   FileText, Database, Trash2, Lightbulb, Activity, UserPlus,
-  ChevronRight, Settings, Bell, BookOpen, Heart,
+  ChevronRight, Settings, Bell, BookOpen, Heart, Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,6 +59,7 @@ const SECTIONS = [
   {
     group: "Coaching",
     items: [
+      { id: "coach-mgmt", label: "Coach Management", icon: Briefcase },
       { id: "coach-invites", label: "Coach Invites", icon: Link2 },
       { id: "assignments", label: "Assignments", icon: UserCheck },
     ],
@@ -265,6 +266,10 @@ const Admin = () => {
                         <button
                           key={item.id}
                           onClick={() => {
+                            if (item.id === "coach-mgmt") {
+                              navigate("/admin/coach-management");
+                              return;
+                            }
                             setActiveSection(item.id);
                             setSidebarOpen(false);
                           }}
