@@ -85,6 +85,7 @@ import RemoteLessons from "./pages/RemoteLessons";
 import GroupSessions from "./pages/GroupSessions";
 import FreeVelocityGuide from "./pages/FreeVelocityGuide";
 import AthleteOnboarding from "./pages/AthleteOnboarding";
+import RemoteTrainingHub from "./pages/RemoteTrainingHub";
 
 const queryClient = new QueryClient();
 
