@@ -117,6 +117,7 @@ const PaymentSuccess = () => {
         setVerified(data?.verified ?? false);
         setUnlockedCourses(data?.coursesUnlocked || []);
         setIsFoundersAccess(data?.isFoundersAccess || false);
+        setProductKey(data?.productKey || null);
         
         if (data?.verified) {
           // Fire confetti for successful purchases
@@ -269,7 +270,7 @@ const PaymentSuccess = () => {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to={`/athlete-onboarding${data?.productKey ? `?product=${data.productKey}` : ''}`}>
+                  <Link to={`/athlete-onboarding${productKey ? `?product=${productKey}` : ''}`}>
                     <Button variant="vault" size="lg">
                       Complete Your Onboarding
                       <ArrowRight className="w-5 h-5 ml-2" />
