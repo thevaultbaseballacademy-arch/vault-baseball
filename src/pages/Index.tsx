@@ -257,7 +257,7 @@ const Index = () => {
                 { step: "01", name: "Free Velocity Guide", price: "FREE", desc: "Learn the 5 mistakes that kill pitch velocity — and how to fix them. Instant download.", cta: "Download Now", href: "/free-velocity-guide", highlight: false },
                 { step: "02", name: "Velo-Check Assessment", price: "$97", desc: "Upload your video. Get 3 specific mechanical fixes from Vault coaches within 48 hours.", cta: "Get Velo-Check", href: "/products/velo-check", highlight: false },
                 { step: "03", name: "Vault Velocity System", price: "$397", desc: "The complete 12-week self-guided velocity program. Drills, metrics, and progressive overload built in.", cta: "Start the System", href: "/products/velocity-system", highlight: true },
-                { step: "04", name: "Remote Training", price: "$199/mo", desc: "Monthly coaching, weekly programming, metrics tracking, and direct coach access. Cancel anytime.", cta: "Join Now", href: "/#pricing", highlight: false },
+                { step: "04", name: "Remote Training", price: "$199/mo", desc: "Monthly coaching, weekly programming, metrics tracking, and direct coach access. Cancel anytime.", cta: "Join Now", href: "/products/remote-training", highlight: false },
               ].map((offer, i) => (
                 <motion.div
                   key={i}

@@ -53,6 +53,7 @@ import ShowcasePrep from "./pages/products/ShowcasePrep";
 import VideoAnalysis from "./pages/products/VideoAnalysis";
 import OrgStarterPack from "./pages/products/OrgStarterPack";
 import FoundersAccess from "./pages/products/FoundersAccess";
+import RemoteTraining from "./pages/products/RemoteTraining";
 import PartnerClaim from "./pages/PartnerClaim";
 import WallOfWins from "./pages/WallOfWins";
 import Products from "./pages/Products";
@@ -176,6 +177,7 @@ const App = () => (
             <Route path="/products/showcase-prep" element={<ShowcasePrep />} />
             <Route path="/products/video-analysis" element={<VideoAnalysis />} />
             <Route path="/products/org-starter-pack" element={<OrgStarterPack />} />
+            <Route path="/products/remote-training" element={<RemoteTraining />} />
             <Route path="/products/founders-access" element={<FoundersAccess />} />
             <Route path="/partner-claim" element={<PartnerClaim />} />
             <Route path="/wall-of-wins" element={<WallOfWins />} />
