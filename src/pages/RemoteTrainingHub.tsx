@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Loader2, Video, Calendar, MessageCircle,
   BarChart3, Clock, Target, BookOpen, Play, User,
-  ChevronRight, Trophy, Zap, FileText, MonitorPlay,
+  ChevronRight, Trophy, Zap, FileText, MonitorPlay, Columns2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +14,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachingMessenger from "@/components/coaching/CoachingMessenger";
 import LiveVideoCall from "@/components/coaching/LiveVideoCall";
+import VideoComparison from "@/components/coaching/VideoComparison";
 import { formatDistanceToNow } from "date-fns";
 
 interface Session {
