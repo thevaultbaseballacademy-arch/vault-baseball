@@ -12,6 +12,7 @@ const VALID_SUBSCRIPTION_PRICE_IDS = [
   'price_1SjGMKPhXS410TO5XQcZm9fZ', // basic
   'price_1SjGMYPhXS410TO5bGu1kSSZ', // performance
   'price_1SjGMhPhXS410TO59WKiE81b', // elite
+  'price_1T8ckaPhXS410TO57tcuh1nv', // remote_training $199/mo
   'price_1SqEGEPhXS410TO5DeHOuqVH', // small_org_license
   'price_1SqEGIPhXS410TO5JUNSsTCq', // org_quick_start
   'price_1SqEGOPhXS410TO5XtSbPx0v', // certified_coach

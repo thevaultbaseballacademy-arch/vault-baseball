@@ -12,10 +12,13 @@ const VALID_PAYMENT_PRICE_IDS = [
   // Beta Systems
   'price_1SqEGAPhXS410TO5ZIx2g0RZ', // longevity_beta
   'price_1SqEGCPhXS410TO5iCsokNpV', // transfer_beta
-  // Stand-alone Products
-  'price_1SqEGGPhXS410TO52G0rlmEk', // velocity_12week
+  // Stand-alone Products (new $97/$397 prices)
+  'price_1T8ckXPhXS410TO5tYyygmol', // velo_check $97
+  'price_1T8ckYPhXS410TO5WkQI2EpC', // velocity_system $397
+  // Legacy prices (keep for existing purchases)
+  'price_1SqEGGPhXS410TO52G0rlmEk', // velocity_12week (old)
   'price_1SqEW4PhXS410TO51a1fzsw1', // velocity_accelerator
-  'price_1SqEGKPhXS410TO5JALh4Imp', // velo_check
+  'price_1SqEGKPhXS410TO5JALh4Imp', // velo_check (old)
   'price_1SqEGMPhXS410TO5PNwPNJOe', // recruitment_audit
   // Bundles
   'price_1SqEW6PhXS410TO5GbLVm4te', // velocity_max_pack
