@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Loader2, Video, Calendar, MessageCircle,
   BarChart3, Clock, Target, BookOpen, Play, User,
-  ChevronRight, Trophy, Zap, FileText, MonitorPlay, Columns2,
+  ChevronRight, Trophy, Zap, FileText, MonitorPlay, Columns2, Brain,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +15,7 @@ import Footer from "@/components/Footer";
 import CoachingMessenger from "@/components/coaching/CoachingMessenger";
 import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 import VideoComparison from "@/components/coaching/VideoComparison";
+import VideoAnalysisPanel from "@/components/coaching/VideoAnalysisPanel";
 import { formatDistanceToNow } from "date-fns";
 
 interface Session {
@@ -187,6 +188,7 @@ const RemoteTrainingHub = () => {
                 {activeSessionId && <TabsTrigger value="live">Live Session</TabsTrigger>}
                 <TabsTrigger value="sessions">Sessions</TabsTrigger>
                 <TabsTrigger value="compare"><Columns2 className="w-3 h-3 mr-1" /> Compare</TabsTrigger>
+                <TabsTrigger value="ai-analysis"><Brain className="w-3 h-3 mr-1" /> AI Analysis</TabsTrigger>
                 <TabsTrigger value="recordings">Recordings</TabsTrigger>
                 <TabsTrigger value="messages">Messages</TabsTrigger>
                 <TabsTrigger value="progress">Progress</TabsTrigger>
