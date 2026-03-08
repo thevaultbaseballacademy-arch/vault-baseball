@@ -74,9 +74,9 @@ export const EddieAIChat = () => {
   }
 
   const quickStarters = [
-    { text: "I'm a parent exploring options", emoji: "👨‍👩‍👦" },
-    { text: "I'm an athlete who wants to throw harder", emoji: "⚾" },
-    { text: "I'm a coach looking for a system", emoji: "📋" },
+    { text: "I'm a parent looking into structured training", emoji: "👨‍👩‍👦" },
+    { text: "I'm an athlete — I want to throw harder", emoji: "⚾" },
+    { text: "I'm a coach looking for a development system", emoji: "📋" },
   ];
 
   return (
@@ -108,8 +108,8 @@ export const EddieAIChat = () => {
                 <span className="text-sm font-display">E</span>
               </div>
               <div>
-                <span className="font-display text-sm tracking-wide">EDDIE AI</span>
-                <p className="text-[10px] opacity-60 tracking-wide">Development Consultant</p>
+                <span className="font-display text-sm tracking-wide">EDDIE MEJIA</span>
+                <p className="text-[10px] opacity-60 tracking-wide">Development Architect</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -136,9 +136,9 @@ export const EddieAIChat = () => {
                     <div className="w-14 h-14 bg-muted flex items-center justify-center mb-4">
                       <span className="text-2xl font-display text-muted-foreground">E</span>
                     </div>
-                    <p className="text-sm font-display text-foreground mb-1">EDDIE AI</p>
+                    <p className="text-sm font-display text-foreground mb-1">EDDIE MEJIA</p>
                     <p className="text-xs text-muted-foreground mb-5 leading-relaxed max-w-[260px]">
-                      I help athletes and families find the right development path. Tell me about yourself to get started.
+                      Vault Baseball development architect. Tell me about the athlete and I'll point you to the right path.
                     </p>
                     <div className="flex flex-col gap-2 w-full">
                       {quickStarters.map((q) => (
@@ -245,7 +245,7 @@ export const EddieAIChat = () => {
                   <Input
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Tell Eddie about your athlete..."
+                    placeholder="Tell Eddie about your situation..."
                     disabled={isLoading}
                     className="flex-1 text-sm h-10"
                   />
