@@ -2606,6 +2606,45 @@ export type Database = {
         }
         Relationships: []
       }
+      video_analyses: {
+        Row: {
+          ai_analysis: Json | null
+          coach_notes: string | null
+          coach_user_id: string | null
+          created_at: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+          video_type: string
+          video_url: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          coach_notes?: string | null
+          coach_user_id?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          video_type?: string
+          video_url: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          coach_notes?: string | null
+          coach_user_id?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          video_type?: string
+          video_url?: string
+        }
+        Relationships: []
+      }
       weekly_tips: {
         Row: {
           category: string
