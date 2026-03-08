@@ -171,13 +171,9 @@ const RemoteTrainingHub = () => {
                     </p>
                     {nextSession.notes && <p className="text-xs text-muted-foreground mt-1">Focus: {nextSession.notes}</p>}
                   </div>
-                  {nextSession.video_call_link && (
-                    <Button variant="vault" asChild>
-                      <a href={nextSession.video_call_link} target="_blank" rel="noopener noreferrer">
-                        <Video className="w-4 h-4 mr-2" /> Join Session
-                      </a>
-                    </Button>
-                  )}
+                  <Button variant="vault" onClick={() => { setActiveSessionId(nextSession.id); setActiveTab("live"); }}>
+                    <MonitorPlay className="w-4 h-4 mr-2" /> Join Live Session
+                  </Button>
                 </div>
               </div>
             )}
