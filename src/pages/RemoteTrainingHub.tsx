@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Loader2, Video, Calendar, MessageCircle,
   BarChart3, Clock, Target, BookOpen, Play, User,
-  ChevronRight, Trophy, Zap, FileText,
+  ChevronRight, Trophy, Zap, FileText, MonitorPlay,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachingMessenger from "@/components/coaching/CoachingMessenger";
+import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 import { formatDistanceToNow } from "date-fns";
 
 interface Session {
@@ -41,6 +42,7 @@ const RemoteTrainingHub = () => {
   const [coach, setCoach] = useState<CoachProfile | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [recordings, setRecordings] = useState<any[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -169,13 +171,9 @@ const RemoteTrainingHub = () => {
                     </p>
                     {nextSession.notes && <p className="text-xs text-muted-foreground mt-1">Focus: {nextSession.notes}</p>}
                   </div>
-                  {nextSession.video_call_link && (
-                    <Button variant="vault" asChild>
-                      <a href={nextSession.video_call_link} target="_blank" rel="noopener noreferrer">
-                        <Video className="w-4 h-4 mr-2" /> Join Session
-                      </a>
-                    </Button>
-                  )}
+                  <Button variant="vault" onClick={() => { setActiveSessionId(nextSession.id); setActiveTab("live"); }}>
+                    <MonitorPlay className="w-4 h-4 mr-2" /> Join Live Session
+                  </Button>
                 </div>
               </div>
             )}
@@ -184,11 +182,35 @@ const RemoteTrainingHub = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="w-full justify-start">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                {activeSessionId && <TabsTrigger value="live">Live Session</TabsTrigger>}
                 <TabsTrigger value="sessions">Sessions</TabsTrigger>
                 <TabsTrigger value="recordings">Recordings</TabsTrigger>
                 <TabsTrigger value="messages">Messages</TabsTrigger>
                 <TabsTrigger value="progress">Progress</TabsTrigger>
               </TabsList>
+
+              {/* LIVE SESSION */}
+              <TabsContent value="live" className="mt-6 space-y-4">
+                {activeSessionId && user && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-display text-xl text-foreground">LIVE COACHING SESSION</h2>
+                      <Button variant="outline" size="sm" onClick={() => { setActiveSessionId(null); setActiveTab("sessions"); }}>
+                        <ArrowLeft className="w-3 h-3 mr-1" /> Back
+                      </Button>
+                    </div>
+                    <LiveVideoCall
+                      sessionId={activeSessionId}
+                      userId={user.id}
+                      isCoach={false}
+                      onEnd={() => { setActiveSessionId(null); setActiveTab("sessions"); }}
+                    />
+                    <p className="text-xs text-muted-foreground text-center">
+                      Position your camera so your coach can see your full mechanics. Use a tripod for best results.
+                    </p>
+                  </>
+                )}
+              </TabsContent>
 
               {/* OVERVIEW */}
               <TabsContent value="overview" className="mt-6 space-y-6">
@@ -288,11 +310,9 @@ const RemoteTrainingHub = () => {
                             </p>
                             {s.coach_notes && <p className="text-xs text-muted-foreground mt-1 italic">"{s.coach_notes}"</p>}
                           </div>
-                          {!isPast && s.video_call_link && (
-                            <Button variant="vault" size="sm" asChild>
-                              <a href={s.video_call_link} target="_blank" rel="noopener noreferrer">
-                                <Video className="w-3 h-3 mr-1" /> Join
-                              </a>
+                          {!isPast && (
+                            <Button variant="vault" size="sm" onClick={() => { setActiveSessionId(s.id); setActiveTab("live"); }}>
+                              <MonitorPlay className="w-3 h-3 mr-1" /> Join Live
                             </Button>
                           )}
                         </div>
