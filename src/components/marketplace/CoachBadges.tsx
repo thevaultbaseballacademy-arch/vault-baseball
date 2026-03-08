@@ -1,4 +1,4 @@
-import { Award, Shield, ShieldCheck, Star } from "lucide-react";
+import { Award, Shield, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface CoachBadgesProps {
@@ -26,11 +26,11 @@ const CoachBadges = ({ isCertified, isBypassCertified, isStaff, compact = false 
   if (isBypassCertified) {
     badges.push(
       <Badge
-        key="bypass"
+        key="inperson"
         className="bg-purple-600 text-white gap-1"
       >
         <ShieldCheck className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
-        {!compact && "In-Person Certified"}
+        {!compact && "Certified by Eddie Mejia"}
       </Badge>
     );
   } else if (isCertified) {
