@@ -185,10 +185,10 @@ serve(async (req) => {
       } : undefined,
       success_url: hasTrial 
         ? `${origin}/velocity-baseline?subscription=success` 
-        : `${origin}/?subscription=success`,
+        : `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: hasTrial 
         ? `${origin}/trial?subscription=canceled`
-        : `${origin}/?subscription=canceled`,
+        : `${origin}/payment-canceled`,
       allow_promotion_codes: true,
     });
 
