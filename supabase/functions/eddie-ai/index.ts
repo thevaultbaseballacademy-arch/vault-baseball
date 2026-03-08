@@ -8,6 +8,61 @@ const corsHeaders = {
 const MAX_MESSAGES = 30;
 const MAX_MESSAGE_LENGTH = 2000;
 
+// Rate limiting configuration
+const RATE_LIMIT_REQUESTS = 20; // Max requests per window
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+
+// Simple in-memory rate limiter (resets on function cold start)
+const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
+
+function getClientIP(req: Request): string {
+  // Try various headers for client IP
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  const realIP = req.headers.get("x-real-ip");
+  if (realIP) {
+    return realIP;
+  }
+  const cfConnectingIP = req.headers.get("cf-connecting-ip");
+  if (cfConnectingIP) {
+    return cfConnectingIP;
+  }
+  return "unknown";
+}
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  // Clean up old entries periodically
+  if (rateLimitMap.size > 10000) {
+    const cutoff = now - RATE_LIMIT_WINDOW_MS;
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (value.windowStart < cutoff) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+
+  if (!record || now - record.windowStart > RATE_LIMIT_WINDOW_MS) {
+    // New window
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return { allowed: true, remaining: RATE_LIMIT_REQUESTS - 1, resetIn: RATE_LIMIT_WINDOW_MS };
+  }
+
+  if (record.count >= RATE_LIMIT_REQUESTS) {
+    const resetIn = RATE_LIMIT_WINDOW_MS - (now - record.windowStart);
+    return { allowed: false, remaining: 0, resetIn };
+  }
+
+  record.count++;
+  const remaining = RATE_LIMIT_REQUESTS - record.count;
+  const resetIn = RATE_LIMIT_WINDOW_MS - (now - record.windowStart);
+  return { allowed: true, remaining, resetIn };
+}
+
 interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
@@ -172,6 +227,26 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Rate limiting check
+  const clientIP = getClientIP(req);
+  const rateLimit = checkRateLimit(clientIP);
+  
+  if (!rateLimit.allowed) {
+    console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(JSON.stringify({ 
+      error: "Too many requests. Please wait a moment before trying again." 
+    }), {
+      status: 429,
+      headers: { 
+        ...corsHeaders, 
+        "Content-Type": "application/json",
+        "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString(),
+        "X-RateLimit-Remaining": "0",
+        "X-RateLimit-Reset": Math.ceil(rateLimit.resetIn / 1000).toString()
+      },
+    });
+  }
+
   try {
     let body: unknown;
     try {
@@ -228,11 +303,15 @@ serve(async (req) => {
     }
 
     return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      headers: { 
+        ...corsHeaders, 
+        "Content-Type": "text/event-stream",
+        "X-RateLimit-Remaining": rateLimit.remaining.toString(),
+      },
     });
   } catch (e) {
     console.error("Eddie AI error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "An error occurred. Please try again." }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
