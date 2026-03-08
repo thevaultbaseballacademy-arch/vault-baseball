@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, TrendingUp, Calendar, 
   ChevronDown, ChevronUp, Search, Activity, Trophy,
-  BookOpen, Target, BarChart3, Video, Brain
+  BookOpen, Target, BarChart3, Video, Brain, DollarSign, Store
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +23,8 @@ import PositionShortcuts from "@/components/coach/PositionShortcuts";
 import FavoritesQuickStart from "@/components/coach/FavoritesQuickStart";
 import QuickAccessCard from "@/components/coach/QuickAccessCard";
 import CoachAnalysisReview from "@/components/coaching/CoachAnalysisReview";
+import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashboard";
+import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
 import {
   LineChart,
   Line,
@@ -59,6 +61,7 @@ const CoachDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isCoach, setIsCoach] = useState(false);
+  const [coachRecordId, setCoachRecordId] = useState<string | null>(null);
   const [athletes, setAthletes] = useState<AthleteProfile[]>([]);
   const [checkins, setCheckins] = useState<CheckinData[]>([]);
   const [expandedAthlete, setExpandedAthlete] = useState<string | null>(null);
@@ -111,6 +114,13 @@ const CoachDashboard = () => {
         setIsCoach(true);
         fetchAthletes();
         fetchAllCheckins();
+        // Fetch coach record ID for marketplace
+        const { data: coachData } = await supabase
+          .from('coaches')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle();
+        if (coachData) setCoachRecordId(coachData.id);
       }
       setLoading(false);
     } catch (error) {
@@ -323,7 +333,7 @@ const CoachDashboard = () => {
 
             {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="grid w-full max-w-3xl grid-cols-5">
+              <TabsList className="grid w-full max-w-4xl grid-cols-7">
                 <TabsTrigger value="athletes" className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Athletes
@@ -335,6 +345,14 @@ const CoachDashboard = () => {
                 <TabsTrigger value="lessons" className="flex items-center gap-1">
                   <Video className="w-3 h-3" />
                   Lessons
+                </TabsTrigger>
+                <TabsTrigger value="marketplace" className="flex items-center gap-1">
+                  <Store className="w-3 h-3" />
+                  Marketplace
+                </TabsTrigger>
+                <TabsTrigger value="earnings" className="flex items-center gap-1">
+                  <DollarSign className="w-3 h-3" />
+                  Earnings
                 </TabsTrigger>
                 <TabsTrigger value="leaderboards" className="flex items-center gap-1">
                   <Trophy className="w-3 h-3" />
@@ -367,6 +385,22 @@ const CoachDashboard = () => {
 
               <TabsContent value="lessons" className="space-y-6">
                 <CoachLessonMonitor coachUserId={user?.id || ''} />
+              </TabsContent>
+
+              <TabsContent value="marketplace" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">MARKETPLACE SETTINGS</h2>
+                <p className="text-sm text-muted-foreground">Set up your public profile, services, and pricing for the Vault Coach Marketplace.</p>
+                <CoachMarketplaceSetup userId={user?.id || ''} />
+              </TabsContent>
+
+              <TabsContent value="earnings" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">MARKETPLACE EARNINGS</h2>
+                <p className="text-sm text-muted-foreground">Track your session income and payout history. Platform fee: 30% / Coach: 70%.</p>
+                {coachRecordId ? (
+                  <CoachEarningsDashboard coachId={coachRecordId} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">Loading coach record...</p>
+                )}
               </TabsContent>
 
               <TabsContent value="leaderboards" className="space-y-6">

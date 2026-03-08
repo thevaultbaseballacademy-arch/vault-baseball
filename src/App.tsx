@@ -86,6 +86,8 @@ import GroupSessions from "./pages/GroupSessions";
 import FreeVelocityGuide from "./pages/FreeVelocityGuide";
 import AthleteOnboarding from "./pages/AthleteOnboarding";
 import RemoteTrainingHub from "./pages/RemoteTrainingHub";
+import Marketplace from "./pages/Marketplace";
+import CoachMarketplaceProfile from "./pages/CoachMarketplaceProfile";
 
 const queryClient = new QueryClient();
 
@@ -221,6 +223,8 @@ const App = () => (
             <Route path="/free-velocity-guide" element={<FreeVelocityGuide />} />
             <Route path="/athlete-onboarding" element={<AthleteOnboarding />} />
             <Route path="/training-hub" element={<RemoteTrainingHub />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
