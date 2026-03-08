@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, ArrowRight, Loader2, BookOpen, Zap, Crown, AlertTriangle } from "lucide-react";
+import { CheckCircle, ArrowRight, Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -22,61 +22,35 @@ interface VerifyPurchaseResponse {
   code?: string;
 }
 
+// Map product keys to human-readable info
+const PRODUCT_INFO: Record<string, { name: string; tagline: string }> = {
+  velo_check: { name: "VELO-CHECK ASSESSMENT", tagline: "Your personalized mechanical report will be delivered within 48 hours." },
+  velocity_12week: { name: "VAULT VELOCITY SYSTEM", tagline: "12 weeks of structured velocity development — starting now." },
+  remote_training: { name: "REMOTE TRAINING", tagline: "Your coach will reach out within 24 hours to build your first week." },
+  founders_access: { name: "FOUNDER'S ACCESS", tagline: "Lifetime access to the complete V.A.U.L.T. suite. Welcome to the inner circle." },
+};
+
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
-  const [unlockedCourses, setUnlockedCourses] = useState<string[]>([]);
-  const [isFoundersAccess, setIsFoundersAccess] = useState(false);
   const [productKey, setProductKey] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fireConfetti = useCallback(() => {
-    // First burst - left side
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { x: 0.1, y: 0.6 },
-      colors: ['#f59e0b', '#eab308', '#fcd34d', '#ffffff', '#a855f7'],
-    });
-
-    // Second burst - right side
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { x: 0.9, y: 0.6 },
-      colors: ['#f59e0b', '#eab308', '#fcd34d', '#ffffff', '#a855f7'],
-    });
-
-    // Center burst with delay
+    confetti({ particleCount: 80, spread: 70, origin: { x: 0.15, y: 0.6 }, colors: ["#181818", "#B9B9B9", "#F5F5F5", "#4A4A4A"] });
+    confetti({ particleCount: 80, spread: 70, origin: { x: 0.85, y: 0.6 }, colors: ["#181818", "#B9B9B9", "#F5F5F5", "#4A4A4A"] });
     setTimeout(() => {
-      confetti({
-        particleCount: 150,
-        spread: 100,
-        origin: { x: 0.5, y: 0.5 },
-        colors: ['#f59e0b', '#eab308', '#fcd34d', '#ffffff', '#a855f7', '#22c55e'],
-      });
-    }, 200);
-
-    // Final celebration burst
-    setTimeout(() => {
-      confetti({
-        particleCount: 50,
-        spread: 120,
-        origin: { x: 0.5, y: 0.3 },
-        colors: ['#f59e0b', '#eab308', '#fcd34d'],
-        gravity: 0.8,
-      });
-    }, 400);
+      confetti({ particleCount: 120, spread: 100, origin: { x: 0.5, y: 0.5 }, colors: ["#181818", "#B9B9B9", "#D4D4D4", "#F5F5F5"] });
+    }, 250);
   }, []);
 
   useEffect(() => {
     const verifyPurchase = async () => {
-      const sessionId = searchParams.get('session_id');
-      
+      const sessionId = searchParams.get("session_id");
+
       if (!sessionId) {
-        // No session ID means direct navigation - still show success
         setVerifying(false);
         setVerified(true);
         fireConfetti();
@@ -85,77 +59,44 @@ const PaymentSuccess = () => {
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (!session) {
-          // User not logged in - prompt them to log in
           setVerifying(false);
           setVerified(true);
-          setErrorMessage("Please sign in to access your purchased content.");
+          setErrorMessage("Sign in to access your purchased content.");
           return;
         }
 
-        const { data, error } = await supabase.functions.invoke<VerifyPurchaseResponse>('verify-purchase', {
+        const { data, error } = await supabase.functions.invoke<VerifyPurchaseResponse>("verify-purchase", {
           body: { sessionId },
         });
 
         if (error) {
-          console.error('Verification function error:', error);
-          // Still show success since payment went through
+          console.error("Verification error:", error);
           setVerified(true);
-          setErrorMessage("Your payment was successful, but we couldn't verify your access. Please contact support if you don't see your content.");
+          setErrorMessage("Payment successful. If content doesn't appear, contact support.");
           fireConfetti();
           return;
         }
 
         if (data?.error) {
-          console.error('Verification error:', data.error);
           setVerified(false);
           setErrorMessage(data.error);
           return;
         }
 
         setVerified(data?.verified ?? false);
-        setUnlockedCourses(data?.coursesUnlocked || []);
-        setIsFoundersAccess(data?.isFoundersAccess || false);
         setProductKey(data?.productKey || null);
-        
+
         if (data?.verified) {
-          // Fire confetti for successful purchases
           fireConfetti();
-          
-          // Extra confetti for Founder's Access
-          if (data.isFoundersAccess) {
-            setTimeout(() => fireConfetti(), 600);
-            setTimeout(() => fireConfetti(), 1200);
-          }
-          
           if (!data.alreadyProcessed) {
-            toast({
-              title: data.isFoundersAccess ? "Welcome, Founder! 👑" : "Access Granted! 🎉",
-              description: data.isFoundersAccess 
-                ? "You now have lifetime access to the complete V.A.U.L.T. suite!"
-                : `You now have access to ${data.coursesUnlocked?.length || 0} training programs.`,
-            });
-          }
-          
-          // Show warnings if any
-          if (data.warnings && data.warnings.length > 0) {
-            toast({
-              title: "Note",
-              description: "Some items may require additional setup. Check your dashboard.",
-              variant: "default",
-            });
+            toast({ title: "Access Granted", description: "Your content is ready." });
           }
         }
-      } catch (error) {
-        console.error('Verification error:', error);
-        // Still show success - payment went through
+      } catch {
         setVerified(true);
         fireConfetti();
-        toast({
-          title: "Payment Successful! 🎉",
-          description: "Your access is being set up. Check your dashboard in a moment.",
-        });
       } finally {
         setVerifying(false);
       }
@@ -164,168 +105,152 @@ const PaymentSuccess = () => {
     verifyPurchase();
   }, [searchParams, toast, fireConfetti]);
 
-  const courseNames: Record<string, string> = {
-    'velocity-system': 'Velocity System',
-    'strength-conditioning': 'Strength & Conditioning',
-    'speed-agility': 'Speed & Agility',
-    'arm-health-workload': 'Arm Health & Workload',
-    'strength-power-system': 'Strength & Power System',
-    'transfer-system': 'Transfer System',
-    'organizational-development': 'Organizational Development',
-  };
+  const info = productKey ? PRODUCT_INFO[productKey] : null;
 
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
+
       <section className="pt-32 pb-24">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="max-w-xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-lg mx-auto text-center"
           >
             {verifying ? (
-              <>
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <Loader2 className="w-10 h-10 text-primary animate-spin" />
+              <div className="space-y-6">
+                <div className="w-16 h-16 bg-muted flex items-center justify-center mx-auto">
+                  <Loader2 className="w-8 h-8 text-foreground animate-spin" />
                 </div>
-                <h1 className="text-3xl font-display text-foreground mb-4">
-                  VERIFYING YOUR PURCHASE...
-                </h1>
-                <p className="text-muted-foreground">
-                  Please wait while we unlock your content.
-                </p>
-              </>
+                <h1 className="text-3xl font-display text-foreground">VERIFYING PURCHASE...</h1>
+                <p className="text-sm text-muted-foreground">Unlocking your content. This takes a moment.</p>
+              </div>
             ) : verified ? (
-              <>
-                <motion.div 
-                  className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
-                    isFoundersAccess ? 'bg-amber-500/20' : 'bg-green-500/10'
-                  }`}
+              <div className="space-y-8">
+                {/* Check icon */}
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 12 }}
+                  className="w-16 h-16 bg-foreground flex items-center justify-center mx-auto"
                 >
-                  {isFoundersAccess ? (
-                    <Crown className="w-10 h-10 text-amber-500" />
-                  ) : (
-                    <CheckCircle className="w-10 h-10 text-green-500" />
-                  )}
+                  <CheckCircle className="w-8 h-8 text-background" />
                 </motion.div>
-                <motion.h1 
-                  className="text-4xl md:text-5xl font-display text-foreground mb-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  {isFoundersAccess ? (
-                    <>
-                      WELCOME, <span className="text-amber-500">FOUNDER</span>
-                    </>
-                  ) : (
-                    "PAYMENT SUCCESSFUL"
+
+                {/* Headline */}
+                <div>
+                  <motion.h1
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="text-4xl md:text-5xl font-display text-foreground mb-2"
+                  >
+                    YOU'RE IN.
+                  </motion.h1>
+                  {info && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.25 }}
+                      className="text-xs font-display tracking-[0.25em] text-muted-foreground"
+                    >
+                      {info.name}
+                    </motion.p>
                   )}
-                </motion.h1>
-                <motion.p 
-                  className="text-lg text-muted-foreground mb-6"
-                  initial={{ opacity: 0, y: 20 }}
+                </div>
+
+                {/* Tagline */}
+                <motion.p
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
+                  className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto"
                 >
-                  {isFoundersAccess 
-                    ? "You now have lifetime access to the complete V.A.U.L.T. suite. Thank you for believing in us!"
-                    : "Thank you for your purchase! You now have access to your VAULT™ content."
-                  }
+                  {info?.tagline || "Thank you for your purchase. Your Vault content is ready."}
                 </motion.p>
-                
+
                 {errorMessage && (
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-6 text-left"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.35 }}
+                    className="bg-muted border border-border p-4 text-left"
                   >
                     <div className="flex items-start gap-3">
-                      <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-amber-200">{errorMessage}</p>
+                      <AlertTriangle className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                      <p className="text-xs text-muted-foreground">{errorMessage}</p>
                     </div>
                   </motion.div>
                 )}
-                
-                {unlockedCourses.length > 0 && (
-                  <div className="bg-card border border-border rounded-xl p-6 mb-8 text-left">
-                    <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-primary" />
-                      Programs Unlocked
-                    </h3>
-                    <ul className="space-y-2">
-                      {unlockedCourses.map(courseId => (
-                        <li key={courseId} className="flex items-center gap-2 text-muted-foreground">
-                          <BookOpen className="w-4 h-4 text-green-500" />
-                          {courseNames[courseId] || courseId}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to={`/athlete-onboarding${productKey ? `?product=${productKey}` : ''}`}>
-                    <Button variant="vault" size="lg">
-                      Complete Your Onboarding
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
-                  </Link>
-                  <Link to="/my-programs">
-                    <Button variant="outline" size="lg">
-                      Start Training Now
-                    </Button>
-                  </Link>
-                </div>
-              </>
-            ) : (
-              <>
-                <motion.div 
-                  className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-500/10"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                {/* Next steps */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-card border border-border p-6 text-left space-y-4"
                 >
-                  <AlertTriangle className="w-10 h-10 text-red-500" />
+                  <p className="text-[11px] font-display tracking-[0.25em] text-muted-foreground">NEXT STEPS</p>
+                  <div className="space-y-3">
+                    {[
+                      { num: "01", text: "Complete your athlete onboarding so we can personalize your experience." },
+                      { num: "02", text: "Check your email for access details and login instructions." },
+                      { num: "03", text: "Start your first training session from your dashboard." },
+                    ].map((step) => (
+                      <div key={step.num} className="flex gap-3">
+                        <span className="text-lg font-display text-border">{step.num}</span>
+                        <p className="text-xs text-muted-foreground leading-relaxed pt-1">{step.text}</p>
+                      </div>
+                    ))}
+                  </div>
                 </motion.div>
-                <motion.h1 
-                  className="text-4xl md:text-5xl font-display text-foreground mb-4"
-                  initial={{ opacity: 0, y: 20 }}
+
+                {/* CTAs */}
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex flex-col gap-3"
                 >
-                  VERIFICATION ISSUE
-                </motion.h1>
-                <motion.p 
-                  className="text-lg text-muted-foreground mb-6"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  {errorMessage || "We couldn't verify your purchase. Please contact support."}
-                </motion.p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to="/contact">
-                    <Button variant="vault" size="lg">
-                      Contact Support
+                  <Link to={`/athlete-onboarding${productKey ? `?product=${productKey}` : ""}`}>
+                    <Button variant="vault" size="lg" className="w-full">
+                      COMPLETE ONBOARDING
+                      <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Link>
                   <Link to="/dashboard">
-                    <Button variant="outline" size="lg">
-                      Go to Dashboard
+                    <Button variant="vaultOutline" size="lg" className="w-full">
+                      GO TO DASHBOARD
                     </Button>
                   </Link>
+                </motion.div>
+              </div>
+            ) : (
+              /* Verification failed */
+              <div className="space-y-6">
+                <div className="w-16 h-16 bg-destructive/10 flex items-center justify-center mx-auto">
+                  <AlertTriangle className="w-8 h-8 text-destructive" />
                 </div>
-              </>
+                <h1 className="text-4xl font-display text-foreground">VERIFICATION ISSUE</h1>
+                <p className="text-sm text-muted-foreground">
+                  {errorMessage || "We couldn't verify your purchase. Please contact support."}
+                </p>
+                <div className="flex flex-col gap-3">
+                  <Link to="/contact">
+                    <Button variant="vault" size="lg" className="w-full">CONTACT SUPPORT</Button>
+                  </Link>
+                  <Link to="/">
+                    <Button variant="vaultOutline" size="lg" className="w-full">RETURN HOME</Button>
+                  </Link>
+                </div>
+              </div>
             )}
           </motion.div>
         </div>
       </section>
+
       <Footer />
     </main>
   );
