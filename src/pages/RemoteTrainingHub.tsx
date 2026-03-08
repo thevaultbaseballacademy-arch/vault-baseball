@@ -186,6 +186,7 @@ const RemoteTrainingHub = () => {
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 {activeSessionId && <TabsTrigger value="live">Live Session</TabsTrigger>}
                 <TabsTrigger value="sessions">Sessions</TabsTrigger>
+                <TabsTrigger value="compare"><Columns2 className="w-3 h-3 mr-1" /> Compare</TabsTrigger>
                 <TabsTrigger value="recordings">Recordings</TabsTrigger>
                 <TabsTrigger value="messages">Messages</TabsTrigger>
                 <TabsTrigger value="progress">Progress</TabsTrigger>
@@ -197,9 +198,18 @@ const RemoteTrainingHub = () => {
                   <>
                     <div className="flex items-center justify-between">
                       <h2 className="font-display text-xl text-foreground">LIVE COACHING SESSION</h2>
-                      <Button variant="outline" size="sm" onClick={() => { setActiveSessionId(null); setActiveTab("sessions"); }}>
-                        <ArrowLeft className="w-3 h-3 mr-1" /> Back
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={showComparison ? "vault" : "outline"}
+                          size="sm"
+                          onClick={() => setShowComparison(!showComparison)}
+                        >
+                          <Columns2 className="w-3 h-3 mr-1" /> {showComparison ? "Hide Compare" : "Compare"}
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => { setActiveSessionId(null); setActiveTab("sessions"); }}>
+                          <ArrowLeft className="w-3 h-3 mr-1" /> Back
+                        </Button>
+                      </div>
                     </div>
                     <LiveVideoCall
                       sessionId={activeSessionId}
@@ -207,10 +217,33 @@ const RemoteTrainingHub = () => {
                       isCoach={false}
                       onEnd={() => { setActiveSessionId(null); setActiveTab("sessions"); }}
                     />
+                    {showComparison && (
+                      <VideoComparison
+                        sessionId={activeSessionId}
+                        userId={user.id}
+                        isCoach={false}
+                        onClose={() => setShowComparison(false)}
+                      />
+                    )}
                     <p className="text-xs text-muted-foreground text-center">
                       Position your camera so your coach can see your full mechanics. Use a tripod for best results.
                     </p>
                   </>
+                )}
+              </TabsContent>
+
+              {/* COMPARE (standalone) */}
+              <TabsContent value="compare" className="mt-6 space-y-4">
+                <h2 className="font-display text-xl text-foreground">MECHANICS COMPARISON</h2>
+                <p className="text-sm text-muted-foreground">
+                  Load two videos side by side to compare mechanics. Use session recordings, highlight clips, or upload reference footage.
+                </p>
+                {user && (
+                  <VideoComparison
+                    sessionId="compare-standalone"
+                    userId={user.id}
+                    isCoach={false}
+                  />
                 )}
               </TabsContent>
 
