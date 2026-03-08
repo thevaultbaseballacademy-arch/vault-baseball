@@ -1,78 +1,17 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Users, ShoppingCart, UserPlus, Search, Download } from "lucide-react";
+import { Loader2, UserPlus, ShoppingCart, Users, MessageCircle, CreditCard, BarChart3, Download, Filter, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useAdminCRM } from "@/hooks/useAdminCRM";
 import { formatPrice } from "@/lib/productPricing";
 
-interface Lead {
-  id: string;
-  athlete_name: string;
-  parent_name: string | null;
-  email: string;
-  athlete_age: number | null;
-  primary_position: string | null;
-  lead_source: string | null;
-  created_at: string;
-}
-
-interface Purchase {
-  id: string;
-  user_id: string;
-  product_key: string;
-  amount_cents: number;
-  purchased_at: string;
-  status: string;
-  expires_at: string | null;
-}
-
-interface OnboardingEntry {
-  id: string;
-  user_id: string | null;
-  email: string;
-  athlete_goals: string | null;
-  current_level: string | null;
-  position: string | null;
-  current_velocity: string | null;
-  exit_velo: string | null;
-  social_handle: string | null;
-  product_purchased: string | null;
-  created_at: string;
-}
-
 const LeadsCustomersPanel = () => {
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [onboarding, setOnboarding] = useState<OnboardingEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [leadsRes, purchasesRes, onboardingRes] = await Promise.all([
-        supabase.from("lead_captures").select("*").order("created_at", { ascending: false }),
-        supabase.rpc("list_all_purchases_for_admin"),
-        supabase.from("athlete_onboarding").select("*").order("created_at", { ascending: false }),
-      ]);
-
-      if (leadsRes.data) setLeads(leadsRes.data);
-      if (purchasesRes.data) setPurchases(purchasesRes.data as Purchase[]);
-      if (onboardingRes.data) setOnboarding(onboardingRes.data as OnboardingEntry[]);
-    } catch (err) {
-      console.error("Failed to fetch admin data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredLeads = leads.filter(l =>
-    l.athlete_name.toLowerCase().includes(search.toLowerCase()) ||
-    l.email.toLowerCase().includes(search.toLowerCase())
-  );
+  const {
+    loading, filters, setFilters, resetFilters,
+    leads, purchases, onboarding, profiles,
+    kpis, uniqueProducts, uniquePositions,
+  } = useAdminCRM();
 
   if (loading) {
     return (
@@ -82,155 +21,239 @@ const LeadsCustomersPanel = () => {
     );
   }
 
+  const hasActiveFilters = filters.search || filters.product !== "all" || filters.position !== "all" || filters.membershipStatus !== "all" || filters.dateFrom || filters.dateTo;
+
   return (
     <div className="space-y-6">
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-card border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <UserPlus className="w-4 h-4 text-blue-500" />
-            <span className="text-sm text-muted-foreground">Total Leads</span>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        {[
+          { label: "New Leads (30d)", value: kpis.recentLeads, icon: UserPlus, color: "text-blue-500" },
+          { label: "Guide Signups", value: kpis.guideSignups, icon: Download, color: "text-emerald-500" },
+          { label: "Chat Qualified", value: kpis.chatQualified, icon: MessageCircle, color: "text-purple-500" },
+          { label: "Purchases", value: kpis.totalPurchases, icon: ShoppingCart, color: "text-amber-500" },
+          { label: "Active Members", value: kpis.activeMemberships, icon: CreditCard, color: "text-primary" },
+          { label: "Athlete Profiles", value: kpis.totalProfiles, icon: Users, color: "text-cyan-500" },
+          { label: "Revenue", value: formatPrice(kpis.totalRevenue), icon: BarChart3, color: "text-green-500" },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-card border border-border rounded-lg p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <kpi.icon className={`w-3.5 h-3.5 ${kpi.color}`} />
+              <span className="text-[11px] text-muted-foreground leading-tight">{kpi.label}</span>
+            </div>
+            <p className="text-xl font-display text-foreground">{kpi.value}</p>
           </div>
-          <p className="text-2xl font-display text-foreground">{leads.length}</p>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="bg-card border border-border rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Filters</span>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={resetFilters} className="ml-auto h-7 text-xs">
+              <X className="w-3 h-3 mr-1" /> Clear
+            </Button>
+          )}
         </div>
-        <div className="bg-card border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <ShoppingCart className="w-4 h-4 text-green-500" />
-            <span className="text-sm text-muted-foreground">Purchases</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search name or email…"
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            className="px-3 py-2 text-sm bg-secondary border border-border rounded-md text-foreground placeholder:text-muted-foreground"
+          />
+          {/* Product */}
+          <Select value={filters.product} onValueChange={(v) => setFilters({ ...filters, product: v })}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Product" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Products</SelectItem>
+              {uniqueProducts.map(p => <SelectItem key={p} value={p}>{p.replace(/_/g, " ")}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {/* Position */}
+          <Select value={filters.position} onValueChange={(v) => setFilters({ ...filters, position: v })}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Position" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Positions</SelectItem>
+              {uniquePositions.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {/* Membership Status */}
+          <Select value={filters.membershipStatus} onValueChange={(v) => setFilters({ ...filters, membershipStatus: v })}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="expired">Expired</SelectItem>
+            </SelectContent>
+          </Select>
+          {/* Date Range */}
+          <div className="flex gap-2">
+            <input
+              type="date"
+              value={filters.dateFrom}
+              onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+              className="flex-1 px-2 py-2 text-xs bg-secondary border border-border rounded-md text-foreground"
+            />
+            <input
+              type="date"
+              value={filters.dateTo}
+              onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+              className="flex-1 px-2 py-2 text-xs bg-secondary border border-border rounded-md text-foreground"
+            />
           </div>
-          <p className="text-2xl font-display text-foreground">{purchases.length}</p>
-        </div>
-        <div className="bg-card border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="w-4 h-4 text-amber-500" />
-            <span className="text-sm text-muted-foreground">Onboarded</span>
-          </div>
-          <p className="text-2xl font-display text-foreground">{onboarding.length}</p>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search leads..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 pr-4 py-2 bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full"
-        />
-      </div>
-
+      {/* Data Tabs */}
       <Tabs defaultValue="leads">
-        <TabsList>
+        <TabsList className="w-full justify-start">
           <TabsTrigger value="leads">Leads ({leads.length})</TabsTrigger>
           <TabsTrigger value="purchases">Purchases ({purchases.length})</TabsTrigger>
-          <TabsTrigger value="onboarding">Onboarding ({onboarding.length})</TabsTrigger>
+          <TabsTrigger value="onboarding">Guide / Qualified ({onboarding.length})</TabsTrigger>
+          <TabsTrigger value="profiles">Athlete Profiles ({profiles.length})</TabsTrigger>
         </TabsList>
 
+        {/* LEADS */}
         <TabsContent value="leads" className="mt-4">
-          <div className="bg-card border border-border overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b border-border bg-muted/50">
-                  <tr>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Athlete</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Parent</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Age</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Position</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Source</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredLeads.map((lead) => (
-                    <tr key={lead.id} className="hover:bg-muted/30">
-                      <td className="p-3 text-foreground font-medium">{lead.athlete_name}</td>
-                      <td className="p-3 text-muted-foreground">{lead.parent_name || "—"}</td>
-                      <td className="p-3 text-muted-foreground">{lead.email}</td>
-                      <td className="p-3 text-muted-foreground">{lead.athlete_age || "—"}</td>
-                      <td className="p-3 text-muted-foreground capitalize">{lead.primary_position || "—"}</td>
-                      <td className="p-3"><span className="px-2 py-0.5 bg-blue-500/10 text-blue-600 text-xs">{lead.lead_source}</span></td>
-                      <td className="p-3 text-muted-foreground text-xs">{new Date(lead.created_at).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                  {filteredLeads.length === 0 && (
-                    <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No leads yet</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Athlete</TableHead>
+                  <TableHead className="hidden md:table-cell">Parent</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead className="hidden sm:table-cell">Age</TableHead>
+                  <TableHead className="hidden sm:table-cell">Position</TableHead>
+                  <TableHead className="hidden lg:table-cell">Source</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {leads.length === 0 ? (
+                  <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">No leads found</TableCell></TableRow>
+                ) : leads.map((l) => (
+                  <TableRow key={l.id}>
+                    <TableCell className="font-medium">{l.athlete_name}</TableCell>
+                    <TableCell className="hidden md:table-cell text-muted-foreground">{l.parent_name || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground text-xs">{l.email}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground">{l.athlete_age || "—"}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground capitalize">{l.primary_position || "—"}</TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      <span className="px-2 py-0.5 bg-blue-500/10 text-blue-600 text-xs rounded">{l.lead_source || "direct"}</span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs">{new Date(l.created_at).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </TabsContent>
 
+        {/* PURCHASES */}
         <TabsContent value="purchases" className="mt-4">
-          <div className="bg-card border border-border overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b border-border bg-muted/50">
-                  <tr>
-                    <th className="text-left p-3 font-medium text-muted-foreground">User ID</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Product</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Amount</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Status</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {purchases.map((p) => (
-                    <tr key={p.id} className="hover:bg-muted/30">
-                      <td className="p-3 text-muted-foreground text-xs font-mono">{p.user_id?.slice(0, 8)}...</td>
-                      <td className="p-3 text-foreground font-medium">{p.product_key}</td>
-                      <td className="p-3 text-foreground">{formatPrice(p.amount_cents)}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-0.5 text-xs ${p.status === "completed" ? "bg-green-500/10 text-green-600" : "bg-amber-500/10 text-amber-600"}`}>
-                          {p.status}
-                        </span>
-                      </td>
-                      <td className="p-3 text-muted-foreground text-xs">{new Date(p.purchased_at).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                  {purchases.length === 0 && (
-                    <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No purchases yet</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden md:table-cell">Expires</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {purchases.length === 0 ? (
+                  <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No purchases found</TableCell></TableRow>
+                ) : purchases.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell className="text-xs font-mono text-muted-foreground">{p.user_id?.slice(0, 8)}…</TableCell>
+                    <TableCell className="font-medium">{p.product_key.replace(/_/g, " ")}</TableCell>
+                    <TableCell>{formatPrice(p.amount_cents)}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-0.5 text-xs rounded ${
+                        p.status === "completed" ? "bg-green-500/10 text-green-600" :
+                        p.status === "expired" ? "bg-red-500/10 text-red-500" :
+                        "bg-amber-500/10 text-amber-600"
+                      }`}>{p.status}</span>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell text-muted-foreground text-xs">
+                      {p.expires_at ? new Date(p.expires_at).toLocaleDateString() : "—"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs">{new Date(p.purchased_at).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </TabsContent>
 
+        {/* ONBOARDING / GUIDE / QUALIFIED */}
         <TabsContent value="onboarding" className="mt-4">
-          <div className="bg-card border border-border overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b border-border bg-muted/50">
-                  <tr>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Level</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Position</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Velo</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Goals</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {onboarding.map((o) => (
-                    <tr key={o.id} className="hover:bg-muted/30">
-                      <td className="p-3 text-foreground">{o.email}</td>
-                      <td className="p-3 text-muted-foreground capitalize">{o.current_level?.replace("_", " ") || "—"}</td>
-                      <td className="p-3 text-muted-foreground capitalize">{o.position || "—"}</td>
-                      <td className="p-3 text-muted-foreground">{o.current_velocity || "—"}</td>
-                      <td className="p-3 text-muted-foreground text-xs max-w-[200px] truncate">{o.athlete_goals || "—"}</td>
-                      <td className="p-3 text-muted-foreground text-xs">{new Date(o.created_at).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                  {onboarding.length === 0 && (
-                    <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">No onboarding entries yet</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Email</TableHead>
+                  <TableHead className="hidden sm:table-cell">Level</TableHead>
+                  <TableHead className="hidden sm:table-cell">Position</TableHead>
+                  <TableHead className="hidden md:table-cell">Velocity</TableHead>
+                  <TableHead className="hidden lg:table-cell">Goals</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {onboarding.length === 0 ? (
+                  <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No entries found</TableCell></TableRow>
+                ) : onboarding.map((o) => (
+                  <TableRow key={o.id}>
+                    <TableCell className="font-medium text-sm">{o.email}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground capitalize">{o.current_level?.replace("_", " ") || "—"}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground capitalize">{o.position || "—"}</TableCell>
+                    <TableCell className="hidden md:table-cell text-muted-foreground">{o.current_velocity || "—"}</TableCell>
+                    <TableCell className="hidden lg:table-cell text-muted-foreground text-xs max-w-[180px] truncate">{o.athlete_goals || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground text-xs">{new Date(o.created_at).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+
+        {/* ATHLETE PROFILES */}
+        <TabsContent value="profiles" className="mt-4">
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead className="hidden sm:table-cell">Position</TableHead>
+                  <TableHead className="hidden md:table-cell">Grad Year</TableHead>
+                  <TableHead>Joined</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {profiles.length === 0 ? (
+                  <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">No profiles found</TableCell></TableRow>
+                ) : profiles.map((p) => (
+                  <TableRow key={p.user_id}>
+                    <TableCell className="font-medium">{p.display_name || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground text-xs">{p.email || "—"}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground capitalize">{p.position || "—"}</TableCell>
+                    <TableCell className="hidden md:table-cell text-muted-foreground">{p.graduation_year || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground text-xs">{new Date(p.created_at).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </TabsContent>
       </Tabs>
