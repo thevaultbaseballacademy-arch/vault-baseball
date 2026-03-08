@@ -80,7 +80,7 @@ Based on the diagnosis, recommend the SINGLE best next step. Use this decision l
 - They've done random training and want a real system
 - Frame it as: "This is the complete 12-week velocity development program. Drills, progressions, and benchmarks — everything mapped out."
 
-**→ Performance Membership — $59/mo** (link: /#pricing)
+**→ Remote Training Membership — $199/mo** (link: /#pricing)
 - They want ongoing coaching and accountability
 - They're age 15-18 and preparing for college recruitment
 - They want weekly programming, metrics tracking, and coach access
