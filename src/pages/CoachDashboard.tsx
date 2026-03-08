@@ -379,6 +379,22 @@ const CoachDashboard = () => {
                 <CoachLessonMonitor coachUserId={user?.id || ''} />
               </TabsContent>
 
+              <TabsContent value="marketplace" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">MARKETPLACE SETTINGS</h2>
+                <p className="text-sm text-muted-foreground">Set up your public profile, services, and pricing for the Vault Coach Marketplace.</p>
+                <CoachMarketplaceSetup userId={user?.id || ''} />
+              </TabsContent>
+
+              <TabsContent value="earnings" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">MARKETPLACE EARNINGS</h2>
+                <p className="text-sm text-muted-foreground">Track your session income and payout history. Platform fee: 30% / Coach: 70%.</p>
+                {coachRecord ? (
+                  <CoachEarningsDashboard coachId={coachRecord} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">Loading coach record...</p>
+                )}
+              </TabsContent>
+
               <TabsContent value="leaderboards" className="space-y-6">
                 <KPILeaderboards coachUserId={user?.id || ''} />
               </TabsContent>
