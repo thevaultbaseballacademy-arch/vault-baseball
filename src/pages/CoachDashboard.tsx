@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, TrendingUp, Calendar, 
   ChevronDown, ChevronUp, Search, Activity, Trophy,
-  BookOpen, Target, BarChart3, Video
+  BookOpen, Target, BarChart3, Video, Brain
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +22,7 @@ import GlobalSearch from "@/components/coach/GlobalSearch";
 import PositionShortcuts from "@/components/coach/PositionShortcuts";
 import FavoritesQuickStart from "@/components/coach/FavoritesQuickStart";
 import QuickAccessCard from "@/components/coach/QuickAccessCard";
+import CoachAnalysisReview from "@/components/coaching/CoachAnalysisReview";
 import {
   LineChart,
   Line,
@@ -322,10 +323,14 @@ const CoachDashboard = () => {
 
             {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="grid w-full max-w-2xl grid-cols-4">
+              <TabsList className="grid w-full max-w-3xl grid-cols-5">
                 <TabsTrigger value="athletes" className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Athletes
+                </TabsTrigger>
+                <TabsTrigger value="motion" className="flex items-center gap-1">
+                  <Brain className="w-3 h-3" />
+                  Motion
                 </TabsTrigger>
                 <TabsTrigger value="lessons" className="flex items-center gap-1">
                   <Video className="w-3 h-3" />
@@ -340,6 +345,25 @@ const CoachDashboard = () => {
                   Schedules
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="motion" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">VAULT AI MOTION ANALYSIS</h2>
+                <p className="text-sm text-muted-foreground">Review AI-generated biomechanics reports. Add notes and mark key points for live sessions.</p>
+                {athletes.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No assigned athletes yet.</p>
+                ) : (
+                  <div className="space-y-6">
+                    {athletes.map((a: any) => (
+                      <CoachAnalysisReview
+                        key={a.user_id}
+                        coachUserId={user?.id || ''}
+                        athleteUserId={a.user_id}
+                        athleteName={a.display_name}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
 
               <TabsContent value="lessons" className="space-y-6">
                 <CoachLessonMonitor coachUserId={user?.id || ''} />
