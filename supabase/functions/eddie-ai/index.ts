@@ -87,7 +87,7 @@ Frame: "Send us your video. We break down your mechanics against our development
 For: Serious. Age 14-17. Has goals. Done random training. Wants a complete self-guided program.
 Frame: "This is a 12-week velocity development system. Drills, progressions, arm care, and weekly benchmarks. It's what we use with our in-person athletes, built for remote execution."
 
-**Remote Training Membership — $199/mo** → /#pricing
+**Remote Training Membership — $199/mo** → /products/remote-training
 For: Wants ongoing coaching. Age 15-18. Preparing for recruitment or showcase season. Needs weekly programming and accountability.
 Frame: "You get a structured weekly program, metrics tracking, and direct access to Vault coaches. It's the closest thing to training with us without being in the building."
 
