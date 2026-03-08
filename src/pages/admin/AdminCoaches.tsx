@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { Loader2, Plus, Users, Shield } from "lucide-react";
+import { Loader2, Plus, Users, Shield, BarChart3 } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useCoachManagement, type Coach } from "@/hooks/useCoachManagement";
 import { AdminSidebar } from "@/components/admin-analytics/AdminSidebar";
 import { CoachesTable } from "@/components/admin/CoachesTable";
 import { CoachForm } from "@/components/admin/CoachForm";
 import CoachApprovalPanel from "@/components/admin/CoachApprovalPanel";
+import CoachPerformancePanel from "@/components/admin/CoachPerformancePanel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -72,9 +73,9 @@ const AdminCoaches = () => {
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-display">Coaches</h1>
+              <h1 className="text-4xl font-display">COACHES</h1>
               <p className="text-muted-foreground mt-1">
-                Manage coach accounts, approvals, and marketplace access
+                Manage coach applications, approvals, and performance
               </p>
             </div>
             <Button onClick={handleAddCoach}>
@@ -83,22 +84,28 @@ const AdminCoaches = () => {
             </Button>
           </div>
 
-          <Tabs defaultValue="approval" className="space-y-6">
+          <Tabs defaultValue="applications" className="space-y-6">
             <TabsList>
-              <TabsTrigger value="approval" className="gap-1.5">
+              <TabsTrigger value="applications" className="gap-1.5">
                 <Shield className="w-3.5 h-3.5" />
-                Marketplace Approval
+                Applications
               </TabsTrigger>
               <TabsTrigger value="all" className="gap-1.5">
                 <Users className="w-3.5 h-3.5" />
                 All Coaches
               </TabsTrigger>
+              <TabsTrigger value="performance" className="gap-1.5">
+                <BarChart3 className="w-3.5 h-3.5" />
+                Performance
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="approval">
+            {/* Applications Tab — uses CoachApprovalPanel */}
+            <TabsContent value="applications">
               <CoachApprovalPanel />
             </TabsContent>
 
+            {/* All Coaches Tab */}
             <TabsContent value="all" className="space-y-6">
               <div className="grid gap-4 md:grid-cols-3">
                 <Card>
@@ -156,6 +163,11 @@ const AdminCoaches = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Performance Tab */}
+            <TabsContent value="performance">
+              <CoachPerformancePanel />
             </TabsContent>
           </Tabs>
         </div>
