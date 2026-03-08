@@ -24,9 +24,9 @@ const ProductCTA = ({ href, label }: { href: string; label: string }) => {
 
 const PRODUCT_PATTERNS: { pattern: RegExp; href: string; label: string }[] = [
   { pattern: /\/free-velocity-guide/i, href: "/free-velocity-guide", label: "GET THE FREE VELOCITY GUIDE" },
-  { pattern: /\/products\/velo-check/i, href: "/products/velo-check", label: "GET VELO-CHECK — $79" },
-  { pattern: /\/products\/velocity-system/i, href: "/products/velocity-system", label: "START THE VELOCITY SYSTEM — $399" },
-  { pattern: /\/#pricing/i, href: "/#pricing", label: "JOIN PERFORMANCE MEMBERSHIP — $59/MO" },
+  { pattern: /\/products\/velo-check/i, href: "/products/velo-check", label: "GET VELO-CHECK — $97" },
+  { pattern: /\/products\/velocity-system/i, href: "/products/velocity-system", label: "START THE VELOCITY SYSTEM — $397" },
+  { pattern: /\/#pricing/i, href: "/#pricing", label: "JOIN REMOTE TRAINING — $199/MO" },
 ];
 
 function extractProductCTAs(content: string) {
