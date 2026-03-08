@@ -42,6 +42,7 @@ const RemoteTrainingHub = () => {
   const [coach, setCoach] = useState<CoachProfile | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [recordings, setRecordings] = useState<any[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
