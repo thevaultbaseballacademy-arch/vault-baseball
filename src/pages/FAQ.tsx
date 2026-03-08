@@ -89,7 +89,7 @@ const faqData = {
     questions: [
       {
         q: "What subscription plans are available?",
-        a: "We offer Monthly ($29/month) and Annual ($249/year - save 28%) subscription plans. Both plans include access to all courses, community features, and basic certification exam attempts."
+        a: "We offer three tiers: Athlete ($29/month), Performance ($59/month), and Elite ($149/month). We also offer Founder's Lifetime Access at $499 — a one-time payment for permanent access to all current and future VAULT™ programs."
       },
       {
         q: "Can I cancel my subscription at any time?",
@@ -97,11 +97,11 @@ const faqData = {
       },
       {
         q: "What payment methods do you accept?",
-        a: "We accept all major credit cards (Visa, Mastercard, American Express, Discover) through our secure payment processor, Stripe. We also support Apple Pay and Google Pay."
+        a: "We accept all major credit cards (Visa, Mastercard, American Express, Discover) through our secure payment processor. We also support Apple Pay and Google Pay."
       },
       {
         q: "Is there a free trial available?",
-        a: "We don't currently offer a free trial, but we do have free preview content for each course so you can get a feel for our teaching style before subscribing."
+        a: "Yes! We offer a 7-Day Velocity Baseline Trial — no credit card required. You'll get baseline scores across all 5 pillars so you can see exactly where you stand before committing."
       },
       {
         q: "What is your refund policy?",
