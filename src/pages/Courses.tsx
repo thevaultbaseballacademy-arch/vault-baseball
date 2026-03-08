@@ -424,6 +424,31 @@ export const allCourses = [
 
   // TRANSFER PILLAR - Game Translation
   {
+    id: "transfer-system",
+    title: "VAULT™ Transfer System",
+    description: "12-week system to close the practice-to-game gap. 60+ game-realistic drills, decision training, competitive execution frameworks, and transfer rate analytics.",
+    image: courseHitting,
+    duration: "12 Weeks",
+    modules: 6,
+    lessons: 24,
+    icon: Flame,
+    tag: "Flagship",
+    pillar: "transfer",
+    category: "performance",
+    level: "All Levels",
+    metrics: ["Transfer Rate", "Decision Speed", "Clutch Performance"],
+    features: [
+      "60+ game-realistic drill library",
+      "Decision training protocols",
+      "Competitive execution frameworks",
+      "Transfer rate analytics",
+      "AI-powered practice design",
+    ],
+    instructor: "Vault Performance",
+    students: 1450,
+    isNew: true,
+  },
+  {
     id: "competitive-execution",
     title: "Competitive Execution System",
     description: "Practice → game carryover rules, competitive reps, pressure execution standards, and retesting protocols. Training that shows up when it matters.",

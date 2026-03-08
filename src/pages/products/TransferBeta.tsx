@@ -1,14 +1,25 @@
 import { motion } from "framer-motion";
-import { Target, Check, ShieldCheck, ArrowRight, Loader2, Crosshair, Brain, Flame, Trophy } from "lucide-react";
+import { Target, Check, ShieldCheck, ArrowRight, Loader2, Crosshair, Brain, Flame, Trophy, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
+import { useHasProductAccess } from "@/hooks/useUserPurchases";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const TransferBeta = () => {
   const { checkout, loading } = useProductCheckout();
   const product = PRODUCT_PRICES.transfer_beta;
+  const [userId, setUserId] = useState<string | undefined>();
+  
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id));
+  }, []);
+  
+  const { hasAccess } = useHasProductAccess(userId, 'transfer_beta');
 
   const pillars = [
     {
@@ -159,19 +170,29 @@ const TransferBeta = () => {
                     Lifetime access to all Transfer System content &amp; future updates
                   </p>
                 </div>
-                <Button
-                  variant="vault"
-                  size="xl"
-                  onClick={() => checkout('transfer_beta')}
-                  disabled={loading === 'transfer_beta'}
-                  className="whitespace-nowrap"
-                >
-                  {loading === 'transfer_beta' ? (
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  ) : null}
-                  Get Full Access
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
+                {hasAccess ? (
+                  <Button variant="vault" size="xl" asChild>
+                    <Link to="/courses/transfer-system">
+                      <BookOpen className="w-5 h-5 mr-2" />
+                      Access Your Course
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="vault"
+                    size="xl"
+                    onClick={() => checkout('transfer_beta')}
+                    disabled={loading === 'transfer_beta'}
+                    className="whitespace-nowrap"
+                  >
+                    {loading === 'transfer_beta' ? (
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    ) : null}
+                    Get Full Access
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                )}
               </div>
             </motion.div>
 
