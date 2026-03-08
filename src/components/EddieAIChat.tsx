@@ -60,7 +60,7 @@ I help athletes and parents figure out the right next step for velocity, arm car
 
 Let's start with a few quick questions so I can point you in the right direction.`;
 
-export const EddieAIChat = () => {
+export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
@@ -265,4 +265,6 @@ export const EddieAIChat = () => {
       )}
     </>
   );
-};
+});
+
+EddieAIChat.displayName = "EddieAIChat";

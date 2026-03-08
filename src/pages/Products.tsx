@@ -88,7 +88,7 @@ const Products = () => {
       subtitle: "Advisory Service",
       description: "Know exactly where you stand and what it takes to get recruited to your target programs.",
       features: ["Metrics review", "Division-fit analysis", "6-12 month plan"],
-      href: "/products/recruitment-audit",
+      href: "/products/recruitment",
       price: PRODUCT_PRICES.recruitment_audit.price,
       badge: "Parents Love",
       badgeColor: "bg-green-500",
