@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import TrialStatusBanner from "@/components/trial/TrialStatusBanner";
 import {
   RadarChart,
   PolarGrid,
@@ -207,6 +208,7 @@ const VaultDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      <TrialStatusBanner />
 
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 max-w-6xl">
