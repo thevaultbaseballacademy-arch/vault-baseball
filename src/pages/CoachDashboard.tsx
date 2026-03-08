@@ -389,8 +389,8 @@ const CoachDashboard = () => {
               <TabsContent value="earnings" className="space-y-6">
                 <h2 className="font-display text-xl text-foreground">MARKETPLACE EARNINGS</h2>
                 <p className="text-sm text-muted-foreground">Track your session income and payout history. Platform fee: 30% / Coach: 70%.</p>
-                {coachRecord ? (
-                  <CoachEarningsDashboard coachId={coachRecord} />
+                {coachRecordId ? (
+                  <CoachEarningsDashboard coachId={coachRecordId} />
                 ) : (
                   <p className="text-sm text-muted-foreground">Loading coach record...</p>
                 )}
