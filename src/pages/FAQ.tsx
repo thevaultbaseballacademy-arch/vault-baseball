@@ -28,28 +28,28 @@ const faqData = {
     title: "Courses & Training",
     questions: [
       {
-        q: "What courses are available on Vault Baseball?",
-        a: "We offer comprehensive training programs including Hitting Mastery, Pitching Excellence, and Fielding Fundamentals. Each course is designed by professional coaches and includes video lessons, drills, and progress tracking."
+        q: "What programs are available on Vault Baseball?",
+        a: "We offer elite training programs across all five V.A.U.L.T. pillars: Velocity (hitting and pitching systems), Athleticism (speed, strength, and conditioning), Utility (catcher development and positional versatility), Longevity (arm care and workload management), and Transfer (competitive execution). Each program is research-backed and includes video lessons, drills, metrics tracking, and progressive overload."
       },
       {
-        q: "How long do I have access to a course after purchasing?",
-        a: "Once you purchase a course, you have lifetime access to all course materials. This includes any future updates or additions to the course content."
+        q: "How long do I have access to a program after purchasing?",
+        a: "Once you purchase a program, you have lifetime access to all course materials. This includes any future updates or additions to the content."
       },
       {
         q: "Can I download course videos for offline viewing?",
-        a: "Currently, all course content is streamed through our platform to ensure you always have access to the latest updates. Offline viewing is not available at this time."
+        a: "Currently, all content is streamed through our platform to ensure you always have access to the latest updates. Offline viewing is not available at this time."
       },
       {
-        q: "How do I track my progress through a course?",
+        q: "How do I track my progress through a program?",
         a: "Your progress is automatically tracked as you complete lessons. You can view your progress on the course detail page and in your My Programs dashboard. Completed lessons are marked with a checkmark."
       },
       {
-        q: "Are there any prerequisites for the courses?",
-        a: "Our courses are designed for various skill levels. Hitting Mastery and Fielding Fundamentals are suitable for beginners, while Pitching Excellence is recommended for players with some baseball experience. Each course description includes recommended skill levels."
+        q: "Are there any prerequisites for the programs?",
+        a: "Our programs are designed for athletes ages 12–18 at various skill levels. Youth programs (ages 9–13) focus on foundational mechanics, while Elite programs are built for competitive high school athletes. Each program description includes the recommended skill level."
       },
       {
-        q: "Do I receive a certificate after completing a course?",
-        a: "Yes! Upon completing all lessons in a course, you'll receive a digital certificate of completion that you can download, share, and add to your profile."
+        q: "Do I receive a certificate after completing a program?",
+        a: "Yes! Upon completing all lessons in a program, you'll receive a digital certificate of completion that you can download, share, and add to your profile."
       }
     ]
   },
