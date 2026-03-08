@@ -109,12 +109,16 @@ export const useMarketplaceCoaches = (filters?: { specialty?: string; search?: s
           is_marketplace_approved: item.coaches?.is_marketplace_approved,
           marketplace_status: item.coaches?.marketplace_status,
         }))
-        // CRITICAL: Only show approved coaches with active status
-        .filter((c: any) =>
-          c.is_marketplace_approved === true &&
-          c.marketplace_status === "approved" &&
-          c.coach_status === "Active"
-        );
+        // CRITICAL PROTECTION: Only show coaches who meet ALL requirements:
+        // 1. Admin has approved marketplace access
+        // 2. Status is "approved"
+        // 3. Coach is certified (Vault Certified, Vault Staff, OR Eddie Certified)
+        .filter((c: any) => {
+          const isApproved = c.is_marketplace_approved === true;
+          const hasApprovedStatus = c.marketplace_status === "approved";
+          const isCertified = c.is_certified === true || c.is_bypass_certified === true || c.is_staff === true;
+          return isApproved && hasApprovedStatus && isCertified;
+        });
 
       // Client-side filtering
       if (filters?.specialty) {
