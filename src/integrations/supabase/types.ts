@@ -873,52 +873,76 @@ export type Database = {
       }
       coach_registration_requests: {
         Row: {
+          coaching_experience: string | null
           created_at: string
           email: string
           experience_years: number | null
           full_name: string
           id: string
           invite_token_id: string | null
+          location: string | null
           message: string | null
           organization: string | null
+          phone: string | null
+          playing_experience: string | null
+          resume_url: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          social_media: string | null
           specialization: string | null
+          specialties: string[] | null
           status: string
           updated_at: string
           user_id: string
+          video_sample_url: string | null
         }
         Insert: {
+          coaching_experience?: string | null
           created_at?: string
           email: string
           experience_years?: number | null
           full_name: string
           id?: string
           invite_token_id?: string | null
+          location?: string | null
           message?: string | null
           organization?: string | null
+          phone?: string | null
+          playing_experience?: string | null
+          resume_url?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          social_media?: string | null
           specialization?: string | null
+          specialties?: string[] | null
           status?: string
           updated_at?: string
           user_id: string
+          video_sample_url?: string | null
         }
         Update: {
+          coaching_experience?: string | null
           created_at?: string
           email?: string
           experience_years?: number | null
           full_name?: string
           id?: string
           invite_token_id?: string | null
+          location?: string | null
           message?: string | null
           organization?: string | null
+          phone?: string | null
+          playing_experience?: string | null
+          resume_url?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          social_media?: string | null
           specialization?: string | null
+          specialties?: string[] | null
           status?: string
           updated_at?: string
           user_id?: string
+          video_sample_url?: string | null
         }
         Relationships: [
           {
