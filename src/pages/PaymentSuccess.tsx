@@ -28,6 +28,7 @@ const PaymentSuccess = () => {
   const [verified, setVerified] = useState(false);
   const [unlockedCourses, setUnlockedCourses] = useState<string[]>([]);
   const [isFoundersAccess, setIsFoundersAccess] = useState(false);
+  const [productKey, setProductKey] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
