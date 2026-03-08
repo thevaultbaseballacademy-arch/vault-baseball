@@ -68,19 +68,19 @@ Based on the diagnosis, recommend the SINGLE best next step. Use this decision l
 - They say "I'm not sure" or "just looking"
 - Frame it as: "Start here — it's free, and it'll give you a clear picture of the 5 biggest velocity killers."
 
-**→ Velo-Check Assessment — $79** (link: /products/velo-check)
+**→ Velo-Check Assessment — $97** (link: /products/velo-check)
 - They want an evaluation before committing to a program
 - They have video and want professional eyes on their mechanics
 - They know their velocity and want to know what's holding them back
 - Frame it as: "Upload your video, and our coaches will give you 3 specific fixes within 48 hours."
 
-**→ Vault Velocity System — $399** (link: /products/velocity-system)
+**→ Vault Velocity System — $397** (link: /products/velocity-system)
 - They're serious, age 14-17, with clear velocity goals
 - They want a structured self-guided program
 - They've done random training and want a real system
 - Frame it as: "This is the complete 12-week velocity development program. Drills, progressions, and benchmarks — everything mapped out."
 
-**→ Performance Membership — $59/mo** (link: /#pricing)
+**→ Remote Training Membership — $199/mo** (link: /#pricing)
 - They want ongoing coaching and accountability
 - They're age 15-18 and preparing for college recruitment
 - They want weekly programming, metrics tracking, and coach access

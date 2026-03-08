@@ -12,6 +12,7 @@ const VALID_SUBSCRIPTION_PRICE_IDS = [
   'price_1SjGMKPhXS410TO5XQcZm9fZ', // basic
   'price_1SjGMYPhXS410TO5bGu1kSSZ', // performance
   'price_1SjGMhPhXS410TO59WKiE81b', // elite
+  'price_1T8ckaPhXS410TO57tcuh1nv', // remote_training $199/mo
   'price_1SqEGEPhXS410TO5DeHOuqVH', // small_org_license
   'price_1SqEGIPhXS410TO5JUNSsTCq', // org_quick_start
   'price_1SqEGOPhXS410TO5XtSbPx0v', // certified_coach
@@ -184,10 +185,10 @@ serve(async (req) => {
       } : undefined,
       success_url: hasTrial 
         ? `${origin}/velocity-baseline?subscription=success` 
-        : `${origin}/?subscription=success`,
+        : `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: hasTrial 
         ? `${origin}/trial?subscription=canceled`
-        : `${origin}/?subscription=canceled`,
+        : `${origin}/payment-canceled`,
       allow_promotion_codes: true,
     });
 

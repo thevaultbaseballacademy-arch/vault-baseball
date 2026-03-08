@@ -15,6 +15,13 @@ export const PRODUCT_PRICES = {
     price: 5900,
     type: 'subscription' as const,
   },
+  remote_training: {
+    price_id: 'price_1T8ckaPhXS410TO57tcuh1nv',
+    product_id: 'prod_U6qRK6r5KI4995',
+    name: 'Remote Training Membership',
+    price: 19900,
+    type: 'subscription' as const,
+  },
   elite: {
     price_id: 'price_1SjGMhPhXS410TO59WKiE81b',
     product_id: 'prod_Tgdd8gSJpkk33e',
@@ -59,10 +66,10 @@ export const PRODUCT_PRICES = {
   
   // Stand-alone Products (one-time)
   velocity_12week: {
-    price_id: 'price_1SqEGGPhXS410TO52G0rlmEk',
-    product_id: 'prod_TnpwFqR8hRH6mG',
-    name: '12-Week Vault Velocity System',
-    price: 39900, // Updated to $399
+    price_id: 'price_1T8ckYPhXS410TO5WkQI2EpC',
+    product_id: 'prod_U6qR2KHT4Ahl76',
+    name: 'Vault Velocity System',
+    price: 39700,
     type: 'payment' as const,
   },
   velocity_accelerator: {
@@ -73,10 +80,10 @@ export const PRODUCT_PRICES = {
     type: 'payment' as const,
   },
   velo_check: {
-    price_id: 'price_1SqEGKPhXS410TO5JALh4Imp',
-    product_id: 'prod_TnpwQqOjp9wbbc',
-    name: 'Vault Velo-Check™ Analysis',
-    price: 7900, // Updated to $79
+    price_id: 'price_1T8ckXPhXS410TO5tYyygmol',
+    product_id: 'prod_U6qRFtddsuGgum',
+    name: 'Velo-Check Assessment',
+    price: 9700,
     type: 'payment' as const,
   },
   recruitment_audit: {
