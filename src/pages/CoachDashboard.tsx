@@ -61,6 +61,7 @@ const CoachDashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isCoach, setIsCoach] = useState(false);
+  const [coachRecordId, setCoachRecordId] = useState<string | null>(null);
   const [athletes, setAthletes] = useState<AthleteProfile[]>([]);
   const [checkins, setCheckins] = useState<CheckinData[]>([]);
   const [expandedAthlete, setExpandedAthlete] = useState<string | null>(null);
