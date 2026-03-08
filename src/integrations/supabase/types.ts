@@ -898,6 +898,45 @@ export type Database = {
         }
         Relationships: []
       }
+      coaching_messages: {
+        Row: {
+          attachment_type: string | null
+          attachment_url: string | null
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          recipient_id: string
+          sender_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          attachment_type?: string | null
+          attachment_url?: string | null
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          recipient_id: string
+          sender_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          attachment_type?: string | null
+          attachment_url?: string | null
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          recipient_id?: string
+          sender_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       coaching_sessions: {
         Row: {
           coach_name: string
@@ -2279,6 +2318,39 @@ export type Database = {
           status?: string
           title?: string
           type?: string
+        }
+        Relationships: []
+      }
+      session_recordings: {
+        Row: {
+          athlete_user_id: string
+          coach_user_id: string
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          notes: string | null
+          recording_url: string
+          session_id: string | null
+        }
+        Insert: {
+          athlete_user_id: string
+          coach_user_id: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          notes?: string | null
+          recording_url: string
+          session_id?: string | null
+        }
+        Update: {
+          athlete_user_id?: string
+          coach_user_id?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          notes?: string | null
+          recording_url?: string
+          session_id?: string | null
         }
         Relationships: []
       }
