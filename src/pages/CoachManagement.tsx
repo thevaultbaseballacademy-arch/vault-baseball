@@ -519,10 +519,17 @@ const CoachManagement = () => {
                 <CoachForm
                   coach={editingCoach}
                   onSubmit={(data) => {
+                    const coachData = {
+                      name: data.name || "",
+                      email: data.email || "",
+                      role: data.role as any,
+                      org_id: data.org_id || "",
+                      ...(data.team_id ? { team_id: data.team_id } : {}),
+                    };
                     if (editingCoach) {
-                      updateCoach.mutate({ id: editingCoach.id, ...data });
+                      updateCoach.mutate({ id: editingCoach.id, ...coachData });
                     } else {
-                      createCoach.mutate(data);
+                      createCoach.mutate(coachData);
                     }
                     setShowCoachForm(false);
                     setEditingCoach(null);
