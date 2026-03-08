@@ -275,47 +275,62 @@ export type Database = {
       }
       athlete_onboarding: {
         Row: {
+          age: number | null
           athlete_goals: string | null
+          athlete_name: string | null
+          biggest_struggle: string | null
           created_at: string
           current_level: string | null
           current_velocity: string | null
           email: string
           exit_velo: string | null
           id: string
+          parent_name: string | null
           position: string | null
           product_purchased: string | null
           sixty_time: string | null
           social_handle: string | null
+          training_history: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          age?: number | null
           athlete_goals?: string | null
+          athlete_name?: string | null
+          biggest_struggle?: string | null
           created_at?: string
           current_level?: string | null
           current_velocity?: string | null
           email: string
           exit_velo?: string | null
           id?: string
+          parent_name?: string | null
           position?: string | null
           product_purchased?: string | null
           sixty_time?: string | null
           social_handle?: string | null
+          training_history?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          age?: number | null
           athlete_goals?: string | null
+          athlete_name?: string | null
+          biggest_struggle?: string | null
           created_at?: string
           current_level?: string | null
           current_velocity?: string | null
           email?: string
           exit_velo?: string | null
           id?: string
+          parent_name?: string | null
           position?: string | null
           product_purchased?: string | null
           sixty_time?: string | null
           social_handle?: string | null
+          training_history?: string | null
           updated_at?: string
           user_id?: string | null
         }
