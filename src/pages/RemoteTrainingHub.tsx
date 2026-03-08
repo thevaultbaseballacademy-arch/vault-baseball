@@ -249,7 +249,15 @@ const RemoteTrainingHub = () => {
                 )}
               </TabsContent>
 
-              {/* OVERVIEW */}
+              {/* AI ANALYSIS */}
+              <TabsContent value="ai-analysis" className="mt-6">
+                <h2 className="font-display text-xl text-foreground mb-1">AI DEVELOPMENT ANALYSIS</h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Upload a video of your mechanics. Vault AI will break down every phase and prepare focus areas before your next coaching session.
+                </p>
+                {user && <VideoAnalysisPanel userId={user.id} />}
+              </TabsContent>
+
               <TabsContent value="overview" className="mt-6 space-y-6">
                 {/* Coach card */}
                 {coach && (
