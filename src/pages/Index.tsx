@@ -255,9 +255,9 @@ const Index = () => {
             <div className="grid md:grid-cols-4 gap-5">
               {[
                 { step: "01", name: "Free Velocity Guide", price: "FREE", desc: "Learn the 5 mistakes that kill pitch velocity — and how to fix them. Instant download.", cta: "Download Now", href: "/free-velocity-guide", highlight: false },
-                { step: "02", name: "Velo-Check Analysis", price: "$79", desc: "Upload your video. Get 3 specific mechanical fixes from Vault coaches within 48 hours.", cta: "Get Velo-Check", href: "/products/velo-check", highlight: false },
-                { step: "03", name: "Vault Velocity System", price: "$399", desc: "The complete 12-week self-guided velocity program. Drills, metrics, and progressive overload built in.", cta: "Start the System", href: "/products/velocity-system", highlight: true },
-                { step: "04", name: "Performance Membership", price: "$59/mo", desc: "Ongoing coaching, weekly programming, metrics tracking, and direct coach access. Cancel anytime.", cta: "Join Now", href: "/#pricing", highlight: false },
+                { step: "02", name: "Velo-Check Assessment", price: "$97", desc: "Upload your video. Get 3 specific mechanical fixes from Vault coaches within 48 hours.", cta: "Get Velo-Check", href: "/products/velo-check", highlight: false },
+                { step: "03", name: "Vault Velocity System", price: "$397", desc: "The complete 12-week self-guided velocity program. Drills, metrics, and progressive overload built in.", cta: "Start the System", href: "/products/velocity-system", highlight: true },
+                { step: "04", name: "Remote Training", price: "$199/mo", desc: "Monthly coaching, weekly programming, metrics tracking, and direct coach access. Cancel anytime.", cta: "Join Now", href: "/#pricing", highlight: false },
               ].map((offer, i) => (
                 <motion.div
                   key={i}
@@ -309,7 +309,7 @@ const Index = () => {
                 { name: "Dylan R.", detail: "17 · RHP/1B · Florida", quote: "The Performance membership keeps me accountable. I know exactly where I stand for D1 benchmarks and what I need to work on. It's not guessing anymore.", stat: "+8 MPH", label: "Pitching Velo" },
                 { name: "Marcus W.", detail: "14 · IF/P · California", quote: "Vault showed me exactly where I was losing velocity in my mechanics. In two months I went from 62 to 66 and I'm still climbing.", stat: "+4 MPH", label: "Pitching Velo" },
                 { name: "Ryan K.", detail: "Coach · Travel Ball", quote: "I put my entire 14U team on Vault. The system gives me a framework for developing each player individually while running the same program. Game changer for coaches.", stat: "12", label: "Athletes Coached" },
-                { name: "Mike D.", detail: "Parent · Son age 16", quote: "We spent $3,000 on private lessons last year with no real plan. Vault gave us more structure in one month than a year of random training.", stat: "$399", label: "Full System" },
+                { name: "Mike D.", detail: "Parent · Son age 16", quote: "We spent $3,000 on private lessons last year with no real plan. Vault gave us more structure in one month than a year of random training.", stat: "$397", label: "Full System" },
               ].map((t, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="bg-card border border-border p-6 flex flex-col">
                   <div className="flex items-center gap-1 mb-4">
