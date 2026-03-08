@@ -1,57 +1,62 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { 
+import {
   UserCheck, Loader2, ArrowLeft, Shield, CheckCircle, Clock,
-  Briefcase, Award, MessageSquare, Users
+  Target, Video, Users, BarChart3, Calendar, BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CoachApplicationForm from "@/components/coach-register/CoachApplicationForm";
+
+const BENEFITS = [
+  { icon: Users, title: "Athlete Marketplace", desc: "Access to athletes and parents actively seeking coaching" },
+  { icon: Video, title: "Remote Lessons", desc: "Offer live video lessons and async video analysis" },
+  { icon: Target, title: "Profile Exposure", desc: "Public coach profile with ratings and specialties" },
+  { icon: Calendar, title: "Session Booking", desc: "Secure scheduling and booking built into the platform" },
+  { icon: BookOpen, title: "Video Coaching Tools", desc: "Built-in tools for video breakdown and analysis" },
+  { icon: BarChart3, title: "Progress Tracking", desc: "Track athlete KPIs and development over time" },
+];
+
+const WHO_IS_FOR = [
+  "Former college or professional baseball players",
+  "Experienced private instructors",
+  "Strength and performance coaches working with baseball athletes",
+  "Coaches committed to structured development systems",
+];
 
 const CoachRegister = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [existingRequest, setExistingRequest] = useState<any>(null);
   const [isAlreadyCoach, setIsAlreadyCoach] = useState(false);
   const [inviteValid, setInviteValid] = useState<boolean | null>(null);
   const [inviteTokenId, setInviteTokenId] = useState<string | null>(null);
-
-  // Form
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [organization, setOrganization] = useState("");
-  const [experienceYears, setExperienceYears] = useState("");
-  const [specialization, setSpecialization] = useState("");
-  const [message, setMessage] = useState("");
+  const [defaultName, setDefaultName] = useState("");
+  const [defaultEmail, setDefaultEmail] = useState("");
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const inviteToken = searchParams.get("invite");
-  const { toast } = useToast();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
-        navigate("/auth", { state: { from: { pathname: `/coach-register${inviteToken ? `?invite=${inviteToken}` : ""}` } } });
+        navigate("/auth", {
+          state: { from: { pathname: `/coach-register${inviteToken ? `?invite=${inviteToken}` : ""}` } },
+        });
         return;
       }
       setUser(session.user);
-      setEmail(session.user.email || "");
+      setDefaultEmail(session.user.email || "");
       init(session.user.id);
     });
   }, [navigate]);
 
   const init = async (userId: string) => {
     try {
-      // Check if already a coach
       const { data: roleData } = await supabase
         .from("user_roles")
         .select("role")
@@ -65,7 +70,6 @@ const CoachRegister = () => {
         return;
       }
 
-      // Check for existing request
       const { data: reqData } = await supabase
         .from("coach_registration_requests")
         .select("*")
@@ -76,7 +80,6 @@ const CoachRegister = () => {
 
       if (reqData) setExistingRequest(reqData);
 
-      // Validate invite token if present
       if (inviteToken) {
         const { data: tokenData } = await supabase
           .from("coach_invite_tokens")
@@ -85,7 +88,7 @@ const CoachRegister = () => {
           .eq("is_active", true)
           .maybeSingle();
 
-        if (tokenData && tokenData.used_count < (tokenData.max_uses || 999)) {
+        if (tokenData && tokenData.used_count! < (tokenData.max_uses || 999)) {
           const notExpired = !tokenData.expires_at || new Date(tokenData.expires_at) > new Date();
           setInviteValid(notExpired);
           if (notExpired) setInviteTokenId(tokenData.id);
@@ -94,101 +97,17 @@ const CoachRegister = () => {
         }
       }
 
-      // Pre-fill name from profile
       const { data: profile } = await supabase
         .from("profiles")
         .select("display_name")
         .eq("user_id", userId)
         .maybeSingle();
 
-      if (profile?.display_name) setFullName(profile.display_name);
+      if (profile?.display_name) setDefaultName(profile.display_name);
     } catch (error) {
       console.error("Error initializing:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-    setSubmitting(true);
-
-    try {
-      // If valid invite token, auto-approve
-      if (inviteValid && inviteTokenId) {
-        // Insert request as approved
-        const { error: reqError } = await supabase
-          .from("coach_registration_requests")
-          .insert({
-            user_id: user.id,
-            full_name: fullName,
-            email,
-            organization: organization || null,
-            experience_years: experienceYears ? parseInt(experienceYears) : null,
-            specialization: specialization || null,
-            message: message || null,
-            invite_token_id: inviteTokenId,
-            status: "approved",
-            reviewed_at: new Date().toISOString(),
-          });
-
-        if (reqError) throw reqError;
-
-        // Auto-assign coach role
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({ user_id: user.id, role: "coach" });
-
-        if (roleError) throw roleError;
-
-        // Increment invite token usage
-        await supabase.rpc("increment_invite_usage" as any, { token_id: inviteTokenId });
-
-        // Create onboarding record
-        await supabase
-          .from("coach_onboarding")
-          .insert({ user_id: user.id });
-
-        toast({
-          title: "Welcome, Coach!",
-          description: "Your coach access has been activated. Let's get you set up.",
-        });
-
-        navigate("/coach-onboarding");
-        return;
-      }
-
-      // Otherwise submit as pending request
-      const { error } = await supabase
-        .from("coach_registration_requests")
-        .insert({
-          user_id: user.id,
-          full_name: fullName,
-          email,
-          organization: organization || null,
-          experience_years: experienceYears ? parseInt(experienceYears) : null,
-          specialization: specialization || null,
-          message: message || null,
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Application Submitted!",
-        description: "An admin will review your request shortly.",
-      });
-
-      setExistingRequest({ status: "pending" });
-    } catch (error: any) {
-      console.error("Error submitting:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to submit application",
-        variant: "destructive",
-      });
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -204,36 +123,32 @@ const CoachRegister = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 max-w-2xl">
+        <div className="container mx-auto px-4 max-w-3xl">
           <Button variant="ghost" className="mb-6" onClick={() => navigate("/")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
             {/* Header */}
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                <UserCheck className="w-8 h-8 text-accent" />
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-5">
+                <UserCheck className="w-8 h-8 text-primary-foreground" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-display text-foreground mb-2">
-                BECOME A VAULT COACH
+              <h1 className="text-4xl md:text-5xl font-display tracking-wider text-foreground mb-3">
+                BECOME A VAULT CERTIFIED COACH
               </h1>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Join the VAULT coaching network and get access to powerful tools for managing your athletes.
+              <p className="text-muted-foreground max-w-xl mx-auto text-base leading-relaxed">
+                Join the Vault development network and work with athletes who are serious about real progress.
               </p>
               {inviteValid && (
-                <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm">
+                <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-medium">
                   <CheckCircle className="w-4 h-4" />
-                  Invite link verified — instant access upon registration
+                  Invite verified — instant access upon submission
                 </div>
               )}
               {inviteValid === false && (
-                <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 text-destructive text-sm">
+                <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive text-sm">
                   Invite link is invalid or expired
                 </div>
               )}
@@ -241,169 +156,91 @@ const CoachRegister = () => {
 
             {/* Already a coach */}
             {isAlreadyCoach && (
-              <div className="bg-card border border-accent/30 rounded-2xl p-8 text-center">
-                <CheckCircle className="w-12 h-12 text-accent mx-auto mb-4" />
-                <h2 className="text-xl font-display text-foreground mb-2">You're Already a Coach!</h2>
-                <p className="text-muted-foreground mb-6">
-                  You already have coach access. Head to your dashboard to get started.
-                </p>
-                <Button variant="vault" onClick={() => navigate("/coach")}>
-                  Go to Coach Dashboard
-                </Button>
+              <div className="bg-card border border-border p-8 text-center">
+                <CheckCircle className="w-12 h-12 text-foreground mx-auto mb-4" />
+                <h2 className="text-xl font-display text-foreground mb-2">YOU'RE ALREADY A COACH</h2>
+                <p className="text-muted-foreground mb-6">Head to your dashboard to get started.</p>
+                <Button variant="vault" onClick={() => navigate("/coach")}>Go to Coach Dashboard</Button>
               </div>
             )}
 
             {/* Existing pending request */}
             {existingRequest && !isAlreadyCoach && (
-              <div className="bg-card border border-border rounded-2xl p-8 text-center">
+              <div className="bg-card border border-border p-8 text-center">
                 {existingRequest.status === "pending" ? (
                   <>
-                    <Clock className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-                    <h2 className="text-xl font-display text-foreground mb-2">Application Pending</h2>
-                    <p className="text-muted-foreground mb-6">
-                      Your coach application is being reviewed. You'll be notified once approved.
+                    <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h2 className="text-xl font-display text-foreground mb-2">APPLICATION SUBMITTED</h2>
+                    <p className="text-muted-foreground mb-2 max-w-md mx-auto">
+                      Thank you for applying to the Vault Coach Network.
+                    </p>
+                    <p className="text-muted-foreground mb-6 max-w-md mx-auto text-sm">
+                      Our team will review your application to determine if you are a good fit for the Vault development system. If approved, you will receive next steps for joining the platform.
                     </p>
                   </>
                 ) : existingRequest.status === "rejected" ? (
                   <>
                     <Shield className="w-12 h-12 text-destructive mx-auto mb-4" />
-                    <h2 className="text-xl font-display text-foreground mb-2">Application Not Approved</h2>
-                    <p className="text-muted-foreground mb-6">
-                      Your previous application was not approved. Contact support for more info.
-                    </p>
+                    <h2 className="text-xl font-display text-foreground mb-2">APPLICATION NOT APPROVED</h2>
+                    <p className="text-muted-foreground mb-6">Contact support for more information.</p>
                   </>
                 ) : null}
-                <Button variant="ghost" onClick={() => navigate("/")}>
-                  Back to Home
-                </Button>
+                <Button variant="ghost" onClick={() => navigate("/")}>Back to Home</Button>
               </div>
             )}
 
-            {/* Registration form */}
+            {/* Application content */}
             {!isAlreadyCoach && !existingRequest && (
               <>
-                {/* Benefits */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                  <div className="bg-card border border-border rounded-xl p-4 text-center">
-                    <Users className="w-6 h-6 text-accent mx-auto mb-2" />
-                    <p className="text-sm font-medium text-foreground">Athlete Management</p>
-                    <p className="text-xs text-muted-foreground">Track check-ins, KPIs & progress</p>
-                  </div>
-                  <div className="bg-card border border-border rounded-xl p-4 text-center">
-                    <Award className="w-6 h-6 text-accent mx-auto mb-2" />
-                    <p className="text-sm font-medium text-foreground">Certifications</p>
-                    <p className="text-xs text-muted-foreground">Get VAULT verified credentials</p>
-                  </div>
-                  <div className="bg-card border border-border rounded-xl p-4 text-center">
-                    <Briefcase className="w-6 h-6 text-accent mx-auto mb-2" />
-                    <p className="text-sm font-medium text-foreground">Schedule Builder</p>
-                    <p className="text-xs text-muted-foreground">Create & assign training programs</p>
+                {/* Intro */}
+                <div className="bg-card border border-border p-6 md:p-8 space-y-4">
+                  <p className="text-foreground leading-relaxed">
+                    Vault Baseball is built around one principle: <span className="font-semibold">development through systems, discipline, and measurable progress.</span>
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed">
+                    We work with coaches who believe in structured training and long-term athlete growth. If you are passionate about helping athletes improve and want to be part of a high-level development platform, you can apply to join the Vault Coach Marketplace.
+                  </p>
+                </div>
+
+                {/* Who This Is For */}
+                <div>
+                  <h2 className="text-2xl font-display tracking-wide text-foreground mb-4">WHO THIS IS FOR</h2>
+                  <div className="bg-card border border-border p-6 space-y-3">
+                    {WHO_IS_FOR.map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="w-1.5 h-1.5 bg-foreground mt-2 shrink-0" />
+                        <p className="text-muted-foreground">{item}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name *</Label>
-                    <Input
-                      id="fullName"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Coach John Smith"
-                      required
-                    />
+                {/* What Coaches Get */}
+                <div>
+                  <h2 className="text-2xl font-display tracking-wide text-foreground mb-4">WHAT COACHES GET</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {BENEFITS.map(({ icon: Icon, title, desc }) => (
+                      <div key={title} className="bg-card border border-border p-4 flex gap-3">
+                        <Icon className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{title}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="coach@example.com"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="organization">Organization / Team</Label>
-                    <Input
-                      id="organization"
-                      value={organization}
-                      onChange={(e) => setOrganization(e.target.value)}
-                      placeholder="e.g. Elite Baseball Academy"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="experience">Years Coaching</Label>
-                      <Select value={experienceYears} onValueChange={setExperienceYears}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">1-2 years</SelectItem>
-                          <SelectItem value="3">3-5 years</SelectItem>
-                          <SelectItem value="6">6-10 years</SelectItem>
-                          <SelectItem value="11">10+ years</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="specialization">Specialization</Label>
-                      <Select value={specialization} onValueChange={setSpecialization}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="hitting">Hitting</SelectItem>
-                          <SelectItem value="pitching">Pitching</SelectItem>
-                          <SelectItem value="fielding">Fielding</SelectItem>
-                          <SelectItem value="strength">Strength & Conditioning</SelectItem>
-                          <SelectItem value="general">General / All-Around</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Why do you want to coach on VAULT? (Optional)</Label>
-                    <Textarea
-                      id="message"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Tell us about your coaching philosophy and goals..."
-                      rows={3}
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    variant="vault"
-                    size="lg"
-                    className="w-full"
-                    disabled={submitting || !fullName || !email}
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Submitting...
-                      </>
-                    ) : inviteValid ? (
-                      "Activate Coach Access"
-                    ) : (
-                      "Submit Application"
-                    )}
-                  </Button>
-
-                  {!inviteValid && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      Applications are typically reviewed within 24-48 hours.
-                    </p>
-                  )}
-                </form>
+                {/* Form */}
+                <CoachApplicationForm
+                  user={user}
+                  inviteValid={inviteValid}
+                  inviteTokenId={inviteTokenId}
+                  defaultName={defaultName}
+                  defaultEmail={defaultEmail}
+                  onSubmitted={() => setExistingRequest({ status: "pending" })}
+                  onAutoApproved={() => navigate("/coach-onboarding")}
+                />
               </>
             )}
           </motion.div>
