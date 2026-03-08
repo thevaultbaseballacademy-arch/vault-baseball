@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, TrendingUp, Calendar, 
   ChevronDown, ChevronUp, Search, Activity, Trophy,
-  BookOpen, Target, BarChart3, Video
+  BookOpen, Target, BarChart3, Video, Brain
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +22,7 @@ import GlobalSearch from "@/components/coach/GlobalSearch";
 import PositionShortcuts from "@/components/coach/PositionShortcuts";
 import FavoritesQuickStart from "@/components/coach/FavoritesQuickStart";
 import QuickAccessCard from "@/components/coach/QuickAccessCard";
+import CoachAnalysisReview from "@/components/coaching/CoachAnalysisReview";
 import {
   LineChart,
   Line,
@@ -322,10 +323,14 @@ const CoachDashboard = () => {
 
             {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="grid w-full max-w-2xl grid-cols-4">
+              <TabsList className="grid w-full max-w-3xl grid-cols-5">
                 <TabsTrigger value="athletes" className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Athletes
+                </TabsTrigger>
+                <TabsTrigger value="motion" className="flex items-center gap-1">
+                  <Brain className="w-3 h-3" />
+                  Motion
                 </TabsTrigger>
                 <TabsTrigger value="lessons" className="flex items-center gap-1">
                   <Video className="w-3 h-3" />
