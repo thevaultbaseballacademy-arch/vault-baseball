@@ -268,7 +268,7 @@ const PaymentSuccess = () => {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to="/athlete-onboarding">
+                  <Link to={`/athlete-onboarding${data?.productKey ? `?product=${data.productKey}` : ''}`}>
                     <Button variant="vault" size="lg">
                       Complete Your Onboarding
                       <ArrowRight className="w-5 h-5 ml-2" />
