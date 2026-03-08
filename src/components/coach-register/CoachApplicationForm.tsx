@@ -135,6 +135,7 @@ const CoachApplicationForm = ({
           message: message || null,
           resume_url: resumeUrl,
           video_sample_url: videoUrl,
+          status: "applied",
         } as any);
 
       if (error) throw error;
