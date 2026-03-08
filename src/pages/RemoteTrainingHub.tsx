@@ -310,11 +310,9 @@ const RemoteTrainingHub = () => {
                             </p>
                             {s.coach_notes && <p className="text-xs text-muted-foreground mt-1 italic">"{s.coach_notes}"</p>}
                           </div>
-                          {!isPast && s.video_call_link && (
-                            <Button variant="vault" size="sm" asChild>
-                              <a href={s.video_call_link} target="_blank" rel="noopener noreferrer">
-                                <Video className="w-3 h-3 mr-1" /> Join
-                              </a>
+                          {!isPast && (
+                            <Button variant="vault" size="sm" onClick={() => { setActiveSessionId(s.id); setActiveTab("live"); }}>
+                              <MonitorPlay className="w-3 h-3 mr-1" /> Join Live
                             </Button>
                           )}
                         </div>
