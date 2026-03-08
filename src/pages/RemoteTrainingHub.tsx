@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Loader2, Video, Calendar, MessageCircle,
   BarChart3, Clock, Target, BookOpen, Play, User,
-  ChevronRight, Trophy, Zap, FileText, MonitorPlay,
+  ChevronRight, Trophy, Zap, FileText, MonitorPlay, Columns2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +14,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachingMessenger from "@/components/coaching/CoachingMessenger";
 import LiveVideoCall from "@/components/coaching/LiveVideoCall";
+import VideoComparison from "@/components/coaching/VideoComparison";
 import { formatDistanceToNow } from "date-fns";
 
 interface Session {
@@ -43,6 +44,7 @@ const RemoteTrainingHub = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [recordings, setRecordings] = useState<any[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -184,6 +186,7 @@ const RemoteTrainingHub = () => {
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 {activeSessionId && <TabsTrigger value="live">Live Session</TabsTrigger>}
                 <TabsTrigger value="sessions">Sessions</TabsTrigger>
+                <TabsTrigger value="compare"><Columns2 className="w-3 h-3 mr-1" /> Compare</TabsTrigger>
                 <TabsTrigger value="recordings">Recordings</TabsTrigger>
                 <TabsTrigger value="messages">Messages</TabsTrigger>
                 <TabsTrigger value="progress">Progress</TabsTrigger>
@@ -195,9 +198,18 @@ const RemoteTrainingHub = () => {
                   <>
                     <div className="flex items-center justify-between">
                       <h2 className="font-display text-xl text-foreground">LIVE COACHING SESSION</h2>
-                      <Button variant="outline" size="sm" onClick={() => { setActiveSessionId(null); setActiveTab("sessions"); }}>
-                        <ArrowLeft className="w-3 h-3 mr-1" /> Back
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={showComparison ? "vault" : "outline"}
+                          size="sm"
+                          onClick={() => setShowComparison(!showComparison)}
+                        >
+                          <Columns2 className="w-3 h-3 mr-1" /> {showComparison ? "Hide Compare" : "Compare"}
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => { setActiveSessionId(null); setActiveTab("sessions"); }}>
+                          <ArrowLeft className="w-3 h-3 mr-1" /> Back
+                        </Button>
+                      </div>
                     </div>
                     <LiveVideoCall
                       sessionId={activeSessionId}
@@ -205,10 +217,33 @@ const RemoteTrainingHub = () => {
                       isCoach={false}
                       onEnd={() => { setActiveSessionId(null); setActiveTab("sessions"); }}
                     />
+                    {showComparison && (
+                      <VideoComparison
+                        sessionId={activeSessionId}
+                        userId={user.id}
+                        isCoach={false}
+                        onClose={() => setShowComparison(false)}
+                      />
+                    )}
                     <p className="text-xs text-muted-foreground text-center">
                       Position your camera so your coach can see your full mechanics. Use a tripod for best results.
                     </p>
                   </>
+                )}
+              </TabsContent>
+
+              {/* COMPARE (standalone) */}
+              <TabsContent value="compare" className="mt-6 space-y-4">
+                <h2 className="font-display text-xl text-foreground">MECHANICS COMPARISON</h2>
+                <p className="text-sm text-muted-foreground">
+                  Load two videos side by side to compare mechanics. Use session recordings, highlight clips, or upload reference footage.
+                </p>
+                {user && (
+                  <VideoComparison
+                    sessionId="compare-standalone"
+                    userId={user.id}
+                    isCoach={false}
+                  />
                 )}
               </TabsContent>
 
