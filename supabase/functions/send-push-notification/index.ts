@@ -303,16 +303,12 @@ serve(async (req) => {
       }
     }
 
-    // Return success with token info for native push sending
+    // Return success without exposing device tokens
     return new Response(
       JSON.stringify({
         success: true,
-        tokensToNotify: tokens || [],
-        notification: {
-          title: payload.title,
-          body: payload.body,
-          data: payload.data,
-        },
+        notificationsSent: insertedNotifications?.length || 0,
+        tokensFound: tokens?.length || 0,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

@@ -427,10 +427,10 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR: Unexpected error", { message: errorMessage });
     
+    // Return generic error without exposing internal details
     return new Response(JSON.stringify({ 
       error: "An error occurred verifying your purchase. Please contact support.",
-      code: "VERIFICATION_ERROR",
-      details: errorMessage
+      code: "VERIFICATION_ERROR"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
