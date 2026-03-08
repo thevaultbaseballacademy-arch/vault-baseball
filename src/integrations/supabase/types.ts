@@ -273,6 +273,54 @@ export type Database = {
         }
         Relationships: []
       }
+      athlete_onboarding: {
+        Row: {
+          athlete_goals: string | null
+          created_at: string
+          current_level: string | null
+          current_velocity: string | null
+          email: string
+          exit_velo: string | null
+          id: string
+          position: string | null
+          product_purchased: string | null
+          sixty_time: string | null
+          social_handle: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          athlete_goals?: string | null
+          created_at?: string
+          current_level?: string | null
+          current_velocity?: string | null
+          email: string
+          exit_velo?: string | null
+          id?: string
+          position?: string | null
+          product_purchased?: string | null
+          sixty_time?: string | null
+          social_handle?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          athlete_goals?: string | null
+          created_at?: string
+          current_level?: string | null
+          current_velocity?: string | null
+          email?: string
+          exit_velo?: string | null
+          id?: string
+          position?: string | null
+          product_purchased?: string | null
+          sixty_time?: string | null
+          social_handle?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       athletic_stats: {
         Row: {
           created_at: string
@@ -1604,6 +1652,39 @@ export type Database = {
           updated_at?: string
           user_id?: string
           view_count?: number | null
+        }
+        Relationships: []
+      }
+      lead_captures: {
+        Row: {
+          athlete_age: number | null
+          athlete_name: string
+          created_at: string
+          email: string
+          id: string
+          lead_source: string | null
+          parent_name: string | null
+          primary_position: string | null
+        }
+        Insert: {
+          athlete_age?: number | null
+          athlete_name: string
+          created_at?: string
+          email: string
+          id?: string
+          lead_source?: string | null
+          parent_name?: string | null
+          primary_position?: string | null
+        }
+        Update: {
+          athlete_age?: number | null
+          athlete_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          lead_source?: string | null
+          parent_name?: string | null
+          primary_position?: string | null
         }
         Relationships: []
       }
