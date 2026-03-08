@@ -31,7 +31,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
   pending_review: { label: "Pending Review", color: "bg-yellow-100 text-yellow-800", icon: Clock },
   certification_required: { label: "Cert Required", color: "bg-orange-100 text-orange-800", icon: AlertTriangle },
   certified: { label: "Certified", color: "bg-emerald-100 text-emerald-800", icon: Award },
-  bypass_certified: { label: "Bypass Certified", color: "bg-purple-100 text-purple-800", icon: ShieldCheck },
+  bypass_certified: { label: "Eddie Certified", color: "bg-purple-100 text-purple-800", icon: ShieldCheck },
   approved: { label: "Approved", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
   rejected: { label: "Rejected", color: "bg-red-100 text-red-800", icon: XCircle },
   suspended: { label: "Suspended", color: "bg-red-200 text-red-900", icon: UserX },
@@ -158,7 +158,7 @@ const CoachApprovalPanel = () => {
         <div className="bg-card border border-border rounded-xl p-4">
           <div className="flex items-center gap-2 mb-1">
             <ShieldCheck className="w-4 h-4 text-purple-600" />
-            <span className="text-xs text-muted-foreground">Bypass Certified</span>
+            <span className="text-xs text-muted-foreground">Eddie Certified</span>
           </div>
           <p className="text-2xl font-display text-purple-600">{counts.bypassed}</p>
         </div>
@@ -273,7 +273,7 @@ const CoachApprovalPanel = () => {
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleBypassCertify(coach)}>
                             <ShieldCheck className="mr-2 h-4 w-4 text-purple-600" />
-                            Bypass Certify (Eddie/Staff)
+                            Certify (Eddie / In-Person)
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleSetStatus(coach, "certification_required")}>
                             <Award className="mr-2 h-4 w-4 text-orange-600" />
@@ -357,8 +357,8 @@ const CoachApprovalPanel = () => {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-foreground">Bypass Certified</p>
-                    <p className="text-xs text-muted-foreground">In-person certified by Eddie Mejia</p>
+                    <p className="text-sm text-foreground">Certified by Eddie Mejia</p>
+                    <p className="text-xs text-muted-foreground">In-person certified — skips online certification</p>
                   </div>
                   <Switch
                     checked={detailCoach.is_bypass_certified || false}
