@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CoachBadges from "@/components/marketplace/CoachBadges";
 import {
   useCoachProfile,
   useCoachServices,
@@ -149,10 +150,11 @@ const CoachMarketplaceProfile = () => {
                   <h1 className="text-3xl md:text-4xl font-display text-foreground">
                     {coach.coach_name}
                   </h1>
-                  <Badge className="bg-foreground text-background w-fit mx-auto md:mx-0">
-                    <Award className="w-3 h-3 mr-1" />
-                    Vault Certified
-                  </Badge>
+                  <CoachBadges
+                    isCertified={coach.is_certified}
+                    isBypassCertified={coach.is_bypass_certified}
+                    isStaff={coach.is_staff}
+                  />
                 </div>
 
                 {coach.tagline && (
