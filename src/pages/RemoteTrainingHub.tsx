@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Loader2, Video, Calendar, MessageCircle,
   BarChart3, Clock, Target, BookOpen, Play, User,
-  ChevronRight, Trophy, Zap, FileText,
+  ChevronRight, Trophy, Zap, FileText, MonitorPlay,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
