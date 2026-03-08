@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
-import { Target, Check, ShieldCheck, ArrowRight, Loader2, Clock, Crosshair, Brain, Flame, Trophy } from "lucide-react";
+import { Target, Check, ShieldCheck, ArrowRight, Loader2, Crosshair, Brain, Flame, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
-import BetaUrgencyBanner from "@/components/products/BetaUrgencyBanner";
 
 const TransferBeta = () => {
   const { checkout, loading } = useProductCheckout();
@@ -42,18 +41,12 @@ const TransferBeta = () => {
     "Decision training protocols for each position",
     "Pre-game mental preparation routine",
     "Post-game self-assessment framework",
-    "Monthly program updates during beta",
-    "Access to private community for feedback",
-  ];
-
-  const futureFeatures = [
     "AI-powered practice design recommendations",
     "Transfer rate analytics dashboard",
     "Video analysis with decision-point tagging",
-    "Personalized focus areas based on data",
-    "Coach dashboard for team-wide tracking",
-    "Integration with game stats platforms",
     "Custom drill builder with randomization",
+    "Game stats platform integration",
+    "Access to private community",
   ];
 
   const stats = [
@@ -75,18 +68,6 @@ const TransferBeta = () => {
       <section className="pt-32 pb-24">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
-            {/* Beta Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex justify-center mb-6"
-            >
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 text-sm font-medium border border-purple-500/20">
-                <Clock className="w-4 h-4" />
-                Early Access — Limited Beta Pricing
-              </span>
-            </motion.div>
-
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -105,9 +86,6 @@ const TransferBeta = () => {
                 practice performance and game-day execution with competition-focused training design.
               </p>
             </motion.div>
-
-            {/* Urgency Banner */}
-            <BetaUrgencyBanner accentColor="purple" spotsTotal={100} spotsClaimed={61} />
 
             {/* Problem Section */}
             <motion.div
@@ -172,14 +150,13 @@ const TransferBeta = () => {
             >
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
-                  <p className="text-sm text-purple-600 font-medium mb-2">Beta Access Price</p>
+                  <p className="text-sm text-purple-600 font-medium mb-2">Full Access</p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-5xl font-display text-foreground">{formatPrice(product.price)}</span>
-                    <span className="text-muted-foreground line-through">$299</span>
                     <span className="text-muted-foreground">one-time</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Save 50% — Lock in beta pricing before full release at $299
+                    Lifetime access to all Transfer System content &amp; future updates
                   </p>
                 </div>
                 <Button
@@ -192,65 +169,28 @@ const TransferBeta = () => {
                   {loading === 'transfer_beta' ? (
                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
                   ) : null}
-                  Get Early Access
+                  Get Full Access
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
             </motion.div>
 
-            {/* Comparison Table */}
+            {/* What's Included */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="mb-16"
             >
-              <h3 className="text-2xl font-display text-foreground mb-6 text-center">Beta vs Full Release</h3>
-              <div className="bg-card border border-border rounded-2xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left p-4 text-foreground font-medium">Feature</th>
-                        <th className="text-center p-4 min-w-[120px]">
-                          <div className="flex flex-col items-center">
-                            <span className="text-purple-500 font-display text-lg">Beta</span>
-                            <span className="text-xs text-muted-foreground">{formatPrice(product.price)}</span>
-                          </div>
-                        </th>
-                        <th className="text-center p-4 min-w-[120px]">
-                          <div className="flex flex-col items-center">
-                            <span className="text-foreground font-display text-lg">Full</span>
-                            <span className="text-xs text-muted-foreground">$299</span>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      <tr><td className="p-4 text-muted-foreground">12-Week Transfer Training Plan</td><td className="p-4 text-center"><Check className="w-5 h-5 text-purple-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">60+ Game-Realistic Drill Library</td><td className="p-4 text-center"><Check className="w-5 h-5 text-purple-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Practice Design Templates</td><td className="p-4 text-center"><Check className="w-5 h-5 text-purple-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Competitive Scenario Builder</td><td className="p-4 text-center"><Check className="w-5 h-5 text-purple-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Decision Training Protocols</td><td className="p-4 text-center"><Check className="w-5 h-5 text-purple-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Pre-Game & Post-Game Frameworks</td><td className="p-4 text-center"><Check className="w-5 h-5 text-purple-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Private Community Access</td><td className="p-4 text-center"><Check className="w-5 h-5 text-purple-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">AI-Powered Practice Design</td><td className="p-4 text-center"><span className="text-xs text-purple-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Transfer Rate Analytics Dashboard</td><td className="p-4 text-center"><span className="text-xs text-purple-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Video Analysis with Decision Tagging</td><td className="p-4 text-center"><span className="text-xs text-purple-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Game Stats Platform Integration</td><td className="p-4 text-center"><span className="text-xs text-purple-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Custom Drill Builder</td><td className="p-4 text-center"><span className="text-xs text-purple-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="border-t-2 border-purple-500/30 bg-purple-500/5">
-                        <td className="p-4 text-foreground font-medium">Grandfathered Beta Pricing</td>
-                        <td className="p-4 text-center"><Check className="w-5 h-5 text-purple-500 mx-auto" /></td>
-                        <td className="p-4 text-center"><span className="text-muted-foreground">—</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="p-4 bg-purple-500/5 border-t border-purple-500/20 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    <strong className="text-purple-500">Beta purchasers get all future updates</strong> at no additional cost when full release launches
-                  </p>
+              <h3 className="text-2xl font-display text-foreground mb-6 text-center">Everything Included</h3>
+              <div className="bg-card border border-border rounded-2xl p-8">
+                <div className="grid md:grid-cols-2 gap-3">
+                  {included.map((item, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
+                      <span className="text-muted-foreground text-sm">{item}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -282,17 +222,17 @@ const TransferBeta = () => {
               </div>
             </motion.div>
 
-            {/* Disclaimer */}
+            {/* Guarantee */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="bg-secondary/50 rounded-2xl p-6 text-center"
             >
+              <ShieldCheck className="w-8 h-8 text-purple-500 mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Early Access Notice:</strong> This is the beta version of the VAULT™ Transfer System. 
-                You'll receive immediate access to all current content plus free updates as we build out the full system. 
-                Beta purchasers are grandfathered into the beta price permanently—even when we raise prices at full release.
+                <strong className="text-foreground">30-Day Money-Back Guarantee:</strong> If you don't see measurable improvement 
+                in your practice-to-game transfer within 30 days, we'll refund your purchase — no questions asked.
               </p>
             </motion.div>
           </div>

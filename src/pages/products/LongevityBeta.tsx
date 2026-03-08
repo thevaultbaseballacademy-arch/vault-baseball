@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
-import { Heart, Check, ShieldCheck, ArrowRight, Loader2, Clock, Activity, Shield, TrendingUp, Zap } from "lucide-react";
+import { Heart, Check, ShieldCheck, ArrowRight, Loader2, Activity, Shield, TrendingUp, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
-import BetaUrgencyBanner from "@/components/products/BetaUrgencyBanner";
 
 const LongevityBeta = () => {
   const { checkout, loading } = useProductCheckout();
@@ -42,18 +41,12 @@ const LongevityBeta = () => {
     "Shoulder and elbow mobility program",
     "Sleep optimization guide for athletes",
     "Nutrition basics for arm health",
-    "Monthly program updates during beta",
-    "Access to private community for feedback",
-  ];
-
-  const futureFeatures = [
     "AI-powered workload recommendations",
     "Injury risk scoring algorithm",
-    "Integration with wearable devices",
-    "Personalized recovery protocols",
-    "Coach dashboard for team management",
+    "Wearable device integration",
     "Video analysis for arm action",
-    "Real-time availability alerts",
+    "Coach dashboard for team management",
+    "Access to private community",
   ];
 
   const stats = [
@@ -68,18 +61,6 @@ const LongevityBeta = () => {
       <section className="pt-32 pb-24">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
-            {/* Beta Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex justify-center mb-6"
-            >
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-medium border border-amber-500/20">
-                <Clock className="w-4 h-4" />
-                Early Access — Limited Beta Pricing
-              </span>
-            </motion.div>
-
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -87,8 +68,8 @@ const LongevityBeta = () => {
               transition={{ delay: 0.1 }}
               className="text-center mb-16"
             >
-              <div className="w-20 h-20 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-6">
-                <Heart className="w-10 h-10 text-amber-500" />
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                <Heart className="w-10 h-10 text-primary" />
               </div>
               <h1 className="text-4xl md:text-6xl font-display text-foreground mb-4">
                 VAULT™ LONGEVITY SYSTEM
@@ -99,9 +80,6 @@ const LongevityBeta = () => {
               </p>
             </motion.div>
 
-            {/* Urgency Banner */}
-            <BetaUrgencyBanner accentColor="amber" spotsTotal={100} spotsClaimed={73} />
-
             {/* Stats Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -111,7 +89,7 @@ const LongevityBeta = () => {
             >
               {stats.map((stat, i) => (
                 <div key={i} className="bg-card border border-border rounded-xl p-6 text-center">
-                  <div className="text-4xl font-display text-amber-500 mb-2">{stat.value}</div>
+                  <div className="text-4xl font-display text-primary mb-2">{stat.value}</div>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                 </div>
               ))}
@@ -126,8 +104,8 @@ const LongevityBeta = () => {
             >
               {pillars.map((pillar, i) => (
                 <div key={i} className="bg-card border border-border rounded-xl p-6">
-                  <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center mb-4">
-                    <pillar.icon className="w-6 h-6 text-amber-500" />
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                    <pillar.icon className="w-6 h-6 text-primary" />
                   </div>
                   <h3 className="text-lg font-display text-foreground mb-2">{pillar.title}</h3>
                   <p className="text-muted-foreground text-sm">{pillar.description}</p>
@@ -140,18 +118,17 @@ const LongevityBeta = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="bg-gradient-to-br from-amber-500/5 to-amber-600/10 border border-amber-500/20 rounded-2xl p-8 mb-16"
+              className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-8 mb-16"
             >
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
-                  <p className="text-sm text-amber-600 font-medium mb-2">Beta Access Price</p>
+                  <p className="text-sm text-primary font-medium mb-2">Full Access</p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-5xl font-display text-foreground">{formatPrice(product.price)}</span>
-                    <span className="text-muted-foreground line-through">$299</span>
                     <span className="text-muted-foreground">one-time</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Save 50% — Lock in beta pricing before full release at $299
+                    Lifetime access to all Longevity System content &amp; future updates
                   </p>
                 </div>
                 <Button
@@ -164,65 +141,28 @@ const LongevityBeta = () => {
                   {loading === 'longevity_beta' ? (
                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
                   ) : null}
-                  Get Early Access
+                  Get Full Access
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
             </motion.div>
 
-            {/* Comparison Table */}
+            {/* What's Included */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="mb-16"
             >
-              <h3 className="text-2xl font-display text-foreground mb-6 text-center">Beta vs Full Release</h3>
-              <div className="bg-card border border-border rounded-2xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left p-4 text-foreground font-medium">Feature</th>
-                        <th className="text-center p-4 min-w-[120px]">
-                          <div className="flex flex-col items-center">
-                            <span className="text-amber-500 font-display text-lg">Beta</span>
-                            <span className="text-xs text-muted-foreground">{formatPrice(product.price)}</span>
-                          </div>
-                        </th>
-                        <th className="text-center p-4 min-w-[120px]">
-                          <div className="flex flex-col items-center">
-                            <span className="text-foreground font-display text-lg">Full</span>
-                            <span className="text-xs text-muted-foreground">$299</span>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      <tr><td className="p-4 text-muted-foreground">12-Week Progressive Arm Care Program</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Daily Readiness Assessment Framework</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Throw Count & Intensity Tracking</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Recovery Protocol Library (25+ routines)</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Shoulder & Elbow Mobility Program</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Sleep & Nutrition Guides</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr><td className="p-4 text-muted-foreground">Private Community Access</td><td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">AI-Powered Workload Recommendations</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Injury Risk Scoring Algorithm</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Wearable Device Integration</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Video Analysis for Arm Action</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="bg-secondary/30"><td className="p-4 text-muted-foreground">Coach Dashboard</td><td className="p-4 text-center"><span className="text-xs text-amber-500">Coming Soon</span></td><td className="p-4 text-center"><Check className="w-5 h-5 text-foreground/50 mx-auto" /></td></tr>
-                      <tr className="border-t-2 border-amber-500/30 bg-amber-500/5">
-                        <td className="p-4 text-foreground font-medium">Grandfathered Beta Pricing</td>
-                        <td className="p-4 text-center"><Check className="w-5 h-5 text-amber-500 mx-auto" /></td>
-                        <td className="p-4 text-center"><span className="text-muted-foreground">—</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="p-4 bg-amber-500/5 border-t border-amber-500/20 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    <strong className="text-amber-500">Beta purchasers get all future updates</strong> at no additional cost when full release launches
-                  </p>
+              <h3 className="text-2xl font-display text-foreground mb-6 text-center">Everything Included</h3>
+              <div className="bg-card border border-border rounded-2xl p-8">
+                <div className="grid md:grid-cols-2 gap-3">
+                  {included.map((item, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                      <span className="text-muted-foreground text-sm">{item}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -254,17 +194,17 @@ const LongevityBeta = () => {
               </div>
             </motion.div>
 
-            {/* Disclaimer */}
+            {/* Guarantee */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="bg-secondary/50 rounded-2xl p-6 text-center"
             >
+              <ShieldCheck className="w-8 h-8 text-primary mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Early Access Notice:</strong> This is the beta version of the VAULT™ Longevity System. 
-                You'll receive immediate access to all current content plus free updates as we build out the full system. 
-                Beta purchasers are grandfathered into the beta price permanently—even when we raise prices at full release.
+                <strong className="text-foreground">30-Day Money-Back Guarantee:</strong> If you don't see improvement 
+                in your arm health metrics within 30 days, we'll refund your purchase — no questions asked.
               </p>
             </motion.div>
           </div>
