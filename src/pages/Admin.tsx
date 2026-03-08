@@ -27,6 +27,7 @@ import { SystemHealthDashboard } from "@/components/admin/SystemHealthDashboard"
 import TeamWhitelistManager from "@/components/admin/TeamWhitelistManager";
 import { CoachInviteManager } from "@/components/admin/CoachInviteManager";
 import LeadsCustomersPanel from "@/components/admin/LeadsCustomersPanel";
+import AdminMarketplacePanel from "@/components/marketplace/AdminMarketplacePanel";
 
 interface Profile {
   user_id: string;
@@ -48,6 +49,7 @@ const SECTIONS = [
     group: "CRM & Revenue",
     items: [
       { id: "leads", label: "Leads & CRM", icon: UserPlus },
+      { id: "marketplace", label: "Marketplace", icon: Heart },
       { id: "users", label: "User Roles", icon: Users },
       { id: "team", label: "Team Whitelist", icon: Shield },
     ],
@@ -400,6 +402,7 @@ const Admin = () => {
                 {activeSection === "deletion" && <DeletionRequestsManager />}
                 {activeSection === "gdpr" && <GDPRComplianceDashboard />}
                 {activeSection === "health" && <SystemHealthDashboard />}
+                {activeSection === "marketplace" && <AdminMarketplacePanel />}
               </motion.div>
             </div>
           </div>

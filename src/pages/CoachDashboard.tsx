@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, TrendingUp, Calendar, 
   ChevronDown, ChevronUp, Search, Activity, Trophy,
-  BookOpen, Target, BarChart3, Video, Brain
+  BookOpen, Target, BarChart3, Video, Brain, DollarSign, Store
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +23,8 @@ import PositionShortcuts from "@/components/coach/PositionShortcuts";
 import FavoritesQuickStart from "@/components/coach/FavoritesQuickStart";
 import QuickAccessCard from "@/components/coach/QuickAccessCard";
 import CoachAnalysisReview from "@/components/coaching/CoachAnalysisReview";
+import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashboard";
+import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
 import {
   LineChart,
   Line,
@@ -323,7 +325,7 @@ const CoachDashboard = () => {
 
             {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="grid w-full max-w-3xl grid-cols-5">
+              <TabsList className="grid w-full max-w-4xl grid-cols-7">
                 <TabsTrigger value="athletes" className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Athletes
@@ -335,6 +337,14 @@ const CoachDashboard = () => {
                 <TabsTrigger value="lessons" className="flex items-center gap-1">
                   <Video className="w-3 h-3" />
                   Lessons
+                </TabsTrigger>
+                <TabsTrigger value="marketplace" className="flex items-center gap-1">
+                  <Store className="w-3 h-3" />
+                  Marketplace
+                </TabsTrigger>
+                <TabsTrigger value="earnings" className="flex items-center gap-1">
+                  <DollarSign className="w-3 h-3" />
+                  Earnings
                 </TabsTrigger>
                 <TabsTrigger value="leaderboards" className="flex items-center gap-1">
                   <Trophy className="w-3 h-3" />
