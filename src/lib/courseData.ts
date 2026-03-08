@@ -2219,6 +2219,703 @@ export const courseContent: Record<string, CourseContent> = {
       },
     ],
   },
+  // ID ALIASES - map allCourses IDs to existing content
+  "hitting-velocity-12week": {
+    courseId: "hitting-velocity-12week",
+    modules: [
+      {
+        id: "hv-warmup",
+        title: "Warmup & Activation System",
+        description: "Preparing for high-intent hitting work with dynamic movement prep",
+        lessons: [
+          { id: "hv-1-1", title: "Dynamic Warmup for Hitters", description: "Skips, hip mobility, thoracic rotation, med ball warmups to prime the kinetic chain.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "hv-1-2", title: "Bat Speed & Rotational Prep", description: "Top-hand/bottom-hand work, bat path drills, mini-band rotations, overload/underload swings.", duration: "14 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "hv-mechanics",
+        title: "Advanced Swing Mechanics",
+        description: "Hip-rotation sequence, barrel path, and connection through the zone",
+        lessons: [
+          { id: "hv-2-1", title: "Hip-Rotation Sequence", description: "Lead hip fires first, torso and shoulders follow. Based on research from Driveline and ASMI biomechanics labs.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "hv-2-2", title: "Elite Barrel Path", description: "Smooth on-plane entry with slight upward attack angle (8-15°). Matches MLB average launch angle for line drives.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "hv-2-3", title: "Connection & Posture", description: "Maintaining connection between hands and body through the zone. Front-side firmness for energy transfer.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "hv-2-4", title: "Adjustability & Pitch Coverage", description: "How elite hitters adjust barrel to pitch location while maintaining swing intent and bat speed.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "hv-foundation",
+        title: "Weeks 1-4: Foundation Phase",
+        description: "Building posture, sequencing, and consistent barrel path",
+        lessons: [
+          { id: "hv-3-1", title: "Week 1: Posture & Base Setup", description: "Athletic stance, weight distribution, bat angle. Establishing repeatable starting position.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "hv-3-2", title: "Week 2: Sequencing & Load", description: "Proper load mechanics, stride timing, hip-shoulder separation initiation.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "hv-3-3", title: "Week 3: Barrel Path & Contact", description: "On-plane swing path, contact point optimization, staying through the ball.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "hv-3-4", title: "Week 4: Bat Speed Introduction", description: "First intent-based sessions. Overload/underload protocol introduction.", duration: "18 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "hv-power",
+        title: "Weeks 5-8: Power Development Phase",
+        description: "Building rotational power and increasing intent progressively",
+        lessons: [
+          { id: "hv-4-1", title: "Week 5: Rotation Power", description: "Med ball scoop tosses, rotational slams. Building ground-force-to-barrel transfer.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "hv-4-2", title: "Week 6: Intent Training", description: "High-intent tee work and front toss. Tracking exit velocity, pushing 90%+ effort.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "hv-4-3", title: "Week 7: Game-Speed Approach", description: "Live BP with approach work. Situational hitting, count-based strategy.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "hv-4-4", title: "Week 8: Gap-to-Gap Power", description: "Directional hitting at high intent. Line drive power to all fields.", duration: "18 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "hv-peak",
+        title: "Weeks 9-12: Peak Performance Phase",
+        description: "Maximum exit velocity training and competition preparation",
+        lessons: [
+          { id: "hv-5-1", title: "Week 9: Advanced Barrel Control", description: "Pitch-specific barrel adjustments at max intent. Inside/outside/elevated pitch plans.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "hv-5-2", title: "Week 10: Bat Speed Peak", description: "Overload/underload contrast training. Pushing peak bat speed numbers.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "hv-5-3", title: "Week 11: Max EV Training", description: "Game-simulated high-intent sessions. Exit velocity tracking and competition.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "hv-5-4", title: "Week 12: Testing & Assessment", description: "Final exit velocity testing, bat speed assessment, program review and next-phase planning.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "hv-drills",
+        title: "Elite Hitting Drill Library",
+        description: "48 research-backed drills for bat speed and exit velocity development",
+        lessons: [
+          { id: "hv-6-1", title: "Coil Load & Launch Sequence Drills", description: "10 drills building explosive load-to-launch patterns used by MLB hitters.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "hv-6-2", title: "Overload & Underload Training", description: "Contrast training protocol: heavy bat → light bat → game bat for neural adaptation.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "hv-6-3", title: "Intent Training Sessions", description: "High-intent tee, front toss, and BP protocols. Every swing with 90%+ effort.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "hv-6-4", title: "Ground Force & Connection Drills", description: "Drills emphasizing ground reaction force transfer through the kinetic chain.", duration: "18 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "hv-strength",
+        title: "Hitter Strength & Power Add-On",
+        description: "Supporting strength work designed specifically for hitters",
+        lessons: [
+          { id: "hv-7-1", title: "Lower Body Power for Hitters", description: "Trap bar deadlift, split squat, box squat—building the ground force engine.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "hv-7-2", title: "Rotational Power Development", description: "Med ball scoop toss, shot-put throw, cable rotations for hip-to-torso power.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "hv-7-3", title: "Core & Anti-Rotation", description: "Pallof press, suitcase carry, dead bugs—stabilizing the torso for power transfer.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  "elite-speed-agility-12week": {
+    courseId: "elite-speed-agility-12week",
+    modules: [
+      {
+        id: "esa12-warmup",
+        title: "Warmup & Activation System",
+        description: "CNS priming and movement prep for high-level speed work",
+        lessons: [
+          { id: "esa12-1-1", title: "Dynamic Warmup Protocol", description: "A-Skips, B-Skips, high knees, butt kicks, linear mobility drills. Research-based CNS activation.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "esa12-1-2", title: "Acceleration & Plyometric Prep", description: "Wall drive series, lean-fall sprints, pogo jumps, mini-hurdles. Progressive activation.", duration: "15 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "esa12-sprint",
+        title: "Sprint Mechanics",
+        description: "Acceleration position and top-speed mechanics for baseball athletes",
+        lessons: [
+          { id: "esa12-2-1", title: "Acceleration Position", description: "45° forward lean, powerful knee punch. First 10 yards determine stolen base success.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "esa12-2-2", title: "Top-Speed Position", description: "Tall posture, front-side mechanics, relaxed upper body. Maintaining speed through 60 yards.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "esa12-2-3", title: "Baseball-Specific Sprint Applications", description: "Home-to-first, stolen base jumps, tagging mechanics, rounding bases.", duration: "18 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "esa12-foundation",
+        title: "Weeks 1-4: Foundation Phase",
+        description: "Building sprint mechanics and foundational movement patterns",
+        lessons: [
+          { id: "esa12-3-1", title: "Week 1: Acceleration Foundation", description: "Wall drills, falling starts, 10-yard buildups. Teaching proper push angles.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "esa12-3-2", title: "Week 2: Stride Projection", description: "Hip projection, stride length optimization, arm action mechanics.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "esa12-3-3", title: "Week 3: Stride Frequency", description: "Quick feet drills, rhythm running, turnover development.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "esa12-3-4", title: "Week 4: COD Foundation", description: "Lateral shuffle, crossover step, deceleration basics.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "esa12-development",
+        title: "Weeks 5-8: Development Phase",
+        description: "Building reactive speed and multi-directional movement",
+        lessons: [
+          { id: "esa12-4-1", title: "Week 5: Agility Angles", description: "45°, 90°, and 180° cuts. Teaching efficient body angles for direction change.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "esa12-4-2", title: "Week 6: Reactive Speed", description: "Mirror drills, reaction ball, coach-cued direction changes.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "esa12-4-3", title: "Week 7: Sprint Efficiency", description: "Combining acceleration and top-speed mechanics for 60-yard improvement.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "esa12-4-4", title: "Week 8: Explosive Power Integration", description: "Plyometric-to-sprint complexes. Depth jumps → 10-yard sprints.", duration: "18 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "esa12-peak",
+        title: "Weeks 9-12: Peak Phase",
+        description: "Sport-specific speed application and testing",
+        lessons: [
+          { id: "esa12-5-1", title: "Week 9: Sport-Speed Application", description: "Baseball-specific speed: leads, jumps, routes, defensive first-steps.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "esa12-5-2", title: "Week 10: Peak Speed Training", description: "Fly sprints, contrast training, assisted sprints for max velocity.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "esa12-5-3", title: "Week 11: Max COD Ability", description: "Game-speed agility tests, pro agility, L-drill, 5-10-5 competition.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "esa12-5-4", title: "Week 12: Testing Week", description: "60-yard dash, pro agility, vertical jump, broad jump. Full assessment.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "esa12-drills",
+        title: "Elite Drill Library",
+        description: "50+ drills for acceleration, agility, and reactive speed",
+        lessons: [
+          { id: "esa12-6-1", title: "Acceleration Drills (15 Drills)", description: "Wall drives, linear starts, sled pushes, band-resisted sprints.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "esa12-6-2", title: "Top-Speed Drills (10 Drills)", description: "Fly sprints, wicket runs, stride frequency ladders.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "esa12-6-3", title: "Agility & Reactive Drills (15 Drills)", description: "Crossover steps, lateral transitions, mirror drills, reaction starts.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "esa12-6-4", title: "Baseball-Specific Speed Drills (10 Drills)", description: "Lead mechanics, stolen base jumps, defensive first-step reactions.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "esa12-strength",
+        title: "Speed Strength Add-On",
+        description: "Supporting strength work for speed development",
+        lessons: [
+          { id: "esa12-7-1", title: "Lower Body Power for Speed", description: "Trap bar deadlift, single-leg variations, hip thrust for horizontal force.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "esa12-7-2", title: "Plyometric Progressions", description: "Box jumps, depth jumps, bounding—building elastic power for sprinting.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  "strength-conditioning-12week": {
+    courseId: "strength-conditioning-12week",
+    modules: [
+      {
+        id: "sc12-assess",
+        title: "Assessment & Movement Screening",
+        description: "Establish baseline strength, identify limitations, and set training targets",
+        lessons: [
+          { id: "sc12-1-1", title: "Strength Assessment Protocol", description: "Testing trap bar deadlift, front squat, bench press, pull-ups, and rotational power. Establishing 1RM estimates.", duration: "20 min", videoUrl: "", isFree: true },
+          { id: "sc12-1-2", title: "Movement Screening", description: "FMS-based screening: overhead squat, hurdle step, inline lunge, shoulder mobility, active straight leg raise.", duration: "18 min", videoUrl: "", isFree: true },
+          { id: "sc12-1-3", title: "Program Setup & Training Maxes", description: "Calculating training maxes, understanding RPE, setting up your training log.", duration: "14 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "sc12-foundation",
+        title: "Weeks 1-4: Foundation Phase",
+        description: "Building movement quality, work capacity, and structural balance",
+        lessons: [
+          { id: "sc12-2-1", title: "Week 1: Squat & Hinge Foundations", description: "Goblet squat, RDL, hip hinge patterning. 3x8-10 at moderate loads.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "sc12-2-2", title: "Week 2: Push/Pull Balance", description: "Bench press, DB row, overhead press, face pulls. Balanced upper body development.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "sc12-2-3", title: "Week 3: Unilateral & Core", description: "Bulgarian split squat, single-arm DB press, Pallof press, suitcase carry.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "sc12-2-4", title: "Week 4: Power Introduction", description: "Med ball slams, jump squats, explosive push-ups. Teaching rate of force development.", duration: "18 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "sc12-power",
+        title: "Weeks 5-8: Power Development Phase",
+        description: "Building explosive power, rotational strength, and sport-specific force",
+        lessons: [
+          { id: "sc12-3-1", title: "Week 5: Olympic Lift Progressions", description: "Hang clean, power clean from blocks. Teaching triple extension for explosive power.", duration: "24 min", videoUrl: "", isFree: false },
+          { id: "sc12-3-2", title: "Week 6: Rotational Power", description: "Med ball scoop toss, rotational slam, cable rotation. Baseball-specific power patterns.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "sc12-3-3", title: "Week 7: Plyometric Integration", description: "Depth jumps, bounding, lateral hops. Building reactive strength and elastic power.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "sc12-3-4", title: "Week 8: Contrast Training", description: "Heavy strength → explosive movement pairings. Potentiation for max power output.", duration: "20 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "sc12-peak",
+        title: "Weeks 9-12: Peak Performance Phase",
+        description: "Maximizing force output, speed-strength, and competition preparation",
+        lessons: [
+          { id: "sc12-4-1", title: "Week 9: Max Strength Block", description: "Working up to 85-90% 1RM on compound lifts. Low rep, high intent.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "sc12-4-2", title: "Week 10: Speed-Strength", description: "Submaximal loads at max velocity. 50-70% moved as fast as possible.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "sc12-4-3", title: "Week 11: Competition Prep", description: "Reduced volume, maintained intensity. Peaking for performance testing.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "sc12-4-4", title: "Week 12: Testing & Assessment", description: "Re-test all baseline metrics. Program review and next-phase planning.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "sc12-mobility",
+        title: "Mobility & Recovery Protocols",
+        description: "Daily movement flows and recovery strategies for baseball athletes",
+        lessons: [
+          { id: "sc12-5-1", title: "Pre-Training Mobility Flow", description: "Hip 90/90, T-spine rotation, ankle mobility, shoulder CARs. 10-minute daily protocol.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "sc12-5-2", title: "Post-Training Recovery", description: "Foam rolling, static stretching, breathing protocols for parasympathetic recovery.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "sc12-5-3", title: "Sleep & Nutrition for Performance", description: "Research-based sleep hygiene, protein timing, hydration strategies for baseball athletes.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "sc12-drills",
+        title: "Exercise Library (60+ Exercises)",
+        description: "Complete exercise library with video demos and coaching cues",
+        lessons: [
+          { id: "sc12-6-1", title: "Lower Body Exercises", description: "Squat variations, deadlift variations, lunge patterns, hip thrust, step-ups.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "sc12-6-2", title: "Upper Body Exercises", description: "Bench variations, row variations, overhead press, pull-ups, face pulls.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "sc12-6-3", title: "Power & Plyometric Exercises", description: "Olympic lifts, med ball throws, jumps, bounds, reactive drills.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "sc12-6-4", title: "Core & Rotational Exercises", description: "Anti-rotation, anti-extension, rotational power, carry variations.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  "elite-mindset-10week": {
+    courseId: "elite-mindset-10week",
+    modules: [
+      {
+        id: "em10-pillars",
+        title: "Mental Performance Pillars",
+        description: "The five core pillars of championship-level mental strength",
+        lessons: [
+          { id: "em10-1-1", title: "The Five Pillars Overview", description: "Confidence, Focus, Emotional Speed, Self-Talk, and Competitive Identity. Built through repetition and proof.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "em10-1-2", title: "Mental Performance Assessment", description: "Evaluate your current mental game across all 5 pillars. Identify strengths and gaps.", duration: "15 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "em10-week1",
+        title: "Week 1: Identity & Purpose",
+        description: "Athletes perform best when they understand who they are and why they compete",
+        lessons: [
+          { id: "em10-2-1", title: "Define Who You Are", description: "Create your Athlete Identity Statement. Based on research: identity drives behavior, behavior drives results.", duration: "15 min", videoUrl: "", isFree: false },
+          { id: "em10-2-2", title: "Champion Discipline Challenge", description: "Complete 1 full day of 'no excuses' discipline checklist. Build the habit of elite standards.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "em10-week2",
+        title: "Week 2: Confidence & Self-Talk",
+        description: "True confidence = Reps + Preparation + Belief. Self-talk controls performance.",
+        lessons: [
+          { id: "em10-3-1", title: "The Confidence Equation", description: "Confidence isn't born—it's built. Learn the preparation-based confidence system.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "em10-3-2", title: "Reframing Negative Thoughts", description: "Techniques for shifting internal language from fear-based to attack-based patterns.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "em10-week3",
+        title: "Week 3: Focus & Attention Control",
+        description: "Elite focus is a trainable skill, not a personality trait",
+        lessons: [
+          { id: "em10-4-1", title: "Selective Attention Training", description: "Training your brain to focus on what matters and ignore distractions. Narrowing and widening focus on command.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "em10-4-2", title: "Pre-Pitch Focus Routine", description: "Building a consistent mental routine before every pitch—hitting and pitching.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "em10-week4",
+        title: "Week 4: Emotional Speed",
+        description: "The ability to recover from mistakes faster than your opponent",
+        lessons: [
+          { id: "em10-5-1", title: "The 6-Second Reset Routine", description: "Mistake → Breath → Reset → Refocus. Based on sport psychology research on emotional recovery.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "em10-5-2", title: "Performance Breathing", description: "Box breath (4-4-4-4), 4-2-6 breath for activation/calming. Train emotional neutrality.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "em10-week5",
+        title: "Week 5: Visualization System",
+        description: "5-minute daily visualization routines used by elite performers",
+        lessons: [
+          { id: "em10-6-1", title: "5-Minute Visualization Routine", description: "Daily pre-game visualization practice. See it, feel it, execute it.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "em10-6-2", title: "Confidence Anchors & Reset Words", description: "Creating mental triggers that instantly activate your best performance state.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "em10-week67",
+        title: "Weeks 6-7: Pressure & Resilience",
+        description: "Systematic pressure inoculation and bounce-back training",
+        lessons: [
+          { id: "em10-7-1", title: "Pressure Inoculation Training", description: "Progressively expose yourself to increasing pressure to build tolerance and resilience.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "em10-7-2", title: "Adversity Response Protocol", description: "How to respond to failure, bad calls, errors. The 'next play' mentality system.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "em10-7-3", title: "Slump-Busting Framework", description: "Structured approach to breaking out of performance slumps using process focus.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "em10-week89",
+        title: "Weeks 8-9: Leadership & Championship Habits",
+        description: "Building team leadership and daily championship routines",
+        lessons: [
+          { id: "em10-8-1", title: "Leadership by Example", description: "How to lead without a title. Body language, energy, and effort as leadership tools.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "em10-8-2", title: "Championship Daily Routine", description: "Morning routine, pre-game routine, post-game review. Building consistency.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "em10-8-3", title: "Team Culture & Accountability", description: "Creating an environment where elite standards are the norm, not the exception.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "em10-week10",
+        title: "Week 10: Integration & Testing",
+        description: "Bringing all mental skills together for competition",
+        lessons: [
+          { id: "em10-9-1", title: "Mental Skills Integration", description: "Combining all 5 pillars into a seamless game-day mental performance system.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "em10-9-2", title: "Competition Mental Checklist", description: "Your personalized pre-game, in-game, and post-game mental performance checklist.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "em10-9-3", title: "Final Assessment & Maintenance Plan", description: "Re-assess all 5 pillars. Build your ongoing mental performance maintenance plan.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  "winning-mindset-10week": {
+    courseId: "winning-mindset-10week",
+    modules: [
+      {
+        id: "wm-intro",
+        title: "Introduction & Program Goals",
+        description: "Building elite confidence, mental toughness, and competitive resilience",
+        lessons: [
+          { id: "wm-1-1", title: "Program Overview", description: "A 10-week mental performance system for athletes who want to think, act, and perform like elite competitors.", duration: "10 min", videoUrl: "", isFree: true },
+          { id: "wm-1-2", title: "Weekly Structure", description: "Mental lessons, daily tasks, journal prompts, and weekly challenges.", duration: "8 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "wm-week1",
+        title: "Week 1: Identity & Purpose",
+        description: "Athletes perform best when they understand who they are",
+        lessons: [
+          { id: "wm-2-1", title: "Define Who You Are", description: "Creating your Athlete Identity Statement and long-term vision.", duration: "15 min", videoUrl: "", isFree: false },
+          { id: "wm-2-2", title: "Champion Discipline Challenge", description: "Complete 1 full day of 'no excuses' discipline checklist.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "wm-week2",
+        title: "Week 2: Confidence Building",
+        description: "Confidence = Reps + Preparation + Belief",
+        lessons: [
+          { id: "wm-3-1", title: "The Confidence Equation", description: "How preparation creates unshakeable confidence.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "wm-3-2", title: "Positive Self-Talk Rewiring", description: "Replace fear-based language with attack-based language.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "wm-week34",
+        title: "Weeks 3-4: Focus & Emotional Control",
+        description: "Developing focus and emotional control under pressure",
+        lessons: [
+          { id: "wm-4-1", title: "Selective Attention", description: "Training your brain to lock in on what matters.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "wm-4-2", title: "Emotional Speed Training", description: "Recovering from mistakes faster than anyone else.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "wm-4-3", title: "The Reset Routine", description: "6-second physical and mental reset after every play.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "wm-week56",
+        title: "Weeks 5-6: Visualization & Pressure",
+        description: "Mental rehearsal and pressure inoculation",
+        lessons: [
+          { id: "wm-5-1", title: "5-Minute Visualization", description: "Daily visualization practice for pre-game preparation.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "wm-5-2", title: "Pressure Inoculation", description: "Systematically building tolerance to high-pressure situations.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "wm-week78",
+        title: "Weeks 7-8: Resilience & Adversity",
+        description: "Building mental toughness through adversity response training",
+        lessons: [
+          { id: "wm-6-1", title: "Adversity Response Protocol", description: "How champions respond to failure, bad calls, and adversity.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "wm-6-2", title: "Slump-Busting System", description: "Structured approach to breaking performance slumps.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "wm-week910",
+        title: "Weeks 9-10: Leadership & Championship Habits",
+        description: "Leading by example and building championship routines",
+        lessons: [
+          { id: "wm-7-1", title: "Leadership Without a Title", description: "Body language, energy, and effort as leadership tools.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "wm-7-2", title: "Championship Daily Routine", description: "Morning, pre-game, post-game routines for elite consistency.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "wm-7-3", title: "Performance Consistency System", description: "Bringing all mental skills together for daily excellence.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  // MISSING COURSES - Full content
+  "youth-vertical-6week": {
+    courseId: "youth-vertical-6week",
+    modules: [
+      {
+        id: "yv-intro",
+        title: "Program Introduction & Safety",
+        description: "Age-appropriate plyometric training foundations for athletes ages 9-13",
+        lessons: [
+          { id: "yv-1-1", title: "Program Overview & Safety Rules", description: "Understanding plyometric training for young athletes. Landing mechanics are priority #1.", duration: "10 min", videoUrl: "", isFree: true },
+          { id: "yv-1-2", title: "Landing Mechanics Assessment", description: "Teaching proper landing position: knees over toes, soft landings, absorbing force safely.", duration: "12 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "yv-week12",
+        title: "Weeks 1-2: Landing & Absorption",
+        description: "Teaching the body to absorb force safely before producing force",
+        lessons: [
+          { id: "yv-2-1", title: "Snap Downs & Stick Landings", description: "Dropping from heights and sticking the landing. Building eccentric strength.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "yv-2-2", title: "Pogo Jumps & Mini-Hurdles", description: "Quick, low-amplitude jumps building ankle stiffness and ground contact efficiency.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "yv-2-3", title: "Box Step-Downs & Drop Landings", description: "Controlled eccentric loading from progressive heights (6-12 inches).", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "yv-week34",
+        title: "Weeks 3-4: Takeoff & Power",
+        description: "Building explosive takeoff mechanics and jump technique",
+        lessons: [
+          { id: "yv-3-1", title: "Arm Swing Loaders", description: "Teaching the arm swing as a power amplifier. Coordinating upper and lower body.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "yv-3-2", title: "Box Jumps (Introductory)", description: "Safe box jump technique starting at 12 inches. Focus on landing, not height.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "yv-3-3", title: "Broad Jumps & Bounding", description: "Horizontal power development through broad jumps and simple bounding patterns.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "yv-week56",
+        title: "Weeks 5-6: Integration & Testing",
+        description: "Combining skills and measuring improvement",
+        lessons: [
+          { id: "yv-4-1", title: "Jump Circuit Training", description: "Combining pogo jumps, box jumps, broad jumps, and vertical jumps in circuits.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "yv-4-2", title: "Reactive Jump Games", description: "Fun, competitive jump activities that build reactive ability in game-like settings.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "yv-4-3", title: "Testing Day & Progress Review", description: "Vertical jump test, broad jump test. Compare to baseline and celebrate progress.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  "elite-vertical-12week": {
+    courseId: "elite-vertical-12week",
+    modules: [
+      {
+        id: "ev-intro",
+        title: "Program Introduction & Baseline Testing",
+        description: "Establishing baseline metrics and understanding the training methodology",
+        lessons: [
+          { id: "ev-1-1", title: "Program Overview & Methodology", description: "French contrast, plyometric periodization, and force-velocity profiling for vertical jump development.", duration: "14 min", videoUrl: "", isFree: true },
+          { id: "ev-1-2", title: "Baseline Testing Protocol", description: "Standing vertical, approach vertical, broad jump, drop jump reactive strength index.", duration: "16 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "ev-foundation",
+        title: "Weeks 1-4: Strength Foundation",
+        description: "Building the force production base for explosive jump performance",
+        lessons: [
+          { id: "ev-2-1", title: "Week 1: Squat & Hinge Patterns", description: "Back squat, trap bar deadlift, RDL. Building max strength as the foundation.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "ev-2-2", title: "Week 2: Unilateral Strength", description: "Bulgarian split squat, step-ups, single-leg RDL. Correcting asymmetries.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "ev-2-3", title: "Week 3: Plyometric Introduction", description: "Snap downs, pogo jumps, box jumps with emphasis on landing quality.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "ev-2-4", title: "Week 4: Force Production Testing", description: "Mid-program strength check. Adjusting loads for the next phase.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "ev-power",
+        title: "Weeks 5-8: Power Development",
+        description: "Converting strength into explosive power through contrast and complex training",
+        lessons: [
+          { id: "ev-3-1", title: "Week 5: French Contrast Method", description: "Heavy squat → jump squat → drop jump → assisted jump. Post-activation potentiation.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "ev-3-2", title: "Week 6: Depth Jump Progressions", description: "Progressive depth jumps from 12-30 inches. Building reactive strength index.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "ev-3-3", title: "Week 7: Approach Jump Training", description: "1-step, 2-step, and full approach jump technique. Sport-specific power application.", duration: "22 min", videoUrl: "", isFree: false },
+          { id: "ev-3-4", title: "Week 8: Complex Training Circuits", description: "Strength-power complexes designed to maximize rate of force development.", duration: "20 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "ev-peak",
+        title: "Weeks 9-12: Peak Phase",
+        description: "Peaking vertical jump performance through reduced volume and max intent",
+        lessons: [
+          { id: "ev-4-1", title: "Week 9: Max Intent Plyometrics", description: "Low volume, maximum effort jumps. Every rep at 100% intent.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "ev-4-2", title: "Week 10: Sport-Specific Application", description: "Applying vertical power to baseball: explosive starts, stolen base jumps, defensive reactions.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "ev-4-3", title: "Week 11: Taper & Potentiation", description: "Reducing volume, maintaining intensity. Preparing the body for peak output.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "ev-4-4", title: "Week 12: Final Testing & Review", description: "Re-test all baseline metrics. Compare gains. Plan maintenance or next cycle.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "ev-drills",
+        title: "Elite Plyometric Drill Library",
+        description: "42 progressive plyometric exercises with video demonstrations",
+        lessons: [
+          { id: "ev-5-1", title: "Landing & Absorption Drills", description: "Snap downs, altitude landings, eccentric box step-downs.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "ev-5-2", title: "Bilateral Jump Drills", description: "Box jumps, squat jumps, countermovement jumps, tuck jumps.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "ev-5-3", title: "Depth & Reactive Drills", description: "Depth jumps, depth drops to broad jump, reactive hurdle hops.", duration: "20 min", videoUrl: "", isFree: false },
+          { id: "ev-5-4", title: "Single-Leg Power Drills", description: "Single-leg box jumps, bounding, single-leg depth drops.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  "arm-care-complete": {
+    courseId: "arm-care-complete",
+    modules: [
+      {
+        id: "acc-intro",
+        title: "Arm Care System Overview",
+        description: "Why arm care is non-negotiable organizational policy, not optional extra work",
+        lessons: [
+          { id: "acc-1-1", title: "The Arm Care Philosophy", description: "68% of arm injuries are preventable. Arm care is performance work, not rehab. Based on ASMI research.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "acc-1-2", title: "Workload Management Principles", description: "Acute:Chronic Workload Ratio (ACWR), pitch count guidelines, and intent-based volume management.", duration: "14 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "acc-prethrow",
+        title: "Pre-Throw Protocols",
+        description: "Daily preparation routines to perform before any throwing activity",
+        lessons: [
+          { id: "acc-2-1", title: "Mobility Flow (10 min)", description: "T-spine rotations, shoulder CARs, hip 90/90, ankle mobility. Daily non-negotiable.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "acc-2-2", title: "Activation Series", description: "Band external rotations, serratus wall slides, scap push-ups, prone Y-T-W.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "acc-2-3", title: "Progressive Warmup Throwing", description: "Light catch → long toss → intent buildup. Never throw cold. Progressive intensity ramp.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "acc-postthrow",
+        title: "Post-Throw Protocols",
+        description: "Recovery routines to perform within 15 minutes of finishing throwing",
+        lessons: [
+          { id: "acc-3-1", title: "Immediate Post-Throw (0-15 min)", description: "Light band work, compression, breathing exercises. Parasympathetic activation.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "acc-3-2", title: "Extended Recovery (Same Day)", description: "Foam rolling, gentle stretching, cold therapy guidelines, nutrition timing.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "acc-3-3", title: "Next-Day Recovery Protocol", description: "Light movement, blood flow work, arm care circuit. Assessing readiness for next throw.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "acc-workload",
+        title: "Workload Tracking System",
+        description: "How to monitor and manage throwing volume, intensity, and recovery",
+        lessons: [
+          { id: "acc-4-1", title: "Throw Counting & Intent Zones", description: "Zone 1 (recovery), Zone 2 (moderate), Zone 3 (high intent). Daily volume by zone.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "acc-4-2", title: "ACWR Monitoring", description: "Calculating and tracking Acute:Chronic Workload Ratio. Staying in the 0.8-1.3 sweet spot.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "acc-4-3", title: "Red Flag Recognition", description: "When to shut it down: soreness scales, velocity drops, mechanical changes that signal overuse.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "acc-strength",
+        title: "Arm Strength & Tissue Resilience",
+        description: "Building durable throwing arms through progressive loading",
+        lessons: [
+          { id: "acc-5-1", title: "Eccentric Arm Strengthening", description: "Eccentric ER, reverse throws, deceleration work. Building the brakes, not just the engine.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "acc-5-2", title: "Scapular Stabilization", description: "Scap push-ups, serratus activation, lower trap work. Shoulder blade as the platform.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "acc-5-3", title: "Rotator Cuff Strengthening", description: "ER/IR at multiple angles, prone external rotation, side-lying rotations.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "acc-5-4", title: "Elbow & Wrist Care", description: "Forearm pronation/supination, wrist curls, flexor mass care. Protecting the UCL.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "acc-return",
+        title: "Return-to-Throw Guidelines",
+        description: "Structured protocols for returning to throwing after rest or injury",
+        lessons: [
+          { id: "acc-6-1", title: "Post-Rest Ramp-Up Protocol", description: "After 7+ days off: progressive 14-day ramp back to full intensity.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "acc-6-2", title: "Post-Injury Return Framework", description: "Working with medical staff: phases, milestones, clearance criteria.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "acc-6-3", title: "Season-Long Arm Care Calendar", description: "Month-by-month arm care adjustments across off-season, pre-season, and in-season.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  "mobility-durability": {
+    courseId: "mobility-durability",
+    modules: [
+      {
+        id: "md-intro",
+        title: "Mobility & Durability Overview",
+        description: "Why mobility is the foundation of longevity in baseball",
+        lessons: [
+          { id: "md-1-1", title: "The Mobility-Performance Connection", description: "Research shows mobility limitations are the #1 predictor of injury in baseball athletes.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "md-1-2", title: "Movement Assessment", description: "Self-assessment for hip, shoulder, T-spine, and ankle mobility. Identify your priority areas.", duration: "14 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "md-hip",
+        title: "Hip Mobility System",
+        description: "Complete hip mobility for all baseball positions",
+        lessons: [
+          { id: "md-2-1", title: "Hip Internal/External Rotation", description: "90/90 progressions, hip CARs, pigeon variations. Essential for rotation and power.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "md-2-2", title: "Hip Flexor & Adductor Mobility", description: "Half-kneeling stretches, adductor rockbacks, active hip flexor work.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "md-2-3", title: "Catcher & Pitcher-Specific Hip Work", description: "Deep squat mobility for catchers, hip separation drills for pitchers.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "md-shoulder",
+        title: "Shoulder Health System",
+        description: "Maintaining shoulder range of motion and stability for throwers",
+        lessons: [
+          { id: "md-3-1", title: "Shoulder CARs & Passive Range", description: "Controlled articular rotations, sleeper stretches, cross-body stretching.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "md-3-2", title: "Scapular Mobility & Stability", description: "Scap CARs, wall slides, push-up plus, bear crawls.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "md-3-3", title: "Thrower's Shoulder Maintenance", description: "Managing GIRD (glenohumeral internal rotation deficit) common in throwers.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "md-tspine",
+        title: "Thoracic Spine Mobility",
+        description: "T-spine rotation is essential for every movement in baseball",
+        lessons: [
+          { id: "md-4-1", title: "T-Spine Rotation Drills", description: "Open books, thread the needle, seated rotations. Building rotational capacity.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "md-4-2", title: "T-Spine Extension Work", description: "Foam roller extensions, cat-cow, wall angel progressions.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "md-ankle",
+        title: "Ankle & Lower Leg",
+        description: "Ankle mobility for squatting, sprinting, and defensive movement",
+        lessons: [
+          { id: "md-5-1", title: "Ankle Dorsiflexion Drills", description: "Wall ankle stretches, banded ankle mobs, half-kneeling ankle work.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "md-5-2", title: "Foot & Calf Complex", description: "Toe yoga, calf raises, arch strengthening. The foundation of all movement.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "md-flows",
+        title: "Daily Movement Flows",
+        description: "10-15 minute daily routines for consistent mobility maintenance",
+        lessons: [
+          { id: "md-6-1", title: "Morning Movement Flow (10 min)", description: "Wake-up routine: cat-cow, hip CARs, T-spine rotation, shoulder CARs, ankle circles.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "md-6-2", title: "Pre-Training Flow (12 min)", description: "Position-specific mobility prep before strength, throwing, or skill work.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "md-6-3", title: "Recovery Day Flow (15 min)", description: "Extended mobility session for off-days. Full-body joint-by-joint approach.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "md-recovery",
+        title: "Recovery & Tissue Quality",
+        description: "Self-massage, breathing, and sleep optimization",
+        lessons: [
+          { id: "md-7-1", title: "Foam Rolling & Self-Massage", description: "Evidence-based foam rolling protocols. What works and what's a waste of time.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "md-7-2", title: "Breathing for Recovery", description: "Diaphragmatic breathing, box breathing, 4-7-8 sleep protocol.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "md-7-3", title: "Sleep Optimization for Athletes", description: "Sleep hygiene, blue light management, pre-sleep routine. 7-9 hours is non-negotiable.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "md-assess",
+        title: "Self-Assessment & Maintenance",
+        description: "Ongoing self-assessment tools for long-term mobility maintenance",
+        lessons: [
+          { id: "md-8-1", title: "Monthly Mobility Re-Assessment", description: "Re-test all baseline metrics. Identify new priority areas.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "md-8-2", title: "Building Your Personal Mobility Plan", description: "Create a customized daily mobility routine based on your assessment results.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+  "competitive-execution": {
+    courseId: "competitive-execution",
+    modules: [
+      {
+        id: "ce-intro",
+        title: "Competitive Execution Overview",
+        description: "Why practice performance and game performance are different—and how to close the gap",
+        lessons: [
+          { id: "ce-1-1", title: "The Execution Gap", description: "Research shows 40-60% of trained skills fail to transfer to competition. Understanding why.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "ce-1-2", title: "Transfer Rate Assessment", description: "Measure your current practice-to-game execution percentage across key skills.", duration: "14 min", videoUrl: "", isFree: true },
+        ],
+      },
+      {
+        id: "ce-intent",
+        title: "Game-Speed Intent Training",
+        description: "Every rep at game speed, game intensity, game consequences",
+        lessons: [
+          { id: "ce-2-1", title: "Intent-Based Practice Design", description: "Structuring practice so every rep carries game-level intent and consequence.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "ce-2-2", title: "Game-Speed Hitting Blocks", description: "Live BP with count sequences, situational approach, and outcome tracking.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "ce-2-3", title: "Competitive Pitching Sessions", description: "Bullpens with hitter simulation, count management, and location grading.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "ce-pressure",
+        title: "Pressure Simulation",
+        description: "Creating game-like pressure in controlled training environments",
+        lessons: [
+          { id: "ce-3-1", title: "Pressure Drill Framework", description: "Adding consequences, time limits, audience, and competition to every drill.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "ce-3-2", title: "Clutch Situation Training", description: "2-out, runner on 3rd. Full count, 2 outs. Creating clutch reps daily.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "ce-3-3", title: "Team Competition Days", description: "Structured competition formats: King of the Diamond, Situational Wars.", duration: "18 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "ce-decision",
+        title: "Decision-Making Under Pressure",
+        description: "Training the brain to make better decisions faster in competition",
+        lessons: [
+          { id: "ce-4-1", title: "Perception-Action Coupling", description: "Read the cue → react in real-time. Reducing the gap between seeing and doing.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "ce-4-2", title: "Constraint-Led Decision Drills", description: "Manipulating rules, equipment, and environment to force better decisions.", duration: "18 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "ce-retest",
+        title: "Retesting & Progress Tracking",
+        description: "Measuring competitive execution improvement over time",
+        lessons: [
+          { id: "ce-5-1", title: "Bi-Weekly Execution Assessment", description: "Structured game-situation testing protocol. Track transfer rate improvement.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "ce-5-2", title: "Video Analysis for Transfer", description: "Comparing practice video to game video to identify mechanical differences.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "ce-5-3", title: "Post-Game Self-Assessment", description: "5-minute post-game review framework: what transferred, what didn't, what to adjust.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      {
+        id: "ce-compete",
+        title: "Competition Prep Protocols",
+        description: "Pre-game preparation that primes execution",
+        lessons: [
+          { id: "ce-6-1", title: "Pre-Game Physical Preparation", description: "Activation, mobility, throwing progression, batting practice structure.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "ce-6-2", title: "Pre-Game Mental Preparation", description: "Visualization, approach plan, emotional readiness check.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "ce-6-3", title: "In-Game Adjustment Framework", description: "How to adjust approach mid-game based on real-time feedback and results.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
 };
 
 export const getCourseContent = (courseId: string): CourseContent | undefined => {
