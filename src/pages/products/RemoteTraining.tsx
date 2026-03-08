@@ -277,7 +277,6 @@ const RemoteTraining = () => {
         onCheckout={checkout}
         loading={loading}
         ctaText="Join Remote Training"
-        isSubscription
       />
       <Footer />
     </main>
