@@ -454,12 +454,12 @@ const Index = () => {
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               {[
-                { name: "Jake M.", detail: "16 · RHP · Texas", quote: "I gained 6 mph in 8 weeks on the Velocity System. The drills are structured and they actually make sense.", stat: "+6 MPH", label: "Pitching Velo" },
-                { name: "Sarah T.", detail: "Parent · Son age 14", quote: "We finally feel like we're investing in something real. We can see his metrics and know exactly what he's working on.", stat: "5-PILLAR", label: "Full Tracking" },
-                { name: "Dylan R.", detail: "17 · RHP/1B · Florida", quote: "The Remote Training keeps me accountable. I know exactly where I stand for D1 benchmarks.", stat: "+8 MPH", label: "Pitching Velo" },
-                { name: "Marcus W.", detail: "14 · IF/P · California", quote: "Vault showed me exactly where I was losing velocity. In two months I went from 62 to 66.", stat: "+4 MPH", label: "Pitching Velo" },
-                { name: "Ryan K.", detail: "Coach · Travel Ball", quote: "I put my entire 14U team on Vault. The system gives me a framework for developing each player individually.", stat: "12", label: "Athletes Coached" },
-                { name: "Mike D.", detail: "Parent · Son age 16", quote: "We spent $3K on private lessons last year with no plan. Vault gave us more structure in one month.", stat: "$397", label: "Full System" },
+                { name: "J.M.", detail: "16 · RHP", quote: "I gained 6 mph in 8 weeks on the Velocity System. The drills are structured and they actually make sense.", stat: "+6 MPH", label: "Pitching Velo" },
+                { name: "Parent Review", detail: "Parent · Son age 14", quote: "We finally feel like we're investing in something real. We can see his metrics and know exactly what he's working on.", stat: "5-PILLAR", label: "Full Tracking" },
+                { name: "D.R.", detail: "17 · RHP/1B", quote: "The Remote Training keeps me accountable. I know exactly where I stand for college benchmarks.", stat: "+8 MPH", label: "Pitching Velo" },
+                { name: "M.W.", detail: "14 · IF/P", quote: "Vault showed me exactly where I was losing velocity. In two months I went from 62 to 66.", stat: "+4 MPH", label: "Pitching Velo" },
+                { name: "Coach R.K.", detail: "Head Coach · Travel Ball", quote: "I put my entire 14U team on Vault. The system gives me a framework for developing each player individually.", stat: "12", label: "Athletes Coached" },
+                { name: "Parent Review", detail: "Parent · Son age 16", quote: "We spent thousands on private lessons last year with no plan. Vault gave us more structure in one month.", stat: "$397", label: "Full System" },
               ].map((t, i) => (
                 <motion.div
                   key={i}

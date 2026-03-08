@@ -28,28 +28,28 @@ const faqData = {
     title: "Courses & Training",
     questions: [
       {
-        q: "What courses are available on Vault Baseball?",
-        a: "We offer comprehensive training programs including Hitting Mastery, Pitching Excellence, and Fielding Fundamentals. Each course is designed by professional coaches and includes video lessons, drills, and progress tracking."
+        q: "What programs are available on Vault Baseball?",
+        a: "We offer elite training programs across all five V.A.U.L.T. pillars: Velocity (hitting and pitching systems), Athleticism (speed, strength, and conditioning), Utility (catcher development and positional versatility), Longevity (arm care and workload management), and Transfer (competitive execution). Each program is research-backed and includes video lessons, drills, metrics tracking, and progressive overload."
       },
       {
-        q: "How long do I have access to a course after purchasing?",
-        a: "Once you purchase a course, you have lifetime access to all course materials. This includes any future updates or additions to the course content."
+        q: "How long do I have access to a program after purchasing?",
+        a: "Once you purchase a program, you have lifetime access to all course materials. This includes any future updates or additions to the content."
       },
       {
         q: "Can I download course videos for offline viewing?",
-        a: "Currently, all course content is streamed through our platform to ensure you always have access to the latest updates. Offline viewing is not available at this time."
+        a: "Currently, all content is streamed through our platform to ensure you always have access to the latest updates. Offline viewing is not available at this time."
       },
       {
-        q: "How do I track my progress through a course?",
+        q: "How do I track my progress through a program?",
         a: "Your progress is automatically tracked as you complete lessons. You can view your progress on the course detail page and in your My Programs dashboard. Completed lessons are marked with a checkmark."
       },
       {
-        q: "Are there any prerequisites for the courses?",
-        a: "Our courses are designed for various skill levels. Hitting Mastery and Fielding Fundamentals are suitable for beginners, while Pitching Excellence is recommended for players with some baseball experience. Each course description includes recommended skill levels."
+        q: "Are there any prerequisites for the programs?",
+        a: "Our programs are designed for athletes ages 12–18 at various skill levels. Youth programs (ages 9–13) focus on foundational mechanics, while Elite programs are built for competitive high school athletes. Each program description includes the recommended skill level."
       },
       {
-        q: "Do I receive a certificate after completing a course?",
-        a: "Yes! Upon completing all lessons in a course, you'll receive a digital certificate of completion that you can download, share, and add to your profile."
+        q: "Do I receive a certificate after completing a program?",
+        a: "Yes! Upon completing all lessons in a program, you'll receive a digital certificate of completion that you can download, share, and add to your profile."
       }
     ]
   },
@@ -89,7 +89,7 @@ const faqData = {
     questions: [
       {
         q: "What subscription plans are available?",
-        a: "We offer Monthly ($29/month) and Annual ($249/year - save 28%) subscription plans. Both plans include access to all courses, community features, and basic certification exam attempts."
+        a: "We offer three tiers: Athlete ($29/month), Performance ($59/month), and Elite ($149/month). We also offer Founder's Lifetime Access at $499 — a one-time payment for permanent access to all current and future VAULT™ programs."
       },
       {
         q: "Can I cancel my subscription at any time?",
@@ -97,11 +97,11 @@ const faqData = {
       },
       {
         q: "What payment methods do you accept?",
-        a: "We accept all major credit cards (Visa, Mastercard, American Express, Discover) through our secure payment processor, Stripe. We also support Apple Pay and Google Pay."
+        a: "We accept all major credit cards (Visa, Mastercard, American Express, Discover) through our secure payment processor. We also support Apple Pay and Google Pay."
       },
       {
         q: "Is there a free trial available?",
-        a: "We don't currently offer a free trial, but we do have free preview content for each course so you can get a feel for our teaching style before subscribing."
+        a: "Yes! We offer a 7-Day Velocity Baseline Trial — no credit card required. You'll get baseline scores across all 5 pillars so you can see exactly where you stand before committing."
       },
       {
         q: "What is your refund policy?",
@@ -177,11 +177,11 @@ const FAQ = () => {
             <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
               <HelpCircle className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold text-foreground mb-3">
-              Frequently Asked Questions
+            <h1 className="text-4xl md:text-5xl font-display text-foreground mb-3 tracking-wider">
+              FREQUENTLY ASKED QUESTIONS
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Find answers to common questions about our courses, certifications, subscriptions, and platform.
+              Find answers to common questions about our programs, certifications, subscriptions, and platform.
             </p>
           </div>
 
