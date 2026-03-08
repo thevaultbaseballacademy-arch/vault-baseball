@@ -88,6 +88,20 @@ const AthleteOnboarding = () => {
         product_purchased: productPurchased,
       });
       if (error) throw error;
+
+      // Sync key fields to the user's profile for CRM / dashboard use
+      if (userId) {
+        const profileUpdate: Record<string, unknown> = {};
+        if (form.athlete_name.trim()) profileUpdate.display_name = form.athlete_name.trim();
+        if (form.position) profileUpdate.position = form.position;
+        if (form.social_handle.trim()) profileUpdate.instagram_url = form.social_handle.trim();
+        if (form.sixty_time.trim()) profileUpdate.sixty_yard_dash = parseFloat(form.sixty_time);
+
+        if (Object.keys(profileUpdate).length > 0) {
+          await supabase.from("profiles").update(profileUpdate).eq("user_id", userId);
+        }
+      }
+
       setSubmitted(true);
     } catch (err) {
       console.error(err);
