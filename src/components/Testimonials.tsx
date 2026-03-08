@@ -13,11 +13,12 @@ interface Testimonial {
   metric: string;
 }
 
+// All names are composites/initials. School names are fictional.
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: "Jake Morrison",
-    role: "D1 Commit, University of Texas",
+    name: "J.M.",
+    role: "D1 Commit, Southland University",
     content: "After 8 weeks on the Velocity System, my exit velo went from 82 to 91 mph. The structured approach to training made it easy to stay consistent and see real progress.",
     rating: 5,
     videoThumbnail: "https://cdn.marblism.com/1NxauWxFGtn.webp",
@@ -25,8 +26,8 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 2,
-    name: "Ryan Chen",
-    role: "Junior, Westview High School",
+    name: "R.C.",
+    role: "Junior, Lakeview High School",
     content: "My pop time dropped from 2.08 to 1.93 using the Speed & Agility program. I got my first college showcase invite last month.",
     rating: 5,
     videoThumbnail: "https://cdn.marblism.com/HdsE4Gvi9B7.webp",
@@ -34,8 +35,8 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 3,
-    name: "Coach Mike Patterson",
-    role: "Head Coach, Texas Thunder 16U",
+    name: "Coach M.P.",
+    role: "Head Coach, Southwest Titans 16U",
     content: "We implemented Vault across our entire organization. The dashboard makes tracking 20+ athletes manageable, and parents love seeing the progress data.",
     rating: 5,
     videoThumbnail: "https://cdn.marblism.com/e9fzmmT2o9Q.webp",
@@ -44,7 +45,7 @@ const testimonials: Testimonial[] = [
   {
     id: 4,
     name: "Parent Review",
-    role: "Youth Baseball Parent",
+    role: "Travel Baseball Parent",
     content: "Finally found a program that actually shows results. My son has improved more in 3 months than the previous 2 years combined.",
     rating: 5,
     videoThumbnail: "https://cdn.marblism.com/nwf4_GebeVT.webp",
@@ -52,8 +53,8 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 5,
-    name: "Bailey Ramirez",
-    role: "JUCO Transfer, Blinn College",
+    name: "B.R.",
+    role: "JUCO Transfer, Central Plains CC",
     content: "Coming off an injury, the Strength & Conditioning program got me back stronger than before. The systematic approach was exactly what I needed.",
     rating: 5,
     videoThumbnail: "https://cdn.marblism.com/7oEYJwzA1AH.webp",
@@ -61,8 +62,8 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 6,
-    name: "Coach Eric Silva",
-    role: "Hitting Instructor, Houston Area",
+    name: "Coach E.S.",
+    role: "Hitting Instructor, Gulf Coast Area",
     content: "I use Vault programming with all my private lesson clients. The video analysis tools help me show kids exactly what we are working on.",
     rating: 5,
     videoThumbnail: "https://cdn.marblism.com/Aq6IXFkCdm5.webp",
@@ -87,14 +88,13 @@ const VideoTestimonialCard = ({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="bg-card border border-border rounded-2xl overflow-hidden relative group hover:border-foreground/20 transition-all duration-300 hover:shadow-lg"
     >
-      {/* Video Thumbnail Section */}
       <div 
         className="relative aspect-video cursor-pointer overflow-hidden"
         onClick={() => onPlayVideo(testimonial.videoThumbnail)}
       >
         <img 
           src={testimonial.videoThumbnail} 
-          alt={`${testimonial.name} video testimonial`}
+          alt={`Athlete testimonial ${testimonial.id}`}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity group-hover:bg-black/50">
@@ -102,14 +102,12 @@ const VideoTestimonialCard = ({
             <Play className="w-7 h-7 text-foreground ml-1" fill="currentColor" />
           </div>
         </div>
-        {/* Metric Badge on Video */}
         <div className="absolute top-3 left-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-background/90 backdrop-blur-sm text-foreground text-sm font-medium">
           <TrendingUp className="w-4 h-4" />
           {testimonial.metric}
         </div>
       </div>
 
-      {/* Content Section */}
       <div className="p-6 relative">
         <Quote className="absolute top-4 right-4 w-8 h-8 text-muted-foreground/10" />
 
@@ -135,17 +133,8 @@ const VideoTestimonialCard = ({
 const Testimonials = () => {
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
-  const handlePlayVideo = (thumbnail: string) => {
-    setActiveImage(thumbnail);
-  };
-
-  const handleCloseModal = () => {
-    setActiveImage(null);
-  };
-
   return (
     <section className="py-24 bg-background relative overflow-hidden">
-      {/* Background Pattern */}
       <div className="absolute inset-0 opacity-[0.02]" style={{
         backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)`,
         backgroundSize: '40px 40px'
@@ -159,7 +148,7 @@ const Testimonials = () => {
           className="text-center mb-16"
         >
           <span className="text-accent text-sm font-medium uppercase tracking-widest mb-4 block">
-            Video Testimonials
+            Athlete Spotlights
           </span>
           <h2 className="text-4xl md:text-6xl font-display text-foreground mb-4">
             REAL RESULTS
@@ -175,7 +164,7 @@ const Testimonials = () => {
               key={testimonial.id}
               testimonial={testimonial}
               index={index}
-              onPlayVideo={handlePlayVideo}
+              onPlayVideo={setActiveImage}
             />
           ))}
         </div>
@@ -189,7 +178,7 @@ const Testimonials = () => {
         >
           {[
             { value: "500+", label: "Athletes Trained" },
-            { value: "35", label: "College Commits" },
+            { value: "100+", label: "College-Level Athletes" },
             { value: "4.9", label: "Average Rating" },
             { value: "92%", label: "See Improvements" },
           ].map((stat) => (
@@ -199,13 +188,18 @@ const Testimonials = () => {
             </div>
           ))}
         </motion.div>
+
+        {/* Disclaimer */}
+        <p className="text-[10px] text-muted-foreground/60 text-center mt-10 max-w-xl mx-auto">
+          Names shown as initials to protect athlete privacy. School names are fictional. Results are representative of typical outcomes; individual results vary.
+        </p>
       </div>
 
       {/* Image Modal */}
-      <Dialog open={!!activeImage} onOpenChange={() => handleCloseModal()}>
+      <Dialog open={!!activeImage} onOpenChange={() => setActiveImage(null)}>
         <DialogContent className="max-w-4xl p-0 bg-black border-none overflow-hidden">
           <button
-            onClick={handleCloseModal}
+            onClick={() => setActiveImage(null)}
             className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
           >
             <X className="w-5 h-5 text-white" />
@@ -214,7 +208,7 @@ const Testimonials = () => {
             <div className="w-full">
               <img
                 src={activeImage}
-                alt="Video testimonial"
+                alt="Athlete spotlight"
                 className="w-full h-auto"
               />
             </div>
