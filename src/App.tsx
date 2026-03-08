@@ -89,6 +89,7 @@ import RemoteTrainingHub from "./pages/RemoteTrainingHub";
 import Marketplace from "./pages/Marketplace";
 import CoachMarketplaceProfile from "./pages/CoachMarketplaceProfile";
 import Claim22MAccess from "./pages/Claim22MAccess";
+import ShortRedirect from "./pages/ShortRedirect";
 
 const queryClient = new QueryClient();
 
