@@ -88,6 +88,7 @@ import AthleteOnboarding from "./pages/AthleteOnboarding";
 import RemoteTrainingHub from "./pages/RemoteTrainingHub";
 import Marketplace from "./pages/Marketplace";
 import CoachMarketplaceProfile from "./pages/CoachMarketplaceProfile";
+import Claim22MAccess from "./pages/Claim22MAccess";
 
 const queryClient = new QueryClient();
 
@@ -225,6 +226,7 @@ const App = () => (
             <Route path="/training-hub" element={<RemoteTrainingHub />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
+            <Route path="/claim-22m" element={<Claim22MAccess />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

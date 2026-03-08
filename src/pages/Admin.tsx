@@ -28,6 +28,7 @@ import TeamWhitelistManager from "@/components/admin/TeamWhitelistManager";
 import { CoachInviteManager } from "@/components/admin/CoachInviteManager";
 import LeadsCustomersPanel from "@/components/admin/LeadsCustomersPanel";
 import AdminMarketplacePanel from "@/components/marketplace/AdminMarketplacePanel";
+import Admin22MTrialsPanel from "@/components/admin/Admin22MTrialsPanel";
 
 interface Profile {
   user_id: string;
@@ -50,6 +51,7 @@ const SECTIONS = [
     items: [
       { id: "leads", label: "Leads & CRM", icon: UserPlus },
       { id: "marketplace", label: "Marketplace", icon: Heart },
+      { id: "22m-trials", label: "22M Trials", icon: Users },
       { id: "users", label: "User Roles", icon: Users },
       { id: "team", label: "Team Whitelist", icon: Shield },
     ],
