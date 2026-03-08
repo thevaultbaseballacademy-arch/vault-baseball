@@ -26,11 +26,16 @@ export interface OnboardingEntry {
   id: string;
   user_id: string | null;
   email: string;
+  athlete_name: string | null;
+  parent_name: string | null;
   athlete_goals: string | null;
+  biggest_struggle: string | null;
+  training_history: string | null;
   current_level: string | null;
   position: string | null;
   current_velocity: string | null;
   exit_velo: string | null;
+  sixty_time: string | null;
   social_handle: string | null;
   product_purchased: string | null;
   created_at: string;

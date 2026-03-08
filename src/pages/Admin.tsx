@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
-  ArrowLeft, Loader2, Users, Shield, UserCheck, 
-  Search, Plus, X, Check, BarChart3, Link2, Video, Award, Clock, FileText, Database, Trash2, Lightbulb, Activity, UserPlus
+import {
+  ArrowLeft, Loader2, Users, Shield, UserCheck,
+  Search, Plus, Check, BarChart3, Link2, Video, Award, Clock,
+  FileText, Database, Trash2, Lightbulb, Activity, UserPlus,
+  ChevronRight, Settings, Bell, BookOpen, Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -29,17 +30,67 @@ import LeadsCustomersPanel from "@/components/admin/LeadsCustomersPanel";
 
 interface Profile {
   user_id: string;
-  email?: string; // Optional - not fetched to minimize data exposure
+  email?: string;
   display_name: string;
 }
 
 interface UserRole {
   id: string;
   user_id: string;
-  role: 'admin' | 'coach' | 'athlete';
+  role: "admin" | "coach" | "athlete";
 }
 
-const ROLES = ['admin', 'coach', 'athlete'] as const;
+const ROLES = ["admin", "coach", "athlete"] as const;
+
+/* ── Sidebar section definitions ── */
+const SECTIONS = [
+  {
+    group: "CRM & Revenue",
+    items: [
+      { id: "leads", label: "Leads & CRM", icon: UserPlus },
+      { id: "users", label: "User Roles", icon: Users },
+      { id: "team", label: "Team Whitelist", icon: Shield },
+    ],
+  },
+  {
+    group: "Coaching",
+    items: [
+      { id: "coach-invites", label: "Coach Invites", icon: Link2 },
+      { id: "assignments", label: "Assignments", icon: UserCheck },
+    ],
+  },
+  {
+    group: "Content",
+    items: [
+      { id: "tips", label: "Weekly Tips", icon: Lightbulb },
+      { id: "certifications", label: "Exam Questions", icon: Award },
+      { id: "expirations", label: "Cert Expirations", icon: Clock },
+      { id: "videos", label: "Course Videos", icon: Video },
+    ],
+  },
+  {
+    group: "Engagement",
+    items: [
+      { id: "broadcast", label: "Broadcast", icon: Bell },
+      { id: "analytics", label: "Notif Analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    group: "Compliance",
+    items: [
+      { id: "audit", label: "Audit Log", icon: FileText },
+      { id: "retention", label: "Data Retention", icon: Database },
+      { id: "deletion", label: "Deletion Requests", icon: Trash2 },
+      { id: "gdpr", label: "GDPR", icon: BookOpen },
+    ],
+  },
+  {
+    group: "System",
+    items: [
+      { id: "health", label: "System Health", icon: Activity },
+    ],
+  },
+];
 
 const Admin = () => {
   const [user, setUser] = useState<any>(null);
@@ -49,11 +100,20 @@ const Admin = () => {
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeSection, setActiveSection] = useState("leads");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session?.user) {
+        navigate("/auth");
+        return;
+      }
+      setUser(session.user);
+    });
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -63,34 +123,25 @@ const Admin = () => {
       checkAdminRole(session.user.id);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
-        navigate("/auth");
-      }
-      setUser(session?.user ?? null);
-    });
-
     return () => subscription.unsubscribe();
   }, [navigate]);
 
   const checkAdminRole = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
         .maybeSingle();
-
       if (error) throw error;
-      
       if (data) {
         setIsAdmin(true);
         fetchData();
       }
       setLoading(false);
     } catch (error) {
-      console.error('Error checking admin role:', error);
+      console.error("Error checking admin role:", error);
       setLoading(false);
     }
   };
@@ -98,100 +149,56 @@ const Admin = () => {
   const fetchData = async () => {
     try {
       const [profilesRes, rolesRes] = await Promise.all([
-        // Only select user_id and display_name - email is not needed for admin user list display
-        supabase.from('profiles').select('user_id, display_name').order('display_name'),
-        supabase.from('user_roles').select('id, user_id, role'),
+        supabase.from("profiles").select("user_id, display_name").order("display_name"),
+        supabase.from("user_roles").select("id, user_id, role"),
       ]);
-
       if (profilesRes.error) throw profilesRes.error;
       if (rolesRes.error) throw rolesRes.error;
-
       setProfiles(profilesRes.data || []);
       setUserRoles(rolesRes.data || []);
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load user data",
-        variant: "destructive",
-      });
+      console.error("Error fetching data:", error);
+      toast({ title: "Error", description: "Failed to load user data", variant: "destructive" });
     }
   };
 
-  const getUserRoles = (userId: string) => {
-    return userRoles.filter(r => r.user_id === userId);
-  };
+  const hasRole = (userId: string, role: string) =>
+    userRoles.some((r) => r.user_id === userId && r.role === role);
 
-  const hasRole = (userId: string, role: string) => {
-    return userRoles.some(r => r.user_id === userId && r.role === role);
-  };
-
-  const toggleRole = async (userId: string, role: 'admin' | 'coach' | 'athlete') => {
+  const toggleRole = async (userId: string, role: "admin" | "coach" | "athlete") => {
     setUpdatingRole(`${userId}-${role}`);
-    
     try {
-      const existingRole = userRoles.find(r => r.user_id === userId && r.role === role);
-      
-      if (existingRole) {
-        // Remove role
-        const { error } = await supabase
-          .from('user_roles')
-          .delete()
-          .eq('id', existingRole.id);
-        
+      const existing = userRoles.find((r) => r.user_id === userId && r.role === role);
+      if (existing) {
+        const { error } = await supabase.from("user_roles").delete().eq("id", existing.id);
         if (error) throw error;
-        
-        setUserRoles(prev => prev.filter(r => r.id !== existingRole.id));
-        toast({
-          title: "Role removed",
-          description: `Removed ${role} role from user`,
-        });
+        setUserRoles((prev) => prev.filter((r) => r.id !== existing.id));
+        toast({ title: "Role removed", description: `Removed ${role} role` });
       } else {
-        // Add role
-        const { data, error } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role })
-          .select()
-          .single();
-        
+        const { data, error } = await supabase.from("user_roles").insert({ user_id: userId, role }).select().single();
         if (error) throw error;
-        
-        setUserRoles(prev => [...prev, data]);
-        toast({
-          title: "Role assigned",
-          description: `Assigned ${role} role to user`,
-        });
+        setUserRoles((prev) => [...prev, data]);
+        toast({ title: "Role assigned", description: `Assigned ${role} role` });
       }
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update role",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: error.message || "Failed to update role", variant: "destructive" });
     } finally {
       setUpdatingRole(null);
     }
   };
 
-  const filteredProfiles = profiles.filter(p => 
-    p.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProfiles = profiles.filter(
+    (p) =>
+      p.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin': return Shield;
-      case 'coach': return UserCheck;
-      default: return Users;
-    }
-  };
-
   const getRoleColor = (role: string, active: boolean) => {
-    if (!active) return 'bg-secondary text-muted-foreground hover:bg-secondary/80';
+    if (!active) return "bg-secondary text-muted-foreground hover:bg-secondary/80";
     switch (role) {
-      case 'admin': return 'bg-red-500/10 text-red-600 border-red-500/30';
-      case 'coach': return 'bg-blue-500/10 text-blue-600 border-blue-500/30';
-      default: return 'bg-green-500/10 text-green-600 border-green-500/30';
+      case "admin": return "bg-destructive/10 text-destructive border-destructive/30";
+      case "coach": return "bg-primary/10 text-primary border-primary/30";
+      default: return "bg-accent/10 text-accent border-accent/30";
     }
   };
 
@@ -212,12 +219,8 @@ const Admin = () => {
             <div className="bg-card border border-border rounded-2xl p-12 text-center">
               <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h2 className="text-xl font-display text-foreground mb-2">Admin Access Required</h2>
-              <p className="text-muted-foreground mb-6">
-                This page is only available to administrators.
-              </p>
-              <Button variant="vault" onClick={() => navigate("/")}>
-                Go Home
-              </Button>
+              <p className="text-muted-foreground mb-6">This page is only available to administrators.</p>
+              <Button variant="vault" onClick={() => navigate("/")}>Go Home</Button>
             </div>
           </div>
         </main>
@@ -226,257 +229,182 @@ const Admin = () => {
     );
   }
 
+  const activeItem = SECTIONS.flatMap((s) => s.items).find((i) => i.id === activeSection);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <Button variant="ghost" className="mb-6" onClick={() => navigate("/")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Button>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
+      <main className="pt-20 pb-16">
+        <div className="flex min-h-[calc(100vh-5rem)]">
+          {/* ── Sidebar ── */}
+          <aside
+            className={`fixed lg:sticky top-20 left-0 z-30 h-[calc(100vh-5rem)] w-64 bg-card border-r border-border overflow-y-auto transition-transform lg:translate-x-0 ${
+              sidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
           >
-            {/* Header */}
-            <div>
-              <h1 className="text-3xl md:text-4xl font-display text-foreground mb-1">
-                ADMIN PANEL
-              </h1>
-              <p className="text-muted-foreground">Manage users, roles, and send notifications</p>
+            <div className="p-4 border-b border-border">
+              <h2 className="text-sm font-display tracking-widest text-primary">ADMIN PANEL</h2>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{profiles.length} users &middot; {userRoles.filter((r) => r.role === "coach").length} coaches</p>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-card border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-4 h-4 text-accent" />
-                  <span className="text-sm text-muted-foreground">Total Users</span>
-                </div>
-                <p className="text-2xl font-display text-foreground">{profiles.length}</p>
-              </div>
-              <div className="bg-card border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Shield className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-muted-foreground">Admins</span>
-                </div>
-                <p className="text-2xl font-display text-foreground">
-                  {userRoles.filter(r => r.role === 'admin').length}
-                </p>
-              </div>
-              <div className="bg-card border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <UserCheck className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm text-muted-foreground">Coaches</span>
-                </div>
-                <p className="text-2xl font-display text-foreground">
-                  {userRoles.filter(r => r.role === 'coach').length}
-                </p>
-              </div>
-              <div className="bg-card border border-border rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-muted-foreground">Athletes</span>
-                </div>
-                <p className="text-2xl font-display text-foreground">
-                  {userRoles.filter(r => r.role === 'athlete').length}
-                </p>
-              </div>
-            </div>
-
-            {/* Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="flex flex-wrap w-full max-w-6xl gap-1">
-                <TabsTrigger value="users">Users</TabsTrigger>
-                <TabsTrigger value="team" className="flex items-center gap-1">
-                  <UserPlus className="w-3 h-3" />
-                  Team
-                </TabsTrigger>
-                <TabsTrigger value="coach-invites" className="flex items-center gap-1">
-                  <Link2 className="w-3 h-3" />
-                  Coach Invites
-                </TabsTrigger>
-                <TabsTrigger value="assignments">Assignments</TabsTrigger>
-                <TabsTrigger value="tips">Tips</TabsTrigger>
-                <TabsTrigger value="certifications">Questions</TabsTrigger>
-                <TabsTrigger value="expirations">Expirations</TabsTrigger>
-                <TabsTrigger value="videos">Videos</TabsTrigger>
-                <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                <TabsTrigger value="audit">Audit</TabsTrigger>
-                <TabsTrigger value="retention">Retention</TabsTrigger>
-                <TabsTrigger value="deletion">Deletion</TabsTrigger>
-                <TabsTrigger value="gdpr">GDPR</TabsTrigger>
-                <TabsTrigger value="health" className="flex items-center gap-1">
-                  <Activity className="w-3 h-3" />
-                  Health
-                </TabsTrigger>
-                <TabsTrigger value="leads" className="flex items-center gap-1">
-                  <UserPlus className="w-3 h-3" />
-                  Leads & CRM
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="users" className="mt-6 space-y-6">
-                {/* Search */}
-                <div className="relative max-w-md">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search users..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full"
-                  />
-                </div>
-
-                {/* Users List */}
-                <div className="bg-card border border-border rounded-2xl overflow-hidden">
-                  <div className="p-4 border-b border-border">
-                    <h2 className="text-lg font-display text-foreground">Users ({filteredProfiles.length})</h2>
+            <nav className="p-2 space-y-4">
+              {SECTIONS.map((section) => (
+                <div key={section.group}>
+                  <p className="px-3 py-1 text-[10px] font-display tracking-[0.15em] text-muted-foreground uppercase">
+                    {section.group}
+                  </p>
+                  <div className="mt-1 space-y-0.5">
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = activeSection === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            setActiveSection(item.id);
+                            setSidebarOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+                            active
+                              ? "bg-primary/10 text-primary font-medium"
+                              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                          }`}
+                        >
+                          <Icon className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{item.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
+                </div>
+              ))}
+            </nav>
 
-                  {filteredProfiles.length === 0 ? (
-                    <div className="p-8 text-center">
-                      <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-muted-foreground">No users found</p>
+            <div className="p-3 mt-4 mx-2 mb-4">
+              <Button variant="ghost" size="sm" className="w-full justify-start text-xs" onClick={() => navigate("/")}>
+                <ArrowLeft className="w-3 h-3 mr-2" /> Back to Site
+              </Button>
+            </div>
+          </aside>
+
+          {/* Sidebar overlay for mobile */}
+          {sidebarOpen && (
+            <div className="fixed inset-0 bg-black/50 z-20 lg:hidden" onClick={() => setSidebarOpen(false)} />
+          )}
+
+          {/* ── Main content ── */}
+          <div className="flex-1 min-w-0">
+            {/* Mobile header */}
+            <div className="lg:hidden sticky top-20 z-10 bg-background border-b border-border px-4 py-3 flex items-center gap-3">
+              <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-lg bg-secondary text-foreground">
+                <Settings className="w-4 h-4" />
+              </button>
+              <div className="flex items-center gap-2">
+                {activeItem && <activeItem.icon className="w-4 h-4 text-primary" />}
+                <span className="font-display text-sm text-foreground">{activeItem?.label}</span>
+              </div>
+            </div>
+
+            <div className="p-4 md:p-6 lg:p-8 max-w-6xl">
+              <motion.div key={activeSection} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+
+                {/* ── LEADS & CRM ── */}
+                {activeSection === "leads" && <LeadsCustomersPanel />}
+
+                {/* ── USER ROLES ── */}
+                {activeSection === "users" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h1 className="text-2xl font-display text-foreground mb-1">USER ROLES</h1>
+                      <p className="text-sm text-muted-foreground">Assign admin, coach, and athlete roles.</p>
                     </div>
-                  ) : (
-                    <div className="divide-y divide-border max-h-[500px] overflow-y-auto">
-                      {filteredProfiles.map((profile) => {
-                        const roles = getUserRoles(profile.user_id);
-                        
-                        return (
-                          <div 
-                            key={profile.user_id}
-                            className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                                <span className="text-sm font-medium text-accent">
-                                  {profile.display_name?.charAt(0).toUpperCase() || '?'}
+
+                    {/* Stats row */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { label: "Admins", count: userRoles.filter((r) => r.role === "admin").length, color: "text-destructive" },
+                        { label: "Coaches", count: userRoles.filter((r) => r.role === "coach").length, color: "text-primary" },
+                        { label: "Athletes", count: userRoles.filter((r) => r.role === "athlete").length, color: "text-accent" },
+                      ].map((s) => (
+                        <div key={s.label} className="bg-card border border-border rounded-xl p-4">
+                          <span className={`text-sm ${s.color}`}>{s.label}</span>
+                          <p className="text-2xl font-display text-foreground">{s.count}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Search */}
+                    <div className="relative max-w-md">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        placeholder="Search users..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 pr-4 py-2 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground w-full text-sm"
+                      />
+                    </div>
+
+                    {/* List */}
+                    <div className="bg-card border border-border rounded-xl overflow-hidden">
+                      <div className="p-4 border-b border-border">
+                        <h2 className="text-sm font-display text-foreground">Users ({filteredProfiles.length})</h2>
+                      </div>
+                      <div className="divide-y divide-border max-h-[500px] overflow-y-auto">
+                        {filteredProfiles.map((profile) => (
+                          <div key={profile.user_id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center">
+                                <span className="text-xs font-medium text-accent">
+                                  {profile.display_name?.charAt(0).toUpperCase() || "?"}
                                 </span>
                               </div>
-                              <div>
-                                <p className="font-medium text-foreground">
-                                  {profile.display_name || 'Unknown'}
-                                </p>
-                                <p className="text-sm text-muted-foreground">{profile.email}</p>
-                              </div>
+                              <p className="text-sm font-medium text-foreground">{profile.display_name || "Unknown"}</p>
                             </div>
-
                             <div className="flex flex-wrap gap-2">
                               {ROLES.map((role) => {
                                 const active = hasRole(profile.user_id, role);
                                 const isUpdating = updatingRole === `${profile.user_id}-${role}`;
-                                const Icon = getRoleIcon(role);
-                                
                                 return (
                                   <button
                                     key={role}
                                     onClick={() => toggleRole(profile.user_id, role)}
                                     disabled={isUpdating}
-                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${getRoleColor(role, active)} ${active ? 'border' : 'border-transparent'}`}
+                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium border transition-all ${getRoleColor(role, active)} ${active ? "border" : "border-transparent"}`}
                                   >
-                                    {isUpdating ? (
-                                      <Loader2 className="w-3 h-3 animate-spin" />
-                                    ) : active ? (
-                                      <Check className="w-3 h-3" />
-                                    ) : (
-                                      <Plus className="w-3 h-3" />
-                                    )}
+                                    {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : active ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
                                     <span className="capitalize">{role}</span>
                                   </button>
                                 );
                               })}
                             </div>
                           </div>
-                        );
-                      })}
+                        ))}
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
-                {/* Help Text */}
-                <div className="bg-secondary/50 rounded-xl p-4 text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground mb-2">Role Permissions:</p>
-                  <ul className="space-y-1">
-                    <li><span className="text-red-600 font-medium">Admin</span> — Full access to manage users and roles</li>
-                    <li><span className="text-blue-600 font-medium">Coach</span> — View all athletes' check-ins and progress</li>
-                    <li><span className="text-green-600 font-medium">Athlete</span> — Standard user access (for tagging purposes)</li>
-                  </ul>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="team" className="mt-6">
-                <TeamWhitelistManager />
-              </TabsContent>
-
-              <TabsContent value="coach-invites" className="mt-6">
-                <CoachInviteManager />
-              </TabsContent>
-
-              <TabsContent value="assignments" className="mt-6">
-                <CoachAthleteAssignments />
-              </TabsContent>
-
-              <TabsContent value="tips" className="mt-6">
-                <WeeklyTipsManager />
-              </TabsContent>
-
-              <TabsContent value="certifications" className="mt-6">
-                <CertificationQuestionManager />
-              </TabsContent>
-
-              <TabsContent value="expirations" className="mt-6">
-                <CertificationExpirationManager />
-              </TabsContent>
-
-              <TabsContent value="videos" className="mt-6">
-                <CourseVideoManager />
-              </TabsContent>
-
-              <TabsContent value="broadcast" className="mt-6">
-                <BroadcastPanel userCount={profiles.length} />
-              </TabsContent>
-
-              <TabsContent value="analytics" className="mt-6">
-                <NotificationAnalytics />
-              </TabsContent>
-
-              <TabsContent value="audit" className="mt-6">
-                <AuditLogViewer />
-              </TabsContent>
-
-              <TabsContent value="retention" className="mt-6">
-                <DataRetentionPanel />
-              </TabsContent>
-
-              <TabsContent value="deletion" className="mt-6">
-                <DeletionRequestsManager />
-              </TabsContent>
-
-              <TabsContent value="gdpr" className="mt-6">
-                <GDPRComplianceDashboard />
-              </TabsContent>
-
-              <TabsContent value="health" className="mt-6">
-                <SystemHealthDashboard />
-              </TabsContent>
-
-              <TabsContent value="leads" className="mt-6">
-                <LeadsCustomersPanel />
-              </TabsContent>
-            </Tabs>
-          </motion.div>
+                {/* ── Other sections ── */}
+                {activeSection === "team" && <TeamWhitelistManager />}
+                {activeSection === "coach-invites" && <CoachInviteManager />}
+                {activeSection === "assignments" && <CoachAthleteAssignments />}
+                {activeSection === "tips" && <WeeklyTipsManager />}
+                {activeSection === "certifications" && <CertificationQuestionManager />}
+                {activeSection === "expirations" && <CertificationExpirationManager />}
+                {activeSection === "videos" && <CourseVideoManager />}
+                {activeSection === "broadcast" && <BroadcastPanel userCount={profiles.length} />}
+                {activeSection === "analytics" && <NotificationAnalytics />}
+                {activeSection === "audit" && <AuditLogViewer />}
+                {activeSection === "retention" && <DataRetentionPanel />}
+                {activeSection === "deletion" && <DeletionRequestsManager />}
+                {activeSection === "gdpr" && <GDPRComplianceDashboard />}
+                {activeSection === "health" && <SystemHealthDashboard />}
+              </motion.div>
+            </div>
+          </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };
