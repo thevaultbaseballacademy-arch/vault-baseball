@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachingMessenger from "@/components/coaching/CoachingMessenger";
+import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 import { formatDistanceToNow } from "date-fns";
 
 interface Session {
