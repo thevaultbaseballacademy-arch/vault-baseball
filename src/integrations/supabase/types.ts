@@ -1024,9 +1024,15 @@ export type Database = {
       }
       coaches: {
         Row: {
+          approved_by_admin: string | null
           created_at: string
           email: string
           id: string
+          is_bypass_certified: boolean
+          is_certified: boolean
+          is_marketplace_approved: boolean
+          is_staff: boolean
+          marketplace_status: string
           name: string
           org_id: string
           role: Database["public"]["Enums"]["coach_role"]
@@ -1036,9 +1042,15 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          approved_by_admin?: string | null
           created_at?: string
           email: string
           id?: string
+          is_bypass_certified?: boolean
+          is_certified?: boolean
+          is_marketplace_approved?: boolean
+          is_staff?: boolean
+          marketplace_status?: string
           name: string
           org_id: string
           role?: Database["public"]["Enums"]["coach_role"]
@@ -1048,9 +1060,15 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          approved_by_admin?: string | null
           created_at?: string
           email?: string
           id?: string
+          is_bypass_certified?: boolean
+          is_certified?: boolean
+          is_marketplace_approved?: boolean
+          is_staff?: boolean
+          marketplace_status?: string
           name?: string
           org_id?: string
           role?: Database["public"]["Enums"]["coach_role"]
