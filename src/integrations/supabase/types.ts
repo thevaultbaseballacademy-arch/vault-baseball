@@ -714,6 +714,77 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_marketplace_profiles: {
+        Row: {
+          avg_rating: number | null
+          bio: string | null
+          coach_id: string
+          coaching_background: string | null
+          created_at: string | null
+          hourly_rate_cents: number | null
+          id: string
+          is_marketplace_active: boolean | null
+          location: string | null
+          photo_url: string | null
+          playing_background: string | null
+          specialties: string[] | null
+          tagline: string | null
+          total_reviews: number | null
+          total_sessions: number | null
+          updated_at: string | null
+          user_id: string
+          years_experience: number | null
+        }
+        Insert: {
+          avg_rating?: number | null
+          bio?: string | null
+          coach_id: string
+          coaching_background?: string | null
+          created_at?: string | null
+          hourly_rate_cents?: number | null
+          id?: string
+          is_marketplace_active?: boolean | null
+          location?: string | null
+          photo_url?: string | null
+          playing_background?: string | null
+          specialties?: string[] | null
+          tagline?: string | null
+          total_reviews?: number | null
+          total_sessions?: number | null
+          updated_at?: string | null
+          user_id: string
+          years_experience?: number | null
+        }
+        Update: {
+          avg_rating?: number | null
+          bio?: string | null
+          coach_id?: string
+          coaching_background?: string | null
+          created_at?: string | null
+          hourly_rate_cents?: number | null
+          id?: string
+          is_marketplace_active?: boolean | null
+          location?: string | null
+          photo_url?: string | null
+          playing_background?: string | null
+          specialties?: string[] | null
+          tagline?: string | null
+          total_reviews?: number | null
+          total_sessions?: number | null
+          updated_at?: string | null
+          user_id?: string
+          years_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_marketplace_profiles_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: true
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_onboarding: {
         Row: {
           completed_at: string | null
@@ -855,6 +926,98 @@ export type Database = {
             columns: ["invite_token_id"]
             isOneToOne: false
             referencedRelation: "coach_invite_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_reviews: {
+        Row: {
+          athlete_user_id: string
+          booking_id: string
+          coach_id: string
+          created_at: string | null
+          id: string
+          rating: number
+          review_text: string | null
+        }
+        Insert: {
+          athlete_user_id: string
+          booking_id: string
+          coach_id: string
+          created_at?: string | null
+          id?: string
+          rating: number
+          review_text?: string | null
+        }
+        Update: {
+          athlete_user_id?: string
+          booking_id?: string
+          coach_id?: string
+          created_at?: string | null
+          id?: string
+          rating?: number
+          review_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_reviews_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_services: {
+        Row: {
+          coach_id: string
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          is_active: boolean | null
+          price_cents: number
+          service_type: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          price_cents: number
+          service_type: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          price_cents?: number
+          service_type?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_services_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
             referencedColumns: ["id"]
           },
         ]
@@ -1824,6 +1987,126 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      marketplace_bookings: {
+        Row: {
+          amount_cents: number
+          athlete_notes: string | null
+          athlete_user_id: string
+          coach_id: string
+          coach_notes: string | null
+          coach_payout_cents: number
+          created_at: string | null
+          id: string
+          notes: string | null
+          platform_fee_cents: number
+          recording_url: string | null
+          scheduled_at: string | null
+          service_id: string
+          status: string | null
+          updated_at: string | null
+          video_call_link: string | null
+        }
+        Insert: {
+          amount_cents: number
+          athlete_notes?: string | null
+          athlete_user_id: string
+          coach_id: string
+          coach_notes?: string | null
+          coach_payout_cents: number
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          platform_fee_cents: number
+          recording_url?: string | null
+          scheduled_at?: string | null
+          service_id: string
+          status?: string | null
+          updated_at?: string | null
+          video_call_link?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          athlete_notes?: string | null
+          athlete_user_id?: string
+          coach_id?: string
+          coach_notes?: string | null
+          coach_payout_cents?: number
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          platform_fee_cents?: number
+          recording_url?: string | null
+          scheduled_at?: string | null
+          service_id?: string
+          status?: string | null
+          updated_at?: string | null
+          video_call_link?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_bookings_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "coach_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_earnings: {
+        Row: {
+          booking_id: string
+          coach_amount_cents: number
+          coach_id: string
+          created_at: string | null
+          id: string
+          platform_fee_cents: number
+          status: string | null
+          total_amount_cents: number
+        }
+        Insert: {
+          booking_id: string
+          coach_amount_cents: number
+          coach_id: string
+          created_at?: string | null
+          id?: string
+          platform_fee_cents: number
+          status?: string | null
+          total_amount_cents: number
+        }
+        Update: {
+          booking_id?: string
+          coach_amount_cents?: number
+          coach_id?: string
+          created_at?: string | null
+          id?: string
+          platform_fee_cents?: number
+          status?: string | null
+          total_amount_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_earnings_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_earnings_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       metric_share_tokens: {
         Row: {
