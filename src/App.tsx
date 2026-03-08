@@ -89,6 +89,7 @@ import RemoteTrainingHub from "./pages/RemoteTrainingHub";
 import Marketplace from "./pages/Marketplace";
 import CoachMarketplaceProfile from "./pages/CoachMarketplaceProfile";
 import Claim22MAccess from "./pages/Claim22MAccess";
+import ShortRedirect from "./pages/ShortRedirect";
 
 const queryClient = new QueryClient();
 
@@ -227,6 +228,18 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
             <Route path="/claim-22m" element={<Claim22MAccess />} />
+            
+            {/* Short URL redirects for social sharing */}
+            <Route path="/app" element={<ShortRedirect />} />
+            <Route path="/training" element={<ShortRedirect />} />
+            <Route path="/start" element={<ShortRedirect />} />
+            <Route path="/22m" element={<ShortRedirect />} />
+            <Route path="/coaching" element={<ShortRedirect />} />
+            <Route path="/join" element={<ShortRedirect />} />
+            <Route path="/programs" element={<ShortRedirect />} />
+            <Route path="/velocity" element={<ShortRedirect />} />
+            <Route path="/founders" element={<ShortRedirect />} />
+            <Route path="/guide" element={<ShortRedirect />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
