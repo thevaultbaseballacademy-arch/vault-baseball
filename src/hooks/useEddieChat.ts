@@ -29,6 +29,8 @@ export const useEddieChat = () => {
 
     if (!resp.ok) {
       const errorData = await resp.json().catch(() => ({}));
+      if (resp.status === 429) throw new Error("Eddie is busy right now. Try again in a moment.");
+      if (resp.status === 402) throw new Error("AI service temporarily unavailable.");
       throw new Error(errorData.error || "Failed to connect to Eddie AI");
     }
 
@@ -64,6 +66,7 @@ export const useEddieChat = () => {
       }
     }
 
+    // Flush remaining buffer
     if (textBuffer.trim()) {
       for (let raw of textBuffer.split("\n")) {
         if (!raw) continue;
@@ -82,6 +85,11 @@ export const useEddieChat = () => {
 
     onDone();
   };
+
+  // Inject a message without triggering API (for greeting)
+  const injectMessage = useCallback((msg: Message) => {
+    setMessages(prev => [...prev, msg]);
+  }, []);
 
   const sendMessage = useCallback(async (input: string) => {
     if (!input.trim() || isLoading) return;
@@ -120,5 +128,5 @@ export const useEddieChat = () => {
     setError(null);
   }, []);
 
-  return { messages, isLoading, error, sendMessage, clearChat };
+  return { messages, isLoading, error, sendMessage, clearChat, injectMessage };
 };
