@@ -220,6 +220,7 @@ const App = () => (
             <Route path="/group-sessions" element={<GroupSessions />} />
             <Route path="/free-velocity-guide" element={<FreeVelocityGuide />} />
             <Route path="/athlete-onboarding" element={<AthleteOnboarding />} />
+            <Route path="/training-hub" element={<RemoteTrainingHub />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
