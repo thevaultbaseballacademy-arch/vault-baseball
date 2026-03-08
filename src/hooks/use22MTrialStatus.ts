@@ -19,7 +19,7 @@ export const use22MTrialStatus = (userId?: string) => {
     queryFn: async (): Promise<TrialStatus> => {
       if (!userId) return { has_trial: false };
 
-      const { data, error } = await supabase.rpc("get_athlete_trial_status", {
+      const { data, error } = await supabase.rpc("get_athlete_trial_status" as any, {
         p_user_id: userId,
       });
 
@@ -28,7 +28,7 @@ export const use22MTrialStatus = (userId?: string) => {
         return { has_trial: false };
       }
 
-      return data as TrialStatus;
+      return (data as unknown) as TrialStatus;
     },
     enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 minutes

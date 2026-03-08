@@ -215,7 +215,7 @@ const Admin22MTrialsPanel = () => {
                         </TableCell>
                         <TableCell>
                           {isConverted ? (
-                            <Badge className="bg-green-500/20 text-green-500">Converted</Badge>
+                            <Badge className="bg-primary/20 text-primary">Converted</Badge>
                           ) : isExpired ? (
                             <Badge variant="destructive">Expired</Badge>
                           ) : (
@@ -324,7 +324,7 @@ const Admin22MTrialsPanel = () => {
                       </TableCell>
                       <TableCell>
                         {invite.is_active ? (
-                          <Badge variant="default">Active</Badge>
+                          <Badge>Active</Badge>
                         ) : (
                           <Badge variant="secondary">Inactive</Badge>
                         )}

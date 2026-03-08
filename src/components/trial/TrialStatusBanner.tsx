@@ -73,7 +73,7 @@ const TrialStatusBanner = () => {
             <span className="font-medium">{trialLabel}</span>
             <span className="text-muted-foreground ml-2">
               {isUrgent ? (
-                <span className="text-amber-500 font-medium">
+                <span className="text-destructive font-medium">
                   Only {days_remaining} day{days_remaining !== 1 ? "s" : ""} left!
                 </span>
               ) : (
