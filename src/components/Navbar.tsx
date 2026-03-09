@@ -1,21 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, Loader2 } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight, Loader2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
+const OWNER_EMAILS = [
+  "emejia2291@gmail.com",
+  "jacki92brown@gmail.com",
+  "eddie@vaultbaseball.com",
+  "admin@vaultbaseball.com",
+];
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isCoach, setIsCoach] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+    setMobileExpanded(null);
+    setActiveDropdown(null);
+  }, [location.pathname]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -23,6 +41,7 @@ const Navbar = () => {
       setLoading(false);
       if (session?.user) {
         checkUserRoles(session.user.id);
+        checkOwner(session.user.email);
       }
     });
 
@@ -30,14 +49,20 @@ const Navbar = () => {
       setUser(session?.user ?? null);
       if (session?.user) {
         setTimeout(() => checkUserRoles(session.user.id), 0);
+        checkOwner(session.user.email);
       } else {
         setIsCoach(false);
         setIsAdmin(false);
+        setIsOwner(false);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkOwner = (email?: string | null) => {
+    setIsOwner(!!email && OWNER_EMAILS.includes(email.toLowerCase()));
+  };
 
   const checkUserRoles = async (userId: string) => {
     try {
@@ -60,21 +85,46 @@ const Navbar = () => {
     navigate("/");
   };
 
+  const handleNavigate = useCallback((href: string) => {
+    setIsOpen(false);
+    setActiveDropdown(null);
+    setMobileExpanded(null);
+    
+    if (href.startsWith("#") || href.includes("#")) {
+      if (href.startsWith("/#")) {
+        navigate("/");
+        setTimeout(() => {
+          const el = document.querySelector(href.replace("/", ""));
+          el?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      } else {
+        const el = document.querySelector(href);
+        el?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate(href);
+    }
+  }, [navigate]);
+
+  // Desktop dropdown handlers with debounced close
+  const handleMouseEnter = (name: string) => {
+    if (dropdownTimeout.current) {
+      clearTimeout(dropdownTimeout.current);
+      dropdownTimeout.current = null;
+    }
+    setActiveDropdown(name);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeout.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 150);
+  };
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Courses", href: "/courses" },
     { name: "Wall of Wins", href: "/wall-of-wins" },
-    { 
-      name: "The Framework", 
-      href: "/#pillars",
-      dropdown: [
-        { name: "Velocity", href: "/#pillars" },
-        { name: "Athleticism", href: "/#pillars" },
-        { name: "Utility", href: "/#pillars" },
-        { name: "Longevity", href: "/products/longevity" },
-        { name: "Transfer", href: "/products/transfer" },
-      ]
-    },
     { 
       name: "Products", 
       href: "/products",
@@ -92,22 +142,14 @@ const Navbar = () => {
       ]
     },
     { 
-      name: "Training Systems", 
+      name: "Training", 
       href: "/courses",
       dropdown: [
         { name: "Velocity System", href: "/courses" },
-        { name: "Athleticism Program", href: "/courses" },
-        { name: "Utility Development", href: "/courses" },
         { name: "Longevity Dashboard", href: "/longevity" },
         { name: "Weekly Calendar", href: "/calendar" },
-      ]
-    },
-    { 
-      name: "Pathways", 
-      href: "/pathway/youth",
-      dropdown: [
-        { name: "Youth (Ages 8-12)", href: "/pathway/youth" },
-        { name: "Academy (Ages 13-18)", href: "/pathway/academy" },
+        { name: "Youth (8-12)", href: "/pathway/youth" },
+        { name: "Academy (13-18)", href: "/pathway/academy" },
       ]
     },
     { 
@@ -117,12 +159,10 @@ const Navbar = () => {
         { name: "Coach Marketplace", href: "/marketplace" },
         { name: "Find a Coach", href: "/find-coach" },
         { name: "Lesson Packages", href: "/lesson-packages" },
-        { name: "Remote Lessons", href: "/remote-lessons" },
         { name: "Group Sessions", href: "/group-sessions" },
         { name: "Become a Coach", href: "/coach-register" },
       ]
     },
-    { name: "About", href: "#about" },
   ];
 
   return (
@@ -135,13 +175,13 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center">
+          <button onClick={() => handleNavigate("/")} className="flex items-center">
             <img 
               src={vaultLogo} 
               alt="The Vault Baseball Academy" 
               className="h-12 md:h-14 w-auto"
             />
-          </a>
+          </button>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
@@ -149,35 +189,37 @@ const Navbar = () => {
               <div
                 key={link.name}
                 className="relative"
-                onMouseEnter={() => link.dropdown && setActiveDropdown(link.name)}
-                onMouseLeave={() => setActiveDropdown(null)}
+                onMouseEnter={() => link.dropdown ? handleMouseEnter(link.name) : undefined}
+                onMouseLeave={handleMouseLeave}
               >
-                <a
-                  href={link.href}
-                  className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
+                <button
+                  onClick={() => handleNavigate(link.href)}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
                 >
                   {link.name}
-                  {link.dropdown && <ChevronDown className="w-4 h-4 ml-1" />}
-                </a>
+                  {link.dropdown && <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeDropdown === link.name ? "rotate-180" : ""}`} />}
+                </button>
                 
-                {/* Dropdown */}
+                {/* Desktop Dropdown */}
                 <AnimatePresence>
                   {link.dropdown && activeDropdown === link.name && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full left-0 mt-1 w-56 bg-card rounded-xl shadow-lg border border-border overflow-hidden"
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-1 w-56 bg-card rounded-xl shadow-xl border border-border overflow-hidden z-50"
+                      onMouseEnter={() => handleMouseEnter(link.name)}
+                      onMouseLeave={handleMouseLeave}
                     >
                       {link.dropdown.map((item) => (
-                        <a
+                        <button
                           key={item.name}
-                          href={item.href}
-                          className="block px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                          onClick={() => handleNavigate(item.href)}
+                          className="w-full text-left block px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                         >
                           {item.name}
-                        </a>
+                        </button>
                       ))}
                     </motion.div>
                   )}
@@ -190,65 +232,51 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-2">
             <Button 
               size="sm" 
-              onClick={() => navigate("/products/founders-access")}
-              className="mr-2 bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold"
+              onClick={() => handleNavigate("/products/founders-access")}
+              className="mr-1 bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold text-xs"
             >
-              🔥 $499 Lifetime - Limited Window
+              🔥 $499 Lifetime
             </Button>
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
-              <>
+              <div className="flex items-center gap-1">
                 <NotificationBell userId={user.id} />
-                {isAdmin && (
-                  <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
+                {isOwner && (
+                  <Button variant="ghost" size="sm" onClick={() => handleNavigate("/owner")} className="text-primary">
+                    <Crown className="w-4 h-4 mr-1" />
+                    Owner
+                  </Button>
+                )}
+                {isAdmin && !isOwner && (
+                  <Button variant="ghost" size="sm" onClick={() => handleNavigate("/admin")}>
                     Admin
                   </Button>
                 )}
                 {isCoach && (
-                  <>
-                    <Button variant="ghost" size="sm" onClick={() => navigate("/coach")}>
-                      Coach
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => navigate("/certifications")}>
-                      Certifications
-                    </Button>
-                  </>
+                  <Button variant="ghost" size="sm" onClick={() => handleNavigate("/coach")}>
+                    Coach
+                  </Button>
                 )}
-                <Button variant="ghost" size="sm" onClick={() => navigate("/vault")}>
-                  VAULT™
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+                <Button variant="ghost" size="sm" onClick={() => handleNavigate("/dashboard")}>
                   Dashboard
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/my-programs")}>
-                  My Programs
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>
-                  Community
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/checkin")}>
-                  Check-in
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/schedule")}>
-                  Schedule
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/account")}>
+                <Button variant="ghost" size="sm" onClick={() => handleNavigate("/account")}>
                   Account
                 </Button>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   Sign Out
                 </Button>
-              </>
+              </div>
             ) : (
-              <>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => handleNavigate("/auth")}>
                   Log In
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
+                <Button variant="outline" size="sm" onClick={() => handleNavigate("/auth")}>
                   Join Vault
                 </Button>
-              </>
+              </div>
             )}
           </div>
 
@@ -268,92 +296,106 @@ const Navbar = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden py-4 border-t border-border overflow-hidden"
+              transition={{ duration: 0.2 }}
+              className="lg:hidden border-t border-border overflow-hidden max-h-[80vh] overflow-y-auto"
             >
-              <div className="flex flex-col gap-1">
+              <div className="py-3 flex flex-col gap-0.5">
                 {navLinks.map((link) => (
                   <div key={link.name}>
-                    <a
-                      href={link.href}
-                      className="flex items-center justify-between px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors rounded-lg font-medium"
-                      onClick={() => !link.dropdown && setIsOpen(false)}
+                    <button
+                      onClick={() => {
+                        if (link.dropdown) {
+                          setMobileExpanded(mobileExpanded === link.name ? null : link.name);
+                        } else {
+                          handleNavigate(link.href);
+                        }
+                      }}
+                      className="w-full flex items-center justify-between px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors rounded-lg font-medium"
                     >
-                      <span className="flex items-center gap-2">
-                        {link.name}
-                      </span>
-                      {link.dropdown && <ChevronDown className="w-4 h-4" />}
-                    </a>
-                    {link.dropdown && (
-                      <div className="ml-4 border-l border-border">
-                        {link.dropdown.map((item) => (
-                          <a
-                            key={item.name}
-                            href={item.href}
-                            className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {item.name}
-                          </a>
-                        ))}
-                      </div>
-                    )}
+                      <span>{link.name}</span>
+                      {link.dropdown && (
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileExpanded === link.name ? "rotate-180" : ""}`} />
+                      )}
+                    </button>
+                    
+                    {/* Mobile Sub-menu */}
+                    <AnimatePresence>
+                      {link.dropdown && mobileExpanded === link.name && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.15 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="ml-4 pl-3 border-l-2 border-primary/30 mb-2">
+                            {link.dropdown.map((item) => (
+                              <button
+                                key={item.name}
+                                onClick={() => handleNavigate(item.href)}
+                                className="w-full text-left block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-lg transition-colors"
+                              >
+                                {item.name}
+                              </button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 ))}
-                <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border">
+
+                {/* Mobile Auth/User Section */}
+                <div className="flex flex-col gap-1.5 pt-3 mt-2 border-t border-border px-2">
                   <Button 
                     className="justify-center bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold" 
-                    onClick={() => { navigate("/products/founders-access"); setIsOpen(false); }}
+                    onClick={() => handleNavigate("/products/founders-access")}
                   >
                     🔥 $499 Lifetime - Limited Window
                   </Button>
                   {user ? (
                     <>
-                      {isAdmin && (
-                        <Button variant="ghost" className="justify-center" onClick={() => { navigate("/admin"); setIsOpen(false); }}>
+                      {isOwner && (
+                        <Button variant="ghost" className="justify-center text-primary" onClick={() => handleNavigate("/owner")}>
+                          <Crown className="w-4 h-4 mr-2" />
+                          Owner Command Center
+                        </Button>
+                      )}
+                      {isAdmin && !isOwner && (
+                        <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/admin")}>
                           Admin
                         </Button>
                       )}
                       {isCoach && (
-                        <>
-                          <Button variant="ghost" className="justify-center" onClick={() => { navigate("/coach"); setIsOpen(false); }}>
-                            Coach
-                          </Button>
-                          <Button variant="ghost" className="justify-center" onClick={() => { navigate("/certifications"); setIsOpen(false); }}>
-                            Certifications
-                          </Button>
-                        </>
+                        <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/coach")}>
+                          Coach Dashboard
+                        </Button>
                       )}
-                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
+                      <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/dashboard")}>
                         Dashboard
                       </Button>
-                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/my-programs"); setIsOpen(false); }}>
-                        My Programs
+                      <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/vault")}>
+                        VAULT™
                       </Button>
-                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/community"); setIsOpen(false); }}>
+                      <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/community")}>
                         Community
                       </Button>
-                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/checkin"); setIsOpen(false); }}>
-                        Check-in
-                      </Button>
-                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/schedule"); setIsOpen(false); }}>
-                        Schedule
-                      </Button>
-                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/account"); setIsOpen(false); }}>
+                      <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/account")}>
                         Account
                       </Button>
-                      <Button variant="ghost" className="justify-center" onClick={handleSignOut}>
+                      <Button variant="outline" className="justify-center" onClick={handleSignOut}>
                         Sign Out
                       </Button>
                     </>
                   ) : (
-                    <>
-                      <Button variant="ghost" className="justify-center" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" className="flex-1 justify-center" onClick={() => handleNavigate("/auth")}>
                         Log In
                       </Button>
-                      <Button variant="outline" className="justify-center" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                      <Button variant="vault" className="flex-1 justify-center" onClick={() => handleNavigate("/auth")}>
                         Join Vault
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
