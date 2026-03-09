@@ -71,15 +71,8 @@ function validateExamSubmission(body: unknown): { valid: boolean; error?: string
     return { valid: false, error: `certType must be one of: ${VALID_CERT_TYPES.join(", ")}` };
   }
 
-  // Validate passingScore
-  if (typeof b.passingScore !== "number" || b.passingScore < 0 || b.passingScore > 100) {
-    return { valid: false, error: "passingScore must be a number between 0 and 100" };
-  }
-
-  // Validate validityMonths
-  if (typeof b.validityMonths !== "number" || !Number.isInteger(b.validityMonths) || b.validityMonths < 1 || b.validityMonths > 120) {
-    return { valid: false, error: "validityMonths must be an integer between 1 and 120" };
-  }
+  // passingScore and validityMonths are now looked up server-side from certification_definitions
+  // Client-supplied values are ignored
 
   // Validate certificationName
   if (typeof b.certificationName !== "string" || b.certificationName.length === 0 || b.certificationName.length > 200) {
