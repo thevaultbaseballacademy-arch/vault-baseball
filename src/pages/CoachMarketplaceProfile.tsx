@@ -62,6 +62,14 @@ const CoachMarketplaceProfile = () => {
 
   const handleBook = async () => {
     if (!bookingService || !bookingDate || !bookingTime) return;
+
+    // Check authentication first
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
     const scheduledAt = new Date(`${bookingDate}T${bookingTime}`).toISOString();
     await createBooking.mutateAsync({
       coach_id: coachId!,
