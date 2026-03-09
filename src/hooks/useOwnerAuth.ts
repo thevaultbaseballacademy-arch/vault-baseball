@@ -2,14 +2,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 
-// Define owner emails - these users have full platform access
-const OWNER_EMAILS = [
-  "emejia2291@gmail.com",
-  "jacki92brown@gmail.com",
-  "eddie@vaultbaseball.com",
-  "admin@vaultbaseball.com",
-];
-
 interface OwnerAuthState {
   user: User | null;
   isOwner: boolean;
@@ -41,9 +33,6 @@ export const useOwnerAuth = () => {
           return;
         }
 
-        // Check if user email is in owner list
-        const isOwnerByEmail = user.email && OWNER_EMAILS.includes(user.email.toLowerCase());
-
         // Check if user has admin role in user_roles table
         const { data: userRoles } = await supabase
           .from("user_roles")
@@ -52,8 +41,9 @@ export const useOwnerAuth = () => {
 
         const hasAdminRole = userRoles?.some((r) => r.role === "admin");
 
-        // Check team whitelist for admin access
+        // Check team whitelist for owner/admin access (server-side source of truth)
         let hasTeamOwnerAccess = false;
+        let hasTeamAdminAccess = false;
         if (user.email) {
           const { data: teamData } = await supabase
             .from("team_whitelist")
@@ -63,6 +53,7 @@ export const useOwnerAuth = () => {
           
           // Owner access requires both admin_access and full_access
           hasTeamOwnerAccess = (teamData?.admin_access && teamData?.full_access) ?? false;
+          hasTeamAdminAccess = teamData?.admin_access ?? false;
         }
 
         // Get profile data
@@ -72,8 +63,8 @@ export const useOwnerAuth = () => {
           .eq("user_id", user.id)
           .single();
 
-        const isOwner = isOwnerByEmail || hasTeamOwnerAccess;
-        const isAdmin = hasAdminRole || isOwner;
+        const isOwner = hasTeamOwnerAccess;
+        const isAdmin = hasAdminRole || isOwner || hasTeamAdminAccess;
 
         setState({
           user,
