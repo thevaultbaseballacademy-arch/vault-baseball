@@ -772,9 +772,9 @@ const CourseCard = ({ course, index, isEnrolled, enrollment, onEnroll, isEnrolli
         <div className="flex gap-2">
           {!isLoggedIn ? (
             <Button variant="vault" size="sm" className="flex-1 bg-amber-500 hover:bg-amber-600 text-[#181818]" asChild>
-              <Link to="/trial">
+              <Link to="/auth">
                 <Lock className="w-3 h-3 mr-1" />
-                Unlock Module
+                Sign In to Enroll
               </Link>
             </Button>
           ) : isEnrolled ? (
