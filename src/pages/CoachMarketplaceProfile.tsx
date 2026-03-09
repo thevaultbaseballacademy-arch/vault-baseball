@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -62,6 +63,14 @@ const CoachMarketplaceProfile = () => {
 
   const handleBook = async () => {
     if (!bookingService || !bookingDate || !bookingTime) return;
+
+    // Check authentication first
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
     const scheduledAt = new Date(`${bookingDate}T${bookingTime}`).toISOString();
     await createBooking.mutateAsync({
       coach_id: coachId!,
