@@ -150,10 +150,28 @@ serve(async (req) => {
       );
     }
 
-    const { attemptId, answers, questionIds, certType, passingScore, validityMonths, certificationName, coachId, orgId } = validation.submission!;
+    const { attemptId, answers, questionIds, certType, certificationName, coachId, orgId } = validation.submission!;
 
     // Use service role client for grading (access to correct answers)
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Look up passingScore and validityMonths from certification_definitions (server-side source of truth)
+    const { data: certDef, error: certDefError } = await supabaseAdmin
+      .from('certification_definitions')
+      .select('passing_score, validity_months')
+      .eq('certification_type', certType)
+      .single();
+
+    if (certDefError || !certDef) {
+      console.error('Error fetching certification definition:', certDefError);
+      return new Response(
+        JSON.stringify({ error: "Invalid certification type" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const passingScore = certDef.passing_score;
+    const validityMonths = certDef.validity_months;
 
     // Fetch questions with correct answers
     const { data: questions, error: questionsError } = await supabaseAdmin
