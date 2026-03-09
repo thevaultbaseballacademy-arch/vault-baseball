@@ -51,8 +51,8 @@ const LessonPackages = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: pkg.stripe_price_id, mode: 'payment' },
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { priceId: pkg.stripe_price_id },
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
 

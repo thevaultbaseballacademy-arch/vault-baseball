@@ -33,6 +33,9 @@ const VALID_PAYMENT_PRICE_IDS = [
   'price_1SqNiiPhXS410TO51M25fyJR', // org_starter_pack
   'price_1StVz1PhXS410TO5hktrpoe1', // performance_blueprint
   'price_1SqNikPhXS410TO5rLuqRrBn', // founders_access
+  // Lesson Packages
+  'price_1T1LZOPhXS410TO5lhAYrmKO', // 8-lesson pack $349
+  'price_1T1LZNPhXS410TO5u5o2Szl4', // 4-lesson pack $199
 ];
 
 const logStep = (step: string, details?: Record<string, unknown>) => {
