@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,46 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    // Verify admin access using service role for internal calls or auth header for user calls
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const cronSecret = Deno.env.get("CRON_SECRET");
-    
-    const { email, name, internal_secret } = await req.json();
-
-    // Allow internal calls with CRON_SECRET, otherwise verify user auth
-    if (internal_secret && internal_secret === cronSecret) {
-      // Authorized internal call
-    } else {
-      const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-      const authHeader = req.headers.get("Authorization");
-      const supabase = createClient(supabaseUrl, supabaseKey, {
-        global: { headers: { Authorization: authHeader || "" } },
-      });
-
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      // Check admin access via team_whitelist using service role
-      const adminClient = createClient(supabaseUrl, serviceRoleKey);
-      const { data: access } = await adminClient
-        .from("team_whitelist")
-        .select("admin_access")
-        .eq("email", user.email)
-        .maybeSingle();
-
-      if (!access?.admin_access) {
-        return new Response(JSON.stringify({ error: "Admin access required" }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-    }
+    const { email, name } = await req.json();
     if (!email) {
       return new Response(JSON.stringify({ error: "Email is required" }), {
         status: 400,
