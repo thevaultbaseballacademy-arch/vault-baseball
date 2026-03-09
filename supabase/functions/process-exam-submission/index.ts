@@ -16,8 +16,6 @@ interface ExamSubmission {
   answers: Record<string, number>;
   questionIds: string[];
   certType: string;
-  passingScore: number;
-  validityMonths: number;
   certificationName: string;
   coachId?: string;
   orgId?: string;
@@ -71,15 +69,8 @@ function validateExamSubmission(body: unknown): { valid: boolean; error?: string
     return { valid: false, error: `certType must be one of: ${VALID_CERT_TYPES.join(", ")}` };
   }
 
-  // Validate passingScore
-  if (typeof b.passingScore !== "number" || b.passingScore < 0 || b.passingScore > 100) {
-    return { valid: false, error: "passingScore must be a number between 0 and 100" };
-  }
-
-  // Validate validityMonths
-  if (typeof b.validityMonths !== "number" || !Number.isInteger(b.validityMonths) || b.validityMonths < 1 || b.validityMonths > 120) {
-    return { valid: false, error: "validityMonths must be an integer between 1 and 120" };
-  }
+  // passingScore and validityMonths are now looked up server-side from certification_definitions
+  // Client-supplied values are ignored
 
   // Validate certificationName
   if (typeof b.certificationName !== "string" || b.certificationName.length === 0 || b.certificationName.length > 200) {
@@ -103,8 +94,6 @@ function validateExamSubmission(body: unknown): { valid: boolean; error?: string
       answers,
       questionIds: b.questionIds as string[],
       certType: b.certType,
-      passingScore: b.passingScore,
-      validityMonths: b.validityMonths,
       certificationName: b.certificationName,
       coachId: b.coachId as string | undefined,
       orgId: b.orgId as string | undefined,
@@ -161,10 +150,28 @@ serve(async (req) => {
       );
     }
 
-    const { attemptId, answers, questionIds, certType, passingScore, validityMonths, certificationName, coachId, orgId } = validation.submission!;
+    const { attemptId, answers, questionIds, certType, certificationName, coachId, orgId } = validation.submission!;
 
     // Use service role client for grading (access to correct answers)
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Look up passingScore and validityMonths from certification_definitions (server-side source of truth)
+    const { data: certDef, error: certDefError } = await supabaseAdmin
+      .from('certification_definitions')
+      .select('passing_score, validity_months')
+      .eq('certification_type', certType)
+      .single();
+
+    if (certDefError || !certDef) {
+      console.error('Error fetching certification definition:', certDefError);
+      return new Response(
+        JSON.stringify({ error: "Invalid certification type" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const passingScore = certDef.passing_score;
+    const validityMonths = certDef.validity_months;
 
     // Fetch questions with correct answers
     const { data: questions, error: questionsError } = await supabaseAdmin

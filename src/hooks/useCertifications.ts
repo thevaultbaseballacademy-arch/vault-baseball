@@ -193,31 +193,25 @@ export const useSubmitExam = () => {
       questions,
       certType,
       certificationName,
-      passingScore,
-      validityMonths 
     }: { 
       attemptId: string; 
       answers: Record<string, number>;
       questions: ExamQuestion[];
       certType: CertificationType;
       certificationName: string;
-      passingScore: number;
-      validityMonths: number;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       const questionIds = questions.map(q => q.id);
 
-      // Call edge function for secure grading
+      // Call edge function for secure grading (passingScore/validityMonths looked up server-side)
       const { data, error } = await supabase.functions.invoke('process-exam-submission', {
         body: {
           attemptId,
           answers,
           questionIds,
           certType,
-          passingScore,
-          validityMonths,
           certificationName,
         },
       });
