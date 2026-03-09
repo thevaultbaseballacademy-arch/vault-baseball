@@ -94,8 +94,6 @@ function validateExamSubmission(body: unknown): { valid: boolean; error?: string
       answers,
       questionIds: b.questionIds as string[],
       certType: b.certType,
-      passingScore: b.passingScore,
-      validityMonths: b.validityMonths,
       certificationName: b.certificationName,
       coachId: b.coachId as string | undefined,
       orgId: b.orgId as string | undefined,
