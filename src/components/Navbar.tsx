@@ -54,8 +54,21 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkOwner = (email?: string | null) => {
-    setIsOwner(!!email && OWNER_EMAILS.includes(email.toLowerCase()));
+  const checkOwner = async (email?: string | null) => {
+    if (!email) {
+      setIsOwner(false);
+      return;
+    }
+    try {
+      const { data } = await supabase
+        .from("team_whitelist")
+        .select("admin_access, full_access")
+        .eq("email", email.toLowerCase())
+        .maybeSingle();
+      setIsOwner(!!(data?.admin_access && data?.full_access));
+    } catch {
+      setIsOwner(false);
+    }
   };
 
   const checkUserRoles = async (userId: string) => {
