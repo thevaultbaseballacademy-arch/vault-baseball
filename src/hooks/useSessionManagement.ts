@@ -5,9 +5,8 @@ import { useToast } from "@/hooks/use-toast";
 interface UserSession {
   id: string;
   user_id: string;
-  session_token: string;
   device_info: string | null;
-  ip_address_masked: string | null; // IP is masked for privacy (e.g., 192.168.1.xxx)
+  ip_address_masked: string | null;
   user_agent: string | null;
   browser: string | null;
   os: string | null;
@@ -83,10 +82,10 @@ export const useSessionManagement = () => {
 
       if (error) throw error;
 
-      // Mark current session
-      const sessionsWithCurrent = (data || []).map(s => ({
+      // Mark current session (session_token no longer exposed in view for security)
+      const sessionsWithCurrent = (data || []).map((s: any) => ({
         ...s,
-        is_current: s.session_token === token
+        is_current: s.is_current || false
       }));
 
       setSessions(sessionsWithCurrent);
