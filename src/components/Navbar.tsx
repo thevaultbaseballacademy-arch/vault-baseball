@@ -8,12 +8,6 @@ import { User } from "@supabase/supabase-js";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
-const OWNER_EMAILS = [
-  "emejia2291@gmail.com",
-  "jacki92brown@gmail.com",
-  "eddie@vaultbaseball.com",
-  "admin@vaultbaseball.com",
-];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
