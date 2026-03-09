@@ -50,9 +50,9 @@ const SessionManagement = () => {
     return Monitor;
   };
 
-  const handleRevoke = async (sessionId: string, sessionToken: string) => {
+  const handleRevoke = async (sessionId: string) => {
     setRevokingId(sessionId);
-    await revokeSession(sessionId, sessionToken);
+    await revokeSession(sessionId);
     setRevokingId(null);
   };
 

@@ -126,17 +126,8 @@ export const useSessionManagement = () => {
     }
   }, []);
 
-  const revokeSession = async (sessionId: string, sessionToken: string) => {
+  const revokeSession = async (sessionId: string) => {
     try {
-      // Can't revoke current session
-      if (sessionToken === currentSessionToken) {
-        toast({
-          title: "Cannot revoke",
-          description: "You cannot revoke your current session. Use sign out instead.",
-          variant: "destructive",
-        });
-        return false;
-      }
 
       // Delete the session record
       const { error } = await supabase
