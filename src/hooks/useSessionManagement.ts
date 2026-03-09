@@ -181,8 +181,8 @@ export const useSessionManagement = () => {
 
       if (error) throw error;
 
-      // Update local state
-      setSessions(sessions.filter(s => s.session_token === token));
+      // Update local state - keep only current session
+      setSessions(sessions.filter(s => s.is_current));
 
       toast({
         title: "All other sessions revoked",
