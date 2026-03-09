@@ -3225,7 +3225,6 @@ export type Database = {
           last_active_at: string | null
           location: string | null
           os: string | null
-          session_token: string | null
           user_agent: string | null
           user_id: string | null
         }
@@ -3239,7 +3238,6 @@ export type Database = {
           last_active_at?: string | null
           location?: never
           os?: string | null
-          session_token?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
@@ -3253,7 +3251,6 @@ export type Database = {
           last_active_at?: string | null
           location?: never
           os?: string | null
-          session_token?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
