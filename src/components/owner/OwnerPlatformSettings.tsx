@@ -48,7 +48,7 @@ export const OwnerPlatformSettings = () => {
           { name: "highlight-videos", isPublic: false },
           { name: "community-media", isPublic: false },
           { name: "analysis-videos", isPublic: false },
-          { name: "coach-applications", isPublic: true },
+          { name: "coach-applications", isPublic: false },
         ],
       };
     },

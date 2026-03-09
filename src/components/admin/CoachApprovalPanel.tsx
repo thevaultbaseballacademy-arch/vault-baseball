@@ -397,14 +397,14 @@ const CoachApprovalPanel = () => {
                     <TableCell>
                       <div className="flex gap-1.5">
                         {(req as any).resume_url && (
-                          <a href={(req as any).resume_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                          <button onClick={async (e) => { e.stopPropagation(); const { data } = await supabase.storage.from('coach-applications').createSignedUrl((req as any).resume_url, 3600); if (data?.signedUrl) window.open(data.signedUrl, '_blank'); }}>
                             <FileText className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-                          </a>
+                          </button>
                         )}
                         {(req as any).video_sample_url && (
-                          <a href={(req as any).video_sample_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                          <button onClick={async (e) => { e.stopPropagation(); const { data } = await supabase.storage.from('coach-applications').createSignedUrl((req as any).video_sample_url, 3600); if (data?.signedUrl) window.open(data.signedUrl, '_blank'); }}>
                             <Video className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-                          </a>
+                          </button>
                         )}
                         {!(req as any).resume_url && !(req as any).video_sample_url && (
                           <span className="text-xs text-muted-foreground">—</span>
@@ -486,16 +486,16 @@ const CoachApprovalPanel = () => {
               {/* Materials */}
               <div className="flex gap-3">
                 {(detailRequest as any).resume_url && (
-                  <a href={(detailRequest as any).resume_url} target="_blank" rel="noopener noreferrer"
+                  <button onClick={async () => { const { data } = await supabase.storage.from('coach-applications').createSignedUrl((detailRequest as any).resume_url, 3600); if (data?.signedUrl) window.open(data.signedUrl, '_blank'); }}
                     className="flex items-center gap-2 px-3 py-2 border border-border text-sm text-foreground hover:bg-muted transition-colors">
                     <FileText className="w-4 h-4" /> View Resume <ExternalLink className="w-3 h-3" />
-                  </a>
+                  </button>
                 )}
                 {(detailRequest as any).video_sample_url && (
-                  <a href={(detailRequest as any).video_sample_url} target="_blank" rel="noopener noreferrer"
+                  <button onClick={async () => { const { data } = await supabase.storage.from('coach-applications').createSignedUrl((detailRequest as any).video_sample_url, 3600); if (data?.signedUrl) window.open(data.signedUrl, '_blank'); }}
                     className="flex items-center gap-2 px-3 py-2 border border-border text-sm text-foreground hover:bg-muted transition-colors">
                     <Video className="w-4 h-4" /> View Video <ExternalLink className="w-3 h-3" />
-                  </a>
+                  </button>
                 )}
               </div>
 
