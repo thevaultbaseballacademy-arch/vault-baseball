@@ -359,7 +359,7 @@ const OwnerCommandCenter = () => {
                       <h1 className="text-2xl font-display text-foreground mb-1">BROADCAST CENTER</h1>
                       <p className="text-sm text-muted-foreground">Send notifications to users.</p>
                     </div>
-                    <BroadcastPanel />
+                    <BroadcastPanel userCount={0} />
                   </div>
                 )}
                 {activeSection === "analytics" && (

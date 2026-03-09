@@ -91,6 +91,7 @@ import CoachMarketplaceProfile from "./pages/CoachMarketplaceProfile";
 import Claim22MAccess from "./pages/Claim22MAccess";
 import ShortRedirect from "./pages/ShortRedirect";
 import CoachManagement from "./pages/CoachManagement";
+import OwnerCommandCenter from "./pages/OwnerCommandCenter";
 
 const queryClient = new QueryClient();
 
@@ -123,6 +124,7 @@ const App = () => (
               </TrialProtectedRoute>
             } />
             <Route path="/coach" element={<CoachDashboard />} />
+            <Route path="/owner" element={<OwnerCommandCenter />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/certification-analytics" element={<CertificationAnalytics />} />
             <Route path="/admin/coaches" element={<AdminCoaches />} />
