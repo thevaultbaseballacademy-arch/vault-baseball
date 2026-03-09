@@ -81,19 +81,13 @@ const CoachRegister = () => {
       if (reqData) setExistingRequest(reqData);
 
       if (inviteToken) {
-        const { data: tokenData } = await supabase
-          .from("coach_invite_tokens")
-          .select("*")
-          .eq("token", inviteToken)
-          .eq("is_active", true)
-          .maybeSingle();
-
-        if (tokenData && tokenData.used_count! < (tokenData.max_uses || 999)) {
-          const notExpired = !tokenData.expires_at || new Date(tokenData.expires_at) > new Date();
-          setInviteValid(notExpired);
-          if (notExpired) setInviteTokenId(tokenData.id);
-        } else {
-          setInviteValid(false);
+        const { data: isValid } = await supabase.rpc("validate_coach_invite_token", { p_token: inviteToken });
+        setInviteValid(!!isValid);
+        // If valid, we need the token ID for the registration - get it via admin-only query
+        // The form submission will re-validate server-side
+        if (isValid) {
+          // Store the token string; the server will resolve the ID
+          setInviteTokenId(inviteToken);
         }
       }
 
