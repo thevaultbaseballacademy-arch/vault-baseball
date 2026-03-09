@@ -81,12 +81,9 @@ const CoachRegister = () => {
       if (reqData) setExistingRequest(reqData);
 
       if (inviteToken) {
-        const { data: isValid } = await supabase.rpc("validate_coach_invite_token", { p_token: inviteToken });
+        const { data: isValid } = await (supabase.rpc as any)("validate_coach_invite_token", { p_token: inviteToken });
         setInviteValid(!!isValid);
-        // If valid, we need the token ID for the registration - get it via admin-only query
-        // The form submission will re-validate server-side
         if (isValid) {
-          // Store the token string; the server will resolve the ID
           setInviteTokenId(inviteToken);
         }
       }

@@ -81,13 +81,14 @@ export const useValidate22MToken = (token: string | null) => {
     queryFn: async () => {
       if (!token) return null;
 
-      const { data, error } = await supabase.rpc("validate_athlete_invite_token", { p_token: token });
+      const { data, error } = await (supabase.rpc as any)("validate_athlete_invite_token", { p_token: token });
 
       if (error) throw error;
 
-      if (!data || !data.valid) return null;
+      const result = data as { valid: boolean; token_id: string } | null;
+      if (!result || !result.valid) return null;
 
-      return { id: data.token_id, token, is_active: true };
+      return { id: result.token_id, token, is_active: true, label: null };
     },
     enabled: !!token,
   });
