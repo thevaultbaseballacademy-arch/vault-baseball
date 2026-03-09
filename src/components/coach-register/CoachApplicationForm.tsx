@@ -67,8 +67,8 @@ const CoachApplicationForm = ({
       console.error("Upload error:", error);
       return null;
     }
-    const { data } = supabase.storage.from("coach-applications").getPublicUrl(path);
-    return data.publicUrl;
+    // Store the path only - admins will use signed URLs to access
+    return path;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

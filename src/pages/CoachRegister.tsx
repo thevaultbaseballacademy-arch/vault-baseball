@@ -81,19 +81,10 @@ const CoachRegister = () => {
       if (reqData) setExistingRequest(reqData);
 
       if (inviteToken) {
-        const { data: tokenData } = await supabase
-          .from("coach_invite_tokens")
-          .select("*")
-          .eq("token", inviteToken)
-          .eq("is_active", true)
-          .maybeSingle();
-
-        if (tokenData && tokenData.used_count! < (tokenData.max_uses || 999)) {
-          const notExpired = !tokenData.expires_at || new Date(tokenData.expires_at) > new Date();
-          setInviteValid(notExpired);
-          if (notExpired) setInviteTokenId(tokenData.id);
-        } else {
-          setInviteValid(false);
+        const { data: isValid } = await (supabase.rpc as any)("validate_coach_invite_token", { p_token: inviteToken });
+        setInviteValid(!!isValid);
+        if (isValid) {
+          setInviteTokenId(inviteToken);
         }
       }
 

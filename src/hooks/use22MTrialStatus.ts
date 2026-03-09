@@ -81,24 +81,14 @@ export const useValidate22MToken = (token: string | null) => {
     queryFn: async () => {
       if (!token) return null;
 
-      const { data, error } = await supabase
-        .from("athlete_22m_invite_tokens")
-        .select("*")
-        .eq("token", token)
-        .eq("is_active", true)
-        .maybeSingle();
+      const { data, error } = await (supabase.rpc as any)("validate_athlete_invite_token", { p_token: token });
 
       if (error) throw error;
 
-      if (!data) return null;
+      const result = data as { valid: boolean; token_id: string } | null;
+      if (!result || !result.valid) return null;
 
-      // Check if token is valid
-      const notExpired = !data.expires_at || new Date(data.expires_at) > new Date();
-      const hasUses = (data.used_count ?? 0) < (data.max_uses ?? 999);
-
-      if (!notExpired || !hasUses) return null;
-
-      return data;
+      return { id: result.token_id, token, is_active: true, label: null };
     },
     enabled: !!token,
   });

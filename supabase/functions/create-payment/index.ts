@@ -208,8 +208,7 @@ serve(async (req) => {
     
     return new Response(JSON.stringify({ 
       error: "An error occurred during checkout. Please try again.",
-      code: "CHECKOUT_ERROR",
-      details: errorMessage
+      code: "CHECKOUT_ERROR"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

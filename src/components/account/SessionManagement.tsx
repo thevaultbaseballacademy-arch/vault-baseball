@@ -50,9 +50,9 @@ const SessionManagement = () => {
     return Monitor;
   };
 
-  const handleRevoke = async (sessionId: string, sessionToken: string) => {
+  const handleRevoke = async (sessionId: string) => {
     setRevokingId(sessionId);
-    await revokeSession(sessionId, sessionToken);
+    await revokeSession(sessionId);
     setRevokingId(null);
   };
 
@@ -175,7 +175,7 @@ const SessionManagement = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleRevoke(session.id, session.session_token)}
+                        onClick={() => handleRevoke(session.id)}
                         disabled={isRevoking}
                         className="text-destructive hover:text-destructive shrink-0"
                       >
