@@ -16,8 +16,6 @@ interface ExamSubmission {
   answers: Record<string, number>;
   questionIds: string[];
   certType: string;
-  passingScore: number;
-  validityMonths: number;
   certificationName: string;
   coachId?: string;
   orgId?: string;
