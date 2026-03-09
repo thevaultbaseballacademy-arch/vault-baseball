@@ -8,12 +8,6 @@ import { User } from "@supabase/supabase-js";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
-const OWNER_EMAILS = [
-  "emejia2291@gmail.com",
-  "jacki92brown@gmail.com",
-  "eddie@vaultbaseball.com",
-  "admin@vaultbaseball.com",
-];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,8 +54,21 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkOwner = (email?: string | null) => {
-    setIsOwner(!!email && OWNER_EMAILS.includes(email.toLowerCase()));
+  const checkOwner = async (email?: string | null) => {
+    if (!email) {
+      setIsOwner(false);
+      return;
+    }
+    try {
+      const { data } = await supabase
+        .from("team_whitelist")
+        .select("admin_access, full_access")
+        .eq("email", email.toLowerCase())
+        .maybeSingle();
+      setIsOwner(!!(data?.admin_access && data?.full_access));
+    } catch {
+      setIsOwner(false);
+    }
   };
 
   const checkUserRoles = async (userId: string) => {
