@@ -4,9 +4,10 @@ import { User } from "@supabase/supabase-js";
 
 // Define owner emails - these users have full platform access
 const OWNER_EMAILS = [
+  "emejia2291@gmail.com",
+  "jacki92brown@gmail.com",
   "eddie@vaultbaseball.com",
   "admin@vaultbaseball.com",
-  // Add other owner emails here
 ];
 
 interface OwnerAuthState {
