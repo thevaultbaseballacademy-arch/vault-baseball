@@ -3277,7 +3277,6 @@ export type Database = {
               p_selected_answer: number
             }
             Returns: {
-              correct_answer: number
               explanation: string
               is_correct: boolean
             }[]
