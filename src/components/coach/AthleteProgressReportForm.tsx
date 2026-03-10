@@ -130,16 +130,16 @@ const AthleteProgressReportForm = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
 
-    const reportData = {
+    const reportData: any = {
       coach_user_id: user.id,
       athlete_user_id: selectedAthlete,
       report_title: reportTitle,
       report_period: reportPeriod,
-      pitch_velocity: metrics.pitch_velocity as unknown as Record<string, unknown>[],
-      exit_velocity: metrics.exit_velocity as unknown as Record<string, unknown>[],
-      sprint_speed: metrics.sprint_speed as unknown as Record<string, unknown>[],
-      bat_speed: metrics.bat_speed as unknown as Record<string, unknown>[],
-      pop_time: metrics.pop_time as unknown as Record<string, unknown>[],
+      pitch_velocity: JSON.parse(JSON.stringify(metrics.pitch_velocity)),
+      exit_velocity: JSON.parse(JSON.stringify(metrics.exit_velocity)),
+      sprint_speed: JSON.parse(JSON.stringify(metrics.sprint_speed)),
+      bat_speed: JSON.parse(JSON.stringify(metrics.bat_speed)),
+      pop_time: JSON.parse(JSON.stringify(metrics.pop_time)),
       coach_notes: coachNotes,
       strengths_observed: strengths,
       areas_of_improvement: improvements,

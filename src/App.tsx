@@ -94,6 +94,7 @@ import Claim22MAccess from "./pages/Claim22MAccess";
 import ShortRedirect from "./pages/ShortRedirect";
 import CoachManagement from "./pages/CoachManagement";
 import OwnerCommandCenter from "./pages/OwnerCommandCenter";
+import ProgressReport from "./pages/ProgressReport";
 
 const queryClient = new QueryClient();
 
