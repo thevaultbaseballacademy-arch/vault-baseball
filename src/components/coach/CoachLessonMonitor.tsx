@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Video, Users, Calendar, Clock, FileText, MessageSquare,
-  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye
+  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye, Camera, Mic, MicOff, VideoOff, SwitchCamera
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
