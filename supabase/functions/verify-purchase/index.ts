@@ -23,9 +23,9 @@ const PRICE_TO_PRODUCT_KEY: Record<string, string> = {
   'price_1SqEGIPhXS410TO5JUNSsTCq': 'org_quick_start',
   'price_1SqEGOPhXS410TO5XtSbPx0v': 'certified_coach',
   'price_1SrNRkPhXS410TO5vvzFSpNX': 'vault_trial',
-  // Beta Systems
-  'price_1SqEGAPhXS410TO5ZIx2g0RZ': 'longevity_beta',
-  'price_1SqEGCPhXS410TO5iCsokNpV': 'transfer_beta',
+  // Full Release Systems
+  'price_1SqEGAPhXS410TO5ZIx2g0RZ': 'longevity_system',
+  'price_1SqEGCPhXS410TO5iCsokNpV': 'transfer_system',
   // Stand-alone Products (new prices)
   'price_1T8ckXPhXS410TO5tYyygmol': 'velo_check',
   'price_1T8ckYPhXS410TO5WkQI2EpC': 'velocity_12week',
