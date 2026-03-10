@@ -72,7 +72,87 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   const [videoLink, setVideoLink] = useState("");
   const [editingLink, setEditingLink] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [cameraTestOpen, setCameraTestOpen] = useState(false);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [cameraMuted, setCameraMuted] = useState(false);
+  const [cameraOff, setCameraOff] = useState(false);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const cameraVideoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
+
+  const startCameraTest = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: true,
+      });
+      setCameraStream(stream);
+      setCameraMuted(false);
+      setCameraOff(false);
+      if (cameraVideoRef.current) {
+        cameraVideoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      toast({ title: "Camera error", description: "Could not access camera/microphone. Check permissions.", variant: "destructive" });
+    }
+  }, [facingMode, toast]);
+
+  const stopCameraTest = useCallback(() => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      setCameraStream(null);
+    }
+  }, [cameraStream]);
+
+  const handleCameraTestOpen = async () => {
+    setCameraTestOpen(true);
+    // Start after dialog renders
+    setTimeout(() => startCameraTest(), 300);
+  };
+
+  const handleCameraTestClose = () => {
+    stopCameraTest();
+    setCameraTestOpen(false);
+  };
+
+  const toggleCameraMute = () => {
+    if (cameraStream) {
+      cameraStream.getAudioTracks().forEach(t => t.enabled = !t.enabled);
+      setCameraMuted(m => !m);
+    }
+  };
+
+  const toggleCameraVideo = () => {
+    if (cameraStream) {
+      cameraStream.getVideoTracks().forEach(t => t.enabled = !t.enabled);
+      setCameraOff(v => !v);
+    }
+  };
+
+  const switchCameraFacing = async () => {
+    stopCameraTest();
+    const newFacing = facingMode === "user" ? "environment" : "user";
+    setFacingMode(newFacing);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: newFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: true,
+      });
+      setCameraStream(stream);
+      if (cameraVideoRef.current) {
+        cameraVideoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      toast({ title: "Camera switch failed", variant: "destructive" });
+    }
+  };
+
+  // Attach stream to video element when ref or stream changes
+  useEffect(() => {
+    if (cameraVideoRef.current && cameraStream) {
+      cameraVideoRef.current.srcObject = cameraStream;
+    }
+  }, [cameraStream, cameraTestOpen]);
 
   useEffect(() => {
     if (coachUserId) fetchAll();
