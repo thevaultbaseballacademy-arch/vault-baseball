@@ -20,22 +20,22 @@ interface FavoriteItem {
 }
 
 const defaultFavorites: FavoriteItem[] = [
-  { id: "fav-1", title: "Arm Care Routine", type: "drill", href: "/courses/arm-health-workload", color: "#22c55e" },
-  { id: "fav-2", title: "Long Toss Protocol", type: "drill", href: "/courses/velocity-system", color: "#3b82f6" },
-  { id: "fav-3", title: "Plyo Ball Drills", type: "drill", href: "/courses/velocity-system", color: "#8b5cf6" },
+  { id: "fav-1", title: "Arm Care Routine", type: "drill", href: "/course/arm-health-workload", color: "#22c55e" },
+  { id: "fav-2", title: "Long Toss Protocol", type: "drill", href: "/course/velocity-system", color: "#3b82f6" },
+  { id: "fav-3", title: "Plyo Ball Drills", type: "drill", href: "/course/velocity-system", color: "#8b5cf6" },
 ];
 
 const availableDrills: FavoriteItem[] = [
-  { id: "drill-1", title: "Arm Care Routine", type: "drill", href: "/courses/arm-health-workload", color: "#22c55e" },
-  { id: "drill-2", title: "Long Toss Protocol", type: "drill", href: "/courses/velocity-system", color: "#3b82f6" },
-  { id: "drill-3", title: "Plyo Ball Drills", type: "drill", href: "/courses/velocity-system", color: "#8b5cf6" },
-  { id: "drill-4", title: "Hip-Shoulder Separation", type: "drill", href: "/courses/velocity-system", color: "#f59e0b" },
-  { id: "drill-5", title: "Lead Leg Block", type: "drill", href: "/courses/velocity-system", color: "#ef4444" },
-  { id: "drill-6", title: "Sprint Mechanics", type: "drill", href: "/courses/speed-agility", color: "#06b6d4" },
-  { id: "drill-7", title: "Lateral Movement", type: "drill", href: "/courses/speed-agility", color: "#ec4899" },
-  { id: "drill-8", title: "Medicine Ball Training", type: "drill", href: "/courses/strength-power-system", color: "#f97316" },
-  { id: "drill-9", title: "Outfield Routes", type: "drill", href: "/courses/speed-agility", color: "#14b8a6" },
-  { id: "drill-10", title: "Infield Footwork", type: "drill", href: "/courses/speed-agility", color: "#a855f7" },
+  { id: "drill-1", title: "Arm Care Routine", type: "drill", href: "/course/arm-health-workload", color: "#22c55e" },
+  { id: "drill-2", title: "Long Toss Protocol", type: "drill", href: "/course/velocity-system", color: "#3b82f6" },
+  { id: "drill-3", title: "Plyo Ball Drills", type: "drill", href: "/course/velocity-system", color: "#8b5cf6" },
+  { id: "drill-4", title: "Hip-Shoulder Separation", type: "drill", href: "/course/velocity-system", color: "#f59e0b" },
+  { id: "drill-5", title: "Lead Leg Block", type: "drill", href: "/course/velocity-system", color: "#ef4444" },
+  { id: "drill-6", title: "Sprint Mechanics", type: "drill", href: "/course/speed-agility", color: "#06b6d4" },
+  { id: "drill-7", title: "Lateral Movement", type: "drill", href: "/course/speed-agility", color: "#ec4899" },
+  { id: "drill-8", title: "Medicine Ball Training", type: "drill", href: "/course/strength-power-system", color: "#f97316" },
+  { id: "drill-9", title: "Outfield Routes", type: "drill", href: "/course/speed-agility", color: "#14b8a6" },
+  { id: "drill-10", title: "Infield Footwork", type: "drill", href: "/course/speed-agility", color: "#a855f7" },
 ];
 
 const FavoritesQuickStart = () => {

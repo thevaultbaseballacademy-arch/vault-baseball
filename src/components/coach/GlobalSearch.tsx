@@ -26,7 +26,7 @@ const getStaticContent = (): SearchResult[] => {
       description: `Full course with ${course.modules.length} modules`,
       type: "course",
       icon: BookOpen,
-      href: `/courses/${courseId}`,
+      href: `/course/${courseId}`,
       category: "Courses"
     });
 
@@ -38,7 +38,7 @@ const getStaticContent = (): SearchResult[] => {
           description: lesson.description,
           type: "lesson",
           icon: Video,
-          href: `/courses/${courseId}?lesson=${lesson.id}`,
+          href: `/course/${courseId}?lesson=${lesson.id}`,
           category: module.title
         });
       });
@@ -46,15 +46,15 @@ const getStaticContent = (): SearchResult[] => {
   });
 
   const staticDrills: SearchResult[] = [
-    { id: "velocity-drill", title: "Long Toss Protocol", description: "Build arm strength and velocity", type: "drill", icon: Target, href: "/courses/velocity-system", category: "Velocity" },
-    { id: "plyo-drill", title: "Plyo Ball Routines", description: "Weighted ball training drills", type: "drill", icon: Target, href: "/courses/velocity-system", category: "Velocity" },
-    { id: "arm-care", title: "Arm Care Routine", description: "Daily arm health exercises", type: "drill", icon: Target, href: "/courses/arm-health-workload", category: "Arm Health" },
-    { id: "hip-sep", title: "Hip-Shoulder Separation", description: "Rotational mechanics drill", type: "drill", icon: Target, href: "/courses/velocity-system", category: "Mechanics" },
-    { id: "lead-leg", title: "Lead Leg Block Drill", description: "Energy transfer training", type: "drill", icon: Target, href: "/courses/velocity-system", category: "Mechanics" },
-    { id: "sprint-mech", title: "Sprint Mechanics", description: "Base running speed drills", type: "drill", icon: Target, href: "/courses/speed-agility", category: "Speed" },
-    { id: "lateral-move", title: "Lateral Movement", description: "Infield agility drills", type: "drill", icon: Target, href: "/courses/speed-agility", category: "Agility" },
-    { id: "med-ball", title: "Medicine Ball Training", description: "Rotational power development", type: "drill", icon: Target, href: "/courses/strength-power-system", category: "Strength" },
-    { id: "outfield-util", title: "Outfield Utility Drills", description: "Routes, jumps, and arm strength", type: "drill", icon: Target, href: "/courses/speed-agility", category: "Outfield" },
+    { id: "velocity-drill", title: "Long Toss Protocol", description: "Build arm strength and velocity", type: "drill", icon: Target, href: "/course/velocity-system", category: "Velocity" },
+    { id: "plyo-drill", title: "Plyo Ball Routines", description: "Weighted ball training drills", type: "drill", icon: Target, href: "/course/velocity-system", category: "Velocity" },
+    { id: "arm-care", title: "Arm Care Routine", description: "Daily arm health exercises", type: "drill", icon: Target, href: "/course/arm-health-workload", category: "Arm Health" },
+    { id: "hip-sep", title: "Hip-Shoulder Separation", description: "Rotational mechanics drill", type: "drill", icon: Target, href: "/course/velocity-system", category: "Mechanics" },
+    { id: "lead-leg", title: "Lead Leg Block Drill", description: "Energy transfer training", type: "drill", icon: Target, href: "/course/velocity-system", category: "Mechanics" },
+    { id: "sprint-mech", title: "Sprint Mechanics", description: "Base running speed drills", type: "drill", icon: Target, href: "/course/speed-agility", category: "Speed" },
+    { id: "lateral-move", title: "Lateral Movement", description: "Infield agility drills", type: "drill", icon: Target, href: "/course/speed-agility", category: "Agility" },
+    { id: "med-ball", title: "Medicine Ball Training", description: "Rotational power development", type: "drill", icon: Target, href: "/course/strength-power-system", category: "Strength" },
+    { id: "outfield-util", title: "Outfield Utility Drills", description: "Routes, jumps, and arm strength", type: "drill", icon: Target, href: "/course/speed-agility", category: "Outfield" },
   ];
 
   return [...results, ...staticDrills];

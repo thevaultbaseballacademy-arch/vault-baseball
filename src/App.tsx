@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
@@ -97,6 +97,12 @@ import OwnerCommandCenter from "./pages/OwnerCommandCenter";
 import ProgressReport from "./pages/ProgressReport";
 import BookSession from "./pages/BookSession";
 
+// Redirect /courses/:id to /course/:id
+const CoursesRedirect = () => {
+  const courseId = window.location.pathname.split('/courses/')[1];
+  return <Navigate to={`/course/${courseId}`} replace />;
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -143,6 +149,7 @@ const App = () => (
             } />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/courses" element={<Courses />} />
+            <Route path="/courses/:courseId" element={<CoursesRedirect />} />
             <Route path="/course/:courseId" element={
               <TrialProtectedRoute>
                 <CourseDetail />
