@@ -1793,6 +1793,60 @@ export type Database = {
         }
         Relationships: []
       }
+      evaluation_leads: {
+        Row: {
+          age: number | null
+          ai_feedback: Json | null
+          athlete_name: string
+          created_at: string | null
+          current_velocity: string | null
+          development_score: number | null
+          email: string
+          id: string
+          phone: string | null
+          position: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          video_type: string | null
+          video_url: string | null
+        }
+        Insert: {
+          age?: number | null
+          ai_feedback?: Json | null
+          athlete_name: string
+          created_at?: string | null
+          current_velocity?: string | null
+          development_score?: number | null
+          email: string
+          id?: string
+          phone?: string | null
+          position?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          video_type?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          age?: number | null
+          ai_feedback?: Json | null
+          athlete_name?: string
+          created_at?: string | null
+          current_velocity?: string | null
+          development_score?: number | null
+          email?: string
+          id?: string
+          phone?: string | null
+          position?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          video_type?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       exam_questions: {
         Row: {
           cert_type: Database["public"]["Enums"]["admin_cert_type"]
