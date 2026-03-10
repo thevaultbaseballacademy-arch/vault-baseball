@@ -286,7 +286,10 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
               <LiveVideoCall
                 sessionId={activeLessonId}
                 userId={userId}
-                isCoach={true}
+                isCoach={(() => {
+                  const lesson = lessons.find(l => l.id === activeLessonId);
+                  return lesson ? lesson.coach_user_id === userId : false;
+                })()}
                 onEnd={() => setActiveLessonId(null)}
               />
             </div>
