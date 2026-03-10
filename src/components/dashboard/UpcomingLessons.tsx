@@ -74,46 +74,58 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
   }, [userId]);
 
   const fetchLessons = async () => {
-    const now = new Date().toISOString();
-    const { data } = await (supabase.from("remote_lessons" as any) as any)
-      .select("*")
-      .or(`coach_user_id.eq.${userId},athlete_user_id.eq.${userId}`)
-      .gte("scheduled_at", now)
-      .neq("status", "cancelled")
-      .order("scheduled_at", { ascending: true })
-      .limit(5);
+    try {
+      const now = new Date().toISOString();
+      const { data, error } = await supabase
+        .from("remote_lessons")
+        .select("*")
+        .or(`coach_user_id.eq.${userId},athlete_user_id.eq.${userId}`)
+        .gte("scheduled_at", now)
+        .neq("status", "cancelled")
+        .order("scheduled_at", { ascending: true })
+        .limit(5);
 
-    if (!data?.length) {
-      setLessons([]);
-      setLoading(false);
-      return;
-    }
+      if (error) {
+        console.error("Error fetching lessons:", error);
+        setLoading(false);
+        return;
+      }
 
-    // Get the "other person" names
-    const otherIds = [
-      ...new Set(
-        (data as LessonRow[]).map((l) =>
-          l.coach_user_id === userId ? l.athlete_user_id : l.coach_user_id
-        )
-      ),
-    ];
-    const { data: profiles } = await supabase.rpc("get_public_profiles_by_ids", {
-      user_ids: otherIds,
-    });
-    const nameMap = new Map(
-      (profiles || []).map((p: any) => [p.user_id, p.display_name])
-    );
+      if (!data?.length) {
+        setLessons([]);
+        setLoading(false);
+        return;
+      }
 
-    setLessons(
-      (data as LessonRow[]).map((l) => ({
-        ...l,
-        other_name:
-          nameMap.get(
+      // Get the "other person" names
+      const otherIds = [
+        ...new Set(
+          (data as LessonRow[]).map((l) =>
             l.coach_user_id === userId ? l.athlete_user_id : l.coach_user_id
-          ) || "Vault Coach",
-      }))
-    );
-    setLoading(false);
+          )
+        ),
+      ];
+      const { data: profiles } = await supabase.rpc("get_public_profiles_by_ids", {
+        user_ids: otherIds,
+      });
+      const nameMap = new Map(
+        (profiles || []).map((p: any) => [p.user_id, p.display_name])
+      );
+
+      setLessons(
+        (data as LessonRow[]).map((l) => ({
+          ...l,
+          other_name:
+            nameMap.get(
+              l.coach_user_id === userId ? l.athlete_user_id : l.coach_user_id
+            ) || "Vault Coach",
+        }))
+      );
+    } catch (err) {
+      console.error("Unexpected error fetching lessons:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
