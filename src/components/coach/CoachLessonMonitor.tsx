@@ -2,8 +2,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Video, Users, Calendar, Clock, FileText, MessageSquare,
-  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye, Camera, Mic, MicOff, VideoOff, SwitchCamera, CalendarPlus
+  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye, Camera, Mic, MicOff, VideoOff, SwitchCamera, CalendarPlus, Brain, ChevronDown, ChevronUp
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +32,9 @@ interface Lesson {
   coach_notes: string | null;
   video_call_link: string | null;
   athlete_name?: string;
+  ai_recap?: string | null;
+  ai_homework?: string | null;
+  recap_generated_at?: string | null;
 }
 
 interface GroupSessionRow {
@@ -100,6 +104,8 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   const [cameraMuted, setCameraMuted] = useState(false);
   const [cameraOff, setCameraOff] = useState(false);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const [generatingRecap, setGeneratingRecap] = useState<string | null>(null);
+  const [expandedRecap, setExpandedRecap] = useState<string | null>(null);
   const cameraVideoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
 
@@ -283,7 +289,22 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
     setVideoLink("");
     fetchLessons();
   };
-
+  const handleGenerateRecap = async (lessonId: string) => {
+    setGeneratingRecap(lessonId);
+    try {
+      const { data, error } = await supabase.functions.invoke("lesson-recap", {
+        body: { lessonId },
+      });
+      if (error) throw error;
+      toast({ title: "Recap generated!", description: "AI recap and homework are ready." });
+      setExpandedRecap(lessonId);
+      fetchLessons();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to generate recap", variant: "destructive" });
+    } finally {
+      setGeneratingRecap(null);
+    }
+  };
   const handleGroupStatus = async (sessionId: string, newStatus: string) => {
     await (supabase.from("group_sessions" as any) as any)
       .update({ status: newStatus })
@@ -468,8 +489,61 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
                               Confirm
                             </Button>
                           )}
+
+                          {(lesson.status === "completed" || (lesson.status === "confirmed" && new Date(lesson.scheduled_at) < new Date())) && (
+                            <Button
+                              variant={lesson.ai_recap ? "outline" : "vault"}
+                              size="sm"
+                              onClick={() => lesson.ai_recap ? setExpandedRecap(expandedRecap === lesson.id ? null : lesson.id) : handleGenerateRecap(lesson.id)}
+                              disabled={generatingRecap === lesson.id}
+                              className="gap-1"
+                            >
+                              {generatingRecap === lesson.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Brain className="w-3 h-3" />
+                              )}
+                              {lesson.ai_recap ? (expandedRecap === lesson.id ? "Hide Recap" : "View Recap") : "AI Recap"}
+                            </Button>
+                          )}
                         </div>
                       </div>
+
+                      {/* Expanded AI Recap */}
+                      {expandedRecap === lesson.id && lesson.ai_recap && (
+                        <div className="mt-3 pt-3 border-t border-border space-y-3">
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <h4 className="text-xs font-display text-primary mb-2 flex items-center gap-1">
+                              <Brain className="w-3 h-3" /> SESSION RECAP
+                            </h4>
+                            <div className="prose prose-sm max-w-none text-foreground text-xs">
+                              <ReactMarkdown>{lesson.ai_recap}</ReactMarkdown>
+                            </div>
+                          </div>
+                          {lesson.ai_homework && (
+                            <div className="bg-primary/5 rounded-lg p-3">
+                              <h4 className="text-xs font-display text-primary mb-2 flex items-center gap-1">
+                                <TrendingUp className="w-3 h-3" /> HOMEWORK & NEXT STEPS
+                              </h4>
+                              <div className="prose prose-sm max-w-none text-foreground text-xs">
+                                <ReactMarkdown>{lesson.ai_homework}</ReactMarkdown>
+                              </div>
+                            </div>
+                          )}
+                          {!lesson.ai_recap && (
+                            <Button
+                              variant="vault"
+                              size="sm"
+                              onClick={() => handleGenerateRecap(lesson.id)}
+                              disabled={generatingRecap === lesson.id}
+                              className="w-full"
+                            >
+                              {generatingRecap === lesson.id ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Brain className="w-4 h-4 mr-2" />}
+                              Regenerate AI Recap
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
