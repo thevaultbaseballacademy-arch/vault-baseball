@@ -85,6 +85,7 @@ import LessonPackages from "./pages/LessonPackages";
 import RemoteLessons from "./pages/RemoteLessons";
 import GroupSessions from "./pages/GroupSessions";
 import FreeVelocityGuide from "./pages/FreeVelocityGuide";
+import FreeEvaluation from "./pages/FreeEvaluation";
 import AthleteOnboarding from "./pages/AthleteOnboarding";
 import RemoteTrainingHub from "./pages/RemoteTrainingHub";
 import Marketplace from "./pages/Marketplace";
