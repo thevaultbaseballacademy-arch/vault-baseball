@@ -286,6 +286,14 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
 
   return (
     <div className="space-y-6">
+      {/* Header with Camera Test */}
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-xl text-foreground">LESSONS & MONITORING</h2>
+        <Button variant="outline" size="sm" onClick={handleCameraTestOpen} className="gap-2">
+          <Camera className="w-4 h-4" /> Test Camera
+        </Button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-card border-border">
