@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Star, MapPin, Award, Clock, Filter, ChevronDown, Users, Video, FileText, Calendar } from "lucide-react";
+import { Search, Star, MapPin, Award, Clock, Filter, ChevronDown, Users, Video, FileText, Calendar, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -239,12 +239,23 @@ const Marketplace = () => {
             </div>
           )}
 
+          {/* Platform Disclaimer */}
+          <div className="mt-12 bg-destructive/5 border border-destructive/20 rounded-xl p-6">
+            <h3 className="font-display text-sm tracking-wide text-destructive mb-2 flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4" />
+              PLATFORM POLICY
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              All coaching sessions booked through the Vault Baseball Marketplace must be conducted exclusively on this platform. Coaches are prohibited from soliciting or conducting sessions with Vault-connected athletes outside of the platform. A 70/30 revenue split applies to all services (70% coach / 30% platform). Athletes should only book and pay through Vault Baseball to ensure quality, accountability, and protection. Any violations may result in coach removal and forfeiture of earnings.
+            </p>
+          </div>
+
           {/* Become a Coach CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mt-16 bg-foreground text-background rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6"
+            className="mt-8 bg-foreground text-background rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6"
           >
             <div>
               <h3 className="text-2xl font-display mb-2">ARE YOU A COACH?</h3>

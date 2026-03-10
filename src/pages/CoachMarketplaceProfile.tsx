@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Star, MapPin, Clock, Video, FileText, Calendar,
-  Users, MessageSquare, BookOpen, Repeat
+  Users, MessageSquare, BookOpen, Repeat, Award, ShieldAlert
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -211,6 +211,17 @@ const CoachMarketplaceProfile = () => {
                 )}
               </div>
 
+              {/* Platform Usage Disclaimer */}
+              <div className="bg-destructive/5 border border-destructive/20 p-5">
+                <h2 className="font-display text-sm tracking-wide text-destructive mb-2 flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  PLATFORM USAGE AGREEMENT
+                </h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  This coach is a verified member of the Vault Baseball coaching network. All sessions, lessons, video analyses, and coaching services must be conducted exclusively through the Vault Baseball platform. Coaches are contractually prohibited from soliciting, booking, or conducting sessions with Vault-connected athletes outside of this platform. A 70/30 revenue split (70% coach / 30% platform) applies to all services rendered. Any coach found operating outside of the platform with Vault athletes may be subject to immediate removal from the network and forfeiture of pending earnings. Athletes should only book and pay for sessions through this platform to ensure quality, accountability, and protection.
+                </p>
+              </div>
+
               {/* Services & Reviews Tabs */}
               <Tabs defaultValue="services" className="space-y-4">
                 <TabsList className="grid w-full max-w-md grid-cols-2">
@@ -294,7 +305,16 @@ const CoachMarketplaceProfile = () => {
                 <p className="text-4xl font-display text-foreground mb-1">{formatPrice(coach.hourly_rate_cents)}</p>
                 <p className="text-sm text-muted-foreground mb-5">per session</p>
 
-                <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
+                <Dialog open={bookingOpen} onOpenChange={async (open) => {
+                  if (open) {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) {
+                      navigate("/auth");
+                      return;
+                    }
+                  }
+                  setBookingOpen(open);
+                }}>
                   <DialogTrigger asChild>
                     <Button size="lg" className="w-full mb-4">Book a Session</Button>
                   </DialogTrigger>
@@ -346,6 +366,10 @@ const CoachMarketplaceProfile = () => {
                           </div>
                         </div>
                       )}
+                      {/* Booking disclaimer */}
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">
+                        By booking, you agree that all sessions are conducted through the Vault Baseball platform. Do not arrange sessions outside of this platform.
+                      </p>
                       <Button className="w-full" disabled={!bookingService || !bookingDate || !bookingTime || createBooking.isPending} onClick={handleBook}>
                         {createBooking.isPending ? "Booking..." : "Confirm Booking"}
                       </Button>
