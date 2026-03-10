@@ -154,11 +154,11 @@ const LongevitySystem = () => {
                   <Button
                     variant="vault"
                     size="xl"
-                    onClick={() => checkout('longevity_beta')}
-                    disabled={loading === 'longevity_beta'}
+                    onClick={() => checkout('longevity_system')}
+                    disabled={loading === 'longevity_system'}
                     className="whitespace-nowrap"
                   >
-                    {loading === 'longevity_beta' ? (
+                    {loading === 'longevity_system' ? (
                       <Loader2 className="w-5 h-5 animate-spin mr-2" />
                     ) : null}
                     Get Full Access
