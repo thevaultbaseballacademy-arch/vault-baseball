@@ -489,8 +489,61 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
                               Confirm
                             </Button>
                           )}
+
+                          {(lesson.status === "completed" || (lesson.status === "confirmed" && new Date(lesson.scheduled_at) < new Date())) && (
+                            <Button
+                              variant={lesson.ai_recap ? "outline" : "vault"}
+                              size="sm"
+                              onClick={() => lesson.ai_recap ? setExpandedRecap(expandedRecap === lesson.id ? null : lesson.id) : handleGenerateRecap(lesson.id)}
+                              disabled={generatingRecap === lesson.id}
+                              className="gap-1"
+                            >
+                              {generatingRecap === lesson.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Brain className="w-3 h-3" />
+                              )}
+                              {lesson.ai_recap ? (expandedRecap === lesson.id ? "Hide Recap" : "View Recap") : "AI Recap"}
+                            </Button>
+                          )}
                         </div>
                       </div>
+
+                      {/* Expanded AI Recap */}
+                      {expandedRecap === lesson.id && lesson.ai_recap && (
+                        <div className="mt-3 pt-3 border-t border-border space-y-3">
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <h4 className="text-xs font-display text-primary mb-2 flex items-center gap-1">
+                              <Brain className="w-3 h-3" /> SESSION RECAP
+                            </h4>
+                            <div className="prose prose-sm max-w-none text-foreground text-xs">
+                              <ReactMarkdown>{lesson.ai_recap}</ReactMarkdown>
+                            </div>
+                          </div>
+                          {lesson.ai_homework && (
+                            <div className="bg-primary/5 rounded-lg p-3">
+                              <h4 className="text-xs font-display text-primary mb-2 flex items-center gap-1">
+                                <TrendingUp className="w-3 h-3" /> HOMEWORK & NEXT STEPS
+                              </h4>
+                              <div className="prose prose-sm max-w-none text-foreground text-xs">
+                                <ReactMarkdown>{lesson.ai_homework}</ReactMarkdown>
+                              </div>
+                            </div>
+                          )}
+                          {!lesson.ai_recap && (
+                            <Button
+                              variant="vault"
+                              size="sm"
+                              onClick={() => handleGenerateRecap(lesson.id)}
+                              disabled={generatingRecap === lesson.id}
+                              className="w-full"
+                            >
+                              {generatingRecap === lesson.id ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Brain className="w-4 h-4 mr-2" />}
+                              Regenerate AI Recap
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
