@@ -353,72 +353,57 @@ const CoachDashboard = () => {
             {/* Upcoming Lessons Widget - Always Visible */}
             {user?.id && <UpcomingLessons userId={user.id} />}
 
-            {/* Tabs for Athletes vs Schedules vs Leaderboards */}
-            <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="flex w-full max-w-5xl overflow-x-auto no-scrollbar">
-                <TabsTrigger value="athletes" className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
-                  Athletes
-                </TabsTrigger>
-                <TabsTrigger value="lessons" className="flex items-center gap-1">
-                  <Video className="w-3 h-3" />
-                  Lessons
-                </TabsTrigger>
-                <TabsTrigger value="reports" className="flex items-center gap-1">
-                  <ClipboardList className="w-3 h-3" />
-                  Reports
-                </TabsTrigger>
-                <TabsTrigger value="motion" className="flex items-center gap-1">
-                  <Brain className="w-3 h-3" />
-                  Motion
-                </TabsTrigger>
-                <TabsTrigger value="marketplace" className="flex items-center gap-1">
-                  <Store className="w-3 h-3" />
-                  Marketplace
-                </TabsTrigger>
-                <TabsTrigger value="earnings" className="flex items-center gap-1">
-                  <DollarSign className="w-3 h-3" />
-                  Earnings
-                </TabsTrigger>
-                <TabsTrigger value="leaderboards" className="flex items-center gap-1">
-                  <Trophy className="w-3 h-3" />
-                  Leaderboards
-                </TabsTrigger>
-                <TabsTrigger value="schedules" className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  Schedules
-                </TabsTrigger>
-              </TabsList>
+            {/* Coach Dashboard Tabs - Grouped by workflow */}
+            <Tabs defaultValue="lessons" className="space-y-6">
+              <div className="bg-card border border-border rounded-xl p-1.5 overflow-x-auto no-scrollbar">
+                <TabsList className="flex w-max min-w-full gap-1 bg-transparent p-0">
+                  <TabsTrigger value="lessons" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <Video className="w-3.5 h-3.5" />
+                    Lessons
+                  </TabsTrigger>
+                  <TabsTrigger value="athletes" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <Users className="w-3.5 h-3.5" />
+                    Athletes
+                  </TabsTrigger>
+                  <TabsTrigger value="schedules" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <Calendar className="w-3.5 h-3.5" />
+                    Schedules
+                  </TabsTrigger>
+                  <TabsTrigger value="reports" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <ClipboardList className="w-3.5 h-3.5" />
+                    Reports
+                  </TabsTrigger>
+                  <TabsTrigger value="leaderboards" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <Trophy className="w-3.5 h-3.5" />
+                    Leaderboards
+                  </TabsTrigger>
+                  <TabsTrigger value="motion" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <Brain className="w-3.5 h-3.5" />
+                    Motion
+                  </TabsTrigger>
+                  <TabsTrigger value="marketplace" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <Store className="w-3.5 h-3.5" />
+                    Marketplace
+                  </TabsTrigger>
+                  <TabsTrigger value="earnings" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <DollarSign className="w-3.5 h-3.5" />
+                    Earnings
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="lessons" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">LESSON MANAGEMENT</h2>
+                <p className="text-sm text-muted-foreground">Monitor upcoming lessons, manage availability, and generate AI recaps.</p>
+                <CoachLessonMonitor coachUserId={user?.id || ''} />
+                <CoachAvailabilitySync coachUserId={user?.id || ''} />
+                <CompLessonCredits />
+              </TabsContent>
 
               <TabsContent value="reports" className="space-y-6">
                 <h2 className="font-display text-xl text-foreground">ATHLETE PROGRESS REPORTS</h2>
                 <p className="text-sm text-muted-foreground">Create coach-verified progress reports with AI-assisted accuracy validation. Share with parents and athletes.</p>
                 <AthleteProgressReportForm />
-              </TabsContent>
-
-              <TabsContent value="motion" className="space-y-6">
-                <h2 className="font-display text-xl text-foreground">VAULT AI MOTION ANALYSIS</h2>
-                <p className="text-sm text-muted-foreground">Review AI-generated biomechanics reports. Add notes and mark key points for live sessions.</p>
-                {athletes.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No assigned athletes yet.</p>
-                ) : (
-                  <div className="space-y-6">
-                    {athletes.map((a: any) => (
-                      <CoachAnalysisReview
-                        key={a.user_id}
-                        coachUserId={user?.id || ''}
-                        athleteUserId={a.user_id}
-                        athleteName={a.display_name}
-                      />
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="lessons" className="space-y-6">
-                <CoachLessonMonitor coachUserId={user?.id || ''} />
-                <CoachAvailabilitySync coachUserId={user?.id || ''} />
-                <CompLessonCredits />
               </TabsContent>
 
               <TabsContent value="marketplace" className="space-y-6">
