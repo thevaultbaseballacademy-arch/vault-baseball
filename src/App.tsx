@@ -231,6 +231,7 @@ const App = () => (
             <Route path="/group-sessions" element={<GroupSessions />} />
             <Route path="/free-velocity-guide" element={<FreeVelocityGuide />} />
             <Route path="/athlete-onboarding" element={<AthleteOnboarding />} />
+            <Route path="/evaluate" element={<FreeEvaluation />} />
             <Route path="/training-hub" element={<RemoteTrainingHub />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
