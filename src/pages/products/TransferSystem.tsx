@@ -10,16 +10,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const TransferBeta = () => {
+const TransferSystem = () => {
   const { checkout, loading } = useProductCheckout();
-  const product = PRODUCT_PRICES.transfer_beta;
+  const product = PRODUCT_PRICES.transfer_system;
   const [userId, setUserId] = useState<string | undefined>();
   
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id));
   }, []);
   
-  const { hasAccess } = useHasProductAccess(userId, 'transfer_beta');
+  const { hasAccess } = useHasProductAccess(userId, 'transfer_system');
 
   const pillars = [
     {
