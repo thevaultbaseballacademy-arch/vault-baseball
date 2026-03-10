@@ -6,6 +6,7 @@ import {
   BookOpen, Target, BarChart3, Video, Brain, DollarSign, Store, ClipboardList
 } from "lucide-react";
 import CompLessonCredits from "@/components/coach/CompLessonCredits";
+import CoachAvailabilitySync from "@/components/coach/CoachAvailabilitySync";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
