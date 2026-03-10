@@ -238,6 +238,7 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
             <Route path="/progress-report/:token" element={<ProgressReport />} />
+            <Route path="/book-session" element={<BookSession />} />
             <Route path="/claim-22m" element={<Claim22MAccess />} />
             
             {/* Short URL redirects for social sharing */}
