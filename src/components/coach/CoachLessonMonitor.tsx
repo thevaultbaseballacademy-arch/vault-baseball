@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Video, Users, Calendar, Clock, FileText, MessageSquare,
-  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye
+  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye, Camera, Mic, MicOff, VideoOff, SwitchCamera
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -72,7 +72,87 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   const [videoLink, setVideoLink] = useState("");
   const [editingLink, setEditingLink] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [cameraTestOpen, setCameraTestOpen] = useState(false);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [cameraMuted, setCameraMuted] = useState(false);
+  const [cameraOff, setCameraOff] = useState(false);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const cameraVideoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
+
+  const startCameraTest = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: true,
+      });
+      setCameraStream(stream);
+      setCameraMuted(false);
+      setCameraOff(false);
+      if (cameraVideoRef.current) {
+        cameraVideoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      toast({ title: "Camera error", description: "Could not access camera/microphone. Check permissions.", variant: "destructive" });
+    }
+  }, [facingMode, toast]);
+
+  const stopCameraTest = useCallback(() => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      setCameraStream(null);
+    }
+  }, [cameraStream]);
+
+  const handleCameraTestOpen = async () => {
+    setCameraTestOpen(true);
+    // Start after dialog renders
+    setTimeout(() => startCameraTest(), 300);
+  };
+
+  const handleCameraTestClose = () => {
+    stopCameraTest();
+    setCameraTestOpen(false);
+  };
+
+  const toggleCameraMute = () => {
+    if (cameraStream) {
+      cameraStream.getAudioTracks().forEach(t => t.enabled = !t.enabled);
+      setCameraMuted(m => !m);
+    }
+  };
+
+  const toggleCameraVideo = () => {
+    if (cameraStream) {
+      cameraStream.getVideoTracks().forEach(t => t.enabled = !t.enabled);
+      setCameraOff(v => !v);
+    }
+  };
+
+  const switchCameraFacing = async () => {
+    stopCameraTest();
+    const newFacing = facingMode === "user" ? "environment" : "user";
+    setFacingMode(newFacing);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: newFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: true,
+      });
+      setCameraStream(stream);
+      if (cameraVideoRef.current) {
+        cameraVideoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      toast({ title: "Camera switch failed", variant: "destructive" });
+    }
+  };
+
+  // Attach stream to video element when ref or stream changes
+  useEffect(() => {
+    if (cameraVideoRef.current && cameraStream) {
+      cameraVideoRef.current.srcObject = cameraStream;
+    }
+  }, [cameraStream, cameraTestOpen]);
 
   useEffect(() => {
     if (coachUserId) fetchAll();
@@ -206,6 +286,14 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
 
   return (
     <div className="space-y-6">
+      {/* Header with Camera Test */}
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-xl text-foreground">LESSONS & MONITORING</h2>
+        <Button variant="outline" size="sm" onClick={handleCameraTestOpen} className="gap-2">
+          <Camera className="w-4 h-4" /> Test Camera
+        </Button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-card border-border">
@@ -520,6 +608,71 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
             <Button variant="vault" className="w-full" onClick={() => editingLink && handleAddVideoLink(editingLink)} disabled={!videoLink}>
               Save & Confirm Lesson
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Camera Test Dialog */}
+      <Dialog open={cameraTestOpen} onOpenChange={(open) => { if (!open) handleCameraTestClose(); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Camera className="w-5 h-5" /> Camera & Mic Test
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+              <video
+                ref={cameraVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+              />
+              {cameraOff && (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                  <VideoOff className="w-12 h-12 text-muted-foreground" />
+                </div>
+              )}
+              {!cameraStream && !cameraOff && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                variant={cameraMuted ? "destructive" : "outline"}
+                size="sm"
+                onClick={toggleCameraMute}
+                className="gap-2"
+              >
+                {cameraMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                {cameraMuted ? "Unmute" : "Mute"}
+              </Button>
+              <Button
+                variant={cameraOff ? "destructive" : "outline"}
+                size="sm"
+                onClick={toggleCameraVideo}
+                className="gap-2"
+              >
+                {cameraOff ? <VideoOff className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+                {cameraOff ? "Turn On" : "Turn Off"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={switchCameraFacing}
+                className="gap-2"
+              >
+                <SwitchCamera className="w-4 h-4" /> Flip
+              </Button>
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center">
+              If you can see yourself and hear audio feedback, your camera and mic are working correctly.
+            </p>
           </div>
         </DialogContent>
       </Dialog>
