@@ -480,16 +480,21 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
                             {lesson.status}
                           </Badge>
 
-                          {!lesson.video_call_link && lesson.status !== "cancelled" && (
-                            <Button variant="outline" size="sm" onClick={() => { setEditingLink(lesson.id); setVideoLink(""); }}>
-                              Add Link
+                          {lesson.status !== "cancelled" && lesson.status !== "completed" && (
+                            <Button
+                              variant="vault"
+                              size="sm"
+                              onClick={() => setActiveLessonId(lesson.id)}
+                              className="gap-1"
+                            >
+                              <Phone className="w-3 h-3" /> Start Lesson
                             </Button>
                           )}
 
                           {lesson.video_call_link && (
-                            <Button variant="vault" size="sm" asChild>
+                            <Button variant="outline" size="sm" asChild>
                               <a href={lesson.video_call_link} target="_blank" rel="noopener noreferrer">
-                                <Video className="w-3 h-3 mr-1" /> Join
+                                <Video className="w-3 h-3 mr-1" /> External Link
                               </a>
                             </Button>
                           )}
