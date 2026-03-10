@@ -54,10 +54,28 @@ const CourseDetailPage = () => {
   const updateEnrollmentMutation = useUpdateEnrollmentProgress();
   const generateCertificateMutation = useGenerateCertificate();
 
+  // Helper to check if a video URL is a real, playable URL (not a placeholder)
+  const isPlayableUrl = (url: string): boolean => {
+    if (!url || url.trim() === "") return false;
+    // Filter out placeholder/example URLs from static data
+    if (/[?&]v=example\d*/i.test(url)) return false;
+    if (/[?&]v=sc\d*/i.test(url)) return false;
+    if (/[?&]v=sa\d*/i.test(url)) return false;
+    if (/[?&]v=mt\d*/i.test(url)) return false;
+    if (/[?&]v=hm\d*/i.test(url)) return false;
+    if (/[?&]v=gm\d*/i.test(url)) return false;
+    if (/[?&]v=[a-z]{1,4}\d{1,3}$/i.test(url)) return false; // catch generic short placeholders
+    return true;
+  };
+
   // Create a map of lesson IDs to video URLs from database
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
-    dbVideos.forEach(v => map.set(v.lesson_id, v.video_url));
+    dbVideos.forEach(v => {
+      if (isPlayableUrl(v.video_url)) {
+        map.set(v.lesson_id, v.video_url);
+      }
+    });
     return map;
   }, [dbVideos]);
 
