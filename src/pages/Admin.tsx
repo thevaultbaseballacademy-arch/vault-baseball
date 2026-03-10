@@ -133,6 +133,7 @@ const Admin = () => {
 
   const checkAdminRole = async (userId: string) => {
     try {
+      // Check user_roles table
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
@@ -140,7 +141,22 @@ const Admin = () => {
         .eq("role", "admin")
         .maybeSingle();
       if (error) throw error;
-      if (data) {
+      
+      // Also check team_whitelist for admin_access
+      let hasTeamAdminAccess = false;
+      if (!data) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.email) {
+          const { data: teamData } = await supabase
+            .from("team_whitelist")
+            .select("admin_access")
+            .eq("email", user.email.toLowerCase())
+            .maybeSingle();
+          hasTeamAdminAccess = teamData?.admin_access ?? false;
+        }
+      }
+
+      if (data || hasTeamAdminAccess) {
         setIsAdmin(true);
         fetchData();
       }
