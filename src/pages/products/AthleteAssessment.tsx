@@ -185,9 +185,10 @@ const AthleteAssessment = () => {
       <Footer />
       <MobileConversionBar
         productName="Development Assessment"
-        price={formatPrice(product.price)}
-        onCheckout={() => checkout("velo_check")}
-        loading={!!loading}
+        price={product.price}
+        productKey="velo_check"
+        onCheckout={checkout}
+        loading={loading}
       />
     </main>
   );
