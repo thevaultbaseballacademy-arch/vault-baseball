@@ -208,7 +208,7 @@ const ProgressReport = () => {
 
               {report.ai_accuracy_notes && (
                 <div className="flex items-start gap-2 text-xs text-muted-foreground bg-card/50 p-3 border border-border">
-                  <CheckCircle2 className="w-3 h-3 mt-0.5 text-green-400 shrink-0" />
+                  <CheckCircle2 className="w-3 h-3 mt-0.5 text-primary shrink-0" />
                   <span>{report.ai_accuracy_notes}</span>
                 </div>
               )}

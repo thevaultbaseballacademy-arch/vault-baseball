@@ -440,7 +440,7 @@ const AthleteProgressReportForm = () => {
                         <Copy className="w-3 h-3" />
                       </Button>
                     )}
-                    <span className={`text-[10px] font-display px-2 py-0.5 ${report.is_published ? "bg-green-500/20 text-green-400" : "bg-muted text-muted-foreground"}`}>
+                    <span className={`text-[10px] font-display px-2 py-0.5 ${report.is_published ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
                       {report.is_published ? "LIVE" : "DRAFT"}
                     </span>
                   </div>
