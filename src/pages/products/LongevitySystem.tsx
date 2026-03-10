@@ -10,16 +10,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const LongevityBeta = () => {
+const LongevitySystem = () => {
   const { checkout, loading } = useProductCheckout();
-  const product = PRODUCT_PRICES.longevity_beta;
+  const product = PRODUCT_PRICES.longevity_system;
   const [userId, setUserId] = useState<string | undefined>();
   
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id));
   }, []);
   
-  const { hasAccess } = useHasProductAccess(userId, 'longevity_beta');
+  const { hasAccess } = useHasProductAccess(userId, 'longevity_system');
 
   const pillars = [
     {
