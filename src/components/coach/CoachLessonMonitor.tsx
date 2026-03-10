@@ -31,6 +31,9 @@ interface Lesson {
   coach_notes: string | null;
   video_call_link: string | null;
   athlete_name?: string;
+  ai_recap?: string | null;
+  ai_homework?: string | null;
+  recap_generated_at?: string | null;
 }
 
 interface GroupSessionRow {
