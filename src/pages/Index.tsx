@@ -26,6 +26,17 @@ const stagger = (i: number, base = 0.06) => ({ delay: i * base });
 
 const Index = () => {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const openEddie = () => {
     const btn = document.querySelector('[aria-label="Ask Eddie AI"]') as HTMLButtonElement;
