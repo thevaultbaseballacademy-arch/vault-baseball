@@ -40,6 +40,11 @@ const typeConfig: Record<string, { icon: typeof Heart; color: string; bg: string
   community_like: { icon: Heart, color: "text-red-500", bg: "bg-red-500/10" },
   community_comment: { icon: MessageCircle, color: "text-blue-500", bg: "bg-blue-500/10" },
   community_mention: { icon: AtSign, color: "text-purple-500", bg: "bg-purple-500/10" },
+  lesson_booked: { icon: BookOpen, color: "text-green-500", bg: "bg-green-500/10" },
+  lesson_confirmed: { icon: Check, color: "text-green-600", bg: "bg-green-500/10" },
+  lesson_cancelled: { icon: Bell, color: "text-destructive", bg: "bg-destructive/10" },
+  lesson_completed: { icon: Check, color: "text-green-500", bg: "bg-green-500/10" },
+  lesson_link_added: { icon: ExternalLink, color: "text-blue-500", bg: "bg-blue-500/10" },
 };
 
 const NotificationBell = ({ userId }: NotificationBellProps) => {
@@ -160,7 +165,9 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
     
     // Determine destination and track click
     let destination = '/';
-    if (notification.post_id) {
+    if (notification.type?.startsWith('lesson_')) {
+      destination = '/remote-lessons';
+    } else if (notification.post_id) {
       destination = '/community';
     } else if (notification.type === "course_update") {
       destination = "/courses";

@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import LiveActivityFeed from "@/components/dashboard/LiveActivityFeed";
 import WeeklyTipCard from "@/components/dashboard/WeeklyTipCard";
 import TrialStatusBanner from "@/components/trial/TrialStatusBanner";
+import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
 import {
   LineChart,
   Line,
@@ -407,8 +408,9 @@ const Dashboard = () => {
             </div>
 
             {/* Sidebar - Live Activity Feed */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24">
+            <div className="lg:col-span-1 space-y-6">
+              <div className="sticky top-24 space-y-6">
+                {user && <UpcomingLessons userId={user.id} />}
                 <LiveActivityFeed />
               </div>
             </div>
