@@ -38,7 +38,7 @@ const getStaticContent = (): SearchResult[] => {
           description: lesson.description,
           type: "lesson",
           icon: Video,
-          href: `/courses/${courseId}?lesson=${lesson.id}`,
+          href: `/course/${courseId}?lesson=${lesson.id}`,
           category: module.title
         });
       });
