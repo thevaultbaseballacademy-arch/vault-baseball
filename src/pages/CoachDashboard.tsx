@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Loader2, Users, TrendingUp, Calendar, 
   ChevronDown, ChevronUp, Search, Activity, Trophy,
-  BookOpen, Target, BarChart3, Video, Brain, DollarSign, Store
+  BookOpen, Target, BarChart3, Video, Brain, DollarSign, Store, ClipboardList
 } from "lucide-react";
 import CompLessonCredits from "@/components/coach/CompLessonCredits";
 import { Button } from "@/components/ui/button";
