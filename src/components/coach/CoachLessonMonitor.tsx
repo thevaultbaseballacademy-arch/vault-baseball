@@ -194,18 +194,25 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   };
 
   const fetchLessons = async () => {
-    const { data } = await (supabase.from("remote_lessons" as any) as any)
+    const { data, error } = await supabase
+      .from("remote_lessons")
       .select("*")
       .eq("coach_user_id", coachUserId)
       .order("scheduled_at", { ascending: false });
 
+    if (error) {
+      console.error("Error fetching coach lessons:", error);
+      setLessons([]);
+      return;
+    }
+
     if (!data?.length) { setLessons([]); return; }
 
-    const athleteIds = [...new Set((data as any[]).map((l: any) => l.athlete_user_id))];
+    const athleteIds = [...new Set(data.map((l: any) => l.athlete_user_id))];
     const { data: profiles } = await supabase.rpc("get_public_profiles_by_ids", { user_ids: athleteIds });
     const nameMap = new Map((profiles || []).map((p: any) => [p.user_id, p.display_name]));
 
-    setLessons((data as any[]).map((l: any) => ({
+    setLessons(data.map((l: any) => ({
       ...l,
       athlete_name: nameMap.get(l.athlete_user_id) || "Athlete",
     })));
