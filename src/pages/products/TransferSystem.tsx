@@ -182,11 +182,11 @@ const TransferSystem = () => {
                   <Button
                     variant="vault"
                     size="xl"
-                    onClick={() => checkout('transfer_beta')}
-                    disabled={loading === 'transfer_beta'}
+                    onClick={() => checkout('transfer_system')}
+                    disabled={loading === 'transfer_system'}
                     className="whitespace-nowrap"
                   >
-                    {loading === 'transfer_beta' ? (
+                    {loading === 'transfer_system' ? (
                       <Loader2 className="w-5 h-5 animate-spin mr-2" />
                     ) : null}
                     Get Full Access
