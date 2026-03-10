@@ -47,11 +47,14 @@ const Index = () => {
     <main className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Upcoming Lessons for logged-in users */}
+      {/* Quick access for logged-in users */}
       {userId && (
-        <div className="fixed top-16 left-0 right-0 z-40 px-4 py-2 bg-background/95 backdrop-blur-sm border-b border-border">
-          <div className="container mx-auto max-w-4xl">
-            <UpcomingLessons userId={userId} />
+        <div className="relative z-50 bg-primary text-primary-foreground px-4 py-3">
+          <div className="container mx-auto max-w-4xl flex items-center justify-between">
+            <span className="text-sm font-medium">You're logged in — access your dashboard for lessons, schedules & more.</span>
+            <Button size="sm" variant="secondary" onClick={() => navigate("/coach-dashboard")} className="shrink-0 ml-3">
+              Coach Dashboard →
+            </Button>
           </div>
         </div>
       )}
