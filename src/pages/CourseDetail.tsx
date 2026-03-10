@@ -111,9 +111,10 @@ const CourseDetailPage = () => {
         title: module.title,
         description: module.description,
         lessons: module.lessons.map((lesson, lessonIndex) => {
-          // Check for database video URL first, then fall back to static
+          // Check for database video URL first, then fall back to static (only if playable)
           const dbVideoUrl = videoUrlMap.get(lesson.id);
-          const videoUrl = dbVideoUrl || lesson.videoUrl || "";
+          const staticUrl = isPlayableUrl(lesson.videoUrl) ? lesson.videoUrl : "";
+          const videoUrl = dbVideoUrl || staticUrl;
           return {
             index: lessonIndex,
             id: lesson.id,
