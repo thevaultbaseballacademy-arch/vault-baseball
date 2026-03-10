@@ -537,19 +537,19 @@ const Index = () => {
               <Button
                 size="xl"
                 className="font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
-                onClick={openEddie}
+                onClick={() => navigate("/evaluate")}
               >
-                <MessageCircle className="w-5 h-5 mr-2" />
-                ASK EDDIE AI
+                <Zap className="w-5 h-5 mr-2" />
+                START YOUR FREE EVALUATION
               </Button>
               <Button
                 variant="outline"
                 size="lg"
                 className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
-                onClick={() => navigate("/free-velocity-guide")}
+                onClick={() => navigate("/products/velocity-system")}
               >
-                <Download className="w-5 h-5 mr-2" />
-                FREE VELOCITY GUIDE
+                VIEW VELOCITY SYSTEM
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-8">
