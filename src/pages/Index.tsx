@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, MessageCircle, Download, Check, Zap, Target, Shield,
   TrendingUp, Users, Star, ChevronDown, X, AlertTriangle, Gauge,
-  Dumbbell, Heart, Shuffle, BarChart3, BookOpen, Clock, ArrowDown
+  Dumbbell, Heart, Shuffle, BarChart3, BookOpen, Clock, ArrowDown, CalendarDays
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
