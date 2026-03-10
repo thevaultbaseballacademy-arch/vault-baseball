@@ -417,6 +417,12 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ═══════════ DEVELOPMENT PATHWAY ═══════════ */}
+      <DevelopmentPathway />
+
+      {/* ═══════════ ATHLETE RESULTS ═══════════ */}
+      <AthleteResults />
+
       {/* ═══════════ PHILOSOPHY ═══════════ */}
       <section className="py-20 md:py-28 bg-foreground text-primary-foreground">
         <div className="container mx-auto px-4">
