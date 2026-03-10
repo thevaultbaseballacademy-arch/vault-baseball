@@ -53,6 +53,7 @@ import ShowcasePrep from "./pages/products/ShowcasePrep";
 import VideoAnalysis from "./pages/products/VideoAnalysis";
 import OrgStarterPack from "./pages/products/OrgStarterPack";
 import FoundersAccess from "./pages/products/FoundersAccess";
+import AthleteAssessment from "./pages/products/AthleteAssessment";
 import RemoteTraining from "./pages/products/RemoteTraining";
 import PartnerClaim from "./pages/PartnerClaim";
 import WallOfWins from "./pages/WallOfWins";
