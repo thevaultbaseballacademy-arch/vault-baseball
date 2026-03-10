@@ -178,7 +178,7 @@ const ProgressReport = () => {
             <h2 className="text-xs font-display tracking-[0.2em] text-muted-foreground">COACH OBSERVATIONS</h2>
             {report.strengths_observed && (
               <div className="border border-border p-4">
-                <h3 className="text-sm font-display text-green-400 mb-1">✓ STRENGTHS</h3>
+                <h3 className="text-sm font-display text-primary mb-1">✓ STRENGTHS</h3>
                 <p className="text-sm text-foreground whitespace-pre-line">{report.strengths_observed}</p>
               </div>
             )}
