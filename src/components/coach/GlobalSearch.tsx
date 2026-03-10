@@ -26,7 +26,7 @@ const getStaticContent = (): SearchResult[] => {
       description: `Full course with ${course.modules.length} modules`,
       type: "course",
       icon: BookOpen,
-      href: `/courses/${courseId}`,
+      href: `/course/${courseId}`,
       category: "Courses"
     });
 
