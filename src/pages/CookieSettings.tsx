@@ -110,7 +110,7 @@ const CookieSettings = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <main className="flex-1 py-12">
+      <main className="flex-1 pt-24 pb-12">
         <div className="container max-w-4xl mx-auto px-4">
           <Link 
             to="/" 
