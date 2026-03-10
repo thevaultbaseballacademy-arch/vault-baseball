@@ -198,11 +198,14 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   };
 
   const fetchLessons = async () => {
+    console.log("[CoachLessonMonitor] Fetching lessons for coach:", coachUserId);
     const { data, error } = await supabase
       .from("remote_lessons")
       .select("*")
       .eq("coach_user_id", coachUserId)
       .order("scheduled_at", { ascending: false });
+
+    console.log("[CoachLessonMonitor] Result:", { data, error, count: data?.length });
 
     if (error) {
       console.error("Error fetching coach lessons:", error);
