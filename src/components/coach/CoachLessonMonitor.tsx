@@ -189,7 +189,11 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
 
   const fetchAll = async () => {
     setLoading(true);
-    await Promise.all([fetchLessons(), fetchGroupSessions(), fetchCourseProgress()]);
+    try {
+      await Promise.allSettled([fetchLessons(), fetchGroupSessions(), fetchCourseProgress()]);
+    } catch (err) {
+      console.error("Error in fetchAll:", err);
+    }
     setLoading(false);
   };
 
