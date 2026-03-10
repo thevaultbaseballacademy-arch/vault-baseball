@@ -61,6 +61,29 @@ const statusColors: Record<string, string> = {
   completed: "bg-green-500/10 text-green-600",
   cancelled: "bg-destructive/10 text-destructive",
 };
+function downloadLessonICS(lesson: Lesson) {
+  const start = new Date(lesson.scheduled_at);
+  const end = new Date(start.getTime() + lesson.duration_minutes * 60000);
+  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const ics = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Vault Baseball//Lessons//EN",
+    "BEGIN:VEVENT",
+    `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
+    `SUMMARY:Vault Lesson - ${lesson.athlete_name || "Athlete"}`,
+    `DESCRIPTION:${lesson.notes || "Remote coaching session"}${lesson.video_call_link ? "\\nJoin: " + lesson.video_call_link : ""}`,
+    lesson.video_call_link ? `URL:${lesson.video_call_link}` : "",
+    `UID:${lesson.id}@vault-baseball.com`, "STATUS:CONFIRMED",
+    "BEGIN:VALARM", "TRIGGER:-PT15M", "ACTION:DISPLAY", "DESCRIPTION:Vault lesson in 15 minutes", "END:VALARM",
+    "END:VEVENT", "END:VCALENDAR",
+  ].filter(Boolean).join("\r\n");
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `vault-lesson-${start.toISOString().split("T")[0]}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => {
   const [loading, setLoading] = useState(true);
