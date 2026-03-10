@@ -107,6 +107,7 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [generatingRecap, setGeneratingRecap] = useState<string | null>(null);
   const [expandedRecap, setExpandedRecap] = useState<string | null>(null);
+  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const cameraVideoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
 
