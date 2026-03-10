@@ -289,8 +289,24 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
     setVideoLink("");
     fetchLessons();
   };
+  const handleGenerateRecap = async (lessonId: string) => {
+    setGeneratingRecap(lessonId);
+    try {
+      const { data, error } = await supabase.functions.invoke("lesson-recap", {
+        body: { lessonId },
+      });
+      if (error) throw error;
+      toast({ title: "Recap generated!", description: "AI recap and homework are ready." });
+      setExpandedRecap(lessonId);
+      fetchLessons();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to generate recap", variant: "destructive" });
+    } finally {
+      setGeneratingRecap(null);
+    }
+  };
 
-  const handleGroupStatus = async (sessionId: string, newStatus: string) => {
+
     await (supabase.from("group_sessions" as any) as any)
       .update({ status: newStatus })
       .eq("id", sessionId);
