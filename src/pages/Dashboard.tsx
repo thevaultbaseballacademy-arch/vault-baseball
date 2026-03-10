@@ -408,8 +408,9 @@ const Dashboard = () => {
             </div>
 
             {/* Sidebar - Live Activity Feed */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24">
+            <div className="lg:col-span-1 space-y-6">
+              <div className="sticky top-24 space-y-6">
+                {user && <UpcomingLessons userId={user.id} />}
                 <LiveActivityFeed />
               </div>
             </div>
