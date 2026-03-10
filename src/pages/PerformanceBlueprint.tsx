@@ -122,7 +122,7 @@ const PerformanceBlueprint = () => {
               Fast-Track Upgrade
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
+            <h1 className="text-4xl md:text-6xl font-display text-foreground leading-tight">
               The Map to{" "}
               <span className="text-primary">95+ MPH</span>
               <br />

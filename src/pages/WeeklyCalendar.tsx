@@ -220,7 +220,7 @@ const WeeklyCalendar = () => {
                 <Clock className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold">VAULT™ Weekly Calendar</h1>
+                <h1 className="text-3xl font-display">VAULT™ Weekly Calendar</h1>
                 <p className="text-muted-foreground">
                   Structured training distribution for optimal development
                 </p>

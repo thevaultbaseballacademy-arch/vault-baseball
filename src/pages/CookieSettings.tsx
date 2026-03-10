@@ -110,7 +110,7 @@ const CookieSettings = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <main className="flex-1 py-12">
+      <main className="flex-1 pt-24 pb-12">
         <div className="container max-w-4xl mx-auto px-4">
           <Link 
             to="/" 
@@ -125,7 +125,7 @@ const CookieSettings = () => {
               <Cookie className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Cookie Settings</h1>
+              <h1 className="text-3xl font-display text-foreground">Cookie Settings</h1>
               <p className="text-muted-foreground">Manage your cookie preferences</p>
             </div>
           </div>
