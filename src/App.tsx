@@ -95,6 +95,7 @@ import ShortRedirect from "./pages/ShortRedirect";
 import CoachManagement from "./pages/CoachManagement";
 import OwnerCommandCenter from "./pages/OwnerCommandCenter";
 import ProgressReport from "./pages/ProgressReport";
+import BookSession from "./pages/BookSession";
 
 const queryClient = new QueryClient();
 
