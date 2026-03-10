@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Star, MapPin, Clock, Video, FileText, Calendar,
-  Users, MessageSquare, BookOpen, Repeat
+  Users, MessageSquare, BookOpen, Repeat, Award, ShieldAlert
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

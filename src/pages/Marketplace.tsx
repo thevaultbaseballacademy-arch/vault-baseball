@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Star, MapPin, Award, Clock, Filter, ChevronDown, Users, Video, FileText, Calendar } from "lucide-react";
+import { Search, Star, MapPin, Award, Clock, Filter, ChevronDown, Users, Video, FileText, Calendar, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
