@@ -190,6 +190,7 @@ const App = () => (
             <Route path="/products/org-starter-pack" element={<OrgStarterPack />} />
             <Route path="/products/remote-training" element={<RemoteTraining />} />
             <Route path="/products/founders-access" element={<FoundersAccess />} />
+            <Route path="/products/athlete-assessment" element={<AthleteAssessment />} />
             <Route path="/partner-claim" element={<PartnerClaim />} />
             <Route path="/wall-of-wins" element={<WallOfWins />} />
             <Route path="/find-coach" element={<FindCoach />} />
