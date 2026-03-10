@@ -3,6 +3,7 @@ import { Search, X, BookOpen, Video, Target, Users, Calendar } from "lucide-reac
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { courseContent, Lesson, Module } from "@/lib/courseData";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SearchResult {
   id: string;
@@ -15,11 +16,10 @@ interface SearchResult {
 }
 
 // Flatten course content for searching
-const getAllSearchableContent = (): SearchResult[] => {
+const getStaticContent = (): SearchResult[] => {
   const results: SearchResult[] = [];
   
   Object.entries(courseContent).forEach(([courseId, course]) => {
-    // Add course as searchable
     results.push({
       id: courseId,
       title: courseId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
@@ -30,7 +30,6 @@ const getAllSearchableContent = (): SearchResult[] => {
       category: "Courses"
     });
 
-    // Add each lesson as searchable
     course.modules.forEach((module: Module) => {
       module.lessons.forEach((lesson: Lesson) => {
         results.push({
@@ -46,7 +45,6 @@ const getAllSearchableContent = (): SearchResult[] => {
     });
   });
 
-  // Add static drills/resources
   const staticDrills: SearchResult[] = [
     { id: "velocity-drill", title: "Long Toss Protocol", description: "Build arm strength and velocity", type: "drill", icon: Target, href: "/courses/velocity-system", category: "Velocity" },
     { id: "plyo-drill", title: "Plyo Ball Routines", description: "Weighted ball training drills", type: "drill", icon: Target, href: "/courses/velocity-system", category: "Velocity" },
@@ -70,7 +68,7 @@ const GlobalSearch = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   
-  const allContent = getAllSearchableContent();
+  const staticContent = getStaticContent();
 
   useEffect(() => {
     if (query.length < 2) {
@@ -79,13 +77,40 @@ const GlobalSearch = () => {
     }
 
     const lowerQuery = query.toLowerCase();
-    const filtered = allContent.filter(item => 
+
+    // Filter static content
+    const staticResults = staticContent.filter(item => 
       item.title.toLowerCase().includes(lowerQuery) ||
       item.description.toLowerCase().includes(lowerQuery) ||
       item.category?.toLowerCase().includes(lowerQuery)
-    ).slice(0, 8);
+    ).slice(0, 5);
 
-    setResults(filtered);
+    // Search athletes from database
+    const searchAthletes = async () => {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('user_id, display_name, position')
+          .ilike('display_name', `%${query}%`)
+          .limit(5);
+
+        const athleteResults: SearchResult[] = (data || []).map(a => ({
+          id: a.user_id,
+          title: a.display_name || 'Unknown Athlete',
+          description: a.position || 'Athlete',
+          type: "athlete" as const,
+          icon: Users,
+          href: `/profile/${a.user_id}`,
+          category: "Athletes"
+        }));
+
+        setResults([...athleteResults, ...staticResults].slice(0, 8));
+      } catch {
+        setResults(staticResults);
+      }
+    };
+
+    searchAthletes();
     setSelectedIndex(0);
   }, [query]);
 
