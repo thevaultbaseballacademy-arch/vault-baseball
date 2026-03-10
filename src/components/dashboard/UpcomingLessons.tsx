@@ -138,7 +138,21 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
     );
   }
 
-  if (lessons.length === 0) return null;
+  if (lessons.length === 0) {
+    return (
+      <Card className="bg-card border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-display flex items-center gap-2">
+            <Video className="w-5 h-5 text-primary" />
+            UPCOMING LESSONS
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">No upcoming lessons scheduled.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-card border-border">
