@@ -47,6 +47,15 @@ const Index = () => {
     <main className="min-h-screen bg-background">
       <Navbar />
 
+      {/* Upcoming Lessons for logged-in users */}
+      {userId && (
+        <div className="fixed top-16 left-0 right-0 z-40 px-4 py-2 bg-background/95 backdrop-blur-sm border-b border-border">
+          <div className="container mx-auto max-w-4xl">
+            <UpcomingLessons userId={userId} />
+          </div>
+        </div>
+      )}
+
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
         {/* BG */}
