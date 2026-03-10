@@ -5,6 +5,7 @@ import {
   ChevronDown, ChevronUp, Search, Activity, Trophy,
   BookOpen, Target, BarChart3, Video, Brain, DollarSign, Store, ClipboardList
 } from "lucide-react";
+import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
 import CompLessonCredits from "@/components/coach/CompLessonCredits";
 import CoachAvailabilitySync from "@/components/coach/CoachAvailabilitySync";
 import { Button } from "@/components/ui/button";
