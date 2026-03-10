@@ -102,19 +102,19 @@ const Index = () => {
                 <Button
                   size="xl"
                   className="font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
-                  onClick={() => navigate("/evaluate")}
+                  onClick={() => navigate("/book-session")}
                 >
-                  <Zap className="w-5 h-5 mr-2" />
-                  START FREE EVALUATION
+                  <CalendarDays className="w-5 h-5 mr-2" />
+                  BOOK DEVELOPMENT SESSION
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
                   className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
-                  onClick={openEddie}
+                  onClick={() => navigate("/evaluate")}
                 >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  ASK EDDIE AI
+                  <Zap className="w-5 h-5 mr-2" />
+                  SUBMIT ATHLETE VIDEO
                 </Button>
               </motion.div>
 
