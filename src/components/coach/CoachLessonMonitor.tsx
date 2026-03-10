@@ -449,6 +449,10 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
                             </Button>
                           )}
 
+                          <Button variant="outline" size="sm" onClick={() => downloadLessonICS(lesson)} title="Add to Calendar">
+                            <CalendarPlus className="w-3 h-3" />
+                          </Button>
+
                           <Button variant="outline" size="sm" onClick={() => { setEditingNotes(lesson.id); setCoachNotes(lesson.coach_notes || ""); }}>
                             <MessageSquare className="w-3 h-3 mr-1" /> Notes
                           </Button>
