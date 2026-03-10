@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, MessageCircle, Download, Check, Zap, Target, Shield,
@@ -11,7 +12,8 @@ import Footer from "@/components/Footer";
 import DevelopmentPathway from "@/components/home/DevelopmentPathway";
 import AthleteResults from "@/components/home/AthleteResults";
 import ContentAuthority from "@/components/home/ContentAuthority";
-import { useState } from "react";
+import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
