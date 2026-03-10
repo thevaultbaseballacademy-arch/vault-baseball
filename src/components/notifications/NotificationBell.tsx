@@ -165,7 +165,9 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
     
     // Determine destination and track click
     let destination = '/';
-    if (notification.post_id) {
+    if (notification.type?.startsWith('lesson_')) {
+      destination = '/remote-lessons';
+    } else if (notification.post_id) {
       destination = '/community';
     } else if (notification.type === "course_update") {
       destination = "/courses";
