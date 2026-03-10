@@ -360,6 +360,10 @@ const CoachDashboard = () => {
                   <Users className="w-3 h-3" />
                   Athletes
                 </TabsTrigger>
+                <TabsTrigger value="lessons" className="flex items-center gap-1">
+                  <Video className="w-3 h-3" />
+                  Lessons
+                </TabsTrigger>
                 <TabsTrigger value="reports" className="flex items-center gap-1">
                   <ClipboardList className="w-3 h-3" />
                   Reports
@@ -367,10 +371,6 @@ const CoachDashboard = () => {
                 <TabsTrigger value="motion" className="flex items-center gap-1">
                   <Brain className="w-3 h-3" />
                   Motion
-                </TabsTrigger>
-                <TabsTrigger value="lessons" className="flex items-center gap-1">
-                  <Video className="w-3 h-3" />
-                  Lessons
                 </TabsTrigger>
                 <TabsTrigger value="marketplace" className="flex items-center gap-1">
                   <Store className="w-3 h-3" />
