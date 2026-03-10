@@ -136,18 +136,8 @@ const CompLessonCredits = () => {
 
           <div className="flex items-end gap-4">
             <div className="space-y-2 flex-1">
-              <Label>Number of Lessons</Label>
-              <Select value={lessonCount} onValueChange={setLessonCount}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1 Lesson</SelectItem>
-                  <SelectItem value="3">3 Lessons</SelectItem>
-                  <SelectItem value="5">5 Lessons</SelectItem>
-                  <SelectItem value="10">10 Lessons</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Lessons</Label>
+              <p className="text-sm font-medium text-foreground">1 Comp Lesson</p>
             </div>
 
             <Button variant="vault" onClick={handleGrant} disabled={granting}>
@@ -156,7 +146,7 @@ const CompLessonCredits = () => {
               ) : (
                 <Gift className="w-4 h-4 mr-2" />
               )}
-              Grant Comp Lessons
+              Grant 1 Comp Lesson
             </Button>
           </div>
         </div>
