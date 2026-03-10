@@ -64,8 +64,8 @@ const CompLessonCredits = () => {
 
       setSuccess(true);
       toast({
-        title: "Lessons granted!",
-        description: `${lessonCount} comp lesson${parseInt(lessonCount) > 1 ? "s" : ""} granted to ${selectedAthlete.display_name}`,
+        title: "Lesson granted!",
+        description: `1 comp lesson granted to ${selectedAthlete.display_name}`,
       });
       setSelectedAthlete(null);
       setSearchResults([]);
