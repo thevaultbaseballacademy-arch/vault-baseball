@@ -211,6 +211,17 @@ const CoachMarketplaceProfile = () => {
                 )}
               </div>
 
+              {/* Platform Usage Disclaimer */}
+              <div className="bg-destructive/5 border border-destructive/20 p-5">
+                <h2 className="font-display text-sm tracking-wide text-destructive mb-2 flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  PLATFORM USAGE AGREEMENT
+                </h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  This coach is a verified member of the Vault Baseball coaching network. All sessions, lessons, video analyses, and coaching services must be conducted exclusively through the Vault Baseball platform. Coaches are contractually prohibited from soliciting, booking, or conducting sessions with Vault-connected athletes outside of this platform. A 70/30 revenue split (70% coach / 30% platform) applies to all services rendered. Any coach found operating outside of the platform with Vault athletes may be subject to immediate removal from the network and forfeiture of pending earnings. Athletes should only book and pay for sessions through this platform to ensure quality, accountability, and protection.
+                </p>
+              </div>
+
               {/* Services & Reviews Tabs */}
               <Tabs defaultValue="services" className="space-y-4">
                 <TabsList className="grid w-full max-w-md grid-cols-2">
