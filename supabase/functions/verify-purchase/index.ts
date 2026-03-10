@@ -84,7 +84,9 @@ const PRODUCT_TO_COURSES: Record<string, string[]> = {
   // Stand-alone products
   'velocity_12week': ['velocity-system', 'hitting-velocity-12week', 'pitching-velocity-8week', 'elite-pitching-12week'],
   'velocity_accelerator': ['velocity-system', 'hitting-velocity-12week'],
+  'longevity_system': ['arm-health-workload', 'arm-care-complete', 'mobility-durability', 'pitcher-catcher-overlap'],
   'longevity_beta': ['arm-health-workload', 'arm-care-complete', 'mobility-durability', 'pitcher-catcher-overlap'],
+  'transfer_system': ['transfer-system', 'competitive-execution'],
   'transfer_beta': ['transfer-system', 'competitive-execution'],
   'transfer_intensive': ['transfer-system', 'competitive-execution'],
   // Bundles

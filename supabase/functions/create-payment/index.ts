@@ -9,9 +9,9 @@ const corsHeaders = {
 
 // Whitelist of valid Stripe price IDs for one-time payments
 const VALID_PAYMENT_PRICE_IDS = [
-  // Beta Systems
-  'price_1SqEGAPhXS410TO5ZIx2g0RZ', // longevity_beta
-  'price_1SqEGCPhXS410TO5iCsokNpV', // transfer_beta
+  // Full Release Systems
+  'price_1SqEGAPhXS410TO5ZIx2g0RZ', // longevity_system
+  'price_1SqEGCPhXS410TO5iCsokNpV', // transfer_system
   // Stand-alone Products (new $97/$397 prices)
   'price_1T8ckXPhXS410TO5tYyygmol', // velo_check $97
   'price_1T8ckYPhXS410TO5WkQI2EpC', // velocity_system $397
