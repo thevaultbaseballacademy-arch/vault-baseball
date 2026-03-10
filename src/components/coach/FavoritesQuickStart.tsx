@@ -20,9 +20,9 @@ interface FavoriteItem {
 }
 
 const defaultFavorites: FavoriteItem[] = [
-  { id: "fav-1", title: "Arm Care Routine", type: "drill", href: "/courses/arm-health-workload", color: "#22c55e" },
-  { id: "fav-2", title: "Long Toss Protocol", type: "drill", href: "/courses/velocity-system", color: "#3b82f6" },
-  { id: "fav-3", title: "Plyo Ball Drills", type: "drill", href: "/courses/velocity-system", color: "#8b5cf6" },
+  { id: "fav-1", title: "Arm Care Routine", type: "drill", href: "/course/arm-health-workload", color: "#22c55e" },
+  { id: "fav-2", title: "Long Toss Protocol", type: "drill", href: "/course/velocity-system", color: "#3b82f6" },
+  { id: "fav-3", title: "Plyo Ball Drills", type: "drill", href: "/course/velocity-system", color: "#8b5cf6" },
 ];
 
 const availableDrills: FavoriteItem[] = [
