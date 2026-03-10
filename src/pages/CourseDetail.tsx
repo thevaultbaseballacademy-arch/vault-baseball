@@ -54,10 +54,28 @@ const CourseDetailPage = () => {
   const updateEnrollmentMutation = useUpdateEnrollmentProgress();
   const generateCertificateMutation = useGenerateCertificate();
 
+  // Helper to check if a video URL is a real, playable URL (not a placeholder)
+  const isPlayableUrl = (url: string): boolean => {
+    if (!url || url.trim() === "") return false;
+    // Filter out placeholder/example URLs from static data
+    if (/[?&]v=example\d*/i.test(url)) return false;
+    if (/[?&]v=sc\d*/i.test(url)) return false;
+    if (/[?&]v=sa\d*/i.test(url)) return false;
+    if (/[?&]v=mt\d*/i.test(url)) return false;
+    if (/[?&]v=hm\d*/i.test(url)) return false;
+    if (/[?&]v=gm\d*/i.test(url)) return false;
+    if (/[?&]v=[a-z]{1,4}\d{1,3}$/i.test(url)) return false; // catch generic short placeholders
+    return true;
+  };
+
   // Create a map of lesson IDs to video URLs from database
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
-    dbVideos.forEach(v => map.set(v.lesson_id, v.video_url));
+    dbVideos.forEach(v => {
+      if (isPlayableUrl(v.video_url)) {
+        map.set(v.lesson_id, v.video_url);
+      }
+    });
     return map;
   }, [dbVideos]);
 
@@ -93,9 +111,10 @@ const CourseDetailPage = () => {
         title: module.title,
         description: module.description,
         lessons: module.lessons.map((lesson, lessonIndex) => {
-          // Check for database video URL first, then fall back to static
+          // Check for database video URL first, then fall back to static (only if playable)
           const dbVideoUrl = videoUrlMap.get(lesson.id);
-          const videoUrl = dbVideoUrl || lesson.videoUrl || "";
+          const staticUrl = isPlayableUrl(lesson.videoUrl) ? lesson.videoUrl : "";
+          const videoUrl = dbVideoUrl || staticUrl;
           return {
             index: lessonIndex,
             id: lesson.id,
