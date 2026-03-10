@@ -413,6 +413,7 @@ const CoachDashboard = () => {
 
               <TabsContent value="lessons" className="space-y-6">
                 <CoachLessonMonitor coachUserId={user?.id || ''} />
+                <CoachAvailabilitySync coachUserId={user?.id || ''} />
                 <CompLessonCredits />
               </TabsContent>
 
