@@ -184,7 +184,7 @@ const ProgressReport = () => {
             )}
             {report.areas_of_improvement && (
               <div className="border border-border p-4">
-                <h3 className="text-sm font-display text-amber-400 mb-1">⚡ AREAS FOR GROWTH</h3>
+                <h3 className="text-sm font-display text-accent-foreground mb-1">⚡ AREAS FOR GROWTH</h3>
                 <p className="text-sm text-foreground whitespace-pre-line">{report.areas_of_improvement}</p>
               </div>
             )}
