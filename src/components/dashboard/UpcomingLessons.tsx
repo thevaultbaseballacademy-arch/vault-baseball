@@ -233,14 +233,18 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
                     TODAY
                   </Badge>
                 )}
+                <Button
+                  variant="vault"
+                  size="sm"
+                  className="h-7 text-xs gap-1"
+                  onClick={() => setActiveLessonId(lesson.id)}
+                >
+                  <Phone className="w-3 h-3" /> Start
+                </Button>
                 {lesson.video_call_link && (
-                  <Button variant="vault" size="sm" asChild className="h-7 text-xs">
-                    <a
-                      href={lesson.video_call_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Join
+                  <Button variant="outline" size="sm" asChild className="h-7 text-xs">
+                    <a href={lesson.video_call_link} target="_blank" rel="noopener noreferrer">
+                      Link
                     </a>
                   </Button>
                 )}
@@ -252,8 +256,7 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
                     downloadICS(lesson, lesson.other_name);
                     toast({
                       title: "Calendar event downloaded",
-                      description:
-                        "Open the .ics file to add it to your calendar app.",
+                      description: "Open the .ics file to add it to your calendar app.",
                     });
                   }}
                 >
