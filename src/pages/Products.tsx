@@ -732,10 +732,10 @@ const Products = () => {
 
               <AccordionItem value="lifetime" className="border border-border rounded-xl px-6 bg-card">
                 <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
-                  What does "Lifetime Access" mean for Beta products?
+                  What does "Lifetime Access" mean?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Beta Access products grant you permanent access to the program at the founding member price. As we develop and enhance the program, you'll receive all updates and new content at no additional cost. This is our thank you for being an early supporter.
+                  Lifetime Access products grant you permanent access to the program. As we develop and enhance the program, you'll receive all updates and new content at no additional cost.
                 </AccordionContent>
               </AccordionItem>
 
