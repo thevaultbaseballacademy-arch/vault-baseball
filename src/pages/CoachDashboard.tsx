@@ -24,6 +24,7 @@ import PositionShortcuts from "@/components/coach/PositionShortcuts";
 import FavoritesQuickStart from "@/components/coach/FavoritesQuickStart";
 import QuickAccessCard from "@/components/coach/QuickAccessCard";
 import CoachAnalysisReview from "@/components/coaching/CoachAnalysisReview";
+import AthleteProgressReportForm from "@/components/coach/AthleteProgressReportForm";
 import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashboard";
 import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
 import {
