@@ -183,8 +183,8 @@ const App = () => (
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* Product Pages */}
             <Route path="/products" element={<Products />} />
-            <Route path="/products/longevity" element={<LongevityBeta />} />
-            <Route path="/products/transfer" element={<TransferBeta />} />
+            <Route path="/products/longevity" element={<LongevitySystem />} />
+            <Route path="/products/transfer" element={<TransferSystem />} />
             <Route path="/products/velocity-system" element={<VelocitySystem />} />
             <Route path="/products/velocity-accelerator" element={<VelocityAccelerator />} />
             <Route path="/products/teams" element={<TeamLicenses />} />

@@ -236,4 +236,4 @@ const LongevitySystem = () => {
   );
 };
 
-export default LongevityBeta;
+export default LongevitySystem;

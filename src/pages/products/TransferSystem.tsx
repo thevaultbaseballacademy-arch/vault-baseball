@@ -264,4 +264,4 @@ const TransferSystem = () => {
   );
 };
 
-export default TransferBeta;
+export default TransferSystem;
