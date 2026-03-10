@@ -38,8 +38,8 @@ import AdminCertifications from "./pages/admin/AdminCertifications";
 import AdminPayouts from "./pages/admin/AdminPayouts";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
-import LongevityBeta from "./pages/products/LongevityBeta";
-import TransferBeta from "./pages/products/TransferBeta";
+import LongevitySystem from "./pages/products/LongevitySystem";
+import TransferSystem from "./pages/products/TransferSystem";
 import VelocitySystem from "./pages/products/VelocitySystem";
 import VelocityAccelerator from "./pages/products/VelocityAccelerator";
 import TeamLicenses from "./pages/products/TeamLicenses";
@@ -183,8 +183,8 @@ const App = () => (
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* Product Pages */}
             <Route path="/products" element={<Products />} />
-            <Route path="/products/longevity" element={<LongevityBeta />} />
-            <Route path="/products/transfer" element={<TransferBeta />} />
+            <Route path="/products/longevity" element={<LongevitySystem />} />
+            <Route path="/products/transfer" element={<TransferSystem />} />
             <Route path="/products/velocity-system" element={<VelocitySystem />} />
             <Route path="/products/velocity-accelerator" element={<VelocityAccelerator />} />
             <Route path="/products/teams" element={<TeamLicenses />} />

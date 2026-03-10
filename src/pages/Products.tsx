@@ -96,23 +96,23 @@ const Products = () => {
     },
     // Core Systems
     {
-      key: "longevity_beta",
+      key: "longevity_system",
       icon: Shield,
       title: "Longevity System",
       subtitle: "Full Release",
       description: "Arm health monitoring, workload management, and recovery protocols to maximize availability.",
       href: "/products/longevity",
-      price: PRODUCT_PRICES.longevity_beta.price,
+      price: PRODUCT_PRICES.longevity_system.price,
       category: "flagship" as Category,
     },
     {
-      key: "transfer_beta",
+      key: "transfer_system",
       icon: Target,
       title: "Transfer System",
       subtitle: "Full Release",
       description: "Bridge practice performance to game-day execution with competition-focused training.",
       href: "/products/transfer",
-      price: PRODUCT_PRICES.transfer_beta.price,
+      price: PRODUCT_PRICES.transfer_system.price,
       category: "flagship" as Category,
     },
     // Featured Products
@@ -248,7 +248,6 @@ const Products = () => {
   // Group filtered products by category for display
   const flagshipProducts = filteredProducts.filter(p => p.category === "flagship");
   const entryProducts = filteredProducts.filter(p => p.category === "entry");
-  const betaSystems = filteredProducts.filter(p => p.category === "beta");
   const featuredProducts = filteredProducts.filter(p => p.category === "featured");
   const bundles = filteredProducts.filter(p => p.category === "bundles");
   const coachingProducts = filteredProducts.filter(p => p.category === "coaching");
@@ -501,62 +500,6 @@ const Products = () => {
         </section>
       )}
 
-      {/* Beta Systems */}
-      {betaSystems.length > 0 && (
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="mb-12"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-purple-500" />
-                </div>
-                <h2 className="text-3xl font-display text-foreground">Beta Systems</h2>
-              </div>
-              <p className="text-muted-foreground max-w-2xl">
-                Early access to our newest development systems. Get lifetime access at founding member pricing.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {betaSystems.map((product, index) => (
-                <motion.div
-                  key={product.key}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link to={product.href}>
-                    <div className="group flex items-center gap-6 p-6 rounded-2xl border border-border bg-card hover:border-purple-500/50 hover:shadow-lg transition-all duration-300">
-                      <div className="w-14 h-14 shrink-0 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                        <product.icon className="w-7 h-7 text-purple-500" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-xl font-display text-foreground">{product.title}</h3>
-                          <Badge variant="outline" className="border-purple-500/50 text-purple-600 text-xs">
-                            {product.subtitle}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{product.description}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-xl font-bold text-foreground">{formatPrice(product.price)}</span>
-                        <p className="text-xs text-muted-foreground">Lifetime Access</p>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Bundles */}
       {bundles.length > 0 && (
@@ -789,10 +732,10 @@ const Products = () => {
 
               <AccordionItem value="lifetime" className="border border-border rounded-xl px-6 bg-card">
                 <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
-                  What does "Lifetime Access" mean for Beta products?
+                  What does "Lifetime Access" mean?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Beta Access products grant you permanent access to the program at the founding member price. As we develop and enhance the program, you'll receive all updates and new content at no additional cost. This is our thank you for being an early supporter.
+                  Lifetime Access products grant you permanent access to the program. As we develop and enhance the program, you'll receive all updates and new content at no additional cost.
                 </AccordionContent>
               </AccordionItem>
 

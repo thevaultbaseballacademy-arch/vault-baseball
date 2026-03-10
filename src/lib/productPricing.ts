@@ -31,14 +31,14 @@ export const PRODUCT_PRICES = {
   },
   
   // Full Release Systems (one-time)
-  longevity_beta: {
+  longevity_system: {
     price_id: 'price_1SqEGAPhXS410TO5ZIx2g0RZ',
     product_id: 'prod_TnpwnzycjMTqXu',
     name: 'VAULT™ Longevity System',
     price: 29900,
     type: 'payment' as const,
   },
-  transfer_beta: {
+  transfer_system: {
     price_id: 'price_1SqEGCPhXS410TO5iCsokNpV',
     product_id: 'prod_Tnpwn4vDbQNQGz',
     name: 'VAULT™ Transfer System',

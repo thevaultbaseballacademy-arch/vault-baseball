@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
-import BetaUrgencyBanner from "@/components/products/BetaUrgencyBanner";
+
 
 const TransferIntensive = () => {
   const { checkout, loading } = useProductCheckout();
@@ -139,13 +139,6 @@ const TransferIntensive = () => {
               </div>
             </motion.div>
 
-            {/* Urgency Banner */}
-            <BetaUrgencyBanner 
-              accentColor="purple" 
-              spotsTotal={20} 
-              spotsClaimed={14}
-              endDate={new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)}
-            />
 
             {/* The Problem */}
             <motion.div
