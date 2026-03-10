@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Video, Calendar, Clock, CalendarPlus, ExternalLink, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Video, Calendar, Clock, CalendarPlus, ExternalLink, Loader2, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 
 interface LessonRow {
   id: string;
@@ -66,6 +68,7 @@ interface UpcomingLessonsProps {
 const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
   const [lessons, setLessons] = useState<(LessonRow & { other_name: string })[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -230,14 +233,18 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
                     TODAY
                   </Badge>
                 )}
+                <Button
+                  variant="vault"
+                  size="sm"
+                  className="h-7 text-xs gap-1"
+                  onClick={() => setActiveLessonId(lesson.id)}
+                >
+                  <Phone className="w-3 h-3" /> Start
+                </Button>
                 {lesson.video_call_link && (
-                  <Button variant="vault" size="sm" asChild className="h-7 text-xs">
-                    <a
-                      href={lesson.video_call_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Join
+                  <Button variant="outline" size="sm" asChild className="h-7 text-xs">
+                    <a href={lesson.video_call_link} target="_blank" rel="noopener noreferrer">
+                      Link
                     </a>
                   </Button>
                 )}
@@ -249,8 +256,7 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
                     downloadICS(lesson, lesson.other_name);
                     toast({
                       title: "Calendar event downloaded",
-                      description:
-                        "Open the .ics file to add it to your calendar app.",
+                      description: "Open the .ics file to add it to your calendar app.",
                     });
                   }}
                 >
@@ -261,6 +267,32 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
           );
         })}
       </CardContent>
+
+      {/* In-App Live Lesson */}
+      {activeLessonId && (
+        <Dialog open={!!activeLessonId} onOpenChange={(open) => !open && setActiveLessonId(null)}>
+          <DialogContent className="max-w-4xl w-full h-[90vh] p-0 overflow-hidden">
+            <DialogHeader className="p-4 pb-0">
+              <DialogTitle className="font-display flex items-center gap-2">
+                <Video className="w-5 h-5 text-primary" />
+                LIVE LESSON
+                {(() => {
+                  const lesson = lessons.find(l => l.id === activeLessonId);
+                  return lesson ? ` — ${lesson.other_name}` : '';
+                })()}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 min-h-0 p-4 pt-2">
+              <LiveVideoCall
+                sessionId={activeLessonId}
+                userId={userId}
+                isCoach={true}
+                onEnd={() => setActiveLessonId(null)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </Card>
   );
 };

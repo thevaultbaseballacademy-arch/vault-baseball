@@ -2,11 +2,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Video, Users, Calendar, Clock, FileText, MessageSquare,
-  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye, Camera, Mic, MicOff, VideoOff, SwitchCamera, CalendarPlus, Brain, ChevronDown, ChevronUp
+  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye, Camera, Mic, MicOff, VideoOff, SwitchCamera, CalendarPlus, Brain, ChevronDown, ChevronUp, Phone
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -106,6 +107,7 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [generatingRecap, setGeneratingRecap] = useState<string | null>(null);
   const [expandedRecap, setExpandedRecap] = useState<string | null>(null);
+  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const cameraVideoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
 
@@ -478,16 +480,21 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
                             {lesson.status}
                           </Badge>
 
-                          {!lesson.video_call_link && lesson.status !== "cancelled" && (
-                            <Button variant="outline" size="sm" onClick={() => { setEditingLink(lesson.id); setVideoLink(""); }}>
-                              Add Link
+                          {lesson.status !== "cancelled" && lesson.status !== "completed" && (
+                            <Button
+                              variant="vault"
+                              size="sm"
+                              onClick={() => setActiveLessonId(lesson.id)}
+                              className="gap-1"
+                            >
+                              <Phone className="w-3 h-3" /> Start Lesson
                             </Button>
                           )}
 
                           {lesson.video_call_link && (
-                            <Button variant="vault" size="sm" asChild>
+                            <Button variant="outline" size="sm" asChild>
                               <a href={lesson.video_call_link} target="_blank" rel="noopener noreferrer">
-                                <Video className="w-3 h-3 mr-1" /> Join
+                                <Video className="w-3 h-3 mr-1" /> External Link
                               </a>
                             </Button>
                           )}
@@ -799,6 +806,35 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* In-App Live Lesson Video Call */}
+      {activeLessonId && (
+        <Dialog open={!!activeLessonId} onOpenChange={(open) => !open && setActiveLessonId(null)}>
+          <DialogContent className="max-w-4xl w-full h-[90vh] p-0 overflow-hidden">
+            <DialogHeader className="p-4 pb-0">
+              <DialogTitle className="font-display flex items-center gap-2">
+                <Video className="w-5 h-5 text-primary" />
+                LIVE LESSON
+                {(() => {
+                  const lesson = lessons.find(l => l.id === activeLessonId);
+                  return lesson ? ` — ${lesson.athlete_name}` : '';
+                })()}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 min-h-0 p-4 pt-2">
+              <LiveVideoCall
+                sessionId={activeLessonId}
+                userId={coachUserId}
+                isCoach={true}
+                onEnd={() => {
+                  setActiveLessonId(null);
+                  fetchAll();
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
