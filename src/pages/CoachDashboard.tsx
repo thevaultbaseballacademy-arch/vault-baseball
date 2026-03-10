@@ -350,10 +350,14 @@ const CoachDashboard = () => {
 
             {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="grid w-full max-w-4xl grid-cols-7">
+              <TabsList className="grid w-full max-w-5xl grid-cols-8">
                 <TabsTrigger value="athletes" className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Athletes
+                </TabsTrigger>
+                <TabsTrigger value="reports" className="flex items-center gap-1">
+                  <ClipboardList className="w-3 h-3" />
+                  Reports
                 </TabsTrigger>
                 <TabsTrigger value="motion" className="flex items-center gap-1">
                   <Brain className="w-3 h-3" />
@@ -380,6 +384,12 @@ const CoachDashboard = () => {
                   Schedules
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="reports" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">ATHLETE PROGRESS REPORTS</h2>
+                <p className="text-sm text-muted-foreground">Create coach-verified progress reports with AI-assisted accuracy validation. Share with parents and athletes.</p>
+                <AthleteProgressReportForm />
+              </TabsContent>
 
               <TabsContent value="motion" className="space-y-6">
                 <h2 className="font-display text-xl text-foreground">VAULT AI MOTION ANALYSIS</h2>
