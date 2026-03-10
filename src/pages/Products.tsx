@@ -96,23 +96,23 @@ const Products = () => {
     },
     // Core Systems
     {
-      key: "longevity_beta",
+      key: "longevity_system",
       icon: Shield,
       title: "Longevity System",
       subtitle: "Full Release",
       description: "Arm health monitoring, workload management, and recovery protocols to maximize availability.",
       href: "/products/longevity",
-      price: PRODUCT_PRICES.longevity_beta.price,
+      price: PRODUCT_PRICES.longevity_system.price,
       category: "flagship" as Category,
     },
     {
-      key: "transfer_beta",
+      key: "transfer_system",
       icon: Target,
       title: "Transfer System",
       subtitle: "Full Release",
       description: "Bridge practice performance to game-day execution with competition-focused training.",
       href: "/products/transfer",
-      price: PRODUCT_PRICES.transfer_beta.price,
+      price: PRODUCT_PRICES.transfer_system.price,
       category: "flagship" as Category,
     },
     // Featured Products
