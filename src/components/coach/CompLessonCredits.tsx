@@ -16,7 +16,6 @@ const CompLessonCredits = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<AthleteResult[]>([]);
   const [selectedAthlete, setSelectedAthlete] = useState<AthleteResult | null>(null);
-  const [lessonCount, setLessonCount] = useState("1");
   const [searching, setSearching] = useState(false);
   const [granting, setGranting] = useState(false);
   const [success, setSuccess] = useState(false);
