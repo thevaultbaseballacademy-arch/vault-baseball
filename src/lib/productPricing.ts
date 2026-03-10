@@ -31,7 +31,7 @@ export const PRODUCT_PRICES = {
   },
   
   // Full Release Systems (one-time)
-  longevity_beta: {
+  longevity_system: {
     price_id: 'price_1SqEGAPhXS410TO5ZIx2g0RZ',
     product_id: 'prod_TnpwnzycjMTqXu',
     name: 'VAULT™ Longevity System',
