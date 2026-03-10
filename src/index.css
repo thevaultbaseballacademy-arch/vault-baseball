@@ -222,4 +222,7 @@
   .border-utility { border-color: hsl(var(--vault-utility)); }
   .border-longevity { border-color: hsl(var(--vault-longevity)); }
   .border-transfer { border-color: hsl(var(--vault-transfer)); }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }

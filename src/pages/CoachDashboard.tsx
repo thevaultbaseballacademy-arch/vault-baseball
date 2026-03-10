@@ -5,6 +5,7 @@ import {
   ChevronDown, ChevronUp, Search, Activity, Trophy,
   BookOpen, Target, BarChart3, Video, Brain, DollarSign, Store, ClipboardList
 } from "lucide-react";
+import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
 import CompLessonCredits from "@/components/coach/CompLessonCredits";
 import CoachAvailabilitySync from "@/components/coach/CoachAvailabilitySync";
 import { Button } from "@/components/ui/button";
@@ -349,9 +350,12 @@ const CoachDashboard = () => {
               />
             </div>
 
+            {/* Upcoming Lessons Widget - Always Visible */}
+            {user?.id && <UpcomingLessons userId={user.id} />}
+
             {/* Tabs for Athletes vs Schedules vs Leaderboards */}
             <Tabs defaultValue="athletes" className="space-y-6">
-              <TabsList className="grid w-full max-w-5xl grid-cols-8">
+              <TabsList className="flex w-full max-w-5xl overflow-x-auto no-scrollbar">
                 <TabsTrigger value="athletes" className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   Athletes
