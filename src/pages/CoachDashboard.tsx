@@ -101,6 +101,7 @@ const CoachDashboard = () => {
 
   const checkCoachRole = async (userId: string) => {
     try {
+      // Check user_roles table first
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -110,7 +111,21 @@ const CoachDashboard = () => {
 
       if (error) throw error;
       
-      if (data) {
+      // Also check team_whitelist for full_access as fallback
+      let hasTeamAccess = false;
+      if (!data) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.email) {
+          const { data: teamData } = await supabase
+            .from('team_whitelist')
+            .select('full_access')
+            .eq('email', user.email.toLowerCase())
+            .maybeSingle();
+          hasTeamAccess = teamData?.full_access ?? false;
+        }
+      }
+
+      if (data || hasTeamAccess) {
         setIsCoach(true);
         fetchAthletes();
         fetchAllCheckins();
