@@ -66,10 +66,10 @@ const Contact = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
-      <main className="flex-1 py-12">
+      <main className="flex-1 pt-24 pb-12">
         <div className="container max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-foreground mb-3">Contact & Support</h1>
+            <h1 className="text-4xl md:text-5xl font-display text-foreground mb-3 tracking-wider">CONTACT & SUPPORT</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Get instant help from our AI assistant or send us a message. We're here to help you succeed.
             </p>
