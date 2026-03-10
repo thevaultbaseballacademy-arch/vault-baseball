@@ -267,6 +267,32 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
           );
         })}
       </CardContent>
+
+      {/* In-App Live Lesson */}
+      {activeLessonId && (
+        <Dialog open={!!activeLessonId} onOpenChange={(open) => !open && setActiveLessonId(null)}>
+          <DialogContent className="max-w-4xl w-full h-[90vh] p-0 overflow-hidden">
+            <DialogHeader className="p-4 pb-0">
+              <DialogTitle className="font-display flex items-center gap-2">
+                <Video className="w-5 h-5 text-primary" />
+                LIVE LESSON
+                {(() => {
+                  const lesson = lessons.find(l => l.id === activeLessonId);
+                  return lesson ? ` — ${lesson.other_name}` : '';
+                })()}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 min-h-0 p-4 pt-2">
+              <LiveVideoCall
+                sessionId={activeLessonId}
+                userId={userId}
+                isCoach={true}
+                onEnd={() => setActiveLessonId(null)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </Card>
   );
 };
