@@ -249,7 +249,6 @@ const Products = () => {
   const flagshipProducts = filteredProducts.filter(p => p.category === "flagship");
   const entryProducts = filteredProducts.filter(p => p.category === "entry");
   const featuredProducts = filteredProducts.filter(p => p.category === "featured");
-  const featuredProducts = filteredProducts.filter(p => p.category === "featured");
   const bundles = filteredProducts.filter(p => p.category === "bundles");
   const coachingProducts = filteredProducts.filter(p => p.category === "coaching");
 
