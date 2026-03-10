@@ -104,6 +104,8 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   const [cameraMuted, setCameraMuted] = useState(false);
   const [cameraOff, setCameraOff] = useState(false);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const [generatingRecap, setGeneratingRecap] = useState<string | null>(null);
+  const [expandedRecap, setExpandedRecap] = useState<string | null>(null);
   const cameraVideoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
 
