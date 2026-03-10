@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, MessageCircle, Download, Check, Zap, Target, Shield,
@@ -11,7 +12,8 @@ import Footer from "@/components/Footer";
 import DevelopmentPathway from "@/components/home/DevelopmentPathway";
 import AthleteResults from "@/components/home/AthleteResults";
 import ContentAuthority from "@/components/home/ContentAuthority";
-import { useState } from "react";
+import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -24,6 +26,17 @@ const stagger = (i: number, base = 0.06) => ({ delay: i * base });
 
 const Index = () => {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const openEddie = () => {
     const btn = document.querySelector('[aria-label="Ask Eddie AI"]') as HTMLButtonElement;
@@ -33,6 +46,15 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
+
+      {/* Upcoming Lessons for logged-in users */}
+      {userId && (
+        <div className="fixed top-16 left-0 right-0 z-40 px-4 py-2 bg-background/95 backdrop-blur-sm border-b border-border">
+          <div className="container mx-auto max-w-4xl">
+            <UpcomingLessons userId={userId} />
+          </div>
+        </div>
+      )}
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
