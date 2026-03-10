@@ -223,14 +223,22 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   };
 
   const fetchGroupSessions = async () => {
-    const { data: sessionsData } = await (supabase.from("group_sessions" as any) as any)
+    const { data: sessionsData, error: sessionsError } = await supabase
+      .from("group_sessions")
       .select("*")
       .eq("coach_user_id", coachUserId)
       .order("scheduled_at", { ascending: false });
 
+    if (sessionsError) {
+      console.error("Error fetching group sessions:", sessionsError);
+      setGroupSessions([]);
+      return;
+    }
+
     if (!sessionsData?.length) { setGroupSessions([]); return; }
 
-    const { data: enrollments } = await (supabase.from("group_session_enrollments" as any) as any)
+    const { data: enrollments } = await supabase
+      .from("group_session_enrollments")
       .select("session_id");
 
     const countMap = new Map<string, number>();
