@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import DevelopmentPathway from "@/components/home/DevelopmentPathway";
+import AthleteResults from "@/components/home/AthleteResults";
+import ContentAuthority from "@/components/home/ContentAuthority";
 import { useState } from "react";
 
 const fadeUp = {
@@ -99,19 +102,19 @@ const Index = () => {
                 <Button
                   size="xl"
                   className="font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
-                  onClick={openEddie}
+                  onClick={() => navigate("/evaluate")}
                 >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  ASK EDDIE AI
+                  <Zap className="w-5 h-5 mr-2" />
+                  START FREE EVALUATION
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
                   className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
-                  onClick={() => navigate("/free-velocity-guide")}
+                  onClick={openEddie}
                 >
-                  <Download className="w-5 h-5 mr-2" />
-                  FREE VELOCITY GUIDE
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  ASK EDDIE AI
                 </Button>
               </motion.div>
 
@@ -375,8 +378,8 @@ const Index = () => {
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { step: "01", name: "Free Velocity Guide", price: "FREE", desc: "Learn the 5 mistakes killing your pitch velocity. Instant download, no card required.", cta: "Download Now", href: "/free-velocity-guide", highlight: false },
-                { step: "02", name: "Velo-Check Assessment", price: "$97", desc: "Upload your video. Get 3 specific mechanical fixes from Vault coaches within 48 hours.", cta: "Get Velo-Check", href: "/products/velo-check", highlight: false },
+                { step: "01", name: "Free Athlete Evaluation", price: "FREE", desc: "Get your development score, velocity potential, and personalized program recommendation. Takes 2 minutes.", cta: "Start Evaluation", href: "/evaluate", highlight: false },
+                { step: "02", name: "Development Assessment", price: "$97", desc: "Professional video analysis, development scorecard, and custom improvement plan within 48 hours.", cta: "Get Assessment", href: "/products/athlete-assessment", highlight: false },
                 { step: "03", name: "Vault Velocity System", price: "$397", desc: "Complete 12-week self-guided velocity program. Drills, metrics, progressive overload — all built in.", cta: "Start the System", href: "/products/velocity-system", highlight: true },
                 { step: "04", name: "Remote Training", price: "$199/mo", desc: "Monthly coaching, weekly programming, metrics tracking, and direct coach access. Cancel anytime.", cta: "Join Now", href: "/products/remote-training", highlight: false },
               ].map((offer, i) => (
@@ -414,6 +417,12 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ═══════════ DEVELOPMENT PATHWAY ═══════════ */}
+      <DevelopmentPathway />
+
+      {/* ═══════════ ATHLETE RESULTS ═══════════ */}
+      <AthleteResults />
+
       {/* ═══════════ PHILOSOPHY ═══════════ */}
       <section className="py-20 md:py-28 bg-foreground text-primary-foreground">
         <div className="container mx-auto px-4">
@@ -443,6 +452,9 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ═══════════ CONTENT AUTHORITY ═══════════ */}
+      <ContentAuthority />
 
       {/* ═══════════ TESTIMONIALS ═══════════ */}
       <section className="py-20 md:py-28">
@@ -525,19 +537,19 @@ const Index = () => {
               <Button
                 size="xl"
                 className="font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
-                onClick={openEddie}
+                onClick={() => navigate("/evaluate")}
               >
-                <MessageCircle className="w-5 h-5 mr-2" />
-                ASK EDDIE AI
+                <Zap className="w-5 h-5 mr-2" />
+                START YOUR FREE EVALUATION
               </Button>
               <Button
                 variant="outline"
                 size="lg"
                 className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
-                onClick={() => navigate("/free-velocity-guide")}
+                onClick={() => navigate("/products/velocity-system")}
               >
-                <Download className="w-5 h-5 mr-2" />
-                FREE VELOCITY GUIDE
+                VIEW VELOCITY SYSTEM
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-8">

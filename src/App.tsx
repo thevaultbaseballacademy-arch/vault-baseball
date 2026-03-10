@@ -53,6 +53,7 @@ import ShowcasePrep from "./pages/products/ShowcasePrep";
 import VideoAnalysis from "./pages/products/VideoAnalysis";
 import OrgStarterPack from "./pages/products/OrgStarterPack";
 import FoundersAccess from "./pages/products/FoundersAccess";
+import AthleteAssessment from "./pages/products/AthleteAssessment";
 import RemoteTraining from "./pages/products/RemoteTraining";
 import PartnerClaim from "./pages/PartnerClaim";
 import WallOfWins from "./pages/WallOfWins";
@@ -84,6 +85,7 @@ import LessonPackages from "./pages/LessonPackages";
 import RemoteLessons from "./pages/RemoteLessons";
 import GroupSessions from "./pages/GroupSessions";
 import FreeVelocityGuide from "./pages/FreeVelocityGuide";
+import FreeEvaluation from "./pages/FreeEvaluation";
 import AthleteOnboarding from "./pages/AthleteOnboarding";
 import RemoteTrainingHub from "./pages/RemoteTrainingHub";
 import Marketplace from "./pages/Marketplace";
@@ -188,6 +190,7 @@ const App = () => (
             <Route path="/products/org-starter-pack" element={<OrgStarterPack />} />
             <Route path="/products/remote-training" element={<RemoteTraining />} />
             <Route path="/products/founders-access" element={<FoundersAccess />} />
+            <Route path="/products/athlete-assessment" element={<AthleteAssessment />} />
             <Route path="/partner-claim" element={<PartnerClaim />} />
             <Route path="/wall-of-wins" element={<WallOfWins />} />
             <Route path="/find-coach" element={<FindCoach />} />
@@ -228,6 +231,7 @@ const App = () => (
             <Route path="/group-sessions" element={<GroupSessions />} />
             <Route path="/free-velocity-guide" element={<FreeVelocityGuide />} />
             <Route path="/athlete-onboarding" element={<AthleteOnboarding />} />
+            <Route path="/evaluate" element={<FreeEvaluation />} />
             <Route path="/training-hub" element={<RemoteTrainingHub />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
