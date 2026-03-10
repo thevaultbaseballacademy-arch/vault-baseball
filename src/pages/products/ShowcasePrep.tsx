@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
-import BetaUrgencyBanner from "@/components/products/BetaUrgencyBanner";
+
 
 const ShowcasePrep = () => {
   const { checkout, loading } = useProductCheckout();
