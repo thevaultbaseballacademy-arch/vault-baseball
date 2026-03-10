@@ -611,6 +611,71 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Camera Test Dialog */}
+      <Dialog open={cameraTestOpen} onOpenChange={(open) => { if (!open) handleCameraTestClose(); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Camera className="w-5 h-5" /> Camera & Mic Test
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+              <video
+                ref={cameraVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+              />
+              {cameraOff && (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                  <VideoOff className="w-12 h-12 text-muted-foreground" />
+                </div>
+              )}
+              {!cameraStream && !cameraOff && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                variant={cameraMuted ? "destructive" : "outline"}
+                size="sm"
+                onClick={toggleCameraMute}
+                className="gap-2"
+              >
+                {cameraMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                {cameraMuted ? "Unmute" : "Mute"}
+              </Button>
+              <Button
+                variant={cameraOff ? "destructive" : "outline"}
+                size="sm"
+                onClick={toggleCameraVideo}
+                className="gap-2"
+              >
+                {cameraOff ? <VideoOff className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+                {cameraOff ? "Turn On" : "Turn Off"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={switchCameraFacing}
+                className="gap-2"
+              >
+                <SwitchCamera className="w-4 h-4" /> Flip
+              </Button>
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center">
+              If you can see yourself and hear audio feedback, your camera and mic are working correctly.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
