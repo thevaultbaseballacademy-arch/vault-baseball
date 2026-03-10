@@ -94,6 +94,7 @@ import Claim22MAccess from "./pages/Claim22MAccess";
 import ShortRedirect from "./pages/ShortRedirect";
 import CoachManagement from "./pages/CoachManagement";
 import OwnerCommandCenter from "./pages/OwnerCommandCenter";
+import ProgressReport from "./pages/ProgressReport";
 
 const queryClient = new QueryClient();
 
@@ -235,6 +236,7 @@ const App = () => (
             <Route path="/training-hub" element={<RemoteTrainingHub />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
+            <Route path="/progress-report/:token" element={<ProgressReport />} />
             <Route path="/claim-22m" element={<Claim22MAccess />} />
             
             {/* Short URL redirects for social sharing */}
