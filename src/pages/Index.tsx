@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import DevelopmentPathway from "@/components/home/DevelopmentPathway";
+import AthleteResults from "@/components/home/AthleteResults";
+import ContentAuthority from "@/components/home/ContentAuthority";
 import { useState } from "react";
 
 const fadeUp = {
