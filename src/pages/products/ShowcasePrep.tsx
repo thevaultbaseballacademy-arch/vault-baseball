@@ -135,13 +135,6 @@ const ShowcasePrep = () => {
               </div>
             </motion.div>
 
-            {/* Urgency Banner */}
-            <BetaUrgencyBanner 
-              accentColor="amber" 
-              spotsTotal={50} 
-              spotsClaimed={31}
-              endDate={new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)}
-            />
 
             {/* Results Stats */}
             <motion.div

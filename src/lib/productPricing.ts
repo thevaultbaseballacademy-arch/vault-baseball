@@ -38,7 +38,7 @@ export const PRODUCT_PRICES = {
     price: 29900,
     type: 'payment' as const,
   },
-  transfer_beta: {
+  transfer_system: {
     price_id: 'price_1SqEGCPhXS410TO5iCsokNpV',
     product_id: 'prod_Tnpwn4vDbQNQGz',
     name: 'VAULT™ Transfer System',

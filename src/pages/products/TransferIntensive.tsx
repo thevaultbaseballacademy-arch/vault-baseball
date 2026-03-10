@@ -139,13 +139,6 @@ const TransferIntensive = () => {
               </div>
             </motion.div>
 
-            {/* Urgency Banner */}
-            <BetaUrgencyBanner 
-              accentColor="purple" 
-              spotsTotal={20} 
-              spotsClaimed={14}
-              endDate={new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)}
-            />
 
             {/* The Problem */}
             <motion.div

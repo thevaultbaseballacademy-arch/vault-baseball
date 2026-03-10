@@ -36,7 +36,6 @@ const categories: { value: Category; label: string }[] = [
   { value: "flagship", label: "Flagship Programs" },
   { value: "entry", label: "Entry Points" },
   { value: "featured", label: "Featured Products" },
-  { value: "beta", label: "Beta Systems" },
   { value: "bundles", label: "Value Bundles" },
   { value: "coaching", label: "For Coaches" },
 ];
