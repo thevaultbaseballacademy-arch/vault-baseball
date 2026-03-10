@@ -2,11 +2,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Video, Users, Calendar, Clock, FileText, MessageSquare,
-  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye, Camera, Mic, MicOff, VideoOff, SwitchCamera, CalendarPlus, Brain, ChevronDown, ChevronUp
+  CheckCircle2, BookOpen, TrendingUp, Loader2, Send, Eye, Camera, Mic, MicOff, VideoOff, SwitchCamera, CalendarPlus, Brain, ChevronDown, ChevronUp, Phone
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
