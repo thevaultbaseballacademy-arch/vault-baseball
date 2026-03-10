@@ -18,7 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-export type Category = "all" | "flagship" | "entry" | "featured" | "beta" | "bundles" | "coaching";
+export type Category = "all" | "flagship" | "entry" | "featured" | "bundles" | "coaching";
 export type PriceRange = "all" | "under100" | "100to300" | "300to500" | "over500";
 
 interface ProductFiltersProps {
