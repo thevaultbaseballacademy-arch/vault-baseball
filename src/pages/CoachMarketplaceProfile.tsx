@@ -305,7 +305,16 @@ const CoachMarketplaceProfile = () => {
                 <p className="text-4xl font-display text-foreground mb-1">{formatPrice(coach.hourly_rate_cents)}</p>
                 <p className="text-sm text-muted-foreground mb-5">per session</p>
 
-                <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
+                <Dialog open={bookingOpen} onOpenChange={async (open) => {
+                  if (open) {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) {
+                      navigate("/auth");
+                      return;
+                    }
+                  }
+                  setBookingOpen(open);
+                }}>
                   <DialogTrigger asChild>
                     <Button size="lg" className="w-full mb-4">Book a Session</Button>
                   </DialogTrigger>
@@ -357,6 +366,10 @@ const CoachMarketplaceProfile = () => {
                           </div>
                         </div>
                       )}
+                      {/* Booking disclaimer */}
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">
+                        By booking, you agree that all sessions are conducted through the Vault Baseball platform. Do not arrange sessions outside of this platform.
+                      </p>
                       <Button className="w-full" disabled={!bookingService || !bookingDate || !bookingTime || createBooking.isPending} onClick={handleBook}>
                         {createBooking.isPending ? "Booking..." : "Confirm Booking"}
                       </Button>
