@@ -55,7 +55,7 @@ const CompLessonCredits = () => {
     try {
       const { error } = await (supabase.from("lesson_credits" as any) as any).insert({
         user_id: selectedAthlete.user_id,
-        total_lessons: parseInt(lessonCount),
+        total_lessons: 1,
         used_lessons: 0,
         purchased_at: new Date().toISOString(),
       });
