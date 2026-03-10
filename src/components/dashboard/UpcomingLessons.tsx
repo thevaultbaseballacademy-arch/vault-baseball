@@ -239,7 +239,7 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
                   className="h-7 text-xs gap-1"
                   onClick={() => setActiveLessonId(lesson.id)}
                 >
-                  <Phone className="w-3 h-3" /> Start
+                  <Phone className="w-3 h-3" /> {lesson.coach_user_id === userId ? "Start" : "Join"}
                 </Button>
                 {lesson.video_call_link && (
                   <Button variant="outline" size="sm" asChild className="h-7 text-xs">
@@ -286,7 +286,10 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
               <LiveVideoCall
                 sessionId={activeLessonId}
                 userId={userId}
-                isCoach={true}
+                isCoach={(() => {
+                  const lesson = lessons.find(l => l.id === activeLessonId);
+                  return lesson ? lesson.coach_user_id === userId : false;
+                })()}
                 onEnd={() => setActiveLessonId(null)}
               />
             </div>
