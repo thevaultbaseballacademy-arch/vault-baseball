@@ -144,7 +144,7 @@ const LongevityBeta = () => {
                 </div>
                 {hasAccess ? (
                   <Button variant="vault" size="xl" asChild>
-                    <Link to="/courses/arm-health-workload">
+                    <Link to="/course/arm-health-workload">
                       <BookOpen className="w-5 h-5 mr-2" />
                       Access Your Course
                       <ArrowRight className="w-5 h-5 ml-2" />
