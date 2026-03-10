@@ -305,8 +305,7 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
       setGeneratingRecap(null);
     }
   };
-
-
+  const handleGroupStatus = async (sessionId: string, newStatus: string) => {
     await (supabase.from("group_sessions" as any) as any)
       .update({ status: newStatus })
       .eq("id", sessionId);
