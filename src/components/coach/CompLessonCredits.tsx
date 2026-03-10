@@ -3,7 +3,6 @@ import { Gift, Loader2, Search, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +16,6 @@ const CompLessonCredits = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<AthleteResult[]>([]);
   const [selectedAthlete, setSelectedAthlete] = useState<AthleteResult | null>(null);
-  const [lessonCount, setLessonCount] = useState("1");
   const [searching, setSearching] = useState(false);
   const [granting, setGranting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -57,7 +55,7 @@ const CompLessonCredits = () => {
     try {
       const { error } = await (supabase.from("lesson_credits" as any) as any).insert({
         user_id: selectedAthlete.user_id,
-        total_lessons: parseInt(lessonCount),
+        total_lessons: 1,
         used_lessons: 0,
         purchased_at: new Date().toISOString(),
       });
@@ -66,8 +64,8 @@ const CompLessonCredits = () => {
 
       setSuccess(true);
       toast({
-        title: "Lessons granted!",
-        description: `${lessonCount} comp lesson${parseInt(lessonCount) > 1 ? "s" : ""} granted to ${selectedAthlete.display_name}`,
+        title: "Lesson granted!",
+        description: `1 comp lesson granted to ${selectedAthlete.display_name}`,
       });
       setSelectedAthlete(null);
       setSearchResults([]);
@@ -136,18 +134,8 @@ const CompLessonCredits = () => {
 
           <div className="flex items-end gap-4">
             <div className="space-y-2 flex-1">
-              <Label>Number of Lessons</Label>
-              <Select value={lessonCount} onValueChange={setLessonCount}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1 Lesson</SelectItem>
-                  <SelectItem value="3">3 Lessons</SelectItem>
-                  <SelectItem value="5">5 Lessons</SelectItem>
-                  <SelectItem value="10">10 Lessons</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Lessons</Label>
+              <p className="text-sm font-medium text-foreground">1 Comp Lesson</p>
             </div>
 
             <Button variant="vault" onClick={handleGrant} disabled={granting}>
@@ -156,7 +144,7 @@ const CompLessonCredits = () => {
               ) : (
                 <Gift className="w-4 h-4 mr-2" />
               )}
-              Grant Comp Lessons
+              Grant 1 Comp Lesson
             </Button>
           </div>
         </div>
