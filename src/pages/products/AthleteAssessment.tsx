@@ -74,8 +74,8 @@ const AthleteAssessment = () => {
               <Button
                 size="xl"
                 className="bg-primary-foreground text-foreground hover:bg-primary-foreground/90 font-display tracking-wide"
-                onClick={() => checkout(product.price_id, product.type)}
-                disabled={loading}
+                onClick={() => checkout("velo_check")}
+                disabled={!!loading}
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Zap className="w-5 h-5 mr-2" />}
                 GET YOUR ASSESSMENT
@@ -186,8 +186,8 @@ const AthleteAssessment = () => {
       <MobileConversionBar
         productName="Development Assessment"
         price={formatPrice(product.price)}
-        onCheckout={() => checkout(product.price_id, product.type)}
-        loading={loading}
+        onCheckout={() => checkout("velo_check")}
+        loading={!!loading}
       />
     </main>
   );
