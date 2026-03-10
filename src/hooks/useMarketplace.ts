@@ -306,7 +306,16 @@ export const useCreateBooking = () => {
       notes?: string;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error("Not authenticated — you must create a Vault Baseball account to book sessions.");
+
+      // Verify the athlete has a profile (registered user)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!profile) throw new Error("You must complete your profile before booking a session. Please visit your Dashboard first.");
 
       const platform_fee_cents = Math.round(amount_cents * (PLATFORM_FEE_PERCENT / 100));
       const coach_payout_cents = amount_cents - platform_fee_cents;

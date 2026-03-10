@@ -427,6 +427,24 @@ const CoachMarketplaceSetup = ({ userId }: Props) => {
           )}
         </div>
       </div>
+
+      {/* Platform Agreement Disclaimer */}
+      <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-5">
+        <h3 className="font-display text-sm tracking-wide text-destructive mb-2 flex items-center gap-2">
+          <Lock className="w-4 h-4" />
+          COACH PLATFORM AGREEMENT
+        </h3>
+        <ul className="text-xs text-muted-foreground space-y-2 leading-relaxed">
+          <li>• All coaching sessions, lessons, and services with Vault-connected athletes must be conducted exclusively through the Vault Baseball platform.</li>
+          <li>• You are prohibited from soliciting, booking, or conducting sessions with Vault athletes outside of this platform.</li>
+          <li>• A <strong className="text-foreground">70/30 revenue split</strong> (70% coach / 30% platform) applies to all services rendered through the marketplace.</li>
+          <li>• Violations of this agreement may result in immediate removal from the Vault coaching network and forfeiture of all pending earnings.</li>
+          <li>• All athlete data, progress reports, and communications remain the property of Vault Baseball and may not be used outside of this platform.</li>
+        </ul>
+        <p className="text-[10px] text-muted-foreground/70 mt-3">
+          By activating your marketplace profile, you acknowledge and agree to these terms.
+        </p>
+      </div>
     </div>
   );
 };
