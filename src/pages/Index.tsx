@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, MessageCircle, Download, Check, Zap, Target, Shield,
   TrendingUp, Users, Star, ChevronDown, X, AlertTriangle, Gauge,
-  Dumbbell, Heart, Shuffle, BarChart3, BookOpen, Clock, ArrowDown
+  Dumbbell, Heart, Shuffle, BarChart3, BookOpen, Clock, ArrowDown, CalendarDays
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -102,19 +102,19 @@ const Index = () => {
                 <Button
                   size="xl"
                   className="font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
-                  onClick={() => navigate("/evaluate")}
+                  onClick={() => navigate("/book-session")}
                 >
-                  <Zap className="w-5 h-5 mr-2" />
-                  START FREE EVALUATION
+                  <CalendarDays className="w-5 h-5 mr-2" />
+                  BOOK DEVELOPMENT SESSION
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
                   className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
-                  onClick={openEddie}
+                  onClick={() => navigate("/evaluate")}
                 >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  ASK EDDIE AI
+                  <Zap className="w-5 h-5 mr-2" />
+                  SUBMIT ATHLETE VIDEO
                 </Button>
               </motion.div>
 
@@ -556,6 +556,44 @@ const Index = () => {
               {["No Credit Card", "Instant Access", "Ages 12–18"].map((t, i) => (
                 <span key={i} className="text-[10px] text-primary-foreground/20 font-display tracking-[0.2em]">{t}</span>
               ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+      {/* ═══════════ FINAL CTA ═══════════ */}
+      <section className="py-20 md:py-28 bg-foreground">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeUp} className="max-w-3xl mx-auto text-center space-y-6">
+            <span className="text-[11px] font-display tracking-[0.3em] text-primary-foreground/40 block">GET STARTED TODAY</span>
+            <h2 className="text-3xl md:text-5xl font-display text-primary-foreground">READY TO DEVELOP?</h2>
+            <p className="text-sm text-primary-foreground/50 max-w-lg mx-auto">
+              Book a session with a Vault coach, submit your video for evaluation, or start a training program. Your development starts now.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+              <Button
+                size="lg"
+                className="font-display tracking-wide bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
+                onClick={() => navigate("/book-session")}
+              >
+                <CalendarDays className="w-4 h-4 mr-2" />
+                BOOK DEVELOPMENT SESSION
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
+                onClick={() => navigate("/evaluate")}
+              >
+                SUBMIT ATHLETE VIDEO
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="font-display tracking-wide border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
+                onClick={() => navigate("/courses")}
+              >
+                START TRAINING PROGRAM
+              </Button>
             </div>
           </motion.div>
         </div>

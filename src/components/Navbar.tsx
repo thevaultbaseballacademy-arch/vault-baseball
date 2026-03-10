@@ -130,8 +130,9 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Courses", href: "/courses" },
-    { name: "Wall of Wins", href: "/wall-of-wins" },
+    { name: "Programs", href: "/courses" },
+    { name: "Book Session", href: "/book-session" },
+    { name: "Submit Video", href: "/evaluate" },
     { 
       name: "Products", 
       href: "/products",
@@ -146,17 +147,6 @@ const Navbar = () => {
         { name: "Team Licenses", href: "/products/teams" },
         { name: "Coach Certification", href: "/products/certified-coach" },
         { name: "Bundles", href: "/products/bundles" },
-      ]
-    },
-    { 
-      name: "Training", 
-      href: "/courses",
-      dropdown: [
-        { name: "Velocity System", href: "/courses" },
-        { name: "Longevity Dashboard", href: "/longevity" },
-        { name: "Weekly Calendar", href: "/calendar" },
-        { name: "Youth (8-12)", href: "/pathway/youth" },
-        { name: "Academy (13-18)", href: "/pathway/academy" },
       ]
     },
     { 

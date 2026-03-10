@@ -2876,6 +2876,78 @@ export type Database = {
         }
         Relationships: []
       }
+      session_bookings: {
+        Row: {
+          athlete_age: number | null
+          athlete_name: string
+          coach_name: string | null
+          coach_notified_at: string | null
+          coach_user_id: string
+          confirmation_sent_at: string | null
+          created_at: string
+          duration_minutes: number | null
+          email: string
+          id: string
+          location: string | null
+          meeting_link: string | null
+          notes: string | null
+          parent_name: string | null
+          phone: string | null
+          primary_position: string | null
+          session_date: string
+          session_time: string
+          session_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          athlete_age?: number | null
+          athlete_name: string
+          coach_name?: string | null
+          coach_notified_at?: string | null
+          coach_user_id: string
+          confirmation_sent_at?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          email: string
+          id?: string
+          location?: string | null
+          meeting_link?: string | null
+          notes?: string | null
+          parent_name?: string | null
+          phone?: string | null
+          primary_position?: string | null
+          session_date: string
+          session_time: string
+          session_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          athlete_age?: number | null
+          athlete_name?: string
+          coach_name?: string | null
+          coach_notified_at?: string | null
+          coach_user_id?: string
+          confirmation_sent_at?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          email?: string
+          id?: string
+          location?: string | null
+          meeting_link?: string | null
+          notes?: string | null
+          parent_name?: string | null
+          phone?: string | null
+          primary_position?: string | null
+          session_date?: string
+          session_time?: string
+          session_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       session_recordings: {
         Row: {
           athlete_user_id: string
