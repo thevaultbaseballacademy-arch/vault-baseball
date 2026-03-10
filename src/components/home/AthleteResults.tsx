@@ -158,10 +158,12 @@ const AthleteResults = () => {
                       <span className="text-sm font-medium text-foreground">{r.after}</span>
                     </div>
                   </div>
-                <span className="text-[10px] font-display tracking-wider text-muted-foreground">{r.weeks} WEEKS</span>
+                  <span className="text-[10px] font-display tracking-wider text-muted-foreground">{r.weeks} WEEKS</span>
                 </div>
                 <MiniProgressChart progress={r.progress} maxWeeks={r.weeks} />
+              </motion.div>
             ))}
+
           </div>
 
           <p className="text-center text-[10px] text-muted-foreground mt-6 italic">
