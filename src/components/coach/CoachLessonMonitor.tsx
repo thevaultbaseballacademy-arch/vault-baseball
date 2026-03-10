@@ -189,37 +189,56 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
 
   const fetchAll = async () => {
     setLoading(true);
-    await Promise.all([fetchLessons(), fetchGroupSessions(), fetchCourseProgress()]);
+    try {
+      await Promise.allSettled([fetchLessons(), fetchGroupSessions(), fetchCourseProgress()]);
+    } catch (err) {
+      console.error("Error in fetchAll:", err);
+    }
     setLoading(false);
   };
 
   const fetchLessons = async () => {
-    const { data } = await (supabase.from("remote_lessons" as any) as any)
+    const { data, error } = await supabase
+      .from("remote_lessons")
       .select("*")
       .eq("coach_user_id", coachUserId)
       .order("scheduled_at", { ascending: false });
 
+    if (error) {
+      console.error("Error fetching coach lessons:", error);
+      setLessons([]);
+      return;
+    }
+
     if (!data?.length) { setLessons([]); return; }
 
-    const athleteIds = [...new Set((data as any[]).map((l: any) => l.athlete_user_id))];
+    const athleteIds = [...new Set(data.map((l: any) => l.athlete_user_id))];
     const { data: profiles } = await supabase.rpc("get_public_profiles_by_ids", { user_ids: athleteIds });
     const nameMap = new Map((profiles || []).map((p: any) => [p.user_id, p.display_name]));
 
-    setLessons((data as any[]).map((l: any) => ({
+    setLessons(data.map((l: any) => ({
       ...l,
       athlete_name: nameMap.get(l.athlete_user_id) || "Athlete",
     })));
   };
 
   const fetchGroupSessions = async () => {
-    const { data: sessionsData } = await (supabase.from("group_sessions" as any) as any)
+    const { data: sessionsData, error: sessionsError } = await supabase
+      .from("group_sessions")
       .select("*")
       .eq("coach_user_id", coachUserId)
       .order("scheduled_at", { ascending: false });
 
+    if (sessionsError) {
+      console.error("Error fetching group sessions:", sessionsError);
+      setGroupSessions([]);
+      return;
+    }
+
     if (!sessionsData?.length) { setGroupSessions([]); return; }
 
-    const { data: enrollments } = await (supabase.from("group_session_enrollments" as any) as any)
+    const { data: enrollments } = await supabase
+      .from("group_session_enrollments")
       .select("session_id");
 
     const countMap = new Map<string, number>();
