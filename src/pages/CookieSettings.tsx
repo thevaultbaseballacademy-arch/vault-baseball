@@ -125,7 +125,7 @@ const CookieSettings = () => {
               <Cookie className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Cookie Settings</h1>
+              <h1 className="text-3xl font-display text-foreground">Cookie Settings</h1>
               <p className="text-muted-foreground">Manage your cookie preferences</p>
             </div>
           </div>
