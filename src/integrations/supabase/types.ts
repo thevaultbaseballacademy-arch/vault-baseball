@@ -372,6 +372,87 @@ export type Database = {
         }
         Relationships: []
       }
+      athlete_progress_reports: {
+        Row: {
+          ai_accuracy_notes: string | null
+          ai_projections: Json | null
+          ai_recommendations: Json | null
+          ai_summary: string | null
+          areas_of_improvement: string | null
+          athlete_user_id: string
+          athlete_viewed_at: string | null
+          bat_speed: Json | null
+          coach_notes: string | null
+          coach_user_id: string
+          created_at: string
+          delivered_at: string | null
+          exit_velocity: Json | null
+          id: string
+          is_published: boolean | null
+          parent_viewed_at: string | null
+          pitch_velocity: Json | null
+          pop_time: Json | null
+          report_period: string | null
+          report_title: string
+          share_token: string | null
+          sprint_speed: Json | null
+          strengths_observed: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_accuracy_notes?: string | null
+          ai_projections?: Json | null
+          ai_recommendations?: Json | null
+          ai_summary?: string | null
+          areas_of_improvement?: string | null
+          athlete_user_id: string
+          athlete_viewed_at?: string | null
+          bat_speed?: Json | null
+          coach_notes?: string | null
+          coach_user_id: string
+          created_at?: string
+          delivered_at?: string | null
+          exit_velocity?: Json | null
+          id?: string
+          is_published?: boolean | null
+          parent_viewed_at?: string | null
+          pitch_velocity?: Json | null
+          pop_time?: Json | null
+          report_period?: string | null
+          report_title?: string
+          share_token?: string | null
+          sprint_speed?: Json | null
+          strengths_observed?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_accuracy_notes?: string | null
+          ai_projections?: Json | null
+          ai_recommendations?: Json | null
+          ai_summary?: string | null
+          areas_of_improvement?: string | null
+          athlete_user_id?: string
+          athlete_viewed_at?: string | null
+          bat_speed?: Json | null
+          coach_notes?: string | null
+          coach_user_id?: string
+          created_at?: string
+          delivered_at?: string | null
+          exit_velocity?: Json | null
+          id?: string
+          is_published?: boolean | null
+          parent_viewed_at?: string | null
+          pitch_velocity?: Json | null
+          pop_time?: Json | null
+          report_period?: string | null
+          report_title?: string
+          share_token?: string | null
+          sprint_speed?: Json | null
+          strengths_observed?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       athlete_trials: {
         Row: {
           converted_at: string | null
