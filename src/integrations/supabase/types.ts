@@ -2730,6 +2730,8 @@ export type Database = {
       }
       remote_lessons: {
         Row: {
+          ai_homework: string | null
+          ai_recap: string | null
           athlete_feedback: string | null
           athlete_rating: number | null
           athlete_user_id: string
@@ -2740,12 +2742,15 @@ export type Database = {
           duration_minutes: number
           id: string
           notes: string | null
+          recap_generated_at: string | null
           scheduled_at: string
           status: string
           updated_at: string
           video_call_link: string | null
         }
         Insert: {
+          ai_homework?: string | null
+          ai_recap?: string | null
           athlete_feedback?: string | null
           athlete_rating?: number | null
           athlete_user_id: string
@@ -2756,12 +2761,15 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          recap_generated_at?: string | null
           scheduled_at: string
           status?: string
           updated_at?: string
           video_call_link?: string | null
         }
         Update: {
+          ai_homework?: string | null
+          ai_recap?: string | null
           athlete_feedback?: string | null
           athlete_rating?: number | null
           athlete_user_id?: string
@@ -2772,6 +2780,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          recap_generated_at?: string | null
           scheduled_at?: string
           status?: string
           updated_at?: string
