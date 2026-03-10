@@ -143,6 +143,7 @@ const App = () => (
             } />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/courses" element={<Courses />} />
+            <Route path="/courses/:courseId" element={<CoursesRedirect />} />
             <Route path="/course/:courseId" element={
               <TrialProtectedRoute>
                 <CourseDetail />
