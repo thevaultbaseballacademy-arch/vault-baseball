@@ -103,7 +103,7 @@ const RemoteLessons = () => {
     try {
       const scheduledAt = new Date(`${selectedDate}T${selectedTime}`).toISOString();
       
-      const { error } = await (supabase.from('remote_lessons' as any) as any).insert({
+      const { error } = await supabase.from('remote_lessons').insert({
         coach_user_id: selectedCoach,
         athlete_user_id: user.id,
         scheduled_at: scheduledAt,
