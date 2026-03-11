@@ -134,6 +134,7 @@ const App = () => (
               </TrialProtectedRoute>
             } />
             <Route path="/coach" element={<CoachDashboard />} />
+            <Route path="/coach-dashboard" element={<CoachDashboard />} />
             <Route path="/owner" element={<OwnerCommandCenter />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/certification-analytics" element={<CertificationAnalytics />} />
