@@ -10,6 +10,8 @@ import LiveActivityFeed from "@/components/dashboard/LiveActivityFeed";
 import WeeklyTipCard from "@/components/dashboard/WeeklyTipCard";
 import TrialStatusBanner from "@/components/trial/TrialStatusBanner";
 import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
+import SelectCoachWidget from "@/components/dashboard/SelectCoachWidget";
+import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequests";
 import {
   LineChart,
   Line,
@@ -410,6 +412,8 @@ const Dashboard = () => {
             {/* Sidebar - Live Activity Feed */}
             <div className="lg:col-span-1 space-y-6">
               <div className="sticky top-24 space-y-6">
+                {user && <SelectCoachWidget userId={user.id} />}
+                {user && <CoachAssignmentRequests userId={user.id} />}
                 {user && <UpcomingLessons userId={user.id} />}
                 <LiveActivityFeed />
               </div>
