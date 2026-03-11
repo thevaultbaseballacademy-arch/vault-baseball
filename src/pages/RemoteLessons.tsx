@@ -69,16 +69,14 @@ const RemoteLessons = () => {
   };
 
   const fetchCoaches = async () => {
-    // Use coaches table (publicly readable via RLS) instead of user_roles
-    const { data: coachRows } = await supabase
-      .from('coaches')
+    // Use coach_marketplace_profiles (publicly readable for active coaches)
+    const { data: marketplaceCoaches } = await supabase
+      .from('coach_marketplace_profiles')
       .select('user_id')
-      .eq('status', 'Active')
-      .not('user_id', 'is', null);
+      .eq('is_marketplace_active', true);
 
-    if (!coachRows?.length) return;
-    const coachIds = coachRows.map(r => r.user_id).filter(Boolean) as string[];
-    if (coachIds.length === 0) return;
+    if (!marketplaceCoaches?.length) return;
+    const coachIds = marketplaceCoaches.map(r => r.user_id);
     
     const { data } = await supabase.rpc('get_public_profiles_by_ids', { user_ids: coachIds });
     setCoaches((data || []).map((p: any) => ({ user_id: p.user_id, display_name: p.display_name, avatar_url: p.avatar_url, position: p.player_position })));
