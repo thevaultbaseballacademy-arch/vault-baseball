@@ -128,7 +128,7 @@ const RemoteLessons = () => {
 
   const handleAddVideoLink = async (lessonId: string) => {
     if (!videoLink) return;
-    await (supabase.from('remote_lessons' as any) as any).update({ video_call_link: videoLink, status: 'confirmed' }).eq('id', lessonId);
+    await supabase.from('remote_lessons').update({ video_call_link: videoLink, status: 'confirmed' }).eq('id', lessonId);
     setEditingLesson(null);
     setVideoLink('');
     fetchLessons();
@@ -136,7 +136,7 @@ const RemoteLessons = () => {
   };
 
   const handleCancel = async (lessonId: string) => {
-    await (supabase.from('remote_lessons' as any) as any).update({ status: 'cancelled' }).eq('id', lessonId);
+    await supabase.from('remote_lessons').update({ status: 'cancelled' }).eq('id', lessonId);
     fetchLessons();
     toast({ title: "Lesson cancelled" });
   };
