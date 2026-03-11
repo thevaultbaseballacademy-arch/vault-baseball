@@ -87,20 +87,31 @@ const AthleteProgressReportForm = () => {
         })));
       }
     } else {
-      // Fallback: show all profiles so the coach can still create reports
-      const { data: allProfiles } = await supabase
-        .from("profiles")
-        .select("user_id, display_name")
-        .order("display_name")
-        .limit(100);
+      // Fallback: use the security-definer function to get assigned athlete profiles
+      const { data: assignedProfiles } = await supabase.rpc("get_assigned_athlete_profiles", {
+        coach_id: user.id,
+      });
 
-      if (allProfiles) {
-        setAthletes(allProfiles
-          .filter((p: any) => p.user_id !== user.id)
-          .map((p: any) => ({
-            user_id: p.user_id,
-            display_name: p.display_name || "Unknown Athlete",
-          })));
+      if (assignedProfiles && assignedProfiles.length > 0) {
+        setAthletes(assignedProfiles.map((p: any) => ({
+          user_id: p.user_id,
+          display_name: p.display_name || "Unknown Athlete",
+        })));
+      } else {
+        // Final fallback: use search function to get some profiles
+        const { data: searchResults } = await supabase.rpc("search_public_profiles", {
+          search_term: "",
+          result_limit: 50,
+        });
+
+        if (searchResults) {
+          setAthletes(searchResults
+            .filter((p: any) => p.user_id !== user.id)
+            .map((p: any) => ({
+              user_id: p.user_id,
+              display_name: p.display_name || "Unknown Athlete",
+            })));
+        }
       }
     }
   };

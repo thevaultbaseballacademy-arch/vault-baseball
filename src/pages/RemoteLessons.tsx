@@ -69,15 +69,21 @@ const RemoteLessons = () => {
   };
 
   const fetchCoaches = async () => {
-    const { data: roles } = await supabase.from('user_roles').select('user_id').eq('role', 'coach');
-    if (!roles?.length) return;
-    const coachIds = roles.map(r => r.user_id);
+    // Use coach_marketplace_profiles (publicly readable for active coaches)
+    const { data: marketplaceCoaches } = await supabase
+      .from('coach_marketplace_profiles')
+      .select('user_id')
+      .eq('is_marketplace_active', true);
+
+    if (!marketplaceCoaches?.length) return;
+    const coachIds = marketplaceCoaches.map(r => r.user_id);
+    
     const { data } = await supabase.rpc('get_public_profiles_by_ids', { user_ids: coachIds });
     setCoaches((data || []).map((p: any) => ({ user_id: p.user_id, display_name: p.display_name, avatar_url: p.avatar_url, position: p.player_position })));
   };
 
   const fetchLessons = async () => {
-    const { data } = await (supabase.from('remote_lessons' as any) as any).select('*').order('scheduled_at', { ascending: true });
+    const { data } = await supabase.from('remote_lessons').select('*').order('scheduled_at', { ascending: true });
     setLessons(data || []);
   };
 
@@ -95,7 +101,7 @@ const RemoteLessons = () => {
     try {
       const scheduledAt = new Date(`${selectedDate}T${selectedTime}`).toISOString();
       
-      const { error } = await (supabase.from('remote_lessons' as any) as any).insert({
+      const { error } = await supabase.from('remote_lessons').insert({
         coach_user_id: selectedCoach,
         athlete_user_id: user.id,
         scheduled_at: scheduledAt,
@@ -120,7 +126,7 @@ const RemoteLessons = () => {
 
   const handleAddVideoLink = async (lessonId: string) => {
     if (!videoLink) return;
-    await (supabase.from('remote_lessons' as any) as any).update({ video_call_link: videoLink, status: 'confirmed' }).eq('id', lessonId);
+    await supabase.from('remote_lessons').update({ video_call_link: videoLink, status: 'confirmed' }).eq('id', lessonId);
     setEditingLesson(null);
     setVideoLink('');
     fetchLessons();
@@ -128,7 +134,7 @@ const RemoteLessons = () => {
   };
 
   const handleCancel = async (lessonId: string) => {
-    await (supabase.from('remote_lessons' as any) as any).update({ status: 'cancelled' }).eq('id', lessonId);
+    await supabase.from('remote_lessons').update({ status: 'cancelled' }).eq('id', lessonId);
     fetchLessons();
     toast({ title: "Lesson cancelled" });
   };
