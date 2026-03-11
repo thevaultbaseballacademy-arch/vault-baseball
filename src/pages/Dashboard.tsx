@@ -10,6 +10,8 @@ import LiveActivityFeed from "@/components/dashboard/LiveActivityFeed";
 import WeeklyTipCard from "@/components/dashboard/WeeklyTipCard";
 import TrialStatusBanner from "@/components/trial/TrialStatusBanner";
 import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
+import SelectCoachWidget from "@/components/dashboard/SelectCoachWidget";
+import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequests";
 import {
   LineChart,
   Line,
