@@ -69,15 +69,23 @@ const RemoteLessons = () => {
   };
 
   const fetchCoaches = async () => {
-    const { data: roles } = await supabase.from('user_roles').select('user_id').eq('role', 'coach');
-    if (!roles?.length) return;
-    const coachIds = roles.map(r => r.user_id);
+    // Use coaches table (publicly readable via RLS) instead of user_roles
+    const { data: coachRows } = await supabase
+      .from('coaches')
+      .select('user_id')
+      .eq('status', 'Active')
+      .not('user_id', 'is', null);
+
+    if (!coachRows?.length) return;
+    const coachIds = coachRows.map(r => r.user_id).filter(Boolean) as string[];
+    if (coachIds.length === 0) return;
+    
     const { data } = await supabase.rpc('get_public_profiles_by_ids', { user_ids: coachIds });
     setCoaches((data || []).map((p: any) => ({ user_id: p.user_id, display_name: p.display_name, avatar_url: p.avatar_url, position: p.player_position })));
   };
 
   const fetchLessons = async () => {
-    const { data } = await (supabase.from('remote_lessons' as any) as any).select('*').order('scheduled_at', { ascending: true });
+    const { data } = await supabase.from('remote_lessons').select('*').order('scheduled_at', { ascending: true });
     setLessons(data || []);
   };
 
