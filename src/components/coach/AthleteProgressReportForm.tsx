@@ -62,14 +62,21 @@ const AthleteProgressReportForm = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    // Try to get assigned athletes first
     const { data } = await supabase
       .from("coach_athlete_assignments")
       .select("athlete_user_id")
       .eq("coach_user_id", user.id)
       .eq("is_active", true);
 
+    let athleteIds: string[] = [];
+
     if (data && data.length > 0) {
-      const athleteIds = data.map(d => d.athlete_user_id);
+      athleteIds = data.map(d => d.athlete_user_id);
+    }
+
+    if (athleteIds.length > 0) {
+      // Fetch profiles for assigned athletes
       const { data: profiles } = await supabase.rpc("get_public_profiles_by_ids", {
         user_ids: athleteIds,
       });
@@ -78,6 +85,22 @@ const AthleteProgressReportForm = () => {
           user_id: p.user_id,
           display_name: p.display_name || "Unknown Athlete",
         })));
+      }
+    } else {
+      // Fallback: show all profiles so the coach can still create reports
+      const { data: allProfiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name")
+        .order("display_name")
+        .limit(100);
+
+      if (allProfiles) {
+        setAthletes(allProfiles
+          .filter((p: any) => p.user_id !== user.id)
+          .map((p: any) => ({
+            user_id: p.user_id,
+            display_name: p.display_name || "Unknown Athlete",
+          })));
       }
     }
   };

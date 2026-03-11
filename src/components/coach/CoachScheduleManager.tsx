@@ -37,23 +37,32 @@ export function CoachScheduleManager() {
 
   const fetchSchedules = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { data: schedulesData, error: schedulesError } = await supabase
         .from("custom_training_schedules")
         .select("*")
+        .eq("coach_user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (schedulesError) throw schedulesError;
 
-      // Get assignment counts
-      const { data: assignmentsData } = await supabase
-        .from("schedule_assignments")
-        .select("schedule_id")
-        .eq("is_active", true);
+      // Get assignment counts only for this coach's schedules
+      const scheduleIds = (schedulesData || []).map(s => s.id);
+      let countMap = new Map<string, number>();
 
-      const countMap = new Map<string, number>();
-      assignmentsData?.forEach(a => {
-        countMap.set(a.schedule_id, (countMap.get(a.schedule_id) || 0) + 1);
-      });
+      if (scheduleIds.length > 0) {
+        const { data: assignmentsData } = await supabase
+          .from("schedule_assignments")
+          .select("schedule_id")
+          .in("schedule_id", scheduleIds)
+          .eq("is_active", true);
+
+        assignmentsData?.forEach(a => {
+          countMap.set(a.schedule_id, (countMap.get(a.schedule_id) || 0) + 1);
+        });
+      }
 
       const schedulesWithCounts = (schedulesData || []).map(s => ({
         ...s,
