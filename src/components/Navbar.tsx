@@ -374,6 +374,9 @@ const Navbar = () => {
                       <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/dashboard")}>
                         Dashboard
                       </Button>
+                      <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/remote-lessons")}>
+                        My Lessons
+                      </Button>
                       <Button variant="ghost" className="justify-center" onClick={() => handleNavigate("/vault")}>
                         VAULT™
                       </Button>
