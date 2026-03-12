@@ -438,6 +438,7 @@ const CoachDashboard = () => {
               <TabsContent value="lessons" className="space-y-6">
                 <h2 className="font-display text-xl text-foreground">LESSON MANAGEMENT</h2>
                 <p className="text-sm text-muted-foreground">Monitor upcoming lessons, manage availability, and generate AI recaps.</p>
+                <AthleteScoreOverview coachUserId={user?.id || ''} />
                 <CoachDevelopmentReview coachUserId={user?.id || ''} />
                 <CoachLessonMonitor coachUserId={user?.id || ''} />
                 <CoachAvailabilitySync coachUserId={user?.id || ''} />
