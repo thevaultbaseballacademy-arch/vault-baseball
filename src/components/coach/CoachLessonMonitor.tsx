@@ -98,8 +98,6 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   const [courseProgress, setCourseProgress] = useState<CourseProgressRow[]>([]);
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [coachNotes, setCoachNotes] = useState("");
-  const [videoLink, setVideoLink] = useState("");
-  const [editingLink, setEditingLink] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [cameraTestOpen, setCameraTestOpen] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
