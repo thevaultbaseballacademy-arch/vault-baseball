@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Video, Calendar, Clock, ArrowLeft, Loader2, ExternalLink, User, Star, Plus, X } from "lucide-react";
+import { Video, Calendar, Clock, ArrowLeft, Loader2, User, Plus, X, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLessonCredits } from "@/hooks/useLessonCredits";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 
 interface Coach {
   user_id: string;
@@ -46,8 +47,7 @@ const RemoteLessons = () => {
   const [selectedTime, setSelectedTime] = useState('');
   const [lessonNotes, setLessonNotes] = useState('');
   const [booking, setBooking] = useState(false);
-  const [videoLink, setVideoLink] = useState('');
-  const [editingLesson, setEditingLesson] = useState<string | null>(null);
+  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const { remainingLessons, refetch: refetchCredits } = useLessonCredits();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -132,13 +132,8 @@ const RemoteLessons = () => {
     }
   };
 
-  const handleAddVideoLink = async (lessonId: string) => {
-    if (!videoLink) return;
-    await supabase.from('remote_lessons').update({ video_call_link: videoLink, status: 'confirmed' }).eq('id', lessonId);
-    setEditingLesson(null);
-    setVideoLink('');
-    fetchLessons(user?.id);
-    toast({ title: "Video link added", description: "The athlete can now see the join link." });
+  const handleStartLesson = (lessonId: string) => {
+    setActiveLessonId(lessonId);
   };
 
   const handleCancel = async (lessonId: string) => {
@@ -234,19 +229,9 @@ const RemoteLessons = () => {
                               'bg-muted text-muted-foreground'
                             }`}>{lesson.status}</span>
                             
-                            {lesson.video_call_link && (
-                              <Button variant="vault" size="sm" asChild>
-                                <a href={lesson.video_call_link} target="_blank" rel="noopener noreferrer">
-                                  <Video className="w-4 h-4 mr-1" /> Join
-                                </a>
-                              </Button>
-                            )}
-
-                            {isCoach && !lesson.video_call_link && (
-                              <Button variant="outline" size="sm" onClick={() => { setEditingLesson(lesson.id); setVideoLink(''); }}>
-                                Add Video Link
-                              </Button>
-                            )}
+                            <Button variant="vault" size="sm" onClick={() => handleStartLesson(lesson.id)}>
+                              <Phone className="w-4 h-4 mr-1" /> {isCoach ? 'Start' : 'Join'}
+                            </Button>
                             
                             <Button variant="ghost" size="sm" onClick={() => handleCancel(lesson.id)}>
                               <X className="w-4 h-4" />
@@ -321,21 +306,27 @@ const RemoteLessons = () => {
             </DialogContent>
           </Dialog>
 
-          {/* Add Video Link Dialog */}
-          <Dialog open={!!editingLesson} onOpenChange={() => setEditingLesson(null)}>
-            <DialogContent className="max-w-md">
-              <DialogHeader><DialogTitle>Add Video Call Link</DialogTitle></DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label>Video Call URL (Zoom, Google Meet, etc.)</Label>
-                  <Input value={videoLink} onChange={e => setVideoLink(e.target.value)} placeholder="https://zoom.us/j/..." className="mt-1" />
+          {/* In-App Live Lesson Dialog */}
+          {activeLessonId && (
+            <Dialog open={!!activeLessonId} onOpenChange={(open) => !open && setActiveLessonId(null)}>
+              <DialogContent className="max-w-4xl w-full h-[90vh] p-0 overflow-hidden">
+                <DialogHeader className="p-4 pb-0">
+                  <DialogTitle className="font-display flex items-center gap-2">
+                    <Video className="w-5 h-5 text-primary" />
+                    LIVE LESSON
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="flex-1 min-h-0 p-4 pt-2">
+                  <LiveVideoCall
+                    sessionId={activeLessonId}
+                    userId={user?.id || ''}
+                    isCoach={isCoach}
+                    onEnd={() => setActiveLessonId(null)}
+                  />
                 </div>
-                <Button variant="vault" className="w-full" onClick={() => editingLesson && handleAddVideoLink(editingLesson)} disabled={!videoLink}>
-                  Save & Confirm Lesson
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </main>
       <Footer />
