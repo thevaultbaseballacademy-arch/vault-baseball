@@ -27,14 +27,41 @@ const stagger = (i: number, base = 0.06) => ({ delay: i * base });
 const Index = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
+  const [dashboardPath, setDashboardPath] = useState("/dashboard");
+  const [dashboardLabel, setDashboardLabel] = useState("My Dashboard");
+
+  const resolveDashboardPath = async (uid: string | null) => {
+    if (!uid) {
+      setDashboardPath("/dashboard");
+      setDashboardLabel("My Dashboard");
+      return;
+    }
+
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", uid)
+      .eq("role", "coach")
+      .maybeSingle();
+
+    const isCoach = !!roleRow;
+    setDashboardPath(isCoach ? "/coach-dashboard" : "/dashboard");
+    setDashboardLabel(isCoach ? "Coach Dashboard" : "My Dashboard");
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserId(session?.user?.id ?? null);
+      const uid = session?.user?.id ?? null;
+      setUserId(uid);
+      resolveDashboardPath(uid);
     });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user?.id ?? null);
+      const uid = session?.user?.id ?? null;
+      setUserId(uid);
+      resolveDashboardPath(uid);
     });
+
     return () => subscription.unsubscribe();
   }, []);
 
@@ -52,8 +79,8 @@ const Index = () => {
         <div className="relative z-50 bg-primary text-primary-foreground px-4 py-3">
           <div className="container mx-auto max-w-4xl flex items-center justify-between">
             <span className="text-sm font-medium">You're logged in — access your dashboard for lessons, schedules & more.</span>
-            <Button size="sm" variant="secondary" onClick={() => navigate("/coach-dashboard")} className="shrink-0 ml-3">
-              Coach Dashboard →
+            <Button size="sm" variant="secondary" onClick={() => navigate(dashboardPath)} className="shrink-0 ml-3">
+              {dashboardLabel} →
             </Button>
           </div>
         </div>

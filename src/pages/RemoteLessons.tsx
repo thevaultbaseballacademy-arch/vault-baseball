@@ -58,7 +58,7 @@ const RemoteLessons = () => {
       setUser(session.user);
       checkCoachRole(session.user.id);
       fetchCoaches();
-      fetchLessons();
+      fetchLessons(session.user.id);
       setLoading(false);
     });
   }, []);
@@ -82,8 +82,16 @@ const RemoteLessons = () => {
     setCoaches((data || []).map((p: any) => ({ user_id: p.user_id, display_name: p.display_name, avatar_url: p.avatar_url, position: p.player_position })));
   };
 
-  const fetchLessons = async () => {
-    const { data } = await supabase.from('remote_lessons').select('*').order('scheduled_at', { ascending: true });
+  const fetchLessons = async (currentUserId?: string) => {
+    const uid = currentUserId || user?.id;
+    if (!uid) return;
+
+    const { data } = await supabase
+      .from('remote_lessons')
+      .select('*')
+      .or(`coach_user_id.eq.${uid},athlete_user_id.eq.${uid}`)
+      .order('scheduled_at', { ascending: true });
+
     setLessons(data || []);
   };
 
@@ -116,7 +124,7 @@ const RemoteLessons = () => {
       setSelectedDate('');
       setSelectedTime('');
       setLessonNotes('');
-      fetchLessons();
+      fetchLessons(user.id);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
@@ -129,13 +137,13 @@ const RemoteLessons = () => {
     await supabase.from('remote_lessons').update({ video_call_link: videoLink, status: 'confirmed' }).eq('id', lessonId);
     setEditingLesson(null);
     setVideoLink('');
-    fetchLessons();
+    fetchLessons(user?.id);
     toast({ title: "Video link added", description: "The athlete can now see the join link." });
   };
 
   const handleCancel = async (lessonId: string) => {
     await supabase.from('remote_lessons').update({ status: 'cancelled' }).eq('id', lessonId);
-    fetchLessons();
+    fetchLessons(user?.id);
     toast({ title: "Lesson cancelled" });
   };
 
