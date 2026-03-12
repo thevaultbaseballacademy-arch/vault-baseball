@@ -75,16 +75,17 @@ export const CoachesTable = ({ coaches, onEdit, onToggleStatus, onDelete }: Coac
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Specialties</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
               <TableHead className="w-[70px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {coaches.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                   No coaches found. Add your first coach to get started.
                 </TableCell>
               </TableRow>
@@ -93,6 +94,14 @@ export const CoachesTable = ({ coaches, onEdit, onToggleStatus, onDelete }: Coac
                 <TableRow key={coach.id}>
                   <TableCell className="font-medium">{coach.name}</TableCell>
                   <TableCell>{coach.email}</TableCell>
+                  <TableCell className="text-muted-foreground">{(coach as any).location || "—"}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {((coach as any).specialties as string[] | null)?.map((s: string) => (
+                        <Badge key={s} variant="outline" className="text-xs">{s}</Badge>
+                      )) || "—"}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={getRoleBadgeVariant(coach.role)}>
                       {coach.role}
@@ -105,9 +114,6 @@ export const CoachesTable = ({ coaches, onEdit, onToggleStatus, onDelete }: Coac
                     >
                       {coach.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {format(new Date(coach.created_at), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

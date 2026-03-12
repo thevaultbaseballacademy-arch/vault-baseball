@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { Coach } from "@/hooks/useCoachManagement";
 
 const coachFormSchema = z.object({
@@ -26,6 +27,10 @@ const coachFormSchema = z.object({
   role: z.enum(["Coach", "Director", "OrgAdmin", "VAULTHQ"]),
   org_id: z.string().uuid("Invalid organization ID"),
   team_id: z.string().uuid("Invalid team ID").optional().or(z.literal("")),
+  location: z.string().optional().or(z.literal("")),
+  bio: z.string().optional().or(z.literal("")),
+  specialties: z.string().optional().or(z.literal("")),
+  years_experience: z.coerce.number().int().min(0).optional().or(z.literal("").transform(() => undefined)),
 });
 
 type CoachFormValues = z.infer<typeof coachFormSchema>;
@@ -46,14 +51,23 @@ export const CoachForm = ({ coach, onSubmit, onCancel, isSubmitting }: CoachForm
       role: coach?.role || "Coach",
       org_id: coach?.org_id || crypto.randomUUID(),
       team_id: coach?.team_id || "",
+      location: (coach as any)?.location || "",
+      bio: (coach as any)?.bio || "",
+      specialties: (coach as any)?.specialties?.join(", ") || "",
+      years_experience: (coach as any)?.years_experience ?? "",
     },
   });
 
   const handleSubmit = (values: CoachFormValues) => {
+    const specialtiesArray = values.specialties
+      ? values.specialties.split(",").map((s: string) => s.trim()).filter(Boolean)
+      : [];
     onSubmit({
       ...values,
       team_id: values.team_id || undefined,
-    });
+      specialties: specialtiesArray,
+      years_experience: values.years_experience || undefined,
+    } as any);
   };
 
   return (
@@ -119,6 +133,62 @@ export const CoachForm = ({ coach, onSubmit, onCancel, isSubmitting }: CoachForm
               <FormLabel>Organization ID</FormLabel>
               <FormControl>
                 <Input placeholder="Organization UUID" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. New Jersey" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="specialties"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Specialties (comma-separated)</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. Hitting, Infield, Catching" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="years_experience"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Years of Experience</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="e.g. 10" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bio</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Coach bio and background..." className="min-h-[80px]" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
