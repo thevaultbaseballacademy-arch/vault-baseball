@@ -14,6 +14,7 @@ import SelectCoachWidget from "@/components/dashboard/SelectCoachWidget";
 import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequests";
 import { PlayerHomeworkChecklist } from "@/components/dashboard/PlayerHomeworkChecklist";
 import { LessonFeedbackReport } from "@/components/dashboard/LessonFeedbackReport";
+import { AthleteDevScore } from "@/components/dashboard/AthleteDevScore";
 import {
   LineChart,
   Line,
