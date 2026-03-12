@@ -61,9 +61,12 @@ export const FloatingChatWidget = React.forwardRef<HTMLDivElement>((_, ref) => {
     setIsMinimized(false);
   };
 
-  // Don't render on contact page to avoid duplication
-  if (typeof window !== "undefined" && window.location.pathname === "/contact") {
-    return null;
+  // Don't render on pages where it interferes with the UI
+  if (typeof window !== "undefined") {
+    const path = window.location.pathname;
+    if (path === "/contact" || path === "/book-session") {
+      return null;
+    }
   }
 
   return (
