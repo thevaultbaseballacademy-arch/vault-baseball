@@ -306,21 +306,27 @@ const RemoteLessons = () => {
             </DialogContent>
           </Dialog>
 
-          {/* Add Video Link Dialog */}
-          <Dialog open={!!editingLesson} onOpenChange={() => setEditingLesson(null)}>
-            <DialogContent className="max-w-md">
-              <DialogHeader><DialogTitle>Add Video Call Link</DialogTitle></DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label>Video Call URL (Zoom, Google Meet, etc.)</Label>
-                  <Input value={videoLink} onChange={e => setVideoLink(e.target.value)} placeholder="https://zoom.us/j/..." className="mt-1" />
+          {/* In-App Live Lesson Dialog */}
+          {activeLessonId && (
+            <Dialog open={!!activeLessonId} onOpenChange={(open) => !open && setActiveLessonId(null)}>
+              <DialogContent className="max-w-4xl w-full h-[90vh] p-0 overflow-hidden">
+                <DialogHeader className="p-4 pb-0">
+                  <DialogTitle className="font-display flex items-center gap-2">
+                    <Video className="w-5 h-5 text-primary" />
+                    LIVE LESSON
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="flex-1 min-h-0 p-4 pt-2">
+                  <LiveVideoCall
+                    sessionId={activeLessonId}
+                    userId={user?.id || ''}
+                    isCoach={isCoach}
+                    onEnd={() => setActiveLessonId(null)}
+                  />
                 </div>
-                <Button variant="vault" className="w-full" onClick={() => editingLesson && handleAddVideoLink(editingLesson)} disabled={!videoLink}>
-                  Save & Confirm Lesson
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </main>
       <Footer />
