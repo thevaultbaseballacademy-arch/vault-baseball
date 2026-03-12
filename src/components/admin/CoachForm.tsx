@@ -51,14 +51,23 @@ export const CoachForm = ({ coach, onSubmit, onCancel, isSubmitting }: CoachForm
       role: coach?.role || "Coach",
       org_id: coach?.org_id || crypto.randomUUID(),
       team_id: coach?.team_id || "",
+      location: (coach as any)?.location || "",
+      bio: (coach as any)?.bio || "",
+      specialties: (coach as any)?.specialties?.join(", ") || "",
+      years_experience: (coach as any)?.years_experience ?? "",
     },
   });
 
   const handleSubmit = (values: CoachFormValues) => {
+    const specialtiesArray = values.specialties
+      ? values.specialties.split(",").map((s: string) => s.trim()).filter(Boolean)
+      : [];
     onSubmit({
       ...values,
       team_id: values.team_id || undefined,
-    });
+      specialties: specialtiesArray,
+      years_experience: values.years_experience || undefined,
+    } as any);
   };
 
   return (
