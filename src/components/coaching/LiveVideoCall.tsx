@@ -112,6 +112,20 @@ const LiveVideoCall = ({ sessionId, userId, isCoach = false, onEnd }: LiveVideoC
         </div>
       )}
 
+      {/* Error overlay */}
+      {callState === "error" && (
+        <div className="absolute inset-0 bg-foreground/95 flex flex-col items-center justify-center gap-3 z-10 px-6 text-center">
+          <AlertTriangle className="w-8 h-8 text-destructive" />
+          <p className="text-destructive font-display tracking-widest text-sm">CONNECTION ERROR</p>
+          <p className="text-muted-foreground text-xs max-w-sm">
+            {errorMessage || "We couldn't establish the live session. Please retry."}
+          </p>
+          <Button variant="vault" size="sm" onClick={() => startCall(isCoach)}>
+            Retry Session
+          </Button>
+        </div>
+      )}
+
       {/* Local video (picture-in-picture) */}
       {localStream && (
         <div className="absolute top-3 right-3 w-32 sm:w-44 aspect-video rounded-none border-2 border-border/30 overflow-hidden shadow-lg z-20">
