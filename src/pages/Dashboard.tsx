@@ -219,9 +219,14 @@ const Dashboard = () => {
                 <p className="text-muted-foreground mb-6">
                   Start logging your daily check-ins to see your progress trends.
                 </p>
-                <Button variant="vault" onClick={() => navigate("/checkin")}>
-                  Log Your First Check-in
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button variant="vault" onClick={() => navigate("/checkin")}>
+                    Log Your First Check-in
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate("/book-session")}>
+                    Book a Lesson
+                  </Button>
+                </div>
               </div>
             ) : (
               <>
