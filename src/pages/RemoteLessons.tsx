@@ -47,8 +47,7 @@ const RemoteLessons = () => {
   const [selectedTime, setSelectedTime] = useState('');
   const [lessonNotes, setLessonNotes] = useState('');
   const [booking, setBooking] = useState(false);
-  const [videoLink, setVideoLink] = useState('');
-  const [editingLesson, setEditingLesson] = useState<string | null>(null);
+  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const { remainingLessons, refetch: refetchCredits } = useLessonCredits();
   const navigate = useNavigate();
   const { toast } = useToast();
