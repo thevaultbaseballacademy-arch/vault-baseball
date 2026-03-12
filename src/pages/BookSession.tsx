@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ type Step = "coach" | "datetime" | "form" | "confirm";
 
 const BookSession = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("coach");
   const [coaches, setCoaches] = useState<CoachOption[]>([]);
   const [loadingCoaches, setLoadingCoaches] = useState(true);
@@ -65,6 +67,20 @@ const BookSession = () => {
 
   useEffect(() => {
     fetchCoaches();
+    // Auto-fill logged-in user info
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setEmail(session.user.email || "");
+        supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("user_id", session.user.id)
+          .single()
+          .then(({ data }) => {
+            if (data?.display_name) setAthleteName(data.display_name);
+          });
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -493,16 +509,15 @@ const BookSession = () => {
                   setSelectedCoach(null);
                   setSelectedDate(undefined);
                   setSelectedTime("");
-                  setAthleteName("");
-                  setParentName("");
-                  setEmail("");
-                  setPhone("");
                   setAthleteAge("");
                   setPosition("");
                 }}>
                   BOOK ANOTHER SESSION
                 </Button>
-                <Button variant="outline" onClick={() => window.location.href = "/"}>
+                <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                  VIEW DASHBOARD
+                </Button>
+                <Button variant="ghost" onClick={() => navigate("/")}>
                   RETURN HOME
                 </Button>
               </div>
