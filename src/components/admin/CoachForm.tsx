@@ -141,6 +141,62 @@ export const CoachForm = ({ coach, onSubmit, onCancel, isSubmitting }: CoachForm
 
         <FormField
           control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. New Jersey" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="specialties"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Specialties (comma-separated)</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. Hitting, Infield, Catching" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="years_experience"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Years of Experience</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="e.g. 10" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bio</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Coach bio and background..." className="min-h-[80px]" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="team_id"
           render={({ field }) => (
             <FormItem>
