@@ -303,15 +303,6 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
     fetchLessons();
   };
 
-  const handleAddVideoLink = async (lessonId: string) => {
-    await (supabase.from("remote_lessons" as any) as any)
-      .update({ video_call_link: videoLink, status: "confirmed" })
-      .eq("id", lessonId);
-    toast({ title: "Video link added & lesson confirmed" });
-    setEditingLink(null);
-    setVideoLink("");
-    fetchLessons();
-  };
   const handleGenerateRecap = async (lessonId: string) => {
     setGeneratingRecap(lessonId);
     try {
