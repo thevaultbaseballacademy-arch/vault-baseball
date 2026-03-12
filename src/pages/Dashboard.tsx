@@ -422,6 +422,8 @@ const Dashboard = () => {
                 {user && <SelectCoachWidget userId={user.id} />}
                 {user && <CoachAssignmentRequests userId={user.id} />}
                 {user && <UpcomingLessons userId={user.id} />}
+                {user && <PlayerHomeworkChecklist userId={user.id} />}
+                {user && <LessonFeedbackReport userId={user.id} />}
                 <LiveActivityFeed />
               </div>
             </div>
