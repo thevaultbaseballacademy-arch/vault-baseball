@@ -124,7 +124,7 @@ const RemoteLessons = () => {
       setSelectedDate('');
       setSelectedTime('');
       setLessonNotes('');
-      fetchLessons();
+      fetchLessons(user.id);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
