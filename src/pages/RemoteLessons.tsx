@@ -132,13 +132,8 @@ const RemoteLessons = () => {
     }
   };
 
-  const handleAddVideoLink = async (lessonId: string) => {
-    if (!videoLink) return;
-    await supabase.from('remote_lessons').update({ video_call_link: videoLink, status: 'confirmed' }).eq('id', lessonId);
-    setEditingLesson(null);
-    setVideoLink('');
-    fetchLessons(user?.id);
-    toast({ title: "Video link added", description: "The athlete can now see the join link." });
+  const handleStartLesson = (lessonId: string) => {
+    setActiveLessonId(lessonId);
   };
 
   const handleCancel = async (lessonId: string) => {
