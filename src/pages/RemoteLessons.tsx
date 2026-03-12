@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Video, Calendar, Clock, ArrowLeft, Loader2, ExternalLink, User, Star, Plus, X } from "lucide-react";
+import { Video, Calendar, Clock, ArrowLeft, Loader2, User, Plus, X, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLessonCredits } from "@/hooks/useLessonCredits";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 
 interface Coach {
   user_id: string;
