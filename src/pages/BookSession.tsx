@@ -126,26 +126,28 @@ const BookSession = () => {
   };
 
   const availableSlots = useMemo(() => {
-    if (!selectedDate) return TIME_SLOTS;
+    if (!selectedDate) return [];
     const dayOfWeek = selectedDate.getDay();
 
-    // Check if coach has availability set for this day
+    // Coach MUST have availability set — no availability = no slots
     const dayAvail = coachAvailability.filter(a => a.day_of_week === dayOfWeek);
+    if (dayAvail.length === 0) return [];
 
-    let slots = TIME_SLOTS;
-    if (dayAvail.length > 0) {
-      slots = TIME_SLOTS.filter(slot => {
-        const hour24 = convertTo24(slot);
-        return dayAvail.some(a => {
-          const start = parseInt(a.start_time.split(":")[0]);
-          const end = parseInt(a.end_time.split(":")[0]);
-          return hour24 >= start && hour24 < end;
-        });
+    const slots = TIME_SLOTS.filter(slot => {
+      const hour24 = convertTo24(slot);
+      return dayAvail.some(a => {
+        const start = parseInt(a.start_time.split(":")[0]);
+        const end = parseInt(a.end_time.split(":")[0]);
+        return hour24 >= start && hour24 < end;
       });
-    }
+    });
 
-    // Filter out booked slots
-    return slots.filter(s => !bookedSlots.includes(s));
+    // Filter out already-booked slots and past times for today
+    const now = new Date();
+    const isToday = selectedDate.toDateString() === now.toDateString();
+    return slots
+      .filter(s => !bookedSlots.includes(s))
+      .filter(s => !isToday || convertTo24(s) > now.getHours());
   }, [selectedDate, bookedSlots, coachAvailability]);
 
   const convertTo24 = (time12: string): number => {
@@ -180,7 +182,15 @@ const BookSession = () => {
 
     setSubmitting(false);
     if (error) {
-      toast({ title: "Booking failed", description: error.message, variant: "destructive" });
+      if (error.message?.includes("duplicate") || error.code === "23505") {
+        toast({ title: "Slot already taken", description: "This time slot was just booked. Please choose another.", variant: "destructive" });
+        // Refresh booked slots
+        fetchBookedSlots();
+        setSelectedTime("");
+        setStep("datetime");
+      } else {
+        toast({ title: "Booking failed", description: error.message, variant: "destructive" });
+      }
     } else {
       setStep("confirm");
       toast({ title: "Session booked successfully!" });
@@ -337,8 +347,10 @@ const BookSession = () => {
 
                 {/* Time Slots */}
                 <div>
-                  <h2 className="text-xs font-display tracking-[0.2em] text-muted-foreground mb-3">
-                    {selectedDate ? `AVAILABLE TIMES — ${format(selectedDate, "MMM d")}` : "SELECT A DATE FIRST"}
+                 <h2 className="text-xs font-display tracking-[0.2em] text-muted-foreground mb-3">
+                    {selectedDate 
+                      ? `AVAILABLE TIMES — ${format(selectedDate, "MMM d")} (${Intl.DateTimeFormat().resolvedOptions().timeZone.split("/").pop()?.replace("_", " ")})`
+                      : "SELECT A DATE FIRST"}
                   </h2>
                   {selectedDate ? (
                     availableSlots.length === 0 ? (
