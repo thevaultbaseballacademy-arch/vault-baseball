@@ -347,8 +347,10 @@ const BookSession = () => {
 
                 {/* Time Slots */}
                 <div>
-                  <h2 className="text-xs font-display tracking-[0.2em] text-muted-foreground mb-3">
-                    {selectedDate ? `AVAILABLE TIMES — ${format(selectedDate, "MMM d")}` : "SELECT A DATE FIRST"}
+                 <h2 className="text-xs font-display tracking-[0.2em] text-muted-foreground mb-3">
+                    {selectedDate 
+                      ? `AVAILABLE TIMES — ${format(selectedDate, "MMM d")} (${Intl.DateTimeFormat().resolvedOptions().timeZone.split("/").pop()?.replace("_", " ")})`
+                      : "SELECT A DATE FIRST"}
                   </h2>
                   {selectedDate ? (
                     availableSlots.length === 0 ? (
