@@ -28,6 +28,7 @@ import QuickAccessCard from "@/components/coach/QuickAccessCard";
 import CoachAnalysisReview from "@/components/coaching/CoachAnalysisReview";
 import AthleteProgressReportForm from "@/components/coach/AthleteProgressReportForm";
 import { CoachDevelopmentReview } from "@/components/coach/CoachDevelopmentReview";
+import { AthleteScoreOverview } from "@/components/coach/AthleteScoreOverview";
 import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashboard";
 import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
 import {
