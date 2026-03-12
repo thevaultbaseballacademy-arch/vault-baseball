@@ -58,7 +58,7 @@ const RemoteLessons = () => {
       setUser(session.user);
       checkCoachRole(session.user.id);
       fetchCoaches();
-      fetchLessons();
+      fetchLessons(session.user.id);
       setLoading(false);
     });
   }, []);

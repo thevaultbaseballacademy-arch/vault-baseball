@@ -27,14 +27,41 @@ const stagger = (i: number, base = 0.06) => ({ delay: i * base });
 const Index = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
+  const [dashboardPath, setDashboardPath] = useState("/dashboard");
+  const [dashboardLabel, setDashboardLabel] = useState("My Dashboard");
+
+  const resolveDashboardPath = async (uid: string | null) => {
+    if (!uid) {
+      setDashboardPath("/dashboard");
+      setDashboardLabel("My Dashboard");
+      return;
+    }
+
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", uid)
+      .eq("role", "coach")
+      .maybeSingle();
+
+    const isCoach = !!roleRow;
+    setDashboardPath(isCoach ? "/coach-dashboard" : "/dashboard");
+    setDashboardLabel(isCoach ? "Coach Dashboard" : "My Dashboard");
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserId(session?.user?.id ?? null);
+      const uid = session?.user?.id ?? null;
+      setUserId(uid);
+      resolveDashboardPath(uid);
     });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user?.id ?? null);
+      const uid = session?.user?.id ?? null;
+      setUserId(uid);
+      resolveDashboardPath(uid);
     });
+
     return () => subscription.unsubscribe();
   }, []);
 
