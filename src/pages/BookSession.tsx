@@ -103,26 +103,46 @@ const BookSession = () => {
 
   const fetchBookedSlots = async () => {
     if (!selectedCoach || !selectedDate) return;
-    const dateStr = format(selectedDate, "yyyy-MM-dd");
-    const { data } = await supabase
-      .from("session_bookings")
-      .select("session_time")
-      .eq("coach_user_id", selectedCoach.user_id)
-      .eq("session_date", dateStr)
-      .neq("status", "cancelled");
+    try {
+      const dateStr = format(selectedDate, "yyyy-MM-dd");
+      const { data, error } = await supabase
+        .from("session_bookings")
+        .select("session_time")
+        .eq("coach_user_id", selectedCoach.user_id)
+        .eq("session_date", dateStr)
+        .neq("status", "cancelled");
 
-    setBookedSlots(data?.map(b => b.session_time) || []);
+      if (error) {
+        console.error("Error fetching booked slots:", error);
+        setBookedSlots([]);
+        return;
+      }
+      setBookedSlots(data?.map(b => b.session_time) || []);
+    } catch (err) {
+      console.error("Error fetching booked slots:", err);
+      setBookedSlots([]);
+    }
   };
 
   const fetchCoachAvailability = async () => {
     if (!selectedCoach) return;
-    const { data } = await supabase
-      .from("coach_availability")
-      .select("*")
-      .eq("coach_user_id", selectedCoach.user_id)
-      .eq("is_active", true);
+    try {
+      const { data, error } = await supabase
+        .from("coach_availability")
+        .select("*")
+        .eq("coach_user_id", selectedCoach.user_id)
+        .eq("is_active", true);
 
-    setCoachAvailability(data || []);
+      if (error) {
+        console.error("Error fetching availability:", error);
+        setCoachAvailability([]);
+        return;
+      }
+      setCoachAvailability(data || []);
+    } catch (err) {
+      console.error("Error fetching availability:", err);
+      setCoachAvailability([]);
+    }
   };
 
   const availableSlots = useMemo(() => {
