@@ -890,6 +890,69 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_lesson_feedback: {
+        Row: {
+          ai_generated_at: string | null
+          ai_homework: Json | null
+          ai_recommended_drills: Json | null
+          ai_summary: string | null
+          areas_for_improvement: string | null
+          athlete_user_id: string
+          coach_user_id: string
+          created_at: string | null
+          delivered_at: string | null
+          delivered_to_athlete: boolean | null
+          id: string
+          lesson_focus: string | null
+          lesson_id: string
+          next_development_focus: string | null
+          recommended_drills: Json | null
+          strengths_observed: string | null
+          submitted_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_generated_at?: string | null
+          ai_homework?: Json | null
+          ai_recommended_drills?: Json | null
+          ai_summary?: string | null
+          areas_for_improvement?: string | null
+          athlete_user_id: string
+          coach_user_id: string
+          created_at?: string | null
+          delivered_at?: string | null
+          delivered_to_athlete?: boolean | null
+          id?: string
+          lesson_focus?: string | null
+          lesson_id: string
+          next_development_focus?: string | null
+          recommended_drills?: Json | null
+          strengths_observed?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_generated_at?: string | null
+          ai_homework?: Json | null
+          ai_recommended_drills?: Json | null
+          ai_summary?: string | null
+          areas_for_improvement?: string | null
+          athlete_user_id?: string
+          coach_user_id?: string
+          created_at?: string | null
+          delivered_at?: string | null
+          delivered_to_athlete?: boolean | null
+          id?: string
+          lesson_focus?: string | null
+          lesson_id?: string
+          next_development_focus?: string | null
+          recommended_drills?: Json | null
+          strengths_observed?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       coach_marketplace_profiles: {
         Row: {
           avg_rating: number | null
@@ -2260,6 +2323,36 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_reminders: {
+        Row: {
+          channel: string
+          created_at: string | null
+          id: string
+          lesson_id: string
+          reminder_type: string
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string | null
+          id?: string
+          lesson_id: string
+          reminder_type: string
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string | null
+          id?: string
+          lesson_id?: string
+          reminder_type?: string
+          sent_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketplace_bookings: {
         Row: {
           amount_cents: number
@@ -2578,6 +2671,65 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_homework: {
+        Row: {
+          athlete_user_id: string
+          category: string | null
+          coach_user_id: string
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          feedback_id: string | null
+          id: string
+          is_completed: boolean | null
+          lesson_id: string
+          sort_order: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          athlete_user_id: string
+          category?: string | null
+          coach_user_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          feedback_id?: string | null
+          id?: string
+          is_completed?: boolean | null
+          lesson_id: string
+          sort_order?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          athlete_user_id?: string
+          category?: string | null
+          coach_user_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          feedback_id?: string | null
+          id?: string
+          is_completed?: boolean | null
+          lesson_id?: string
+          sort_order?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_homework_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "coach_lesson_feedback"
             referencedColumns: ["id"]
           },
         ]
