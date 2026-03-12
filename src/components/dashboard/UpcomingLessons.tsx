@@ -253,10 +253,16 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
                   >
                     <Phone className="w-3 h-3" /> {lesson.coach_user_id === userId ? "Start" : "Join"}
                   </Button>
-                ) : (
+                ) : minutesUntil > 0 ? (
                   <span className="text-[10px] text-muted-foreground px-2">
-                    {minutesUntil > 15 ? `in ${Math.round(minutesUntil)} min` : "Ended"}
+                    {minutesUntil > 1440
+                      ? `in ${Math.round(minutesUntil / 1440)}d`
+                      : minutesUntil > 60
+                      ? `in ${Math.round(minutesUntil / 60)}h`
+                      : `in ${Math.round(minutesUntil)} min`}
                   </span>
+                ) : (
+                  <Badge variant="outline" className="text-[10px]">Ended</Badge>
                 )}
                 {lesson.video_call_link && (
                   <Button variant="outline" size="sm" asChild className="h-7 text-xs">
