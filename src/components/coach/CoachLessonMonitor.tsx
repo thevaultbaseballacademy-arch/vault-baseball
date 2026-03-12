@@ -18,7 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
@@ -98,8 +98,6 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
   const [courseProgress, setCourseProgress] = useState<CourseProgressRow[]>([]);
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [coachNotes, setCoachNotes] = useState("");
-  const [videoLink, setVideoLink] = useState("");
-  const [editingLink, setEditingLink] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [cameraTestOpen, setCameraTestOpen] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
@@ -305,15 +303,6 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
     fetchLessons();
   };
 
-  const handleAddVideoLink = async (lessonId: string) => {
-    await (supabase.from("remote_lessons" as any) as any)
-      .update({ video_call_link: videoLink, status: "confirmed" })
-      .eq("id", lessonId);
-    toast({ title: "Video link added & lesson confirmed" });
-    setEditingLink(null);
-    setVideoLink("");
-    fetchLessons();
-  };
   const handleGenerateRecap = async (lessonId: string) => {
     setGeneratingRecap(lessonId);
     try {
@@ -755,28 +744,6 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
         </DialogContent>
       </Dialog>
 
-      {/* Add Video Link Dialog */}
-      <Dialog open={!!editingLink} onOpenChange={() => setEditingLink(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Video Call Link</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Video Call URL (Zoom, Google Meet, etc.)</Label>
-              <Input
-                value={videoLink}
-                onChange={(e) => setVideoLink(e.target.value)}
-                placeholder="https://zoom.us/j/..."
-                className="mt-1"
-              />
-            </div>
-            <Button variant="vault" className="w-full" onClick={() => editingLink && handleAddVideoLink(editingLink)} disabled={!videoLink}>
-              Save & Confirm Lesson
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Camera Test Dialog */}
       <Dialog open={cameraTestOpen} onOpenChange={(open) => { if (!open) handleCameraTestClose(); }}>
