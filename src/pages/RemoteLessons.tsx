@@ -143,7 +143,7 @@ const RemoteLessons = () => {
 
   const handleCancel = async (lessonId: string) => {
     await supabase.from('remote_lessons').update({ status: 'cancelled' }).eq('id', lessonId);
-    fetchLessons();
+    fetchLessons(user?.id);
     toast({ title: "Lesson cancelled" });
   };
 

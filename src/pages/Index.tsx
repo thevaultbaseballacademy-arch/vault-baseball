@@ -79,8 +79,8 @@ const Index = () => {
         <div className="relative z-50 bg-primary text-primary-foreground px-4 py-3">
           <div className="container mx-auto max-w-4xl flex items-center justify-between">
             <span className="text-sm font-medium">You're logged in — access your dashboard for lessons, schedules & more.</span>
-            <Button size="sm" variant="secondary" onClick={() => navigate("/coach-dashboard")} className="shrink-0 ml-3">
-              Coach Dashboard →
+            <Button size="sm" variant="secondary" onClick={() => navigate(dashboardPath)} className="shrink-0 ml-3">
+              {dashboardLabel} →
             </Button>
           </div>
         </div>
