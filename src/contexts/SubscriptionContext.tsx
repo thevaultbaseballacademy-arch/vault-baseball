@@ -93,6 +93,26 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Issue #8: Handle session expiry & token refresh failures
+        if (event === "TOKEN_REFRESHED" && !session) {
+          // Token refresh failed — force re-login
+          setIsSubscribed(false);
+          setSubscriptionTier(null);
+          setSubscriptionEnd(null);
+          setHasTeamAccess(false);
+          setIsLoading(false);
+          return;
+        }
+
+        if (event === "SIGNED_OUT") {
+          setIsSubscribed(false);
+          setSubscriptionTier(null);
+          setSubscriptionEnd(null);
+          setHasTeamAccess(false);
+          setIsLoading(false);
+          return;
+        }
+        
         if (session?.access_token) {
           // Defer subscription check to avoid deadlock
           setTimeout(() => {

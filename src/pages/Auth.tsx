@@ -117,12 +117,12 @@ const Auth = () => {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
-            data: { full_name: name },
+            data: { full_name: name, display_name: name },
           },
         });
         if (error) throw error;
-        toast({ title: "Account created!", description: "You can now sign in." });
-        navigate("/");
+        toast({ title: "Account created!", description: "Check your email to verify, then sign in." });
+        setIsLogin(true);
       }
     } catch (error: any) {
       let message = error.message || "An error occurred";

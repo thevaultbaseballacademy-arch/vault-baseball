@@ -182,7 +182,15 @@ const BookSession = () => {
 
     setSubmitting(false);
     if (error) {
-      toast({ title: "Booking failed", description: error.message, variant: "destructive" });
+      if (error.message?.includes("duplicate") || error.code === "23505") {
+        toast({ title: "Slot already taken", description: "This time slot was just booked. Please choose another.", variant: "destructive" });
+        // Refresh booked slots
+        fetchBookedSlots();
+        setSelectedTime("");
+        setStep("datetime");
+      } else {
+        toast({ title: "Booking failed", description: error.message, variant: "destructive" });
+      }
     } else {
       setStep("confirm");
       toast({ title: "Session booked successfully!" });

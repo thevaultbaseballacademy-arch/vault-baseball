@@ -178,11 +178,22 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
       <CardContent className="space-y-3">
         {lessons.map((lesson) => {
           const date = new Date(lesson.scheduled_at);
+          const now = new Date();
           const isToday =
-            date.toDateString() === new Date().toDateString();
+            date.toDateString() === now.toDateString();
           const isTomorrow =
             date.toDateString() ===
             new Date(Date.now() + 86400000).toDateString();
+          
+          // Show join button only within 15 min before to end of lesson
+          const minutesUntil = (date.getTime() - now.getTime()) / 60000;
+          const lessonEndTime = date.getTime() + lesson.duration_minutes * 60000;
+          const canJoin = minutesUntil <= 15 && now.getTime() < lessonEndTime;
+
+          // Timezone abbreviation for display
+          const tzAbbr = new Intl.DateTimeFormat("en-US", { timeZoneName: "short" })
+            .formatToParts(date)
+            .find(p => p.type === "timeZoneName")?.value || "";
 
           return (
             <div
@@ -221,7 +232,7 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
                       {date.toLocaleTimeString("en-US", {
                         hour: "numeric",
                         minute: "2-digit",
-                      })}
+                      })} {tzAbbr}
                     </span>
                   </div>
                 </div>
@@ -233,14 +244,20 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
                     TODAY
                   </Badge>
                 )}
-                <Button
-                  variant="vault"
-                  size="sm"
-                  className="h-7 text-xs gap-1"
-                  onClick={() => setActiveLessonId(lesson.id)}
-                >
-                  <Phone className="w-3 h-3" /> {lesson.coach_user_id === userId ? "Start" : "Join"}
-                </Button>
+                {canJoin ? (
+                  <Button
+                    variant="vault"
+                    size="sm"
+                    className="h-7 text-xs gap-1"
+                    onClick={() => setActiveLessonId(lesson.id)}
+                  >
+                    <Phone className="w-3 h-3" /> {lesson.coach_user_id === userId ? "Start" : "Join"}
+                  </Button>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground px-2">
+                    {minutesUntil > 15 ? `in ${Math.round(minutesUntil)} min` : "Ended"}
+                  </span>
+                )}
                 {lesson.video_call_link && (
                   <Button variant="outline" size="sm" asChild className="h-7 text-xs">
                     <a href={lesson.video_call_link} target="_blank" rel="noopener noreferrer">
