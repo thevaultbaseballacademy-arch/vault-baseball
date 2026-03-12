@@ -156,14 +156,55 @@ const CoachDashboard = () => {
 
   const fetchAthletes = async () => {
     try {
-      // Use profiles_public view to respect email privacy - coaches don't need emails
-      const { data, error } = await supabase
-        .from('profiles_public')
-        .select('user_id, email, display_name')
-        .order('display_name');
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
 
-      if (error) throw error;
-      setAthletes(data || []);
+      // Fetch only assigned athletes for this coach
+      const { data: assignments, error: assignError } = await supabase
+        .from('coach_athlete_assignments')
+        .select('athlete_user_id')
+        .eq('coach_user_id', currentUser.id)
+        .eq('is_active', true);
+
+      if (assignError) throw assignError;
+
+      const athleteIds = assignments?.map(a => a.athlete_user_id) || [];
+      if (athleteIds.length === 0) {
+        // Fallback: also fetch athletes from session_bookings for this coach
+        const { data: bookings } = await supabase
+          .from('session_bookings')
+          .select('email, athlete_name')
+          .eq('coach_user_id', currentUser.id)
+          .neq('status', 'cancelled');
+
+        if (bookings && bookings.length > 0) {
+          const uniqueAthletes = new Map<string, AthleteProfile>();
+          bookings.forEach(b => {
+            if (!uniqueAthletes.has(b.email)) {
+              uniqueAthletes.set(b.email, {
+                user_id: b.email, // Use email as fallback ID
+                email: b.email,
+                display_name: b.athlete_name || b.email,
+              });
+            }
+          });
+          setAthletes(Array.from(uniqueAthletes.values()));
+        } else {
+          setAthletes([]);
+        }
+        return;
+      }
+
+      // Fetch profiles for assigned athletes
+      const { data: profiles } = await supabase.rpc('get_public_profiles_by_ids', {
+        user_ids: athleteIds,
+      });
+
+      setAthletes((profiles || []).map((p: any) => ({
+        user_id: p.user_id,
+        email: '',
+        display_name: p.display_name || 'Athlete',
+      })));
     } catch (error) {
       console.error('Error fetching athletes:', error);
     }

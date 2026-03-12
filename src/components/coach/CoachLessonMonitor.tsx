@@ -352,14 +352,40 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
     );
   }
 
+  const exportScheduleCSV = () => {
+    const upcoming = lessons.filter(l => l.status !== "cancelled" && new Date(l.scheduled_at) >= new Date());
+    if (upcoming.length === 0) {
+      toast({ title: "No upcoming lessons to export", variant: "destructive" });
+      return;
+    }
+    const header = "Date,Time,Athlete,Duration (min),Status,Notes\n";
+    const rows = upcoming.map(l => {
+      const d = new Date(l.scheduled_at);
+      return `"${d.toLocaleDateString()}","${d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}","${l.athlete_name || ""}",${l.duration_minutes},"${l.status}","${(l.notes || "").replace(/"/g, '""')}"`;
+    }).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vault-schedule-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "Schedule exported as CSV" });
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header with Camera Test */}
-      <div className="flex items-center justify-between">
+      {/* Header with Camera Test & Export */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="font-display text-xl text-foreground">LESSONS & MONITORING</h2>
-        <Button variant="outline" size="sm" onClick={handleCameraTestOpen} className="gap-2">
-          <Camera className="w-4 h-4" /> Test Camera
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={exportScheduleCSV} className="gap-2">
+            <FileText className="w-4 h-4" /> Export CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleCameraTestOpen} className="gap-2">
+            <Camera className="w-4 h-4" /> Test Camera
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}
