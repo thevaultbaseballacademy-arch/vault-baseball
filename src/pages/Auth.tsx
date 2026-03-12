@@ -178,6 +178,7 @@ const Auth = () => {
 
   const assignRole = async (userId: string, selectedRole: UserRole) => {
     try {
+      // Parent role maps to athlete in the DB enum since parent is not in app_role
       const dbRole = selectedRole === "coach" ? "coach" as const : "athlete" as const;
       await supabase.from("user_roles").upsert(
         [{ user_id: userId, role: dbRole }],
