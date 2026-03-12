@@ -355,7 +355,9 @@ const BookSession = () => {
                   {selectedDate ? (
                     availableSlots.length === 0 ? (
                       <Card className="border-border"><CardContent className="py-8 text-center">
-                        <p className="text-muted-foreground text-sm">No available slots on this date. Try another day.</p>
+                        <CalendarDays className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
+                        <p className="text-muted-foreground text-sm">No available slots on this date.</p>
+                        <p className="text-muted-foreground text-xs mt-1">This coach may not have availability set for this day. Try another date.</p>
                       </CardContent></Card>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">

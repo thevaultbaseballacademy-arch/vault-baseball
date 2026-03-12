@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import MFAVerify from "@/components/auth/MFAVerify";
 import LegalAgreements from "@/components/auth/LegalAgreements";
+import RoleSelector from "@/components/auth/RoleSelector";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 
@@ -19,11 +20,14 @@ const authSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").optional(),
 });
 
+type UserRole = "athlete" | "coach";
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState<UserRole>("athlete");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
@@ -49,8 +53,7 @@ const Auth = () => {
     try {
       const { data: { currentLevel } } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       if (currentLevel === "aal2") {
-        const from = (location.state as any)?.from?.pathname || "/";
-        navigate(from, { replace: true });
+        await routeByRole(session.user.id);
       } else {
         const { data: factors } = await supabase.auth.mfa.listFactors();
         const verifiedFactors = factors?.totp?.filter(f => f.status === "verified") || [];
@@ -59,13 +62,37 @@ const Auth = () => {
           setMfaFactorId(verifiedFactors[0].id);
           setMfaUserId(session.user.id);
         } else {
-          const from = (location.state as any)?.from?.pathname || "/";
-          navigate(from, { replace: true });
+          await routeByRole(session.user.id);
         }
       }
     } catch (error) {
       const from = (location.state as any)?.from?.pathname || "/";
       navigate(from, { replace: true });
+    }
+  };
+
+  /** Route user to the correct dashboard based on their role */
+  const routeByRole = async (userId: string) => {
+    const from = (location.state as any)?.from?.pathname;
+    if (from && from !== "/auth") {
+      navigate(from, { replace: true });
+      return;
+    }
+
+    // Check user_roles table for role
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+
+    const userRoles = roles?.map(r => r.role) || [];
+    
+    if (userRoles.includes("admin")) {
+      navigate("/admin", { replace: true });
+    } else if (userRoles.includes("coach")) {
+      navigate("/coach-dashboard", { replace: true });
+    } else {
+      navigate("/dashboard", { replace: true });
     }
   };
 
@@ -108,21 +135,31 @@ const Auth = () => {
         } else {
           await recordSession();
           toast({ title: "Welcome back!", description: "You're signed in." });
-          const from = (location.state as any)?.from?.pathname || "/";
-          navigate(from, { replace: true });
+          if (data.user) {
+            await routeByRole(data.user.id);
+          }
         }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
-            data: { full_name: name, display_name: name },
+            emailRedirectTo: `${window.location.origin}/auth`,
+            data: { full_name: name, display_name: name, signup_role: role },
           },
         });
         if (error) throw error;
-        toast({ title: "Account created!", description: "Check your email to verify, then sign in." });
-        setIsLogin(true);
+
+        // If user was auto-confirmed (e.g. in dev), assign role immediately
+        if (signUpData.user && signUpData.session) {
+          await assignRole(signUpData.user.id, role);
+          await recordSession();
+          toast({ title: "Account created!", description: "Welcome to the Vault." });
+          await routeByRole(signUpData.user.id);
+        } else {
+          toast({ title: "Account created!", description: "Check your email to verify, then sign in." });
+          setIsLogin(true);
+        }
       }
     } catch (error: any) {
       let message = error.message || "An error occurred";
@@ -139,11 +176,24 @@ const Auth = () => {
     }
   };
 
+  const assignRole = async (userId: string, selectedRole: UserRole) => {
+    try {
+      const dbRole = selectedRole === "coach" ? "coach" as const : "athlete" as const;
+      await supabase.from("user_roles").upsert(
+        [{ user_id: userId, role: dbRole }],
+        { onConflict: "user_id,role" }
+      );
+    } catch (err) {
+      console.error("Error assigning role:", err);
+    }
+  };
+
   const handleMFASuccess = async () => {
     await recordSession();
     toast({ title: "Welcome back!", description: "You're signed in." });
-    const from = (location.state as any)?.from?.pathname || "/";
-    navigate(from, { replace: true });
+    if (mfaUserId) {
+      await routeByRole(mfaUserId);
+    }
   };
 
   const handleMFACancel = async () => {
@@ -218,22 +268,26 @@ const Auth = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
-              <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-xs">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Your full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="pl-10 h-11"
-                    required
-                  />
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="name" className="text-xs">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Your full name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="pl-10 h-11"
+                      required
+                    />
+                  </div>
+                  {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
                 </div>
-                {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
-              </div>
+
+                <RoleSelector value={role} onChange={setRole} />
+              </>
             )}
 
             <div className="space-y-1.5">

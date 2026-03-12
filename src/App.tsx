@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
+import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -114,6 +115,7 @@ const App = () => (
         <BrowserRouter>
           {/* Site-wide Founder's Pricing Urgency Banner */}
           <FoundersPricingBanner />
+          <SessionExpiryHandler />
           
           <Routes>
             <Route path="/" element={<Index />} />
