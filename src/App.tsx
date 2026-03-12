@@ -9,6 +9,7 @@ import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Account from "./pages/Account";
 import Schedule from "./pages/Schedule";
 import Checkin from "./pages/Checkin";
