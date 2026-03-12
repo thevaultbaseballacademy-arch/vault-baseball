@@ -41,6 +41,7 @@ type Step = "coach" | "datetime" | "form" | "confirm";
 
 const BookSession = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("coach");
   const [coaches, setCoaches] = useState<CoachOption[]>([]);
   const [loadingCoaches, setLoadingCoaches] = useState(true);
