@@ -20,7 +20,7 @@ const authSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").optional(),
 });
 
-type UserRole = "athlete" | "coach";
+type UserRole = "athlete" | "coach" | "parent";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
