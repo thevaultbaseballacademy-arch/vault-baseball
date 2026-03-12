@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mic, MicOff, Video, VideoOff, PhoneOff, SwitchCamera,
-  Maximize2, Minimize2, Loader2,
+  Maximize2, Minimize2, Loader2, AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWebRTC } from "@/hooks/useWebRTC";
