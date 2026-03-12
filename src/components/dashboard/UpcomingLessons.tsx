@@ -185,10 +185,10 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
             date.toDateString() ===
             new Date(Date.now() + 86400000).toDateString();
           
-          // Show join button only within 15 min before to end of lesson
+          // Show join button for today's lessons or lessons within 15 min
           const minutesUntil = (date.getTime() - now.getTime()) / 60000;
           const lessonEndTime = date.getTime() + lesson.duration_minutes * 60000;
-          const canJoin = minutesUntil <= 15 && now.getTime() < lessonEndTime;
+          const canJoin = (isToday || minutesUntil <= 15) && now.getTime() < lessonEndTime;
 
           // Timezone abbreviation for display
           const tzAbbr = new Intl.DateTimeFormat("en-US", { timeZoneName: "short" })
