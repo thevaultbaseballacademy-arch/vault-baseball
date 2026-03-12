@@ -407,11 +407,20 @@ const BookSession = () => {
                         mode="single"
                         selected={selectedDate}
                         onSelect={(date) => { setSelectedDate(date); setSelectedTime(""); }}
-                        disabled={(date) => isBefore(date, startOfDay(new Date())) && !isToday(date)}
+                        disabled={(date) => {
+                          const isPastDate = isBefore(date, startOfDay(new Date())) && !isToday(date);
+                          const isUnavailableDay = hasCoachAvailability && !availableDays.has(date.getDay());
+                          return isPastDate || isUnavailableDay;
+                        }}
                         className="pointer-events-auto"
                       />
                     </CardContent>
                   </Card>
+                  {hasCoachAvailability && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Coach availability: {availableDayLabel}
+                    </p>
+                  )}
                 </div>
 
                 {/* Time Slots */}
@@ -422,11 +431,20 @@ const BookSession = () => {
                       : "SELECT A DATE FIRST"}
                   </h2>
                   {selectedDate ? (
-                    availableSlots.length === 0 ? (
+                    loadingAvailability ? (
+                      <Card className="border-border"><CardContent className="py-8 text-center">
+                        <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto mb-2" />
+                        <p className="text-muted-foreground text-sm">Loading coach availability...</p>
+                      </CardContent></Card>
+                    ) : availableSlots.length === 0 ? (
                       <Card className="border-border"><CardContent className="py-8 text-center">
                         <CalendarDays className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
                         <p className="text-muted-foreground text-sm">No available slots on this date.</p>
-                        <p className="text-muted-foreground text-xs mt-1">This coach may not have availability set for this day. Try another date.</p>
+                        <p className="text-muted-foreground text-xs mt-1">
+                          {hasCoachAvailability && !selectedDateHasAvailability
+                            ? "Pick one of the highlighted availability days to continue."
+                            : "This date is fully booked. Try another date."}
+                        </p>
                       </CardContent></Card>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
