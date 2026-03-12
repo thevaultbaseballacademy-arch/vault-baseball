@@ -258,6 +258,9 @@ const Navbar = () => {
                 <Button variant="ghost" size="sm" onClick={() => handleNavigate("/dashboard")}>
                   Dashboard
                 </Button>
+                <Button variant="ghost" size="sm" onClick={() => handleNavigate("/remote-lessons")}>
+                  My Lessons
+                </Button>
                 <Button variant="ghost" size="sm" onClick={() => handleNavigate("/account")}>
                   Account
                 </Button>
