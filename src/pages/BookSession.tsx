@@ -65,6 +65,20 @@ const BookSession = () => {
 
   useEffect(() => {
     fetchCoaches();
+    // Auto-fill logged-in user info
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setEmail(session.user.email || "");
+        supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("user_id", session.user.id)
+          .single()
+          .then(({ data }) => {
+            if (data?.display_name) setAthleteName(data.display_name);
+          });
+      }
+    });
   }, []);
 
   useEffect(() => {
