@@ -5,16 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {
   CalendarDays, Clock, User, CheckCircle2, ArrowRight,
-  Loader2, ChevronLeft, ChevronRight
+  Loader2, ChevronLeft
 } from "lucide-react";
-import { format, addDays, isBefore, startOfDay, isToday } from "date-fns";
+import { format, isBefore, startOfDay, isToday } from "date-fns";
 
 const SESSION_TYPES = [
   { value: "private_lesson", label: "Private Lesson", duration: 60, description: "1-on-1 focused development session" },
