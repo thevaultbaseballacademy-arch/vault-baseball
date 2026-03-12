@@ -26,6 +26,7 @@ const LiveVideoCall = ({ sessionId, userId, isCoach = false, onEnd }: LiveVideoC
     remoteStream,
     isMuted,
     isVideoOff,
+    errorMessage,
     startCall,
     hangUp,
     toggleMute,
