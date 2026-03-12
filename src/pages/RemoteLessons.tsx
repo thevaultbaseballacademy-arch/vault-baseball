@@ -137,7 +137,7 @@ const RemoteLessons = () => {
     await supabase.from('remote_lessons').update({ video_call_link: videoLink, status: 'confirmed' }).eq('id', lessonId);
     setEditingLesson(null);
     setVideoLink('');
-    fetchLessons();
+    fetchLessons(user?.id);
     toast({ title: "Video link added", description: "The athlete can now see the join link." });
   };
 
