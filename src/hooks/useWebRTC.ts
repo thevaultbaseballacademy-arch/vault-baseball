@@ -6,6 +6,10 @@ const ICE_SERVERS: RTCConfiguration = {
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
     { urls: "stun:stun2.l.google.com:19302" },
+    // Public fallback TURN for tougher NAT/firewall paths
+    { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
+    { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
+    { urls: "turns:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
   ],
 };
 
@@ -108,7 +112,6 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
           setCallState("disconnected");
           break;
         case "disconnected":
-          // transient network drops happen; keep retry loop alive briefly
           setTimeout(() => {
             if (pc.connectionState === "disconnected") {
               setCallState("disconnected");
@@ -239,7 +242,6 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
 
         try {
           if (pc.signalingState === "have-local-offer") {
-            // avoid glare deadlock by resetting local offer and accepting remote
             await pc.setLocalDescription({ type: "rollback" });
           }
 
@@ -301,6 +303,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
           window.clearTimeout(timeout);
           resolve(true);
         }
+
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
           window.clearTimeout(timeout);
           resolve(false);
@@ -351,9 +354,10 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
 
       startRetryLoop();
     } catch {
+      cleanup();
       setCallState("error");
     }
-  }, [createPeerConnection, sendOffer, setupSignaling, startRetryLoop, userId]);
+  }, [cleanup, createPeerConnection, sendOffer, setupSignaling, startRetryLoop, userId]);
 
   const hangUp = useCallback(() => {
     channelRef.current?.send({
