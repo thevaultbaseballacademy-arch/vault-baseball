@@ -744,28 +744,6 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
         </DialogContent>
       </Dialog>
 
-      {/* Add Video Link Dialog */}
-      <Dialog open={!!editingLink} onOpenChange={() => setEditingLink(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Video Call Link</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Video Call URL (Zoom, Google Meet, etc.)</Label>
-              <Input
-                value={videoLink}
-                onChange={(e) => setVideoLink(e.target.value)}
-                placeholder="https://zoom.us/j/..."
-                className="mt-1"
-              />
-            </div>
-            <Button variant="vault" className="w-full" onClick={() => editingLink && handleAddVideoLink(editingLink)} disabled={!videoLink}>
-              Save & Confirm Lesson
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Camera Test Dialog */}
       <Dialog open={cameraTestOpen} onOpenChange={(open) => { if (!open) handleCameraTestClose(); }}>
