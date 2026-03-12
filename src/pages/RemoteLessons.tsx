@@ -229,19 +229,9 @@ const RemoteLessons = () => {
                               'bg-muted text-muted-foreground'
                             }`}>{lesson.status}</span>
                             
-                            {lesson.video_call_link && (
-                              <Button variant="vault" size="sm" asChild>
-                                <a href={lesson.video_call_link} target="_blank" rel="noopener noreferrer">
-                                  <Video className="w-4 h-4 mr-1" /> Join
-                                </a>
-                              </Button>
-                            )}
-
-                            {isCoach && !lesson.video_call_link && (
-                              <Button variant="outline" size="sm" onClick={() => { setEditingLesson(lesson.id); setVideoLink(''); }}>
-                                Add Video Link
-                              </Button>
-                            )}
+                            <Button variant="vault" size="sm" onClick={() => handleStartLesson(lesson.id)}>
+                              <Phone className="w-4 h-4 mr-1" /> {isCoach ? 'Start' : 'Join'}
+                            </Button>
                             
                             <Button variant="ghost" size="sm" onClick={() => handleCancel(lesson.id)}>
                               <X className="w-4 h-4" />
