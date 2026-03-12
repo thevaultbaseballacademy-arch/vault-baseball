@@ -32,6 +32,8 @@ const POSITIONS = [
   "RHP", "LHP", "C", "1B", "2B", "SS", "3B", "OF", "DH", "Utility"
 ];
 
+const WEEKDAY_LABELS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 interface CoachOption {
   user_id: string;
   name: string;
@@ -64,6 +66,7 @@ const BookSession = () => {
   const [submitting, setSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [coachAvailability, setCoachAvailability] = useState<any[]>([]);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
 
   useEffect(() => {
     fetchCoaches();
@@ -84,9 +87,17 @@ const BookSession = () => {
   }, []);
 
   useEffect(() => {
+    if (selectedCoach) {
+      fetchCoachAvailability();
+    } else {
+      setCoachAvailability([]);
+      setBookedSlots([]);
+    }
+  }, [selectedCoach]);
+
+  useEffect(() => {
     if (selectedCoach && selectedDate) {
       fetchBookedSlots();
-      fetchCoachAvailability();
     }
   }, [selectedCoach, selectedDate]);
 
@@ -126,6 +137,8 @@ const BookSession = () => {
 
   const fetchCoachAvailability = async () => {
     if (!selectedCoach) return;
+
+    setLoadingAvailability(true);
     try {
       const { data, error } = await supabase
         .from("coach_availability")
@@ -138,45 +151,78 @@ const BookSession = () => {
         setCoachAvailability([]);
         return;
       }
+
       setCoachAvailability(data || []);
     } catch (err) {
       console.error("Error fetching availability:", err);
       setCoachAvailability([]);
+    } finally {
+      setLoadingAvailability(false);
     }
   };
 
+  const convertToMinutes = (value: string): number => {
+    if (value.includes("AM") || value.includes("PM")) {
+      const [time, period] = value.split(" ");
+      const [rawHour, minute] = time.split(":").map(Number);
+      let hour = rawHour;
+      if (period === "PM" && hour !== 12) hour += 12;
+      if (period === "AM" && hour === 12) hour = 0;
+      return hour * 60 + (minute || 0);
+    }
+
+    const [hour, minute] = value.split(":").map(Number);
+    return (hour || 0) * 60 + (minute || 0);
+  };
+
+  const activeAvailability = useMemo(
+    () => coachAvailability.filter((slot) => slot.is_active),
+    [coachAvailability],
+  );
+
+  const availableDays = useMemo(
+    () => new Set<number>(activeAvailability.map((slot) => slot.day_of_week)),
+    [activeAvailability],
+  );
+
+  const hasCoachAvailability = activeAvailability.length > 0;
+  const selectedDateHasAvailability = selectedDate ? availableDays.has(selectedDate.getDay()) : true;
+
+  const availableDayLabel = useMemo(() => {
+    if (!hasCoachAvailability) return "";
+    return Array.from(availableDays)
+      .sort((a, b) => a - b)
+      .map((day) => WEEKDAY_LABELS[day])
+      .join(", ");
+  }, [availableDays, hasCoachAvailability]);
+
   const availableSlots = useMemo(() => {
     if (!selectedDate) return [];
+
     const dayOfWeek = selectedDate.getDay();
+    const dayAvail = activeAvailability.filter((slot) => slot.day_of_week === dayOfWeek);
 
-    // Coach MUST have availability set — no availability = no slots
-    const dayAvail = coachAvailability.filter(a => a.day_of_week === dayOfWeek);
-    if (dayAvail.length === 0) return [];
+    if (hasCoachAvailability && dayAvail.length === 0) return [];
 
-    const slots = TIME_SLOTS.filter(slot => {
-      const hour24 = convertTo24(slot);
-      return dayAvail.some(a => {
-        const start = parseInt(a.start_time.split(":")[0]);
-        const end = parseInt(a.end_time.split(":")[0]);
-        return hour24 >= start && hour24 < end;
+    const slots = TIME_SLOTS.filter((slot) => {
+      if (!hasCoachAvailability) return true;
+
+      const slotMinutes = convertToMinutes(slot);
+      return dayAvail.some((availabilitySlot) => {
+        const startMinutes = convertToMinutes(availabilitySlot.start_time);
+        const endMinutes = convertToMinutes(availabilitySlot.end_time);
+        return slotMinutes >= startMinutes && slotMinutes < endMinutes;
       });
     });
 
-    // Filter out already-booked slots and past times for today
     const now = new Date();
-    const isToday = selectedDate.toDateString() === now.toDateString();
-    return slots
-      .filter(s => !bookedSlots.includes(s))
-      .filter(s => !isToday || convertTo24(s) > now.getHours());
-  }, [selectedDate, bookedSlots, coachAvailability]);
+    const isSameDayAsToday = selectedDate.toDateString() === now.toDateString();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const convertTo24 = (time12: string): number => {
-    const [time, period] = time12.split(" ");
-    let [hours] = time.split(":").map(Number);
-    if (period === "PM" && hours !== 12) hours += 12;
-    if (period === "AM" && hours === 12) hours = 0;
-    return hours;
-  };
+    return slots
+      .filter((slot) => !bookedSlots.includes(slot))
+      .filter((slot) => !isSameDayAsToday || convertToMinutes(slot) > currentMinutes);
+  }, [selectedDate, bookedSlots, activeAvailability, hasCoachAvailability]);
 
   const handleSubmit = async () => {
     if (!selectedCoach || !selectedDate || !selectedTime || !athleteName || !email) {
