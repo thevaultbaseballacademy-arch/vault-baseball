@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mic, MicOff, Video, VideoOff, PhoneOff, SwitchCamera,
-  Maximize2, Minimize2, Loader2,
+  Maximize2, Minimize2, Loader2, AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWebRTC } from "@/hooks/useWebRTC";
@@ -26,6 +26,7 @@ const LiveVideoCall = ({ sessionId, userId, isCoach = false, onEnd }: LiveVideoC
     remoteStream,
     isMuted,
     isVideoOff,
+    errorMessage,
     startCall,
     hangUp,
     toggleMute,
@@ -107,6 +108,20 @@ const LiveVideoCall = ({ sessionId, userId, isCoach = false, onEnd }: LiveVideoC
           <p className="text-destructive font-display tracking-widest text-sm">DISCONNECTED</p>
           <Button variant="vault" size="sm" onClick={() => startCall(isCoach)}>
             Reconnect
+          </Button>
+        </div>
+      )}
+
+      {/* Error overlay */}
+      {callState === "error" && (
+        <div className="absolute inset-0 bg-foreground/95 flex flex-col items-center justify-center gap-3 z-10 px-6 text-center">
+          <AlertTriangle className="w-8 h-8 text-destructive" />
+          <p className="text-destructive font-display tracking-widest text-sm">CONNECTION ERROR</p>
+          <p className="text-muted-foreground text-xs max-w-sm">
+            {errorMessage || "We couldn't establish the live session. Please retry."}
+          </p>
+          <Button variant="vault" size="sm" onClick={() => startCall(isCoach)}>
+            Retry Session
           </Button>
         </div>
       )}

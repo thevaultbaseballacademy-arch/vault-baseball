@@ -5,16 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {
   CalendarDays, Clock, User, CheckCircle2, ArrowRight,
-  Loader2, ChevronLeft, ChevronRight
+  Loader2, ChevronLeft
 } from "lucide-react";
-import { format, addDays, isBefore, startOfDay, isToday } from "date-fns";
+import { format, isBefore, startOfDay, isToday } from "date-fns";
 
 const SESSION_TYPES = [
   { value: "private_lesson", label: "Private Lesson", duration: 60, description: "1-on-1 focused development session" },
@@ -31,6 +31,8 @@ const TIME_SLOTS = [
 const POSITIONS = [
   "RHP", "LHP", "C", "1B", "2B", "SS", "3B", "OF", "DH", "Utility"
 ];
+
+const WEEKDAY_LABELS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 interface CoachOption {
   user_id: string;
@@ -64,6 +66,7 @@ const BookSession = () => {
   const [submitting, setSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [coachAvailability, setCoachAvailability] = useState<any[]>([]);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
 
   useEffect(() => {
     fetchCoaches();
@@ -84,9 +87,17 @@ const BookSession = () => {
   }, []);
 
   useEffect(() => {
+    if (selectedCoach) {
+      fetchCoachAvailability();
+    } else {
+      setCoachAvailability([]);
+      setBookedSlots([]);
+    }
+  }, [selectedCoach]);
+
+  useEffect(() => {
     if (selectedCoach && selectedDate) {
       fetchBookedSlots();
-      fetchCoachAvailability();
     }
   }, [selectedCoach, selectedDate]);
 
@@ -126,6 +137,8 @@ const BookSession = () => {
 
   const fetchCoachAvailability = async () => {
     if (!selectedCoach) return;
+
+    setLoadingAvailability(true);
     try {
       const { data, error } = await supabase
         .from("coach_availability")
@@ -138,45 +151,78 @@ const BookSession = () => {
         setCoachAvailability([]);
         return;
       }
+
       setCoachAvailability(data || []);
     } catch (err) {
       console.error("Error fetching availability:", err);
       setCoachAvailability([]);
+    } finally {
+      setLoadingAvailability(false);
     }
   };
 
+  const convertToMinutes = (value: string): number => {
+    if (value.includes("AM") || value.includes("PM")) {
+      const [time, period] = value.split(" ");
+      const [rawHour, minute] = time.split(":").map(Number);
+      let hour = rawHour;
+      if (period === "PM" && hour !== 12) hour += 12;
+      if (period === "AM" && hour === 12) hour = 0;
+      return hour * 60 + (minute || 0);
+    }
+
+    const [hour, minute] = value.split(":").map(Number);
+    return (hour || 0) * 60 + (minute || 0);
+  };
+
+  const activeAvailability = useMemo(
+    () => coachAvailability.filter((slot) => slot.is_active),
+    [coachAvailability],
+  );
+
+  const availableDays = useMemo(
+    () => new Set<number>(activeAvailability.map((slot) => slot.day_of_week)),
+    [activeAvailability],
+  );
+
+  const hasCoachAvailability = activeAvailability.length > 0;
+  const selectedDateHasAvailability = selectedDate ? availableDays.has(selectedDate.getDay()) : true;
+
+  const availableDayLabel = useMemo(() => {
+    if (!hasCoachAvailability) return "";
+    return Array.from(availableDays)
+      .sort((a, b) => a - b)
+      .map((day) => WEEKDAY_LABELS[day])
+      .join(", ");
+  }, [availableDays, hasCoachAvailability]);
+
   const availableSlots = useMemo(() => {
     if (!selectedDate) return [];
+
     const dayOfWeek = selectedDate.getDay();
+    const dayAvail = activeAvailability.filter((slot) => slot.day_of_week === dayOfWeek);
 
-    // Coach MUST have availability set — no availability = no slots
-    const dayAvail = coachAvailability.filter(a => a.day_of_week === dayOfWeek);
-    if (dayAvail.length === 0) return [];
+    if (hasCoachAvailability && dayAvail.length === 0) return [];
 
-    const slots = TIME_SLOTS.filter(slot => {
-      const hour24 = convertTo24(slot);
-      return dayAvail.some(a => {
-        const start = parseInt(a.start_time.split(":")[0]);
-        const end = parseInt(a.end_time.split(":")[0]);
-        return hour24 >= start && hour24 < end;
+    const slots = TIME_SLOTS.filter((slot) => {
+      if (!hasCoachAvailability) return true;
+
+      const slotMinutes = convertToMinutes(slot);
+      return dayAvail.some((availabilitySlot) => {
+        const startMinutes = convertToMinutes(availabilitySlot.start_time);
+        const endMinutes = convertToMinutes(availabilitySlot.end_time);
+        return slotMinutes >= startMinutes && slotMinutes < endMinutes;
       });
     });
 
-    // Filter out already-booked slots and past times for today
     const now = new Date();
-    const isToday = selectedDate.toDateString() === now.toDateString();
-    return slots
-      .filter(s => !bookedSlots.includes(s))
-      .filter(s => !isToday || convertTo24(s) > now.getHours());
-  }, [selectedDate, bookedSlots, coachAvailability]);
+    const isSameDayAsToday = selectedDate.toDateString() === now.toDateString();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const convertTo24 = (time12: string): number => {
-    const [time, period] = time12.split(" ");
-    let [hours] = time.split(":").map(Number);
-    if (period === "PM" && hours !== 12) hours += 12;
-    if (period === "AM" && hours === 12) hours = 0;
-    return hours;
-  };
+    return slots
+      .filter((slot) => !bookedSlots.includes(slot))
+      .filter((slot) => !isSameDayAsToday || convertToMinutes(slot) > currentMinutes);
+  }, [selectedDate, bookedSlots, activeAvailability, hasCoachAvailability]);
 
   const handleSubmit = async () => {
     if (!selectedCoach || !selectedDate || !selectedTime || !athleteName || !email) {
@@ -307,6 +353,9 @@ const BookSession = () => {
                         key={coach.user_id}
                         onClick={() => {
                           setSelectedCoach(coach);
+                          setSelectedDate(undefined);
+                          setSelectedTime("");
+                          setBookedSlots([]);
                           setStep("datetime");
                         }}
                         className={`border border-border p-5 text-left hover:border-foreground/30 transition-colors group`}
@@ -358,11 +407,20 @@ const BookSession = () => {
                         mode="single"
                         selected={selectedDate}
                         onSelect={(date) => { setSelectedDate(date); setSelectedTime(""); }}
-                        disabled={(date) => isBefore(date, startOfDay(new Date())) && !isToday(date)}
+                        disabled={(date) => {
+                          const isPastDate = isBefore(date, startOfDay(new Date())) && !isToday(date);
+                          const isUnavailableDay = hasCoachAvailability && !availableDays.has(date.getDay());
+                          return isPastDate || isUnavailableDay;
+                        }}
                         className="pointer-events-auto"
                       />
                     </CardContent>
                   </Card>
+                  {hasCoachAvailability && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Coach availability: {availableDayLabel}
+                    </p>
+                  )}
                 </div>
 
                 {/* Time Slots */}
@@ -373,11 +431,20 @@ const BookSession = () => {
                       : "SELECT A DATE FIRST"}
                   </h2>
                   {selectedDate ? (
-                    availableSlots.length === 0 ? (
+                    loadingAvailability ? (
+                      <Card className="border-border"><CardContent className="py-8 text-center">
+                        <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto mb-2" />
+                        <p className="text-muted-foreground text-sm">Loading coach availability...</p>
+                      </CardContent></Card>
+                    ) : availableSlots.length === 0 ? (
                       <Card className="border-border"><CardContent className="py-8 text-center">
                         <CalendarDays className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
                         <p className="text-muted-foreground text-sm">No available slots on this date.</p>
-                        <p className="text-muted-foreground text-xs mt-1">This coach may not have availability set for this day. Try another date.</p>
+                        <p className="text-muted-foreground text-xs mt-1">
+                          {hasCoachAvailability && !selectedDateHasAvailability
+                            ? "Pick one of the highlighted availability days to continue."
+                            : "This date is fully booked. Try another date."}
+                        </p>
                       </CardContent></Card>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">

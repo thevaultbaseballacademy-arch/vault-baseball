@@ -27,6 +27,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
@@ -34,6 +35,8 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
   const pendingCandidatesRef = useRef<RTCIceCandidateInit[]>([]);
   const isInitiatorRef = useRef(false);
   const retryTimerRef = useRef<number | null>(null);
+  const retryCountRef = useRef(0);
+  const connectionTimeoutRef = useRef<number | null>(null);
 
   const channelName = `webrtc-${sessionId}`;
 
@@ -48,8 +51,16 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
     }
   }, []);
 
-  const cleanup = useCallback(() => {
+  const clearConnectionTimeout = useCallback(() => {
+    if (connectionTimeoutRef.current) {
+      window.clearTimeout(connectionTimeoutRef.current);
+      connectionTimeoutRef.current = null;
+    }
+  }, []);
+
+  const cleanup = useCallback((options?: { preserveError?: boolean }) => {
     clearRetryTimer();
+    clearConnectionTimeout();
 
     if (peerConnection.current) {
       peerConnection.current.close();
@@ -67,12 +78,18 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
     }
 
     pendingCandidatesRef.current = [];
+    retryCountRef.current = 0;
     setLocalStream(null);
     setRemoteStream(null);
     setIsMuted(false);
     setIsVideoOff(false);
+
+    if (!options?.preserveError) {
+      setErrorMessage(null);
+    }
+
     setCallState("idle");
-  }, [clearRetryTimer]);
+  }, [clearConnectionTimeout, clearRetryTimer]);
 
   const createPeerConnection = useCallback(() => {
     if (peerConnection.current) {
@@ -105,10 +122,13 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
       switch (pc.connectionState) {
         case "connected":
           clearRetryTimer();
+          clearConnectionTimeout();
+          setErrorMessage(null);
           setCallState("connected");
           break;
         case "failed":
           clearRetryTimer();
+          clearConnectionTimeout();
           setCallState("disconnected");
           break;
         case "disconnected":
@@ -120,6 +140,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
           break;
         case "closed":
           clearRetryTimer();
+          clearConnectionTimeout();
           setCallState("idle");
           break;
       }
@@ -127,7 +148,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
 
     peerConnection.current = pc;
     return pc;
-  }, [clearRetryTimer, onRemoteStream, userId]);
+  }, [clearConnectionTimeout, clearRetryTimer, onRemoteStream, userId]);
 
   const addLocalTracks = useCallback((pc: RTCPeerConnection) => {
     const stream = localStreamRef.current;
@@ -158,7 +179,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
   }, []);
 
   const sendOffer = useCallback(async (pc: RTCPeerConnection) => {
-    if (!channelRef.current) return;
+    if (!channelRef.current || pc.signalingState === "closed") return;
 
     if (pc.signalingState === "have-local-offer" && pc.localDescription) {
       await channelRef.current.send({
@@ -183,6 +204,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
 
   const startRetryLoop = useCallback(() => {
     clearRetryTimer();
+    retryCountRef.current = 0;
 
     retryTimerRef.current = window.setInterval(async () => {
       const pc = peerConnection.current;
@@ -194,15 +216,19 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
         return;
       }
 
+      retryCountRef.current += 1;
+
       try {
-        if (isInitiatorRef.current) {
-          await sendOffer(pc);
-        } else if (!pc.remoteDescription) {
-          await channel.send({
-            type: "broadcast",
-            event: "ready",
-            payload: { from: userId },
-          });
+        if (!pc.remoteDescription) {
+          if (isInitiatorRef.current || retryCountRef.current >= 2) {
+            await sendOffer(pc);
+          } else {
+            await channel.send({
+              type: "broadcast",
+              event: "ready",
+              payload: { from: userId },
+            });
+          }
         }
       } catch {
         // keep retrying silently
@@ -222,9 +248,11 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
 
     channel
       .on("broadcast", { event: "ready" }, async ({ payload }) => {
-        if (payload.from === userId || !isInitiatorRef.current) return;
+        if (payload.from === userId) return;
+
         const pc = peerConnection.current;
-        if (!pc) return;
+        if (!pc || pc.connectionState === "connected") return;
+
         try {
           await sendOffer(pc);
         } catch {
@@ -257,6 +285,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
             payload: { sdp: answer, from: userId },
           });
         } catch {
+          setErrorMessage("Could not negotiate the video connection.");
           setCallState("error");
         }
       })
@@ -272,6 +301,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
             await flushPendingCandidates(pc);
           }
         } catch {
+          setErrorMessage("Could not complete the video handshake.");
           setCallState("error");
         }
       })
@@ -312,6 +342,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
     });
 
     if (!subscribed) {
+      setErrorMessage("Signaling channel failed to connect. Please retry.");
       setCallState("error");
       throw new Error("Failed to subscribe to signaling channel");
     }
@@ -321,9 +352,23 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
   }, [addLocalTracks, channelName, cleanup, createPeerConnection, flushPendingCandidates, sendOffer, userId]);
 
   const startCall = useCallback(async (initiator = true) => {
+    if (!userId) {
+      setErrorMessage("Missing user session. Please refresh and try again.");
+      setCallState("error");
+      return;
+    }
+
+    if (callState === "connecting") return;
+
     try {
+      setErrorMessage(null);
       setCallState("connecting");
       isInitiatorRef.current = initiator;
+
+      if (peerConnection.current || localStreamRef.current || channelRef.current) {
+        cleanup();
+        setCallState("connecting");
+      }
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -353,11 +398,33 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
       }
 
       startRetryLoop();
-    } catch {
-      cleanup();
+
+      clearConnectionTimeout();
+      connectionTimeoutRef.current = window.setTimeout(() => {
+        const pcRef = peerConnection.current;
+        if (!pcRef || pcRef.connectionState === "connected") return;
+        cleanup({ preserveError: true });
+        setErrorMessage("Connection timed out. Please retry the session.");
+        setCallState("error");
+      }, 20000);
+    } catch (error) {
+      cleanup({ preserveError: true });
+
+      if (error instanceof DOMException) {
+        if (error.name === "NotAllowedError") {
+          setErrorMessage("Camera/microphone access is blocked. Please allow permissions and retry.");
+        } else if (error.name === "NotFoundError") {
+          setErrorMessage("No camera or microphone was found on this device.");
+        } else {
+          setErrorMessage("Unable to access camera or microphone. Please retry.");
+        }
+      } else {
+        setErrorMessage("Unable to start the live session. Please retry.");
+      }
+
       setCallState("error");
     }
-  }, [cleanup, createPeerConnection, sendOffer, setupSignaling, startRetryLoop, userId]);
+  }, [callState, cleanup, clearConnectionTimeout, createPeerConnection, sendOffer, setupSignaling, startRetryLoop, userId]);
 
   const hangUp = useCallback(() => {
     channelRef.current?.send({
@@ -437,6 +504,7 @@ export const useWebRTC = ({ sessionId, userId, onRemoteStream }: UseWebRTCOption
     remoteStream,
     isMuted,
     isVideoOff,
+    errorMessage,
     startCall,
     hangUp,
     toggleMute,
