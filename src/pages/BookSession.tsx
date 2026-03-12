@@ -353,6 +353,9 @@ const BookSession = () => {
                         key={coach.user_id}
                         onClick={() => {
                           setSelectedCoach(coach);
+                          setSelectedDate(undefined);
+                          setSelectedTime("");
+                          setBookedSlots([]);
                           setStep("datetime");
                         }}
                         className={`border border-border p-5 text-left hover:border-foreground/30 transition-colors group`}
