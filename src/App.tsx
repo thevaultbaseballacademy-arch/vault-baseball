@@ -115,6 +115,7 @@ const App = () => (
         <BrowserRouter>
           {/* Site-wide Founder's Pricing Urgency Banner */}
           <FoundersPricingBanner />
+          <SessionExpiryHandler />
           
           <Routes>
             <Route path="/" element={<Index />} />

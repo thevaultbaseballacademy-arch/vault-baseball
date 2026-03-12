@@ -178,9 +178,9 @@ const Auth = () => {
 
   const assignRole = async (userId: string, selectedRole: UserRole) => {
     try {
-      // Insert into user_roles (ignore if already exists)
+      const dbRole = selectedRole === "coach" ? "coach" as const : "athlete" as const;
       await supabase.from("user_roles").upsert(
-        { user_id: userId, role: selectedRole === "coach" ? "coach" : "user" },
+        [{ user_id: userId, role: dbRole }],
         { onConflict: "user_id,role" }
       );
     } catch (err) {
