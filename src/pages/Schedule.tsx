@@ -66,6 +66,20 @@ const Schedule = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
+      // Check team whitelist first
+      if (session.user?.email) {
+        const { data: whitelistEntry } = await supabase
+          .from("team_whitelist")
+          .select("full_access")
+          .eq("email", session.user.email.toLowerCase())
+          .maybeSingle();
+        
+        if (whitelistEntry?.full_access) {
+          setIsElite(true);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -73,7 +87,7 @@ const Schedule = () => {
       });
 
       if (error) throw error;
-      setIsElite(data?.product_id === ELITE_PRODUCT_ID);
+      setIsElite(data?.subscribed || data?.product_id === ELITE_PRODUCT_ID);
     } catch (error) {
       console.error('Error checking subscription:', error);
     }
