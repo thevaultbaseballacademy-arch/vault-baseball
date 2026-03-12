@@ -26,6 +26,10 @@ const coachFormSchema = z.object({
   role: z.enum(["Coach", "Director", "OrgAdmin", "VAULTHQ"]),
   org_id: z.string().uuid("Invalid organization ID"),
   team_id: z.string().uuid("Invalid team ID").optional().or(z.literal("")),
+  location: z.string().optional().or(z.literal("")),
+  bio: z.string().optional().or(z.literal("")),
+  specialties: z.string().optional().or(z.literal("")),
+  years_experience: z.coerce.number().int().min(0).optional().or(z.literal("").transform(() => undefined)),
 });
 
 type CoachFormValues = z.infer<typeof coachFormSchema>;
