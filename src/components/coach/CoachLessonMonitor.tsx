@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
+import { LessonFeedbackForm } from "@/components/coach/LessonFeedbackForm";
 import { useToast } from "@/hooks/use-toast";
 import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
