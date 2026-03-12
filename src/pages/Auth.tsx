@@ -144,7 +144,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth`,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: { full_name: name, display_name: name, signup_role: role },
           },
         });
