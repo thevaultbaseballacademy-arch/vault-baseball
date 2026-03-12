@@ -82,8 +82,16 @@ const RemoteLessons = () => {
     setCoaches((data || []).map((p: any) => ({ user_id: p.user_id, display_name: p.display_name, avatar_url: p.avatar_url, position: p.player_position })));
   };
 
-  const fetchLessons = async () => {
-    const { data } = await supabase.from('remote_lessons').select('*').order('scheduled_at', { ascending: true });
+  const fetchLessons = async (currentUserId?: string) => {
+    const uid = currentUserId || user?.id;
+    if (!uid) return;
+
+    const { data } = await supabase
+      .from('remote_lessons')
+      .select('*')
+      .or(`coach_user_id.eq.${uid},athlete_user_id.eq.${uid}`)
+      .order('scheduled_at', { ascending: true });
+
     setLessons(data || []);
   };
 
