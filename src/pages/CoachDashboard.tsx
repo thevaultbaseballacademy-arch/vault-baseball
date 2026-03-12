@@ -27,6 +27,7 @@ import FavoritesQuickStart from "@/components/coach/FavoritesQuickStart";
 import QuickAccessCard from "@/components/coach/QuickAccessCard";
 import CoachAnalysisReview from "@/components/coaching/CoachAnalysisReview";
 import AthleteProgressReportForm from "@/components/coach/AthleteProgressReportForm";
+import { CoachDevelopmentReview } from "@/components/coach/CoachDevelopmentReview";
 import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashboard";
 import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
 import {
@@ -436,6 +437,7 @@ const CoachDashboard = () => {
               <TabsContent value="lessons" className="space-y-6">
                 <h2 className="font-display text-xl text-foreground">LESSON MANAGEMENT</h2>
                 <p className="text-sm text-muted-foreground">Monitor upcoming lessons, manage availability, and generate AI recaps.</p>
+                <CoachDevelopmentReview coachUserId={user?.id || ''} />
                 <CoachLessonMonitor coachUserId={user?.id || ''} />
                 <CoachAvailabilitySync coachUserId={user?.id || ''} />
                 <CompLessonCredits />

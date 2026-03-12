@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
+import { LessonFeedbackForm } from "@/components/coach/LessonFeedbackForm";
 import { useToast } from "@/hooks/use-toast";
 import LiveVideoCall from "@/components/coaching/LiveVideoCall";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -546,20 +547,29 @@ export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => 
                           )}
 
                           {(lesson.status === "completed" || (lesson.status === "confirmed" && new Date(lesson.scheduled_at) < new Date())) && (
-                            <Button
-                              variant={lesson.ai_recap ? "outline" : "vault"}
-                              size="sm"
-                              onClick={() => lesson.ai_recap ? setExpandedRecap(expandedRecap === lesson.id ? null : lesson.id) : handleGenerateRecap(lesson.id)}
-                              disabled={generatingRecap === lesson.id}
-                              className="gap-1"
-                            >
-                              {generatingRecap === lesson.id ? (
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                              ) : (
-                                <Brain className="w-3 h-3" />
-                              )}
-                              {lesson.ai_recap ? (expandedRecap === lesson.id ? "Hide Recap" : "View Recap") : "AI Recap"}
-                            </Button>
+                            <>
+                              <Button
+                                variant={lesson.ai_recap ? "outline" : "vault"}
+                                size="sm"
+                                onClick={() => lesson.ai_recap ? setExpandedRecap(expandedRecap === lesson.id ? null : lesson.id) : handleGenerateRecap(lesson.id)}
+                                disabled={generatingRecap === lesson.id}
+                                className="gap-1"
+                              >
+                                {generatingRecap === lesson.id ? (
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                ) : (
+                                  <Brain className="w-3 h-3" />
+                                )}
+                                {lesson.ai_recap ? (expandedRecap === lesson.id ? "Hide Recap" : "View Recap") : "AI Recap"}
+                              </Button>
+                              <LessonFeedbackForm
+                                lessonId={lesson.id}
+                                athleteUserId={lesson.athlete_user_id}
+                                athleteName={lesson.athlete_name || "Athlete"}
+                                coachUserId={coachUserId}
+                                onSubmitted={() => fetchLessons()}
+                              />
+                            </>
                           )}
                         </div>
                       </div>

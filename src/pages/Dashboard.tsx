@@ -12,6 +12,8 @@ import TrialStatusBanner from "@/components/trial/TrialStatusBanner";
 import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
 import SelectCoachWidget from "@/components/dashboard/SelectCoachWidget";
 import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequests";
+import { PlayerHomeworkChecklist } from "@/components/dashboard/PlayerHomeworkChecklist";
+import { LessonFeedbackReport } from "@/components/dashboard/LessonFeedbackReport";
 import {
   LineChart,
   Line,
@@ -420,6 +422,8 @@ const Dashboard = () => {
                 {user && <SelectCoachWidget userId={user.id} />}
                 {user && <CoachAssignmentRequests userId={user.id} />}
                 {user && <UpcomingLessons userId={user.id} />}
+                {user && <PlayerHomeworkChecklist userId={user.id} />}
+                {user && <LessonFeedbackReport userId={user.id} />}
                 <LiveActivityFeed />
               </div>
             </div>
