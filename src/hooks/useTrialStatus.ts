@@ -35,7 +35,28 @@ export const useTrialStatus = () => {
           return;
         }
 
-        // Check for active subscription first (Full OS member)
+        // Check team whitelist first (full access bypasses everything)
+        const { data: whitelistEntry } = await supabase
+          .from('team_whitelist')
+          .select('full_access')
+          .eq('email', session.user.email?.toLowerCase() ?? '')
+          .maybeSingle();
+
+        if (whitelistEntry?.full_access) {
+          setStatus({
+            isTrialUser: false,
+            isTrialExpired: false,
+            isFullMember: true,
+            daysRemaining: 0,
+            hoursRemaining: 0,
+            trialStartedAt: null,
+            trialExpiresAt: null,
+            loading: false,
+          });
+          return;
+        }
+
+        // Check for active subscription (Full OS member)
         const { data: subscriptionData } = await supabase.functions.invoke('check-subscription', {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
