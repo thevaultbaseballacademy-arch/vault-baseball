@@ -508,16 +508,15 @@ const BookSession = () => {
                   setSelectedCoach(null);
                   setSelectedDate(undefined);
                   setSelectedTime("");
-                  setAthleteName("");
-                  setParentName("");
-                  setEmail("");
-                  setPhone("");
                   setAthleteAge("");
                   setPosition("");
                 }}>
                   BOOK ANOTHER SESSION
                 </Button>
-                <Button variant="outline" onClick={() => window.location.href = "/"}>
+                <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                  VIEW DASHBOARD
+                </Button>
+                <Button variant="ghost" onClick={() => navigate("/")}>
                   RETURN HOME
                 </Button>
               </div>
