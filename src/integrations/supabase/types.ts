@@ -1348,6 +1348,7 @@ export type Database = {
       coaches: {
         Row: {
           approved_by_admin: string | null
+          bio: string | null
           created_at: string
           email: string
           id: string
@@ -1355,17 +1356,21 @@ export type Database = {
           is_certified: boolean
           is_marketplace_approved: boolean
           is_staff: boolean
+          location: string | null
           marketplace_status: string
           name: string
           org_id: string
           role: Database["public"]["Enums"]["coach_role"]
+          specialties: string[] | null
           status: Database["public"]["Enums"]["coach_status"]
           stripe_account_id: string | null
           team_id: string | null
           user_id: string | null
+          years_experience: number | null
         }
         Insert: {
           approved_by_admin?: string | null
+          bio?: string | null
           created_at?: string
           email: string
           id?: string
@@ -1373,17 +1378,21 @@ export type Database = {
           is_certified?: boolean
           is_marketplace_approved?: boolean
           is_staff?: boolean
+          location?: string | null
           marketplace_status?: string
           name: string
           org_id: string
           role?: Database["public"]["Enums"]["coach_role"]
+          specialties?: string[] | null
           status?: Database["public"]["Enums"]["coach_status"]
           stripe_account_id?: string | null
           team_id?: string | null
           user_id?: string | null
+          years_experience?: number | null
         }
         Update: {
           approved_by_admin?: string | null
+          bio?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -1391,14 +1400,17 @@ export type Database = {
           is_certified?: boolean
           is_marketplace_approved?: boolean
           is_staff?: boolean
+          location?: string | null
           marketplace_status?: string
           name?: string
           org_id?: string
           role?: Database["public"]["Enums"]["coach_role"]
+          specialties?: string[] | null
           status?: Database["public"]["Enums"]["coach_status"]
           stripe_account_id?: string | null
           team_id?: string | null
           user_id?: string | null
+          years_experience?: number | null
         }
         Relationships: []
       }
