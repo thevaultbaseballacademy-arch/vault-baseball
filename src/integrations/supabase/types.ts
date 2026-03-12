@@ -225,6 +225,66 @@ export type Database = {
         }
         Relationships: []
       }
+      athlete_development_scores: {
+        Row: {
+          athletic_metrics: number
+          calculated_at: string
+          created_at: string
+          feedback_count: number
+          homework_completed: number
+          homework_total: number
+          id: string
+          lessons_attended: number
+          lessons_missed: number
+          overall_score: number
+          period_end: string
+          period_start: string
+          skill_development: number
+          training_consistency: number
+          user_id: string
+          weekly_focus: string | null
+          work_ethic: number
+        }
+        Insert: {
+          athletic_metrics?: number
+          calculated_at?: string
+          created_at?: string
+          feedback_count?: number
+          homework_completed?: number
+          homework_total?: number
+          id?: string
+          lessons_attended?: number
+          lessons_missed?: number
+          overall_score?: number
+          period_end?: string
+          period_start?: string
+          skill_development?: number
+          training_consistency?: number
+          user_id: string
+          weekly_focus?: string | null
+          work_ethic?: number
+        }
+        Update: {
+          athletic_metrics?: number
+          calculated_at?: string
+          created_at?: string
+          feedback_count?: number
+          homework_completed?: number
+          homework_total?: number
+          id?: string
+          lessons_attended?: number
+          lessons_missed?: number
+          overall_score?: number
+          period_end?: string
+          period_start?: string
+          skill_development?: number
+          training_consistency?: number
+          user_id?: string
+          weekly_focus?: string | null
+          work_ethic?: number
+        }
+        Relationships: []
+      }
       athlete_kpi_goals: {
         Row: {
           achieved_at: string | null
@@ -3629,6 +3689,10 @@ export type Database = {
       anonymize_old_audit_ips:
         | { Args: never; Returns: number }
         | { Args: { days_threshold?: number }; Returns: number }
+      calculate_athlete_development_score: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       can_create_activity: {
         Args: { target_user_id: string }
         Returns: boolean
