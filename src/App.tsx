@@ -9,6 +9,7 @@ import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Account from "./pages/Account";
 import Schedule from "./pages/Schedule";
 import Checkin from "./pages/Checkin";
@@ -120,6 +121,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/account" element={<Account />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/checkin" element={<Checkin />} />

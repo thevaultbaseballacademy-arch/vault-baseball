@@ -20,7 +20,7 @@ const authSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").optional(),
 });
 
-type UserRole = "athlete" | "coach";
+type UserRole = "athlete" | "coach" | "parent";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -144,7 +144,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth`,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: { full_name: name, display_name: name, signup_role: role },
           },
         });
@@ -178,6 +178,7 @@ const Auth = () => {
 
   const assignRole = async (userId: string, selectedRole: UserRole) => {
     try {
+      // Parent role maps to athlete in the DB enum since parent is not in app_role
       const dbRole = selectedRole === "coach" ? "coach" as const : "athlete" as const;
       await supabase.from("user_roles").upsert(
         [{ user_id: userId, role: dbRole }],
