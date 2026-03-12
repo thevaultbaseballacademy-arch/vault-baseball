@@ -126,26 +126,28 @@ const BookSession = () => {
   };
 
   const availableSlots = useMemo(() => {
-    if (!selectedDate) return TIME_SLOTS;
+    if (!selectedDate) return [];
     const dayOfWeek = selectedDate.getDay();
 
-    // Check if coach has availability set for this day
+    // Coach MUST have availability set — no availability = no slots
     const dayAvail = coachAvailability.filter(a => a.day_of_week === dayOfWeek);
+    if (dayAvail.length === 0) return [];
 
-    let slots = TIME_SLOTS;
-    if (dayAvail.length > 0) {
-      slots = TIME_SLOTS.filter(slot => {
-        const hour24 = convertTo24(slot);
-        return dayAvail.some(a => {
-          const start = parseInt(a.start_time.split(":")[0]);
-          const end = parseInt(a.end_time.split(":")[0]);
-          return hour24 >= start && hour24 < end;
-        });
+    const slots = TIME_SLOTS.filter(slot => {
+      const hour24 = convertTo24(slot);
+      return dayAvail.some(a => {
+        const start = parseInt(a.start_time.split(":")[0]);
+        const end = parseInt(a.end_time.split(":")[0]);
+        return hour24 >= start && hour24 < end;
       });
-    }
+    });
 
-    // Filter out booked slots
-    return slots.filter(s => !bookedSlots.includes(s));
+    // Filter out already-booked slots and past times for today
+    const now = new Date();
+    const isToday = selectedDate.toDateString() === now.toDateString();
+    return slots
+      .filter(s => !bookedSlots.includes(s))
+      .filter(s => !isToday || convertTo24(s) > now.getHours());
   }, [selectedDate, bookedSlots, coachAvailability]);
 
   const convertTo24 = (time12: string): number => {
