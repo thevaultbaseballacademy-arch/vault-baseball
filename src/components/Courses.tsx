@@ -224,11 +224,31 @@ const Courses = () => {
           })}
         </motion.div>
 
+        {/* Softball CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-12"
+          className="mt-12 p-6 rounded-2xl border border-border bg-card text-center"
+        >
+          <span className="text-3xl mb-2 block">🥎</span>
+          <h3 className="font-display text-xl text-foreground mb-2">SOFTBALL ATHLETE?</h3>
+          <p className="text-muted-foreground text-sm mb-4 max-w-lg mx-auto">
+            We now offer fastpitch-specific development systems — pitching, hitting, fielding, and baserunning programs built for softball athletes.
+          </p>
+          <Link to="/softball">
+            <Button variant="outline">
+              Explore Softball Development
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mt-8"
         >
           <Link to="/courses">
             <Button variant="outline" size="lg">
