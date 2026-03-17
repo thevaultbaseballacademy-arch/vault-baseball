@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { SportProvider } from "@/contexts/SportContext";
 import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
 import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
