@@ -148,7 +148,7 @@ const Auth = () => {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
-            data: { full_name: name, display_name: name, signup_role: role },
+            data: { full_name: name, display_name: name, signup_role: role, sport_type: sportType },
           },
         });
         if (error) throw error;
