@@ -274,6 +274,7 @@ const App = () => (
           <EddieAIChat />
         </BrowserRouter>
       </TooltipProvider>
+      </SportProvider>
     </SubscriptionProvider>
   </QueryClientProvider>
 );

@@ -183,6 +183,9 @@ const Account = () => {
               </div>
             </div>
 
+            {/* Sport Preference */}
+            <SportSwitcher />
+
             {/* Subscription Section */}
             <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
               <div className="flex items-center justify-between mb-6">
