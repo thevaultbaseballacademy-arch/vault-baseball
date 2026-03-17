@@ -293,6 +293,7 @@ const Auth = () => {
                 </div>
 
                 <RoleSelector value={role} onChange={setRole} />
+                <SportSelector value={sportType} onChange={setSportType} />
               </>
             )}
 
