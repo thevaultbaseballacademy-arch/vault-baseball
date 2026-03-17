@@ -13,6 +13,7 @@ import MFASettings from "@/components/auth/MFASettings";
 import SessionManagement from "@/components/account/SessionManagement";
 import DataExportPanel from "@/components/account/DataExportPanel";
 import DataDeletionPanel from "@/components/account/DataDeletionPanel";
+import SportSwitcher from "@/components/account/SportSwitcher";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
