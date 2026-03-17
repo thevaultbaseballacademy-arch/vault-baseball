@@ -156,6 +156,8 @@ const Auth = () => {
         // If user was auto-confirmed (e.g. in dev), assign role immediately
         if (signUpData.user && signUpData.session) {
           await assignRole(signUpData.user.id, role);
+          // Update sport_type on the profile
+          await supabase.from('profiles').update({ sport_type: sportType } as any).eq('user_id', signUpData.user.id);
           await recordSession();
           toast({ title: "Account created!", description: "Welcome to the Vault." });
           await routeByRole(signUpData.user.id);
