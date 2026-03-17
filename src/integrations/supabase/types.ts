@@ -2825,6 +2825,7 @@ export type Database = {
           physical_stats_privacy: string
           position: string | null
           sixty_yard_dash: number | null
+          sport_type: string
           target_schools: string[] | null
           throwing_arm: string | null
           twitter_url: string | null
@@ -2851,6 +2852,7 @@ export type Database = {
           physical_stats_privacy?: string
           position?: string | null
           sixty_yard_dash?: number | null
+          sport_type?: string
           target_schools?: string[] | null
           throwing_arm?: string | null
           twitter_url?: string | null
@@ -2877,6 +2879,7 @@ export type Database = {
           physical_stats_privacy?: string
           position?: string | null
           sixty_yard_dash?: number | null
+          sport_type?: string
           target_schools?: string[] | null
           throwing_arm?: string | null
           twitter_url?: string | null
