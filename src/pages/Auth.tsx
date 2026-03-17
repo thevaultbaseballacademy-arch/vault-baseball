@@ -11,7 +11,9 @@ import { z } from "zod";
 import MFAVerify from "@/components/auth/MFAVerify";
 import LegalAgreements from "@/components/auth/LegalAgreements";
 import RoleSelector from "@/components/auth/RoleSelector";
+import SportSelector from "@/components/auth/SportSelector";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
+import { SportType } from "@/lib/sportTypes";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 
 const authSchema = z.object({
