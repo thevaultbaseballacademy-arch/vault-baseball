@@ -99,6 +99,7 @@ import CoachManagement from "./pages/CoachManagement";
 import OwnerCommandCenter from "./pages/OwnerCommandCenter";
 import ProgressReport from "./pages/ProgressReport";
 import BookSession from "./pages/BookSession";
+import SoftballDevelopment from "./pages/SoftballDevelopment";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
