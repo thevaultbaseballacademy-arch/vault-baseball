@@ -1,3 +1,5 @@
+import { SportType } from "@/lib/sportTypes";
+
 export type PrivacyLevel = 'public' | 'coaches_only' | 'private';
 
 export interface Profile {
@@ -24,4 +26,5 @@ export interface Profile {
   bio_privacy?: PrivacyLevel | string;
   contact_privacy?: PrivacyLevel | string;
   physical_stats_privacy?: PrivacyLevel | string;
+  sport_type?: SportType;
 }
