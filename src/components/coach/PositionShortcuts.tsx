@@ -1,13 +1,11 @@
 import { motion } from "framer-motion";
 import { 
-  Target, // Pitching
-  Shield, // Catching  
-  Diamond, // Infield
-  Circle, // Outfield
-  Zap // Hitting
+  Target, Shield, Diamond, Circle, Zap
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NewThisWeekBadge from "@/components/ui/NewThisWeekBadge";
+import { useSport } from "@/contexts/SportContext";
+import { softballPositions } from "@/lib/softball/positions";
 
 interface PositionData {
   id: string;
@@ -19,7 +17,8 @@ interface PositionData {
   hasNewContent?: boolean;
 }
 
-const positions: PositionData[] = [
+// Baseball positions (original)
+const baseballPositions: PositionData[] = [
   {
     id: "pitching",
     name: "Pitching",
@@ -27,7 +26,7 @@ const positions: PositionData[] = [
     color: "#ef4444",
     courseId: "velocity-system",
     description: "Velocity, arm care, mechanics",
-    hasNewContent: true, // New drills added
+    hasNewContent: true,
   },
   {
     id: "catching",
@@ -45,7 +44,7 @@ const positions: PositionData[] = [
     color: "#f59e0b",
     courseId: "infield-training",
     description: "Footwork, transfers, throws",
-    hasNewContent: true, // New drills added
+    hasNewContent: true,
   },
   {
     id: "outfield",
@@ -69,9 +68,11 @@ const positions: PositionData[] = [
 
 const PositionShortcuts = () => {
   const navigate = useNavigate();
+  const { sport } = useSport();
+
+  const positions: PositionData[] = sport === 'softball' ? softballPositions : baseballPositions;
 
   const handlePositionClick = (position: PositionData) => {
-    // Navigate to courses page with position filter
     navigate(`/courses?position=${position.id}`);
   };
 
@@ -94,7 +95,6 @@ const PositionShortcuts = () => {
             onClick={() => handlePositionClick(position)}
             className="relative flex flex-col items-center p-4 bg-card border border-border rounded-2xl hover:border-accent/50 hover:shadow-lg transition-all group"
           >
-            {/* New badge */}
             {position.hasNewContent && (
               <NewThisWeekBadge 
                 variant="floating" 
