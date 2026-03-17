@@ -99,6 +99,7 @@ import CoachManagement from "./pages/CoachManagement";
 import OwnerCommandCenter from "./pages/OwnerCommandCenter";
 import ProgressReport from "./pages/ProgressReport";
 import BookSession from "./pages/BookSession";
+import SoftballDevelopment from "./pages/SoftballDevelopment";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
@@ -254,6 +255,13 @@ const App = () => (
             <Route path="/progress-report/:token" element={<ProgressReport />} />
             <Route path="/book-session" element={<BookSession />} />
             <Route path="/claim-22m" element={<Claim22MAccess />} />
+            
+            {/* Softball Development */}
+            <Route path="/softball" element={
+              <TrialProtectedRoute>
+                <SoftballDevelopment />
+              </TrialProtectedRoute>
+            } />
             
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
