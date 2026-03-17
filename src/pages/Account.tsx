@@ -13,6 +13,7 @@ import MFASettings from "@/components/auth/MFASettings";
 import SessionManagement from "@/components/account/SessionManagement";
 import DataExportPanel from "@/components/account/DataExportPanel";
 import DataDeletionPanel from "@/components/account/DataDeletionPanel";
+import SportSwitcher from "@/components/account/SportSwitcher";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -181,6 +182,9 @@ const Account = () => {
                 </div>
               </div>
             </div>
+
+            {/* Sport Preference */}
+            <SportSwitcher />
 
             {/* Subscription Section */}
             <div className="bg-card border border-border rounded-2xl p-6 md:p-8">

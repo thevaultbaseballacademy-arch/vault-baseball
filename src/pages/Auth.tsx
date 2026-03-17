@@ -11,7 +11,9 @@ import { z } from "zod";
 import MFAVerify from "@/components/auth/MFAVerify";
 import LegalAgreements from "@/components/auth/LegalAgreements";
 import RoleSelector from "@/components/auth/RoleSelector";
+import SportSelector from "@/components/auth/SportSelector";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
+import { SportType } from "@/lib/sportTypes";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 
 const authSchema = z.object({
@@ -28,6 +30,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<UserRole>("athlete");
+  const [sportType, setSportType] = useState<SportType>("baseball");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
@@ -145,7 +148,7 @@ const Auth = () => {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
-            data: { full_name: name, display_name: name, signup_role: role },
+            data: { full_name: name, display_name: name, signup_role: role, sport_type: sportType },
           },
         });
         if (error) throw error;
@@ -153,6 +156,8 @@ const Auth = () => {
         // If user was auto-confirmed (e.g. in dev), assign role immediately
         if (signUpData.user && signUpData.session) {
           await assignRole(signUpData.user.id, role);
+          // Update sport_type on the profile
+          await supabase.from('profiles').update({ sport_type: sportType } as any).eq('user_id', signUpData.user.id);
           await recordSession();
           toast({ title: "Account created!", description: "Welcome to the Vault." });
           await routeByRole(signUpData.user.id);
@@ -288,6 +293,7 @@ const Auth = () => {
                 </div>
 
                 <RoleSelector value={role} onChange={setRole} />
+                <SportSelector value={sportType} onChange={setSportType} />
               </>
             )}
 
