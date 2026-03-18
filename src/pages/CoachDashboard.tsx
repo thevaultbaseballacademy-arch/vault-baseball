@@ -472,6 +472,12 @@ const CoachDashboard = () => {
                 )}
               </TabsContent>
 
+              <TabsContent value="intelligence" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">DEVELOPMENT INTELLIGENCE</h2>
+                <p className="text-sm text-muted-foreground">AI-powered athlete analysis with automated recommendations, gap detection, and progress tracking.</p>
+                {user && <CoachIntelligencePanel coachUserId={user.id} />}
+              </TabsContent>
+
               <TabsContent value="leaderboards" className="space-y-6">
                 <KPILeaderboards coachUserId={user?.id || ''} />
               </TabsContent>
