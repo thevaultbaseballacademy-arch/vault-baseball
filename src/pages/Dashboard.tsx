@@ -15,6 +15,7 @@ import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequest
 import { PlayerHomeworkChecklist } from "@/components/dashboard/PlayerHomeworkChecklist";
 import { LessonFeedbackReport } from "@/components/dashboard/LessonFeedbackReport";
 import { AthleteDevScore } from "@/components/dashboard/AthleteDevScore";
+import DevelopmentIntelligence from "@/components/intelligence/DevelopmentIntelligence";
 import {
   LineChart,
   Line,
