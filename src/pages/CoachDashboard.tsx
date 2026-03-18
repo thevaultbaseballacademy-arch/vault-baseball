@@ -31,6 +31,7 @@ import { CoachDevelopmentReview } from "@/components/coach/CoachDevelopmentRevie
 import { AthleteScoreOverview } from "@/components/coach/AthleteScoreOverview";
 import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashboard";
 import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
+import CoachIntelligencePanel from "@/components/intelligence/CoachIntelligencePanel";
 import {
   LineChart,
   Line,
@@ -432,6 +433,10 @@ const CoachDashboard = () => {
                     <DollarSign className="w-3.5 h-3.5" />
                     Earnings
                   </TabsTrigger>
+                  <TabsTrigger value="intelligence" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <Target className="w-3.5 h-3.5" />
+                    Intelligence
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
@@ -465,6 +470,12 @@ const CoachDashboard = () => {
                 ) : (
                   <p className="text-sm text-muted-foreground">Loading coach record...</p>
                 )}
+              </TabsContent>
+
+              <TabsContent value="intelligence" className="space-y-6">
+                <h2 className="font-display text-xl text-foreground">DEVELOPMENT INTELLIGENCE</h2>
+                <p className="text-sm text-muted-foreground">AI-powered athlete analysis with automated recommendations, gap detection, and progress tracking.</p>
+                {user && <CoachIntelligencePanel coachUserId={user.id} />}
               </TabsContent>
 
               <TabsContent value="leaderboards" className="space-y-6">

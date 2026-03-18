@@ -15,6 +15,7 @@ import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequest
 import { PlayerHomeworkChecklist } from "@/components/dashboard/PlayerHomeworkChecklist";
 import { LessonFeedbackReport } from "@/components/dashboard/LessonFeedbackReport";
 import { AthleteDevScore } from "@/components/dashboard/AthleteDevScore";
+import DevelopmentIntelligence from "@/components/intelligence/DevelopmentIntelligence";
 import {
   LineChart,
   Line,
@@ -420,6 +421,7 @@ const Dashboard = () => {
             {/* Sidebar - Live Activity Feed */}
             <div className="lg:col-span-1 space-y-6">
               <div className="sticky top-24 space-y-6">
+                {user && <DevelopmentIntelligence userId={user.id} />}
                 {user && <AthleteDevScore userId={user.id} />}
                 {user && <SelectCoachWidget userId={user.id} />}
                 {user && <CoachAssignmentRequests userId={user.id} />}
