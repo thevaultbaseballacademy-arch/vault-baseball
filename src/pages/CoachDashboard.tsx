@@ -433,6 +433,10 @@ const CoachDashboard = () => {
                     <DollarSign className="w-3.5 h-3.5" />
                     Earnings
                   </TabsTrigger>
+                  <TabsTrigger value="intelligence" className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap">
+                    <Target className="w-3.5 h-3.5" />
+                    Intelligence
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
