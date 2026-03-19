@@ -144,6 +144,11 @@ import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
 import PitchLog from "./pages/workload/PitchLog";
 import ArmCare from "./pages/workload/ArmCare";
 import InjuryLog from "./pages/workload/InjuryLog";
+import TeamHub from "./pages/team/TeamHub";
+import TeamRoster from "./pages/team/TeamRoster";
+import TeamSchedule from "./pages/team/TeamSchedule";
+import TeamAnnouncements from "./pages/team/TeamAnnouncements";
+import TeamAnalytics from "./pages/team/TeamAnalytics";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
@@ -410,6 +415,13 @@ const App = () => (
             <Route path="/workload/pitch-log" element={<TrialProtectedRoute><PitchLog /></TrialProtectedRoute>} />
             <Route path="/workload/arm-care" element={<TrialProtectedRoute><ArmCare /></TrialProtectedRoute>} />
             <Route path="/workload/injuries" element={<TrialProtectedRoute><InjuryLog /></TrialProtectedRoute>} />
+
+            {/* Team Management */}
+            <Route path="/team" element={<TrialProtectedRoute><TeamHub /></TrialProtectedRoute>} />
+            <Route path="/team/roster" element={<TrialProtectedRoute><TeamRoster /></TrialProtectedRoute>} />
+            <Route path="/team/schedule" element={<TrialProtectedRoute><TeamSchedule /></TrialProtectedRoute>} />
+            <Route path="/team/announcements" element={<TrialProtectedRoute><TeamAnnouncements /></TrialProtectedRoute>} />
+            <Route path="/team/analytics" element={<TrialProtectedRoute><TeamAnalytics /></TrialProtectedRoute>} />
 
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
