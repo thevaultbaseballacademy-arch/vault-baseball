@@ -2913,6 +2913,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age_group: string | null
           avatar_url: string | null
           batting_side: string | null
           bio: string | null
@@ -2941,6 +2942,7 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          age_group?: string | null
           avatar_url?: string | null
           batting_side?: string | null
           bio?: string | null
@@ -2969,6 +2971,7 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          age_group?: string | null
           avatar_url?: string | null
           batting_side?: string | null
           bio?: string | null
