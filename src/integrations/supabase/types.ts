@@ -4107,6 +4107,7 @@ export type Database = {
         Args: { _athlete_id: string; _coach_id: string }
         Returns: boolean
       }
+      is_owner: { Args: { _user_id: string }; Returns: boolean }
       list_all_purchases_for_admin: {
         Args: never
         Returns: {
