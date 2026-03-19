@@ -17,11 +17,12 @@ interface LessonFeedbackFormProps {
   athleteUserId: string;
   athleteName: string;
   coachUserId: string;
+  sportType?: string;
   onSubmitted?: () => void;
 }
 
 export const LessonFeedbackForm = ({
-  lessonId, athleteUserId, athleteName, coachUserId, onSubmitted
+  lessonId, athleteUserId, athleteName, coachUserId, sportType = 'baseball', onSubmitted
 }: LessonFeedbackFormProps) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -65,7 +66,8 @@ export const LessonFeedbackForm = ({
           lesson_focus: lessonFocus,
           recommended_drills: filteredDrills,
           next_development_focus: nextFocus,
-        })
+          sport_type: sportType,
+        } as any)
         .select()
         .single();
 
@@ -129,11 +131,13 @@ export const LessonFeedbackForm = ({
   const generateAIAnalysis = async (feedbackId: string) => {
     setGeneratingAI(true);
     try {
-      await supabase.functions.invoke("generate-lesson-analysis", {
-        body: { feedbackId },
-      });
+      // Run AI analysis and intelligence hook in parallel
+      await Promise.all([
+        supabase.functions.invoke("generate-lesson-analysis", { body: { feedbackId } }),
+        supabase.functions.invoke("post-lesson-intelligence", { body: { feedbackId } }),
+      ]);
     } catch (err) {
-      console.error("AI analysis generation failed:", err);
+      console.error("AI analysis/intelligence generation failed:", err);
     } finally {
       setGeneratingAI(false);
     }

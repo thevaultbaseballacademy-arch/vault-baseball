@@ -29,6 +29,9 @@ serve(async (req) => {
 
     if (lessonErr || !lesson) throw new Error("Lesson not found");
 
+    const sportType = lesson.sport_type || "baseball";
+    const isSoftball = sportType === "softball";
+
     // Get athlete profile
     const { data: athleteProfile } = await supabase
       .from("profiles")
@@ -66,7 +69,8 @@ serve(async (req) => {
     const position = athleteProfile?.position || "Unknown";
     const coachName = coachProfile?.display_name || "Coach";
 
-    const prompt = `You are a professional baseball development coach AI assistant for Vault Baseball.
+    const sportLabel = isSoftball ? "softball" : "baseball";
+    const prompt = `You are a professional ${sportLabel} development coach AI assistant for Vault ${isSoftball ? "Softball" : "Baseball"}.
 
 Generate a post-lesson recap and homework plan for this coaching session.
 
@@ -103,7 +107,7 @@ Generate TWO sections:
 - How each drill connects to what was covered in the lesson
 - Any metrics to track
 
-Keep the tone encouraging but direct. Use baseball-specific terminology. Format with markdown.`;
+Keep the tone encouraging but direct. Use ${sportLabel}-specific terminology. Format with markdown.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -114,7 +118,7 @@ Keep the tone encouraging but direct. Use baseball-specific terminology. Format 
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You are Vault Baseball's AI Development Coach. Provide detailed, actionable baseball training recaps and homework." },
+          { role: "system", content: `You are Vault ${isSoftball ? "Softball" : "Baseball"}'s AI Development Coach. Provide detailed, actionable ${sportLabel} training recaps and homework.` },
           { role: "user", content: prompt },
         ],
         tools: [
