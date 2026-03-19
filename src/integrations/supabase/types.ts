@@ -1871,6 +1871,7 @@ export type Database = {
           is_preview: boolean
           lesson_id: string
           module_id: string
+          sport_type: string | null
           updated_at: string
           video_platform: string | null
           video_url: string
@@ -1883,6 +1884,7 @@ export type Database = {
           is_preview?: boolean
           lesson_id: string
           module_id: string
+          sport_type?: string | null
           updated_at?: string
           video_platform?: string | null
           video_url: string
@@ -1895,6 +1897,7 @@ export type Database = {
           is_preview?: boolean
           lesson_id?: string
           module_id?: string
+          sport_type?: string | null
           updated_at?: string
           video_platform?: string | null
           video_url?: string
@@ -2406,6 +2409,7 @@ export type Database = {
           duration_seconds: number | null
           id: string
           privacy_level: string
+          sport_type: string | null
           thumbnail_url: string | null
           title: string
           updated_at: string
@@ -2418,6 +2422,7 @@ export type Database = {
           duration_seconds?: number | null
           id?: string
           privacy_level?: string
+          sport_type?: string | null
           thumbnail_url?: string | null
           title: string
           updated_at?: string
@@ -2430,6 +2435,7 @@ export type Database = {
           duration_seconds?: number | null
           id?: string
           privacy_level?: string
+          sport_type?: string | null
           thumbnail_url?: string | null
           title?: string
           updated_at?: string
@@ -4436,10 +4442,12 @@ export type Database = {
         Row: {
           age_group: string | null
           ai_analysis: Json | null
+          annotation_data: Json | null
           coach_notes: string | null
           coach_user_id: string | null
           created_at: string
           id: string
+          phase_timestamps: Json | null
           pitch_type: string | null
           skill_category: string | null
           sport_type: string
@@ -4452,10 +4460,12 @@ export type Database = {
         Insert: {
           age_group?: string | null
           ai_analysis?: Json | null
+          annotation_data?: Json | null
           coach_notes?: string | null
           coach_user_id?: string | null
           created_at?: string
           id?: string
+          phase_timestamps?: Json | null
           pitch_type?: string | null
           skill_category?: string | null
           sport_type?: string
@@ -4468,10 +4478,12 @@ export type Database = {
         Update: {
           age_group?: string | null
           ai_analysis?: Json | null
+          annotation_data?: Json | null
           coach_notes?: string | null
           coach_user_id?: string | null
           created_at?: string
           id?: string
+          phase_timestamps?: Json | null
           pitch_type?: string | null
           skill_category?: string | null
           sport_type?: string
