@@ -141,6 +141,7 @@ export const allCourses = [
     pillar: "velocity",
     category: "pitching",
     level: "Advanced",
+    sport_type: "baseball",
     metrics: ["Hip-Shoulder Separation", "Arm Path", "Peak Velocity"],
     features: [
       "Advanced plyo ball progressions",
