@@ -3267,6 +3267,168 @@ export type Database = {
           },
         ]
       }
+      recruiting_checklist: {
+        Row: {
+          category: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          is_completed: boolean
+          item_key: string
+          item_label: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          item_key: string
+          item_label: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          item_key?: string
+          item_label?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recruiting_contacts: {
+        Row: {
+          coach_email: string | null
+          coach_name: string | null
+          coach_phone: string | null
+          coach_title: string | null
+          contact_status: string
+          created_at: string
+          division: string | null
+          id: string
+          interest_level: string | null
+          last_contact_date: string | null
+          next_follow_up: string | null
+          notes: string | null
+          school_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coach_email?: string | null
+          coach_name?: string | null
+          coach_phone?: string | null
+          coach_title?: string | null
+          contact_status?: string
+          created_at?: string
+          division?: string | null
+          id?: string
+          interest_level?: string | null
+          last_contact_date?: string | null
+          next_follow_up?: string | null
+          notes?: string | null
+          school_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coach_email?: string | null
+          coach_name?: string | null
+          coach_phone?: string | null
+          coach_title?: string | null
+          contact_status?: string
+          created_at?: string
+          division?: string | null
+          id?: string
+          interest_level?: string | null
+          last_contact_date?: string | null
+          next_follow_up?: string | null
+          notes?: string | null
+          school_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recruiting_profiles: {
+        Row: {
+          academic_interests: string | null
+          act_score: number | null
+          commitment_status: string
+          committed_at: string | null
+          committed_school: string | null
+          created_at: string
+          division_target: string[] | null
+          extracurriculars: string | null
+          gpa: number | null
+          highlight_video_url: string | null
+          id: string
+          ncaa_eligibility_center: boolean | null
+          ncaa_id: string | null
+          recruiting_notes: string | null
+          references_contacts: Json | null
+          sat_score: number | null
+          skills_video_url: string | null
+          sport_type: string
+          updated_at: string
+          user_id: string
+          visibility: string
+        }
+        Insert: {
+          academic_interests?: string | null
+          act_score?: number | null
+          commitment_status?: string
+          committed_at?: string | null
+          committed_school?: string | null
+          created_at?: string
+          division_target?: string[] | null
+          extracurriculars?: string | null
+          gpa?: number | null
+          highlight_video_url?: string | null
+          id?: string
+          ncaa_eligibility_center?: boolean | null
+          ncaa_id?: string | null
+          recruiting_notes?: string | null
+          references_contacts?: Json | null
+          sat_score?: number | null
+          skills_video_url?: string | null
+          sport_type?: string
+          updated_at?: string
+          user_id: string
+          visibility?: string
+        }
+        Update: {
+          academic_interests?: string | null
+          act_score?: number | null
+          commitment_status?: string
+          committed_at?: string | null
+          committed_school?: string | null
+          created_at?: string
+          division_target?: string[] | null
+          extracurriculars?: string | null
+          gpa?: number | null
+          highlight_video_url?: string | null
+          id?: string
+          ncaa_eligibility_center?: boolean | null
+          ncaa_id?: string | null
+          recruiting_notes?: string | null
+          references_contacts?: Json | null
+          sat_score?: number | null
+          skills_video_url?: string | null
+          sport_type?: string
+          updated_at?: string
+          user_id?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       remote_lessons: {
         Row: {
           ai_homework: string | null
@@ -3538,6 +3700,57 @@ export type Database = {
           notes?: string | null
           recording_url?: string
           session_id?: string | null
+        }
+        Relationships: []
+      }
+      showcase_events: {
+        Row: {
+          cost_cents: number | null
+          created_at: string
+          event_date: string | null
+          event_end_date: string | null
+          event_name: string
+          event_type: string
+          id: string
+          location: string | null
+          notes: string | null
+          organization: string | null
+          results: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cost_cents?: number | null
+          created_at?: string
+          event_date?: string | null
+          event_end_date?: string | null
+          event_name: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          organization?: string | null
+          results?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cost_cents?: number | null
+          created_at?: string
+          event_date?: string | null
+          event_end_date?: string | null
+          event_name?: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          organization?: string | null
+          results?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

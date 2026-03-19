@@ -128,6 +128,12 @@ import SoftballPitching from "./pages/softball/SoftballPitching";
 import SoftballHitting from "./pages/softball/SoftballHitting";
 import SoftballFielding from "./pages/softball/SoftballFielding";
 import SoftballAnalytics from "./pages/softball/SoftballAnalytics";
+import RecruitingHub from "./pages/recruiting/RecruitingHub";
+import RecruitingProfilePage from "./pages/recruiting/RecruitingProfile";
+import RecruitingShowcases from "./pages/recruiting/RecruitingShowcases";
+import RecruitingContacts from "./pages/recruiting/RecruitingContacts";
+import RecruitingChecklist from "./pages/recruiting/RecruitingChecklist";
+import RecruitingAssistantPage from "./pages/recruiting/RecruitingAssistantPage";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
@@ -357,6 +363,25 @@ const App = () => (
             <Route path="/softball/fielding" element={<SoftballFielding />} />
             <Route path="/softball/analytics" element={<SoftballAnalytics />} />
             
+            {/* Recruiting Readiness Engine */}
+            <Route path="/recruiting" element={
+              <TrialProtectedRoute><RecruitingHub /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/profile" element={
+              <TrialProtectedRoute><RecruitingProfilePage /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/showcases" element={
+              <TrialProtectedRoute><RecruitingShowcases /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/contacts" element={
+              <TrialProtectedRoute><RecruitingContacts /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/checklist" element={
+              <TrialProtectedRoute><RecruitingChecklist /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/assistant" element={
+              <TrialProtectedRoute><RecruitingAssistantPage /></TrialProtectedRoute>
+            } />
             
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
