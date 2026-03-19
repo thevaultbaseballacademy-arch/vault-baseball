@@ -304,59 +304,86 @@ export type Database = {
         Row: {
           athletic_metrics: number
           calculated_at: string
+          compliance_score: number | null
+          consistency_score: number | null
           created_at: string
           feedback_count: number
+          gaps_summary: string[] | null
           homework_completed: number
           homework_total: number
           id: string
+          improvement_status: string | null
           lessons_attended: number
           lessons_missed: number
           overall_score: number
           period_end: string
           period_start: string
+          readiness_score: number | null
           skill_development: number
+          sport_type: string | null
+          strengths_summary: string[] | null
+          top_priorities: string[] | null
           training_consistency: number
           user_id: string
           weekly_focus: string | null
           work_ethic: number
+          workload_score: number | null
         }
         Insert: {
           athletic_metrics?: number
           calculated_at?: string
+          compliance_score?: number | null
+          consistency_score?: number | null
           created_at?: string
           feedback_count?: number
+          gaps_summary?: string[] | null
           homework_completed?: number
           homework_total?: number
           id?: string
+          improvement_status?: string | null
           lessons_attended?: number
           lessons_missed?: number
           overall_score?: number
           period_end?: string
           period_start?: string
+          readiness_score?: number | null
           skill_development?: number
+          sport_type?: string | null
+          strengths_summary?: string[] | null
+          top_priorities?: string[] | null
           training_consistency?: number
           user_id: string
           weekly_focus?: string | null
           work_ethic?: number
+          workload_score?: number | null
         }
         Update: {
           athletic_metrics?: number
           calculated_at?: string
+          compliance_score?: number | null
+          consistency_score?: number | null
           created_at?: string
           feedback_count?: number
+          gaps_summary?: string[] | null
           homework_completed?: number
           homework_total?: number
           id?: string
+          improvement_status?: string | null
           lessons_attended?: number
           lessons_missed?: number
           overall_score?: number
           period_end?: string
           period_start?: string
+          readiness_score?: number | null
           skill_development?: number
+          sport_type?: string | null
+          strengths_summary?: string[] | null
+          top_priorities?: string[] | null
           training_consistency?: number
           user_id?: string
           weekly_focus?: string | null
           work_ethic?: number
+          workload_score?: number | null
         }
         Relationships: []
       }
@@ -415,6 +442,9 @@ export type Database = {
           kpi_value: number
           notes: string | null
           recorded_at: string
+          recorded_by: string | null
+          session_id: string | null
+          source: string | null
           updated_at: string
           user_id: string
         }
@@ -427,6 +457,9 @@ export type Database = {
           kpi_value: number
           notes?: string | null
           recorded_at?: string
+          recorded_by?: string | null
+          session_id?: string | null
+          source?: string | null
           updated_at?: string
           user_id: string
         }
@@ -439,6 +472,9 @@ export type Database = {
           kpi_value?: number
           notes?: string | null
           recorded_at?: string
+          recorded_by?: string | null
+          session_id?: string | null
+          source?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -2561,6 +2597,51 @@ export type Database = {
         }
         Relationships: []
       }
+      kpi_definitions: {
+        Row: {
+          age_group_adjustments: Json | null
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          position_relevance: string[] | null
+          scale: Json | null
+          sport_type: string
+          thresholds: Json | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          age_group_adjustments?: Json | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          position_relevance?: string[] | null
+          scale?: Json | null
+          sport_type?: string
+          thresholds?: Json | null
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          age_group_adjustments?: Json | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          position_relevance?: string[] | null
+          scale?: Json | null
+          sport_type?: string
+          thresholds?: Json | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       kpi_share_tokens: {
         Row: {
           created_at: string
@@ -2922,6 +3003,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mental_performance_records: {
+        Row: {
+          athlete_user_id: string
+          bounce_back_rate: number | null
+          confidence_score: number | null
+          created_at: string
+          focus_consistency: number | null
+          goal_completion_rate: number | null
+          id: string
+          journal_entry: string | null
+          pressure_performance_index: number | null
+          week_of: string
+        }
+        Insert: {
+          athlete_user_id: string
+          bounce_back_rate?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          focus_consistency?: number | null
+          goal_completion_rate?: number | null
+          id?: string
+          journal_entry?: string | null
+          pressure_performance_index?: number | null
+          week_of: string
+        }
+        Update: {
+          athlete_user_id?: string
+          bounce_back_rate?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          focus_consistency?: number | null
+          goal_completion_rate?: number | null
+          id?: string
+          journal_entry?: string | null
+          pressure_performance_index?: number | null
+          week_of?: string
+        }
+        Relationships: []
       }
       metric_share_tokens: {
         Row: {
@@ -3303,6 +3423,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          academic_gpa: number | null
           age_group: string | null
           avatar_url: string | null
           batting_side: string | null
@@ -3312,14 +3433,18 @@ export type Database = {
           cover_url: string | null
           created_at: string
           display_name: string | null
+          division_target: string | null
           email: string | null
+          goals: Json | null
           graduation_year: number | null
           height_inches: number | null
           hudl_url: string | null
           id: string
           instagram_url: string | null
+          intended_major: string | null
           physical_stats_privacy: string
           position: string | null
+          secondary_positions: string[] | null
           sixty_yard_dash: number | null
           softball_format: string | null
           sport_type: string
@@ -3329,9 +3454,11 @@ export type Database = {
           updated_at: string
           user_id: string
           weight_lbs: number | null
+          wingspan_inches: number | null
           youtube_url: string | null
         }
         Insert: {
+          academic_gpa?: number | null
           age_group?: string | null
           avatar_url?: string | null
           batting_side?: string | null
@@ -3341,14 +3468,18 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           display_name?: string | null
+          division_target?: string | null
           email?: string | null
+          goals?: Json | null
           graduation_year?: number | null
           height_inches?: number | null
           hudl_url?: string | null
           id?: string
           instagram_url?: string | null
+          intended_major?: string | null
           physical_stats_privacy?: string
           position?: string | null
+          secondary_positions?: string[] | null
           sixty_yard_dash?: number | null
           softball_format?: string | null
           sport_type?: string
@@ -3358,9 +3489,11 @@ export type Database = {
           updated_at?: string
           user_id: string
           weight_lbs?: number | null
+          wingspan_inches?: number | null
           youtube_url?: string | null
         }
         Update: {
+          academic_gpa?: number | null
           age_group?: string | null
           avatar_url?: string | null
           batting_side?: string | null
@@ -3370,14 +3503,18 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           display_name?: string | null
+          division_target?: string | null
           email?: string | null
+          goals?: Json | null
           graduation_year?: number | null
           height_inches?: number | null
           hudl_url?: string | null
           id?: string
           instagram_url?: string | null
+          intended_major?: string | null
           physical_stats_privacy?: string
           position?: string | null
+          secondary_positions?: string[] | null
           sixty_yard_dash?: number | null
           softball_format?: string | null
           sport_type?: string
@@ -3387,6 +3524,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           weight_lbs?: number | null
+          wingspan_inches?: number | null
           youtube_url?: string | null
         }
         Relationships: []
