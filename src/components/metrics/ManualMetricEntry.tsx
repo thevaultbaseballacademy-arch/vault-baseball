@@ -26,7 +26,7 @@ import { useAddMetric } from "@/hooks/useDeviceMetrics";
 import { DEVICE_CONFIG, type DeviceType } from "@/types/deviceMetrics";
 
 const metricSchema = z.object({
-  device_type: z.enum(['rapsodo', 'hittrax', 'blast_motion', 'trackman', 'pocket_radar']),
+  device_type: z.string(),
   metric_category: z.enum(['pitching', 'hitting', 'throwing']),
   recorded_at: z.string().optional(),
   pitch_type: z.string().optional(),
