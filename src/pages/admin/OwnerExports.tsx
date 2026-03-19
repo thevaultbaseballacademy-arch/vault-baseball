@@ -126,7 +126,7 @@ const OwnerExports = () => {
       const { count: totalUsers } = await supabase.from("profiles").select("*", { count: "exact", head: true });
       const { count: totalAthletes } = await supabase.from("user_roles").select("*", { count: "exact", head: true }).eq("role", "athlete");
       const { count: totalCoaches } = await supabase.from("coaches").select("*", { count: "exact", head: true }).eq("status", "Active");
-      const { count: totalParents } = await supabase.from("user_roles").select("*", { count: "exact", head: true }).eq("role", "parent");
+      const { count: totalParents } = await supabase.from("parent_athlete_links").select("*", { count: "exact", head: true }).eq("status", "active");
       const { count: totalLessons } = await supabase.from("remote_lessons").select("*", { count: "exact", head: true }).eq("status", "completed");
       const { data: revData } = await supabase.from("user_purchases").select("amount_cents").limit(1000);
       const totalRevenue = (revData || []).reduce((sum: number, r: any) => sum + (r.amount_cents || 0), 0);
