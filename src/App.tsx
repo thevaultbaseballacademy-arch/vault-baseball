@@ -265,6 +265,10 @@ const App = () => (
                 <SoftballDevelopment />
               </TrialProtectedRoute>
             } />
+            <Route path="/softball/lessons/booking" element={<SoftballLessonBooking />} />
+            <Route path="/softball/lessons/coaches" element={<SoftballCoaches />} />
+            <Route path="/softball/lessons/notes" element={<SoftballLessonNotes />} />
+            
             
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
