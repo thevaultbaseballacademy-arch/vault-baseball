@@ -26,7 +26,7 @@ import { useAddMetric } from "@/hooks/useDeviceMetrics";
 import { DEVICE_CONFIG, type DeviceType } from "@/types/deviceMetrics";
 
 const metricSchema = z.object({
-  device_type: z.enum(['rapsodo', 'hittrax', 'blast_motion', 'trackman', 'pocket_radar']),
+  device_type: z.string(),
   metric_category: z.enum(['pitching', 'hitting', 'throwing']),
   recorded_at: z.string().optional(),
   pitch_type: z.string().optional(),
@@ -63,7 +63,7 @@ export function ManualMetricEntry({ userId }: ManualMetricEntryProps) {
   const onSubmit = async (data: MetricFormData) => {
     await addMetric.mutateAsync({
       user_id: userId,
-      device_type: data.device_type,
+      device_type: data.device_type as DeviceType,
       metric_category: data.metric_category,
       recorded_at: data.recorded_at || new Date().toISOString(),
       pitch_type: data.pitch_type || null,

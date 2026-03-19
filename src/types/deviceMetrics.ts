@@ -1,4 +1,18 @@
-export type DeviceType = 'rapsodo' | 'hittrax' | 'blast_motion' | 'trackman' | 'pocket_radar';
+export type DeviceType = 'rapsodo' | 'hittrax' | 'blast_motion' | 'trackman' | 'pocket_radar' | 'rapsodo_pitching' | 'rapsodo_hitting' | 'diamond_kinetics' | 'forcedeck' | 'wearable';
+
+export type DataSource = 
+  | 'manual' 
+  | 'pocket_radar' 
+  | 'blast_motion' 
+  | 'rapsodo_pitching' 
+  | 'rapsodo_hitting' 
+  | 'hittrax' 
+  | 'trackman' 
+  | 'diamond_kinetics' 
+  | 'forcedeck' 
+  | 'wearable' 
+  | 'api_import'
+  | 'csv_import';
 
 export interface DeviceIntegration {
   id: string;
@@ -74,9 +88,39 @@ export interface MetricShareToken {
   created_at: string;
 }
 
+export interface DeviceRegistryEntry {
+  id: string;
+  device_key: string;
+  device_name: string;
+  manufacturer: string;
+  device_category: string;
+  capabilities: string[];
+  integration_status: string;
+  api_type: string | null;
+  data_fields: Record<string, unknown>;
+  priority_order: number;
+  logo_emoji: string;
+  description: string | null;
+  is_active: boolean;
+}
+
+export interface DeviceSyncLog {
+  id: string;
+  user_id: string;
+  device_type: string;
+  sync_type: string;
+  records_imported: number;
+  records_failed: number;
+  sync_status: string;
+  error_message: string | null;
+  metadata: Record<string, unknown>;
+  started_at: string;
+  completed_at: string | null;
+}
+
 export type SyncStatus = 'live' | 'activating' | 'pending';
 
-export const DEVICE_CONFIG: Record<DeviceType, {
+export const DEVICE_CONFIG: Record<string, {
   name: string;
   logo: string;
   color: string;
@@ -87,7 +131,7 @@ export const DEVICE_CONFIG: Record<DeviceType, {
   keyMetrics: string[];
 }> = {
   trackman: {
-    name: 'Trackman',
+    name: 'TrackMan',
     logo: '📡',
     color: 'hsl(var(--vault-velocity))',
     description: 'Stadium V3 / Portable B1 - Real-time ball tracking',
@@ -105,6 +149,26 @@ export const DEVICE_CONFIG: Record<DeviceType, {
     syncStatus: 'live',
     apiMethod: 'Cloud API (OAuth 2.0)',
     keyMetrics: ['Velocity', 'Spin Rate', 'Spin Axis', 'Break']
+  },
+  rapsodo_pitching: {
+    name: 'Rapsodo Pitching 2.0',
+    logo: '📊',
+    color: 'hsl(var(--vault-athleticism))',
+    description: 'Pitch tracking — velocity, spin rate, spin axis, movement',
+    capabilities: ['pitching'],
+    syncStatus: 'live',
+    apiMethod: 'Cloud API (OAuth 2.0)',
+    keyMetrics: ['Velocity', 'Spin Rate', 'Spin Axis', 'Break']
+  },
+  rapsodo_hitting: {
+    name: 'Rapsodo Hitting 3.0',
+    logo: '📊',
+    color: 'hsl(var(--vault-athleticism))',
+    description: 'Exit velocity, launch angle, distance, spin rate on batted balls',
+    capabilities: ['hitting'],
+    syncStatus: 'live',
+    apiMethod: 'Cloud API (OAuth 2.0)',
+    keyMetrics: ['Exit Velocity', 'Launch Angle', 'Distance', 'Spin Rate']
   },
   blast_motion: {
     name: 'Blast Motion',
@@ -130,20 +194,50 @@ export const DEVICE_CONFIG: Record<DeviceType, {
     name: 'Pocket Radar',
     logo: '📻',
     color: 'hsl(var(--vault-transfer))',
-    description: 'Velocity measurement for arm & bat speed',
+    description: 'Smart Coach — Bluetooth radar, most common in youth/HS',
     capabilities: ['pitching', 'throwing', 'hitting'],
     syncStatus: 'pending',
-    apiMethod: 'Manual / CSV Import',
+    apiMethod: 'API / CSV Import',
     keyMetrics: ['Velocity', 'Peak Speed', 'Average Speed']
+  },
+  diamond_kinetics: {
+    name: 'Diamond Kinetics',
+    logo: '💎',
+    color: 'hsl(var(--vault-velocity))',
+    description: 'SwingTracker — bat sensor for swing metrics',
+    capabilities: ['hitting'],
+    syncStatus: 'pending',
+    apiMethod: 'REST API / CSV Import',
+    keyMetrics: ['Bat Speed', 'Power', 'Attack Angle', 'Hand Speed']
+  },
+  forcedeck: {
+    name: 'ForceDecks',
+    logo: '⚡',
+    color: 'hsl(var(--vault-athleticism))',
+    description: 'Force plates — jump testing, asymmetry, power output',
+    capabilities: ['biometric'],
+    syncStatus: 'pending',
+    apiMethod: 'REST API',
+    keyMetrics: ['Peak Force', 'RSI', 'Asymmetry', 'Jump Height']
+  },
+  wearable: {
+    name: 'Wearable',
+    logo: '⌚',
+    color: 'hsl(var(--vault-longevity))',
+    description: 'Sleep, HRV, recovery — Whoop, OURA, Garmin, Apple Watch',
+    capabilities: ['biometric'],
+    syncStatus: 'pending',
+    apiMethod: 'Manual Entry',
+    keyMetrics: ['Sleep', 'HRV', 'Recovery', 'Strain']
   }
 };
 
 // VAULT Power Metrics - Normalized calculations from multiple sources
 export interface VaultPowerMetrics {
-  vaultPowerIndex: number; // Normalized 0-100 score combining exit velo, bat speed
-  vaultArmStrength: number; // Normalized 0-100 combining pitch velo, spin efficiency
-  vaultExplosiveness: number; // Combined athletic metrics
-  vaultConsistency: number; // Variance analysis across sessions
+  vaultPowerIndex: number;
+  vaultArmStrength: number;
+  vaultExplosiveness: number;
+  vaultConsistency: number;
 }
 
 export function calculateVaultPowerIndex(metrics: DeviceMetric[]): number {
@@ -158,7 +252,6 @@ export function calculateVaultPowerIndex(metrics: DeviceMetric[]): number {
     .reduce((sum, m) => sum + (m.bat_speed_mph || 0), 0) / 
     (hittingMetrics.filter(m => m.bat_speed_mph).length || 1);
   
-  // Normalize to 0-100: Exit Velo (60-110 range), Bat Speed (50-90 range)
   const exitVeloScore = Math.min(100, Math.max(0, ((avgExitVelo - 60) / 50) * 100));
   const batSpeedScore = Math.min(100, Math.max(0, ((avgBatSpeed - 50) / 40) * 100));
   
@@ -179,10 +272,25 @@ export function calculateVaultArmStrength(metrics: DeviceMetric[]): number {
     .reduce((sum, m) => sum + (m.spin_efficiency || 0), 0) / 
     (pitchingMetrics.filter(m => m.spin_efficiency).length || 1);
   
-  // Normalize: Velo (60-100 range), Spin Efficiency (0-100)
   const veloScore = Math.min(100, Math.max(0, ((avgVelo - 60) / 40) * 100));
   
   return avgSpinEff 
     ? Math.round((veloScore * 0.7 + avgSpinEff * 0.3))
     : Math.round(veloScore);
 }
+
+// KPI Source labels for display
+export const SOURCE_LABELS: Record<DataSource, string> = {
+  manual: "Manual Entry",
+  pocket_radar: "Pocket Radar",
+  blast_motion: "Blast Motion",
+  rapsodo_pitching: "Rapsodo Pitching",
+  rapsodo_hitting: "Rapsodo Hitting",
+  hittrax: "HitTrax",
+  trackman: "TrackMan",
+  diamond_kinetics: "Diamond Kinetics",
+  forcedeck: "ForceDecks",
+  wearable: "Wearable",
+  api_import: "API Import",
+  csv_import: "CSV Import",
+};

@@ -2279,6 +2279,102 @@ export type Database = {
         }
         Relationships: []
       }
+      device_registry: {
+        Row: {
+          api_type: string | null
+          capabilities: string[]
+          created_at: string
+          data_fields: Json | null
+          description: string | null
+          device_category: string
+          device_key: string
+          device_name: string
+          id: string
+          integration_status: string
+          is_active: boolean | null
+          logo_emoji: string | null
+          manufacturer: string
+          priority_order: number | null
+        }
+        Insert: {
+          api_type?: string | null
+          capabilities?: string[]
+          created_at?: string
+          data_fields?: Json | null
+          description?: string | null
+          device_category?: string
+          device_key: string
+          device_name: string
+          id?: string
+          integration_status?: string
+          is_active?: boolean | null
+          logo_emoji?: string | null
+          manufacturer: string
+          priority_order?: number | null
+        }
+        Update: {
+          api_type?: string | null
+          capabilities?: string[]
+          created_at?: string
+          data_fields?: Json | null
+          description?: string | null
+          device_category?: string
+          device_key?: string
+          device_name?: string
+          id?: string
+          integration_status?: string
+          is_active?: boolean | null
+          logo_emoji?: string | null
+          manufacturer?: string
+          priority_order?: number | null
+        }
+        Relationships: []
+      }
+      device_sync_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          device_type: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          records_failed: number | null
+          records_imported: number | null
+          started_at: string
+          sync_status: string
+          sync_type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          device_type: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          records_failed?: number | null
+          records_imported?: number | null
+          started_at?: string
+          sync_status?: string
+          sync_type?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          device_type?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          records_failed?: number | null
+          records_imported?: number | null
+          started_at?: string
+          sync_status?: string
+          sync_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       drill_assignments: {
         Row: {
           assigned_at: string

@@ -25,7 +25,7 @@ interface CSVUploaderProps {
   userId: string;
 }
 
-const COLUMN_MAPPINGS: Record<DeviceType, Record<string, string>> = {
+const COLUMN_MAPPINGS: Partial<Record<DeviceType, Record<string, string>>> = {
   rapsodo: {
     'Velocity': 'velocity_mph',
     'Spin Rate': 'spin_rate_rpm',
@@ -37,6 +37,21 @@ const COLUMN_MAPPINGS: Record<DeviceType, Record<string, string>> = {
     'Exit Velocity': 'exit_velocity_mph',
     'Launch Angle': 'launch_angle',
     'Distance': 'distance_ft'
+  },
+  rapsodo_pitching: {
+    'Velocity': 'velocity_mph',
+    'Spin Rate': 'spin_rate_rpm',
+    'Spin Axis': 'spin_axis',
+    'Spin Efficiency': 'spin_efficiency',
+    'Horizontal Break': 'horizontal_break',
+    'Vertical Break': 'vertical_break',
+    'Pitch Type': 'pitch_type'
+  },
+  rapsodo_hitting: {
+    'Exit Velocity': 'exit_velocity_mph',
+    'Launch Angle': 'launch_angle',
+    'Distance': 'distance_ft',
+    'Spin Rate': 'spin_rate_rpm'
   },
   hittrax: {
     'Exit Velo': 'exit_velocity_mph',
@@ -67,7 +82,13 @@ const COLUMN_MAPPINGS: Record<DeviceType, Record<string, string>> = {
     'Speed': 'measured_velocity_mph',
     'Velocity': 'measured_velocity_mph',
     'Type': 'velocity_type'
-  }
+  },
+  diamond_kinetics: {
+    'Bat Speed': 'bat_speed_mph',
+    'Hand Speed': 'peak_hand_speed',
+    'Attack Angle': 'attack_angle',
+    'Power': 'power_index'
+  },
 };
 
 export function CSVUploader({ userId }: CSVUploaderProps) {

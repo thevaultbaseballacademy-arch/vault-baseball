@@ -44,7 +44,7 @@ export function useDeviceMetrics(userId?: string, category?: string, deviceType?
         query = query.eq('metric_category', category);
       }
       if (deviceType) {
-        query = query.eq('device_type', deviceType);
+        query = query.eq('device_type', deviceType as any);
       }
       
       const { data, error } = await query;
@@ -86,10 +86,10 @@ export function useAddDeviceIntegration() {
         .from('device_integrations')
         .upsert({
           user_id: userId,
-          device_type: deviceType,
+          device_type: deviceType as any,
           api_key: apiKey,
           is_connected: !!apiKey
-        }, { onConflict: 'user_id,device_type' });
+        } as any, { onConflict: 'user_id,device_type' });
       
       if (error) throw error;
       return { ok: true };
@@ -117,7 +117,7 @@ export function useAddMetric() {
       };
       const { data, error } = await supabase
         .from('device_metrics')
-        .insert(insertPayload)
+        .insert(insertPayload as any)
         .select()
         .single();
       
@@ -146,7 +146,7 @@ export function useBulkAddMetrics() {
       }));
       const { data, error } = await supabase
         .from('device_metrics')
-        .insert(insertData)
+        .insert(insertData as any)
         .select();
       
       if (error) throw error;

@@ -94,6 +94,7 @@ import FAQ from "./pages/FAQ";
 import { CookieConsent } from "@/components/CookieConsent";
 import { EddieAIChat } from "@/components/EddieAIChat";
 import DeviceMetrics from "./pages/DeviceMetrics";
+import DeviceIngestionPage from "./pages/DeviceIngestion";
 import SharedMetricsView from "./pages/SharedMetricsView";
 import Trial from "./pages/Trial";
 import VelocityBaseline from "./pages/VelocityBaseline";
@@ -338,6 +339,7 @@ const App = () => (
                 <DeviceMetrics />
               </TrialProtectedRoute>
             } />
+            <Route path="/data-ingestion" element={<TrialProtectedRoute><DeviceIngestionPage /></TrialProtectedRoute>} />
             <Route path="/shared-metrics/:token" element={<SharedMetricsView />} />
             
             {/* Trial System Routes */}
