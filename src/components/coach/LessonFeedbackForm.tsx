@@ -22,7 +22,7 @@ interface LessonFeedbackFormProps {
 }
 
 export const LessonFeedbackForm = ({
-  lessonId, athleteUserId, athleteName, coachUserId, onSubmitted
+  lessonId, athleteUserId, athleteName, coachUserId, sportType = 'baseball', onSubmitted
 }: LessonFeedbackFormProps) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
