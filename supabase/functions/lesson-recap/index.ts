@@ -118,7 +118,7 @@ Keep the tone encouraging but direct. Use ${sportLabel}-specific terminology. Fo
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You are Vault Baseball's AI Development Coach. Provide detailed, actionable baseball training recaps and homework." },
+          { role: "system", content: `You are Vault ${isSoftball ? "Softball" : "Baseball"}'s AI Development Coach. Provide detailed, actionable ${sportLabel} training recaps and homework.` },
           { role: "user", content: prompt },
         ],
         tools: [
