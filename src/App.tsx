@@ -36,6 +36,7 @@ import OwnerContent from "./pages/admin/OwnerContent";
 import OwnerIntelligence from "./pages/admin/OwnerIntelligence";
 import OwnerSettings from "./pages/admin/OwnerSettings";
 import OwnerAnalytics from "./pages/admin/OwnerAnalytics";
+import OwnerHealthMetrics from "./pages/admin/OwnerHealthMetrics";
 import OwnerAudit from "./pages/admin/OwnerAudit";
 import Community from "./pages/Community";
 import Profile from "./pages/Profile";
