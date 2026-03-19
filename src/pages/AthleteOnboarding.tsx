@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useActivationTracking } from "@/hooks/useActivationTracking";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
