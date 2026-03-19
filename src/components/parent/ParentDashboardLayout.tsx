@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   Users, BarChart3, BookOpen, GraduationCap, Activity,
   Menu, X, ChevronRight, MessageSquare, ClipboardCheck,
-  Dumbbell
+  Dumbbell, Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +15,8 @@ const navItems = [
   { label: "Training", path: "/parent/training", icon: Dumbbell },
   { label: "Wellness", path: "/parent/wellness", icon: Activity },
   { label: "Recruiting", path: "/parent/recruiting", icon: GraduationCap },
+  { label: "Messages", path: "/parent/messages", icon: MessageSquare },
+  { label: "Downloads", path: "/parent/downloads", icon: Download },
 ];
 
 const ParentDashboardLayout = () => {
