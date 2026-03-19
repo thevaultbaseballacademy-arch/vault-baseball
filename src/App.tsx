@@ -243,6 +243,9 @@ const App = () => (
               <Route path="analytics" element={
                 <RoleGuard requires="view_platform_analytics"><OwnerAnalytics /></RoleGuard>
               } />
+              <Route path="health" element={
+                <RoleGuard requires="view_platform_analytics"><OwnerHealthMetrics /></RoleGuard>
+              } />
               <Route path="audit" element={
                 <RoleGuard requires="view_audit_log"><OwnerAudit /></RoleGuard>
               } />

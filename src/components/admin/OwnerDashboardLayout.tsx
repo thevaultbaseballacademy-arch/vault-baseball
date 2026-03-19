@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: "/admin/intelligence", label: "Intelligence", icon: Brain },
   { to: "/admin/settings", label: "Settings", icon: Settings },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/admin/health", label: "Health", icon: HeartPulse },
   { to: "/admin/audit", label: "Audit Log", icon: ScrollText },
 ];
 
