@@ -3,7 +3,8 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Users, BarChart3, BookOpen, GraduationCap, Activity,
-  Menu, X, ChevronRight
+  Menu, X, ChevronRight, MessageSquare, ClipboardCheck,
+  Dumbbell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -11,8 +12,9 @@ const navItems = [
   { label: "My Athletes", path: "/parent", icon: Users },
   { label: "Progress", path: "/parent/progress", icon: BarChart3 },
   { label: "Lessons", path: "/parent/lessons", icon: BookOpen },
-  { label: "Recruiting", path: "/parent/recruiting", icon: GraduationCap },
+  { label: "Training", path: "/parent/training", icon: Dumbbell },
   { label: "Wellness", path: "/parent/wellness", icon: Activity },
+  { label: "Recruiting", path: "/parent/recruiting", icon: GraduationCap },
 ];
 
 const ParentDashboardLayout = () => {
@@ -30,7 +32,7 @@ const ParentDashboardLayout = () => {
       <aside className="hidden lg:flex w-64 border-r border-border flex-col bg-card">
         <div className="p-6 border-b border-border">
           <h2 className="font-display text-xl text-foreground">PARENT PORTAL</h2>
-          <p className="text-xs text-muted-foreground mt-1">Athlete Development Visibility</p>
+          <p className="text-xs text-muted-foreground mt-1">Your athlete's world — at a glance</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => (
@@ -48,6 +50,9 @@ const ParentDashboardLayout = () => {
             </Link>
           ))}
         </nav>
+        <div className="p-4 border-t border-border">
+          <p className="text-[10px] text-muted-foreground text-center">Read-only access · Data powered by coaches</p>
+        </div>
       </aside>
 
       {/* Mobile header */}

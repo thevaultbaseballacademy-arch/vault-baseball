@@ -141,6 +141,7 @@ import ParentProgress from "./pages/parent/ParentProgress";
 import ParentLessons from "./pages/parent/ParentLessons";
 import ParentRecruiting from "./pages/parent/ParentRecruiting";
 import ParentWellness from "./pages/parent/ParentWellness";
+import ParentTraining from "./pages/parent/ParentTraining";
 import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
 import PitchLog from "./pages/workload/PitchLog";
 import ArmCare from "./pages/workload/ArmCare";
@@ -407,8 +408,9 @@ const App = () => (
               <Route index element={<ParentAthletes />} />
               <Route path="progress" element={<ParentProgress />} />
               <Route path="lessons" element={<ParentLessons />} />
-              <Route path="recruiting" element={<ParentRecruiting />} />
+              <Route path="training" element={<ParentTraining />} />
               <Route path="wellness" element={<ParentWellness />} />
+              <Route path="recruiting" element={<ParentRecruiting />} />
             </Route>
 
 
