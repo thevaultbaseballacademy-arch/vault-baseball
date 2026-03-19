@@ -69,7 +69,7 @@ Keep it professional, motivating, and actionable. Use ${sportLabel} terminology 
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You are an elite baseball development analyst providing actionable post-lesson reports." },
+          { role: "system", content: `You are an elite ${sportLabel} development analyst providing actionable post-lesson reports.` },
           { role: "user", content: prompt },
         ],
       }),
