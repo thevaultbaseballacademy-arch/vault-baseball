@@ -245,14 +245,20 @@ const CoachDashboard = () => {
     if (athleteCheckins.length === 0) return null;
 
     const trainingDays = athleteCheckins.filter(c => c.training_completed).length;
-    const avgMood = athleteCheckins.reduce((sum, c) => sum + (c.mood || 0), 0) / athleteCheckins.filter(c => c.mood).length;
-    const avgEnergy = athleteCheckins.reduce((sum, c) => sum + (c.energy_level || 0), 0) / athleteCheckins.filter(c => c.energy_level).length;
+    const moodEntries = athleteCheckins.filter(c => c.mood != null && typeof c.mood === "number");
+    const energyEntries = athleteCheckins.filter(c => c.energy_level != null && typeof c.energy_level === "number");
+    const avgMood = moodEntries.length > 0
+      ? (moodEntries.reduce((sum, c) => sum + (c.mood as number), 0) / moodEntries.length).toFixed(1)
+      : null;
+    const avgEnergy = energyEntries.length > 0
+      ? (energyEntries.reduce((sum, c) => sum + (c.energy_level as number), 0) / energyEntries.length).toFixed(1)
+      : null;
 
     return {
       checkinCount: athleteCheckins.length,
       trainingDays,
-      avgMood: isNaN(avgMood) ? null : avgMood.toFixed(1),
-      avgEnergy: isNaN(avgEnergy) ? null : avgEnergy.toFixed(1),
+      avgMood,
+      avgEnergy,
     };
   };
 

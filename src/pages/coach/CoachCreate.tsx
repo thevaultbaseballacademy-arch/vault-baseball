@@ -15,17 +15,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 const CoachCreate = () => {
   const queryClient = useQueryClient();
+  const { sport } = useSport();
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({
     content_type: "drill",
     title: "",
     description: "",
-    sport_type: "baseball",
+    sport_type: sport,
     skill_category: "",
     difficulty: "intermediate",
     age_group: "",
     coaching_points: "",
   });
+
+  // Keep form sport_type in sync with global toggle
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, sport_type: sport }));
+  }, [sport]);
 
   const { data: user } = useQuery({
     queryKey: ["auth-user"],
