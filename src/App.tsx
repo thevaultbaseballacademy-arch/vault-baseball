@@ -416,6 +416,13 @@ const App = () => (
             <Route path="/workload/arm-care" element={<TrialProtectedRoute><ArmCare /></TrialProtectedRoute>} />
             <Route path="/workload/injuries" element={<TrialProtectedRoute><InjuryLog /></TrialProtectedRoute>} />
 
+            {/* Team Management */}
+            <Route path="/team" element={<TrialProtectedRoute><TeamHub /></TrialProtectedRoute>} />
+            <Route path="/team/roster" element={<TrialProtectedRoute><TeamRoster /></TrialProtectedRoute>} />
+            <Route path="/team/schedule" element={<TrialProtectedRoute><TeamSchedule /></TrialProtectedRoute>} />
+            <Route path="/team/announcements" element={<TrialProtectedRoute><TeamAnnouncements /></TrialProtectedRoute>} />
+            <Route path="/team/analytics" element={<TrialProtectedRoute><TeamAnalytics /></TrialProtectedRoute>} />
+
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
             <Route path="/training" element={<ShortRedirect />} />
