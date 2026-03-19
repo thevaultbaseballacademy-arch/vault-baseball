@@ -389,6 +389,17 @@ const App = () => (
               <TrialProtectedRoute><RecruitingAssistantPage /></TrialProtectedRoute>
             } />
             
+            {/* Parent Portal — nested layout with sidebar */}
+            <Route path="/parent" element={
+              <RoleGuard requiresRole={["parent", "athlete", "owner"]}><ParentDashboardLayout /></RoleGuard>
+            }>
+              <Route index element={<ParentAthletes />} />
+              <Route path="progress" element={<ParentProgress />} />
+              <Route path="lessons" element={<ParentLessons />} />
+              <Route path="recruiting" element={<ParentRecruiting />} />
+              <Route path="wellness" element={<ParentWellness />} />
+            </Route>
+
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
             <Route path="/training" element={<ShortRedirect />} />
