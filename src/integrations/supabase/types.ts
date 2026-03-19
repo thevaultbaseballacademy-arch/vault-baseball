@@ -1653,6 +1653,7 @@ export type Database = {
           skill_category: string | null
           sport_type: string
           status: string
+          submitted_at: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -1676,6 +1677,7 @@ export type Database = {
           skill_category?: string | null
           sport_type?: string
           status?: string
+          submitted_at?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -1699,6 +1701,7 @@ export type Database = {
           skill_category?: string | null
           sport_type?: string
           status?: string
+          submitted_at?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string
