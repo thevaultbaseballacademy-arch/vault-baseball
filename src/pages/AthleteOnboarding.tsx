@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useActivationTracking } from "@/hooks/useActivationTracking";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -27,6 +28,7 @@ const AthleteOnboarding = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { track } = useActivationTracking();
 
   const [form, setForm] = useState({
     athlete_name: "",
@@ -103,6 +105,7 @@ const AthleteOnboarding = () => {
       }
 
       setSubmitted(true);
+      track('onboarding_complete', { position: form.position, level: form.current_level });
     } catch (err) {
       console.error(err);
       toast({ title: "Error", description: "Failed to submit. Please try again.", variant: "destructive" });

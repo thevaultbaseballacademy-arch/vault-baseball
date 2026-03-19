@@ -16,6 +16,9 @@ import { PlayerHomeworkChecklist } from "@/components/dashboard/PlayerHomeworkCh
 import { LessonFeedbackReport } from "@/components/dashboard/LessonFeedbackReport";
 import { AthleteDevScore } from "@/components/dashboard/AthleteDevScore";
 import DevelopmentIntelligence from "@/components/intelligence/DevelopmentIntelligence";
+import ActivationChecklist from "@/components/dashboard/ActivationChecklist";
+import UpsellCards from "@/components/dashboard/UpsellCards";
+import { useOnboardingActivation } from "@/hooks/useOnboardingActivation";
 import {
   LineChart,
   Line,
@@ -49,6 +52,9 @@ const Dashboard = () => {
   const [checkins, setCheckins] = useState<CheckinData[]>([]);
   const [timeRange, setTimeRange] = useState<7 | 14 | 30>(14);
   const navigate = useNavigate();
+
+  // Trigger onboarding activation when user first lands on dashboard
+  useOnboardingActivation(user?.id);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -421,6 +427,8 @@ const Dashboard = () => {
             {/* Sidebar - Live Activity Feed */}
             <div className="lg:col-span-1 space-y-6">
               <div className="sticky top-24 space-y-6">
+                {user && <ActivationChecklist userId={user.id} />}
+                {user && <UpsellCards userId={user.id} />}
                 {user && <DevelopmentIntelligence userId={user.id} />}
                 {user && <AthleteDevScore userId={user.id} />}
                 {user && <SelectCoachWidget userId={user.id} />}

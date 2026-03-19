@@ -44,6 +44,30 @@ export type Database = {
         }
         Relationships: []
       }
+      activation_events: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       activity_feed: {
         Row: {
           activity_type: string
@@ -5645,6 +5669,63 @@ export type Database = {
           feedback?: string | null
           id?: string
           rating?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      upsell_offers: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          cta_label: string
+          cta_route: string
+          description: string
+          dismissed_at: string | null
+          expires_at: string | null
+          id: string
+          is_converted: boolean
+          is_dismissed: boolean
+          offer_key: string
+          offer_type: string
+          priority: number
+          title: string
+          trigger_reason: string
+          user_id: string
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          cta_label?: string
+          cta_route: string
+          description: string
+          dismissed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_converted?: boolean
+          is_dismissed?: boolean
+          offer_key: string
+          offer_type: string
+          priority?: number
+          title: string
+          trigger_reason: string
+          user_id: string
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          cta_label?: string
+          cta_route?: string
+          description?: string
+          dismissed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_converted?: boolean
+          is_dismissed?: boolean
+          offer_key?: string
+          offer_type?: string
+          priority?: number
+          title?: string
+          trigger_reason?: string
           user_id?: string
         }
         Relationships: []
