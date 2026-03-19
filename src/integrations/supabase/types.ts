@@ -3982,6 +3982,156 @@ export type Database = {
         }
         Relationships: []
       }
+      team_announcements: {
+        Row: {
+          author_user_id: string
+          content: string
+          created_at: string
+          id: string
+          pinned: boolean | null
+          priority: string | null
+          team_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_user_id: string
+          content: string
+          created_at?: string
+          id?: string
+          pinned?: boolean | null
+          priority?: string | null
+          team_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_user_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          pinned?: boolean | null
+          priority?: string | null
+          team_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_announcements_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_events: {
+        Row: {
+          created_at: string
+          created_by: string
+          end_time: string | null
+          event_date: string
+          event_type: string
+          id: string
+          is_cancelled: boolean | null
+          location: string | null
+          notes: string | null
+          opponent: string | null
+          start_time: string | null
+          team_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          end_time?: string | null
+          event_date: string
+          event_type?: string
+          id?: string
+          is_cancelled?: boolean | null
+          location?: string | null
+          notes?: string | null
+          opponent?: string | null
+          start_time?: string | null
+          team_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          end_time?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          is_cancelled?: boolean | null
+          location?: string | null
+          notes?: string | null
+          opponent?: string | null
+          start_time?: string | null
+          team_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          id: string
+          jersey_number: string | null
+          joined_at: string | null
+          position: string | null
+          role: string
+          status: string
+          team_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          jersey_number?: string | null
+          joined_at?: string | null
+          position?: string | null
+          role?: string
+          status?: string
+          team_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          jersey_number?: string | null
+          joined_at?: string | null
+          position?: string | null
+          role?: string
+          status?: string
+          team_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_whitelist: {
         Row: {
           added_by: string | null
@@ -4012,6 +4162,54 @@ export type Database = {
           id?: string
           notes?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      teams: {
+        Row: {
+          age_group: string | null
+          created_at: string
+          description: string | null
+          head_coach_user_id: string
+          id: string
+          invite_code: string | null
+          is_active: boolean | null
+          logo_url: string | null
+          max_roster_size: number | null
+          name: string
+          season: string | null
+          sport_type: string
+          updated_at: string
+        }
+        Insert: {
+          age_group?: string | null
+          created_at?: string
+          description?: string | null
+          head_coach_user_id: string
+          id?: string
+          invite_code?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          max_roster_size?: number | null
+          name: string
+          season?: string | null
+          sport_type?: string
+          updated_at?: string
+        }
+        Update: {
+          age_group?: string | null
+          created_at?: string
+          description?: string | null
+          head_coach_user_id?: string
+          id?: string
+          invite_code?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          max_roster_size?: number | null
+          name?: string
+          season?: string | null
+          sport_type?: string
+          updated_at?: string
         }
         Relationships: []
       }
