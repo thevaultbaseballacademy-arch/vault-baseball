@@ -2249,6 +2249,134 @@ export type Database = {
         }
         Relationships: []
       }
+      drill_assignments: {
+        Row: {
+          assigned_at: string
+          athlete_user_id: string
+          coach_user_id: string
+          completed_at: string | null
+          completion_notes: string | null
+          created_at: string
+          drill_id: string
+          due_date: string | null
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          athlete_user_id: string
+          coach_user_id: string
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          drill_id: string
+          due_date?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          athlete_user_id?: string
+          coach_user_id?: string
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          drill_id?: string
+          due_date?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drill_assignments_drill_id_fkey"
+            columns: ["drill_id"]
+            isOneToOne: false
+            referencedRelation: "drills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drills: {
+        Row: {
+          age_group: string[] | null
+          approved_by: string | null
+          coaching_points: string[] | null
+          created_at: string
+          created_by: string
+          description: string | null
+          difficulty: string
+          id: string
+          kpi_mapping: string[] | null
+          position: string[] | null
+          prerequisites: string[] | null
+          published_at: string | null
+          recommended_use_cases: string[] | null
+          rejection_note: string | null
+          revision_note: string | null
+          skill_category: string
+          softball_format: string | null
+          sport_type: string
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          age_group?: string[] | null
+          approved_by?: string | null
+          coaching_points?: string[] | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          difficulty?: string
+          id?: string
+          kpi_mapping?: string[] | null
+          position?: string[] | null
+          prerequisites?: string[] | null
+          published_at?: string | null
+          recommended_use_cases?: string[] | null
+          rejection_note?: string | null
+          revision_note?: string | null
+          skill_category: string
+          softball_format?: string | null
+          sport_type?: string
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          age_group?: string[] | null
+          approved_by?: string | null
+          coaching_points?: string[] | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          difficulty?: string
+          id?: string
+          kpi_mapping?: string[] | null
+          position?: string[] | null
+          prerequisites?: string[] | null
+          published_at?: string | null
+          recommended_use_cases?: string[] | null
+          rejection_note?: string | null
+          revision_note?: string | null
+          skill_category?: string
+          softball_format?: string | null
+          sport_type?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       evaluation_leads: {
         Row: {
           age: number | null
@@ -3541,6 +3669,122 @@ export type Database = {
           weight_lbs?: number | null
           wingspan_inches?: number | null
           youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      program_assignments: {
+        Row: {
+          athlete_user_id: string
+          coach_user_id: string
+          completion_percent: number | null
+          created_at: string
+          current_week: number | null
+          id: string
+          program_id: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          athlete_user_id: string
+          coach_user_id: string
+          completion_percent?: number | null
+          created_at?: string
+          current_week?: number | null
+          id?: string
+          program_id: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          coach_user_id?: string
+          completion_percent?: number | null
+          created_at?: string
+          current_week?: number | null
+          id?: string
+          program_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_assignments_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      programs: {
+        Row: {
+          age_group: string[] | null
+          approved_by: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          difficulty: string | null
+          drill_sequence: Json | null
+          duration_weeks: number | null
+          id: string
+          is_assignable: boolean | null
+          kpi_targets: Json | null
+          name: string
+          published_at: string | null
+          rejection_note: string | null
+          revision_note: string | null
+          skill_focus: string | null
+          softball_format: string | null
+          sport_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          age_group?: string[] | null
+          approved_by?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          difficulty?: string | null
+          drill_sequence?: Json | null
+          duration_weeks?: number | null
+          id?: string
+          is_assignable?: boolean | null
+          kpi_targets?: Json | null
+          name: string
+          published_at?: string | null
+          rejection_note?: string | null
+          revision_note?: string | null
+          skill_focus?: string | null
+          softball_format?: string | null
+          sport_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          age_group?: string[] | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          difficulty?: string | null
+          drill_sequence?: Json | null
+          duration_weeks?: number | null
+          id?: string
+          is_assignable?: boolean | null
+          kpi_targets?: Json | null
+          name?: string
+          published_at?: string | null
+          rejection_note?: string | null
+          revision_note?: string | null
+          skill_focus?: string | null
+          softball_format?: string | null
+          sport_type?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
