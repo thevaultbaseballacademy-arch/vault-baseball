@@ -3023,6 +3023,39 @@ export type Database = {
           },
         ]
       }
+      parent_athlete_links: {
+        Row: {
+          athlete_user_id: string
+          created_at: string
+          id: string
+          link_code: string | null
+          linked_at: string | null
+          parent_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          athlete_user_id: string
+          created_at?: string
+          id?: string
+          link_code?: string | null
+          linked_at?: string | null
+          parent_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          created_at?: string
+          id?: string
+          link_code?: string | null
+          linked_at?: string | null
+          parent_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           category: string
@@ -4415,6 +4448,10 @@ export type Database = {
           question_text: string
           section: string
         }[]
+      }
+      get_parent_athlete_data: {
+        Args: { p_athlete_id: string; p_parent_id: string }
+        Returns: Json
       }
       get_profile_safe: {
         Args: { target_user_id: string }
