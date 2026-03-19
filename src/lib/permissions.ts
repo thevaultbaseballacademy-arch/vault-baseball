@@ -251,7 +251,7 @@ export function getDashboardRoute(role: VaultRole | null): string {
     case "owner": return "/owner";
     case "admin": return "/admin";
     case "coach": return "/coach-dashboard";
-    case "parent": return "/dashboard";
+    case "parent": return "/parent";
     case "athlete":
     default:
       return "/dashboard";
