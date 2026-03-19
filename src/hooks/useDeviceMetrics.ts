@@ -86,10 +86,10 @@ export function useAddDeviceIntegration() {
         .from('device_integrations')
         .upsert({
           user_id: userId,
-          device_type: deviceType,
+          device_type: deviceType as any,
           api_key: apiKey,
           is_connected: !!apiKey
-        }, { onConflict: 'user_id,device_type' });
+        } as any, { onConflict: 'user_id,device_type' });
       
       if (error) throw error;
       return { ok: true };
