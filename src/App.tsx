@@ -144,6 +144,8 @@ import ParentLessons from "./pages/parent/ParentLessons";
 import ParentRecruiting from "./pages/parent/ParentRecruiting";
 import ParentWellness from "./pages/parent/ParentWellness";
 import ParentTraining from "./pages/parent/ParentTraining";
+import ParentMessages from "./pages/parent/ParentMessages";
+import ParentDownloads from "./pages/parent/ParentDownloads";
 import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
 import PitchLog from "./pages/workload/PitchLog";
 import ArmCare from "./pages/workload/ArmCare";
