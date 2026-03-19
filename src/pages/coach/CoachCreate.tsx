@@ -194,9 +194,9 @@ const CoachCreate = () => {
                           )}
                         </div>
                       </div>
-                      {item.status === "rejected" && item.reviewer_notes && (
+                      {item.status === "rejected" && (item as any).reviewer_notes && (
                         <p className="text-xs text-destructive mt-2 bg-destructive/5 p-2 rounded">
-                          Feedback: {item.reviewer_notes}
+                          Feedback: {(item as any).reviewer_notes}
                         </p>
                       )}
                     </CardContent>

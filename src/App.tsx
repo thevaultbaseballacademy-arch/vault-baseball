@@ -168,9 +168,18 @@ const App = () => (
                 <VaultDashboard />
               </TrialProtectedRoute>
             } />
+            {/* Coach Dashboard — nested layout with sidebar */}
             <Route path="/coach" element={
-              <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboard /></RoleGuard>
-            } />
+              <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboardLayout /></RoleGuard>
+            }>
+              <Route index element={<CoachAthletes />} />
+              <Route path="kpis" element={<CoachKPIs />} />
+              <Route path="lessons" element={<CoachLessons />} />
+              <Route path="assignments" element={<CoachAssignments />} />
+              <Route path="create" element={<CoachCreate />} />
+              <Route path="schedule" element={<CoachSchedule />} />
+              <Route path="profile" element={<CoachProfilePage />} />
+            </Route>
             <Route path="/coach-dashboard" element={
               <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboard /></RoleGuard>
             } />

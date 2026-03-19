@@ -95,7 +95,7 @@ const CoachLessons = () => {
                     <p className="text-xs text-muted-foreground">{format(new Date(lesson.scheduled_at), "EEE, MMM d 'at' h:mm a")}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {lesson.lesson_type === "video_review" && <Video className="w-4 h-4 text-muted-foreground" />}
+                    {(lesson as any).lesson_type === "video_review" && <Video className="w-4 h-4 text-muted-foreground" />}
                     <Badge variant={statusColor(lesson.status)}>{lesson.status}</Badge>
                   </div>
                 </CardContent>

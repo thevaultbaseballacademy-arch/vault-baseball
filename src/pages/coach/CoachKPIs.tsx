@@ -156,7 +156,7 @@ const CoachKPIs = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-display">{kpi.kpi_value}</span>
                     {kpi.kpi_unit && <span className="text-xs text-muted-foreground">{kpi.kpi_unit}</span>}
-                    {trend === "up" && <TrendingUp className="w-4 h-4 text-green-600" />}
+                    {trend === "up" && <TrendingUp className="w-4 h-4 text-primary" />}
                     {trend === "down" && <TrendingDown className="w-4 h-4 text-destructive" />}
                   </div>
                 </CardContent>
