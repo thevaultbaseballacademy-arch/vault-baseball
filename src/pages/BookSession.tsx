@@ -10,6 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useSport } from "@/contexts/SportContext";
 import {
   CalendarDays, Clock, User, CheckCircle2, ArrowRight,
   Loader2, ChevronLeft
@@ -28,8 +29,12 @@ const TIME_SLOTS = [
   "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM",
 ];
 
-const POSITIONS = [
+const BASEBALL_POSITIONS = [
   "RHP", "LHP", "C", "1B", "2B", "SS", "3B", "OF", "DH", "Utility"
+];
+
+const SOFTBALL_POSITIONS = [
+  "Pitcher", "Catcher", "1B", "2B", "SS", "3B", "OF", "DP/Flex", "Utility"
 ];
 
 const WEEKDAY_LABELS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
