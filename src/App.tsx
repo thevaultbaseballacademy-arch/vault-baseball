@@ -339,6 +339,7 @@ const App = () => (
                 <DeviceMetrics />
               </TrialProtectedRoute>
             } />
+            <Route path="/data-ingestion" element={<TrialProtectedRoute><DeviceIngestionPage /></TrialProtectedRoute>} />
             <Route path="/shared-metrics/:token" element={<SharedMetricsView />} />
             
             {/* Trial System Routes */}
