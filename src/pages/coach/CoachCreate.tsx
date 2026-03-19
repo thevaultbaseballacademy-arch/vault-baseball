@@ -75,7 +75,7 @@ const CoachCreate = () => {
       toast.success("Draft saved");
       queryClient.invalidateQueries({ queryKey: ["coach-submissions"] });
       setShowCreate(false);
-      setForm({ content_type: "drill", title: "", description: "", sport_type: "baseball", skill_category: "", difficulty: "intermediate", age_group: "", coaching_points: "" });
+      setForm({ content_type: "drill", title: "", description: "", sport_type: sport, skill_category: "", difficulty: "intermediate", age_group: "", coaching_points: "" });
     },
     onError: (e) => toast.error(e.message),
   });
