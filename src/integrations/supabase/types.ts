@@ -162,6 +162,51 @@ export type Database = {
           },
         ]
       }
+      arm_care_logs: {
+        Row: {
+          arm_feeling: number | null
+          band_work_minutes: number | null
+          created_at: string
+          exercises_completed: Json | null
+          icing_minutes: number | null
+          id: string
+          log_date: string
+          notes: string | null
+          rom_score: number | null
+          stretching_minutes: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          arm_feeling?: number | null
+          band_work_minutes?: number | null
+          created_at?: string
+          exercises_completed?: Json | null
+          icing_minutes?: number | null
+          id?: string
+          log_date?: string
+          notes?: string | null
+          rom_score?: number | null
+          stretching_minutes?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          arm_feeling?: number | null
+          band_work_minutes?: number | null
+          created_at?: string
+          exercises_completed?: Json | null
+          icing_minutes?: number | null
+          id?: string
+          log_date?: string
+          notes?: string | null
+          rom_score?: number | null
+          stretching_minutes?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       athlete_22m_invite_tokens: {
         Row: {
           created_at: string
@@ -2393,6 +2438,57 @@ export type Database = {
         }
         Relationships: []
       }
+      injury_reports: {
+        Row: {
+          body_part: string
+          cleared_by_medical: boolean | null
+          created_at: string
+          days_missed: number | null
+          description: string | null
+          id: string
+          injury_date: string
+          injury_type: string
+          is_resolved: boolean | null
+          resolved_date: string | null
+          severity: number
+          treatment: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body_part: string
+          cleared_by_medical?: boolean | null
+          created_at?: string
+          days_missed?: number | null
+          description?: string | null
+          id?: string
+          injury_date?: string
+          injury_type?: string
+          is_resolved?: boolean | null
+          resolved_date?: string | null
+          severity?: number
+          treatment?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body_part?: string
+          cleared_by_medical?: boolean | null
+          created_at?: string
+          days_missed?: number | null
+          description?: string | null
+          id?: string
+          injury_date?: string
+          injury_type?: string
+          is_resolved?: boolean | null
+          resolved_date?: string | null
+          severity?: number
+          treatment?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       intelligence_rules: {
         Row: {
           action_data: Json | null
@@ -3053,6 +3149,60 @@ export type Database = {
           parent_user_id?: string
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      pitch_counts: {
+        Row: {
+          avg_velocity: number | null
+          created_at: string
+          id: string
+          innings_pitched: number | null
+          max_velocity: number | null
+          notes: string | null
+          pain_level: number | null
+          pain_location: string | null
+          pain_reported: boolean | null
+          pitch_count: number
+          pitch_types: Json | null
+          session_date: string
+          session_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_velocity?: number | null
+          created_at?: string
+          id?: string
+          innings_pitched?: number | null
+          max_velocity?: number | null
+          notes?: string | null
+          pain_level?: number | null
+          pain_location?: string | null
+          pain_reported?: boolean | null
+          pitch_count?: number
+          pitch_types?: Json | null
+          session_date?: string
+          session_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_velocity?: number | null
+          created_at?: string
+          id?: string
+          innings_pitched?: number | null
+          max_velocity?: number | null
+          notes?: string | null
+          pain_level?: number | null
+          pain_location?: string | null
+          pain_reported?: boolean | null
+          pitch_count?: number
+          pitch_types?: Json | null
+          session_date?: string
+          session_type?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -4171,6 +4321,48 @@ export type Database = {
           is_active?: boolean
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      workload_rules: {
+        Row: {
+          age_max: number
+          age_min: number
+          created_at: string
+          high_pitch_threshold: number
+          id: string
+          max_innings_per_week: number
+          max_pitches_per_game: number
+          max_pitches_per_week: number
+          notes: string | null
+          required_rest_days_after_high: number
+          sport_type: string
+        }
+        Insert: {
+          age_max: number
+          age_min: number
+          created_at?: string
+          high_pitch_threshold: number
+          id?: string
+          max_innings_per_week: number
+          max_pitches_per_game: number
+          max_pitches_per_week: number
+          notes?: string | null
+          required_rest_days_after_high?: number
+          sport_type?: string
+        }
+        Update: {
+          age_max?: number
+          age_min?: number
+          created_at?: string
+          high_pitch_threshold?: number
+          id?: string
+          max_innings_per_week?: number
+          max_pitches_per_game?: number
+          max_pitches_per_week?: number
+          notes?: string | null
+          required_rest_days_after_high?: number
+          sport_type?: string
         }
         Relationships: []
       }

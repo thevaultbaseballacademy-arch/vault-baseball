@@ -140,6 +140,10 @@ import ParentProgress from "./pages/parent/ParentProgress";
 import ParentLessons from "./pages/parent/ParentLessons";
 import ParentRecruiting from "./pages/parent/ParentRecruiting";
 import ParentWellness from "./pages/parent/ParentWellness";
+import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
+import PitchLog from "./pages/workload/PitchLog";
+import ArmCare from "./pages/workload/ArmCare";
+import InjuryLog from "./pages/workload/InjuryLog";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
@@ -399,6 +403,13 @@ const App = () => (
               <Route path="recruiting" element={<ParentRecruiting />} />
               <Route path="wellness" element={<ParentWellness />} />
             </Route>
+
+
+            {/* Workload & Health Management */}
+            <Route path="/workload" element={<TrialProtectedRoute><WorkloadDashboard /></TrialProtectedRoute>} />
+            <Route path="/workload/pitch-log" element={<TrialProtectedRoute><PitchLog /></TrialProtectedRoute>} />
+            <Route path="/workload/arm-care" element={<TrialProtectedRoute><ArmCare /></TrialProtectedRoute>} />
+            <Route path="/workload/injuries" element={<TrialProtectedRoute><InjuryLog /></TrialProtectedRoute>} />
 
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
