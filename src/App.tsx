@@ -8,6 +8,7 @@ import { SportProvider } from "@/contexts/SportContext";
 import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
 import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
+import RoleGuard from "@/components/RoleGuard";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
@@ -149,16 +150,36 @@ const App = () => (
                 <VaultDashboard />
               </TrialProtectedRoute>
             } />
-            <Route path="/coach" element={<CoachDashboard />} />
-            <Route path="/coach-dashboard" element={<CoachDashboard />} />
-            <Route path="/owner" element={<OwnerCommandCenter />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/certification-analytics" element={<CertificationAnalytics />} />
-            <Route path="/admin/coaches" element={<AdminCoaches />} />
-            <Route path="/admin/exams" element={<AdminExams />} />
-            <Route path="/admin/certifications" element={<AdminCertifications />} />
-            <Route path="/admin/payouts" element={<AdminPayouts />} />
-            <Route path="/admin/coach-management" element={<CoachManagement />} />
+            <Route path="/coach" element={
+              <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboard /></RoleGuard>
+            } />
+            <Route path="/coach-dashboard" element={
+              <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboard /></RoleGuard>
+            } />
+            <Route path="/owner" element={
+              <RoleGuard requires="view_revenue_dashboard"><OwnerCommandCenter /></RoleGuard>
+            } />
+            <Route path="/admin" element={
+              <RoleGuard requires="view_platform_settings"><Admin /></RoleGuard>
+            } />
+            <Route path="/admin/certification-analytics" element={
+              <RoleGuard requires="view_platform_analytics"><CertificationAnalytics /></RoleGuard>
+            } />
+            <Route path="/admin/coaches" element={
+              <RoleGuard requires="view_all_users"><AdminCoaches /></RoleGuard>
+            } />
+            <Route path="/admin/exams" element={
+              <RoleGuard requires="view_platform_settings"><AdminExams /></RoleGuard>
+            } />
+            <Route path="/admin/certifications" element={
+              <RoleGuard requires="view_platform_settings"><AdminCertifications /></RoleGuard>
+            } />
+            <Route path="/admin/payouts" element={
+              <RoleGuard requires="process_payouts"><AdminPayouts /></RoleGuard>
+            } />
+            <Route path="/admin/coach-management" element={
+              <RoleGuard requires="view_all_users"><CoachManagement /></RoleGuard>
+            } />
             <Route path="/community" element={
               <TrialProtectedRoute>
                 <Community />
