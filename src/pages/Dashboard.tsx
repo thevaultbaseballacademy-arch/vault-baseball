@@ -114,18 +114,18 @@ const Dashboard = () => {
     duration: c.training_duration_minutes,
   }));
 
+  const safeAvg = (arr: CheckinData[], key: keyof CheckinData) => {
+    const valid = arr.filter(c => c[key] != null && typeof c[key] === "number");
+    if (valid.length === 0) return "—";
+    return (valid.reduce((sum, c) => sum + (c[key] as number), 0) / valid.length).toFixed(1);
+  };
+
   const stats = {
     totalCheckins: checkins.length,
     trainingDays: checkins.filter((c) => c.training_completed).length,
-    avgMood: checkins.length > 0
-      ? (checkins.reduce((sum, c) => sum + (c.mood || 0), 0) / checkins.filter(c => c.mood).length).toFixed(1)
-      : "—",
-    avgEnergy: checkins.length > 0
-      ? (checkins.reduce((sum, c) => sum + (c.energy_level || 0), 0) / checkins.filter(c => c.energy_level).length).toFixed(1)
-      : "—",
-    avgSleep: checkins.length > 0
-      ? (checkins.reduce((sum, c) => sum + (c.sleep_hours || 0), 0) / checkins.filter(c => c.sleep_hours).length).toFixed(1)
-      : "—",
+    avgMood: safeAvg(checkins, "mood"),
+    avgEnergy: safeAvg(checkins, "energy_level"),
+    avgSleep: safeAvg(checkins, "sleep_hours"),
     totalMinutes: checkins.reduce((sum, c) => sum + (c.training_duration_minutes || 0), 0),
   };
 

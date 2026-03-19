@@ -127,12 +127,12 @@ serve(async (req) => {
           actor_id: lesson.coach_user_id,
         });
 
-        await supabase.from("lesson_reminders").insert({
+        await supabase.from("lesson_reminders").upsert({
           lesson_id: lesson.id,
           user_id: lesson.coach_user_id,
           reminder_type: "feedback_overdue",
           channel: "in_app",
-        }).onConflict("lesson_id,user_id,reminder_type,channel").ignore();
+        }, { onConflict: "lesson_id,user_id,reminder_type,channel", ignoreDuplicates: true });
 
         totalSent++;
       }
