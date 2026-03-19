@@ -165,6 +165,7 @@ import MentalPerformance from "./pages/MentalPerformance";
 import StrengthConditioning from "./pages/StrengthConditioning";
 import PracticePlanBuilder from "./pages/team/PracticePlanBuilder";
 import DPFlexBuilder from "./pages/softball/DPFlexBuilder";
+import ResetPassword from "./pages/ResetPassword";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
