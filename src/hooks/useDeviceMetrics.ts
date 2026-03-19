@@ -117,7 +117,7 @@ export function useAddMetric() {
       };
       const { data, error } = await supabase
         .from('device_metrics')
-        .insert(insertPayload)
+        .insert(insertPayload as any)
         .select()
         .single();
       
