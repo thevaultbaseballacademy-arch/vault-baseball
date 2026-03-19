@@ -154,6 +154,10 @@ import TeamRoster from "./pages/team/TeamRoster";
 import TeamSchedule from "./pages/team/TeamSchedule";
 import TeamAnnouncements from "./pages/team/TeamAnnouncements";
 import TeamAnalytics from "./pages/team/TeamAnalytics";
+import MentalPerformance from "./pages/MentalPerformance";
+import StrengthConditioning from "./pages/StrengthConditioning";
+import PracticePlanBuilder from "./pages/team/PracticePlanBuilder";
+import DPFlexBuilder from "./pages/softball/DPFlexBuilder";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
