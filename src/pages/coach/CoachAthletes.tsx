@@ -11,6 +11,7 @@ import { format } from "date-fns";
 const CoachAthletes = () => {
   const [search, setSearch] = useState("");
   const [selectedAthleteId, setSelectedAthleteId] = useState<string | null>(null);
+  const { sport } = useSport();
 
   const { data: user } = useQuery({
     queryKey: ["auth-user"],
