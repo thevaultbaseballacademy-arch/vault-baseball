@@ -23,6 +23,22 @@ const CoachDashboardLayout = () => {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // Fetch pending video review count for badge
+  const { data: pendingVideoCount } = useQuery({
+    queryKey: ["coach-pending-videos", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("remote_lessons")
+        .select("id", { count: "exact", head: true })
+        .eq("coach_user_id", user!.id)
+        .eq("status", "pending_review");
+      if (error) return 0;
+      return count || 0;
+    },
+    refetchInterval: 60000,
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
