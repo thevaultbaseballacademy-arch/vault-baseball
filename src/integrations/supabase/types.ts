@@ -1634,6 +1634,78 @@ export type Database = {
         }
         Relationships: []
       }
+      content_submissions: {
+        Row: {
+          age_group: string | null
+          coaching_points: string | null
+          content_data: Json | null
+          content_type: string
+          created_at: string
+          created_by: string
+          description: string | null
+          difficulty: string | null
+          id: string
+          published_at: string | null
+          rejection_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          revision_note: string | null
+          skill_category: string | null
+          sport_type: string
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          age_group?: string | null
+          coaching_points?: string | null
+          content_data?: Json | null
+          content_type: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          difficulty?: string | null
+          id?: string
+          published_at?: string | null
+          rejection_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          revision_note?: string | null
+          skill_category?: string | null
+          sport_type?: string
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          age_group?: string | null
+          coaching_points?: string | null
+          content_data?: Json | null
+          content_type?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          difficulty?: string | null
+          id?: string
+          published_at?: string | null
+          rejection_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          revision_note?: string | null
+          skill_category?: string | null
+          sport_type?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       course_certificates: {
         Row: {
           certificate_number: string
@@ -2318,6 +2390,72 @@ export type Database = {
         }
         Relationships: []
       }
+      intelligence_rules: {
+        Row: {
+          action_data: Json | null
+          action_target: string
+          action_type: string
+          condition_field: string
+          condition_operator: string
+          condition_type: string
+          condition_value: string
+          condition_window_days: number | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_active: boolean
+          last_triggered_at: string | null
+          name: string
+          priority: number
+          sport_type: string | null
+          trigger_count: number
+          updated_at: string
+        }
+        Insert: {
+          action_data?: Json | null
+          action_target: string
+          action_type: string
+          condition_field: string
+          condition_operator: string
+          condition_type: string
+          condition_value: string
+          condition_window_days?: number | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_triggered_at?: string | null
+          name: string
+          priority?: number
+          sport_type?: string | null
+          trigger_count?: number
+          updated_at?: string
+        }
+        Update: {
+          action_data?: Json | null
+          action_target?: string
+          action_type?: string
+          condition_field?: string
+          condition_operator?: string
+          condition_type?: string
+          condition_value?: string
+          condition_window_days?: number | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_triggered_at?: string | null
+          name?: string
+          priority?: number
+          sport_type?: string | null
+          trigger_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       kpi_share_tokens: {
         Row: {
           created_at: string
@@ -2881,6 +3019,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_settings: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          setting_key: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       player_homework: {
         Row: {
