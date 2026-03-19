@@ -18,6 +18,14 @@ import Checkin from "./pages/Checkin";
 import Dashboard from "./pages/Dashboard";
 import VaultDashboard from "./pages/VaultDashboard";
 import CoachDashboard from "./pages/CoachDashboard";
+import CoachDashboardLayout from "./components/coach/CoachDashboardLayout";
+import CoachAthletes from "./pages/coach/CoachAthletes";
+import CoachKPIs from "./pages/coach/CoachKPIs";
+import CoachLessons from "./pages/coach/CoachLessons";
+import CoachAssignments from "./pages/coach/CoachAssignments";
+import CoachCreate from "./pages/coach/CoachCreate";
+import CoachSchedule from "./pages/coach/CoachSchedule";
+import CoachProfilePage from "./pages/coach/CoachProfile";
 import Admin from "./pages/Admin";
 import OwnerDashboardLayout from "./components/admin/OwnerDashboardLayout";
 import OwnerOverview from "./pages/admin/OwnerOverview";
@@ -160,9 +168,18 @@ const App = () => (
                 <VaultDashboard />
               </TrialProtectedRoute>
             } />
+            {/* Coach Dashboard — nested layout with sidebar */}
             <Route path="/coach" element={
-              <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboard /></RoleGuard>
-            } />
+              <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboardLayout /></RoleGuard>
+            }>
+              <Route index element={<CoachAthletes />} />
+              <Route path="kpis" element={<CoachKPIs />} />
+              <Route path="lessons" element={<CoachLessons />} />
+              <Route path="assignments" element={<CoachAssignments />} />
+              <Route path="create" element={<CoachCreate />} />
+              <Route path="schedule" element={<CoachSchedule />} />
+              <Route path="profile" element={<CoachProfilePage />} />
+            </Route>
             <Route path="/coach-dashboard" element={
               <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboard /></RoleGuard>
             } />
