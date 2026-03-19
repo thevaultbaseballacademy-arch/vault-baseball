@@ -436,6 +436,14 @@ const App = () => (
             <Route path="/team/schedule" element={<TrialProtectedRoute><TeamSchedule /></TrialProtectedRoute>} />
             <Route path="/team/announcements" element={<TrialProtectedRoute><TeamAnnouncements /></TrialProtectedRoute>} />
             <Route path="/team/analytics" element={<TrialProtectedRoute><TeamAnalytics /></TrialProtectedRoute>} />
+            <Route path="/team/practice-plans" element={<RoleGuard requiresRole={["coach", "owner"]}><PracticePlanBuilder /></RoleGuard>} />
+
+            {/* Mental Performance & S&C */}
+            <Route path="/mental-performance" element={<TrialProtectedRoute><MentalPerformance /></TrialProtectedRoute>} />
+            <Route path="/strength-conditioning" element={<TrialProtectedRoute><StrengthConditioning /></TrialProtectedRoute>} />
+
+            {/* Softball DP/Flex */}
+            <Route path="/softball/dp-flex" element={<RoleGuard requiresRole={["coach", "owner"]}><DPFlexBuilder /></RoleGuard>} />
 
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
