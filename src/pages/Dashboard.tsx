@@ -53,6 +53,9 @@ const Dashboard = () => {
   const [timeRange, setTimeRange] = useState<7 | 14 | 30>(14);
   const navigate = useNavigate();
 
+  // Trigger onboarding activation when user first lands on dashboard
+  useOnboardingActivation(user?.id);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
