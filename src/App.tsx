@@ -100,6 +100,9 @@ import OwnerCommandCenter from "./pages/OwnerCommandCenter";
 import ProgressReport from "./pages/ProgressReport";
 import BookSession from "./pages/BookSession";
 import SoftballDevelopment from "./pages/SoftballDevelopment";
+import SoftballLessonBooking from "./pages/softball/SoftballLessonBooking";
+import SoftballCoaches from "./pages/softball/SoftballCoaches";
+import SoftballLessonNotes from "./pages/softball/SoftballLessonNotes";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
