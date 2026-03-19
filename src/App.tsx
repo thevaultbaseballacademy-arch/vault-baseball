@@ -378,6 +378,7 @@ const App = () => (
             <Route path="/softball/hitting" element={<SoftballHitting />} />
             <Route path="/softball/fielding" element={<SoftballFielding />} />
             <Route path="/softball/analytics" element={<SoftballAnalytics />} />
+            <Route path="/softball/position-tracks" element={<SoftballPositionTracks />} />
             
             {/* Recruiting Readiness Engine */}
             <Route path="/recruiting" element={
