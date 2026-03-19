@@ -363,6 +363,25 @@ const App = () => (
             <Route path="/softball/fielding" element={<SoftballFielding />} />
             <Route path="/softball/analytics" element={<SoftballAnalytics />} />
             
+            {/* Recruiting Readiness Engine */}
+            <Route path="/recruiting" element={
+              <TrialProtectedRoute><RecruitingHub /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/profile" element={
+              <TrialProtectedRoute><RecruitingProfilePage /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/showcases" element={
+              <TrialProtectedRoute><RecruitingShowcases /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/contacts" element={
+              <TrialProtectedRoute><RecruitingContacts /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/checklist" element={
+              <TrialProtectedRoute><RecruitingChecklist /></TrialProtectedRoute>
+            } />
+            <Route path="/recruiting/assistant" element={
+              <TrialProtectedRoute><RecruitingAssistantPage /></TrialProtectedRoute>
+            } />
             
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
