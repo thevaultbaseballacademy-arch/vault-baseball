@@ -116,6 +116,7 @@ export const allCourses = [
     pillar: "velocity",
     category: "pitching",
     level: "Intermediate",
+    sport_type: "baseball",
     metrics: ["Pitch Velocity", "Hip Lead", "Arm Speed"],
     features: [
       "Pivot picks & rocker throws",
