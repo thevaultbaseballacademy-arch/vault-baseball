@@ -90,6 +90,7 @@ export const allCourses = [
     pillar: "velocity",
     category: "hitting",
     level: "Advanced",
+    sport_type: "baseball",
     metrics: ["Exit Velocity", "Bat Speed", "Attack Angle"],
     features: [
       "Intent-based hitting sessions",
@@ -100,7 +101,7 @@ export const allCourses = [
     ],
     instructor: "Vault Performance",
     students: 1340,
-    isNew: true, // New content added this week
+    isNew: true,
   },
   {
     id: "pitching-velocity-8week",
