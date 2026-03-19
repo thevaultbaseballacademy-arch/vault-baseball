@@ -165,6 +165,7 @@ import MentalPerformance from "./pages/MentalPerformance";
 import StrengthConditioning from "./pages/StrengthConditioning";
 import PracticePlanBuilder from "./pages/team/PracticePlanBuilder";
 import DPFlexBuilder from "./pages/softball/DPFlexBuilder";
+import ResetPassword from "./pages/ResetPassword";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
@@ -190,6 +191,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<Account />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/checkin" element={<Checkin />} />
