@@ -35,6 +35,7 @@ import OwnerContentQueue from "./pages/admin/OwnerContentQueue";
 import OwnerContent from "./pages/admin/OwnerContent";
 import OwnerIntelligence from "./pages/admin/OwnerIntelligence";
 import OwnerSettings from "./pages/admin/OwnerSettings";
+import OwnerMaintenance from "./pages/admin/OwnerMaintenance";
 import OwnerAnalytics from "./pages/admin/OwnerAnalytics";
 import OwnerHealthMetrics from "./pages/admin/OwnerHealthMetrics";
 import OwnerAudit from "./pages/admin/OwnerAudit";
@@ -254,6 +255,9 @@ const App = () => (
               } />
               <Route path="health" element={
                 <RoleGuard requires="view_platform_analytics"><OwnerHealthMetrics /></RoleGuard>
+              } />
+              <Route path="maintenance" element={
+                <RoleGuard requires="view_platform_settings"><OwnerMaintenance /></RoleGuard>
               } />
               <Route path="audit" element={
                 <RoleGuard requires="view_audit_log"><OwnerAudit /></RoleGuard>

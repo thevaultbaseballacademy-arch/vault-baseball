@@ -3317,6 +3317,45 @@ export type Database = {
         }
         Relationships: []
       }
+      maintenance_reports: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          errors: Json | null
+          id: string
+          report_data: Json
+          run_ended_at: string | null
+          run_started_at: string
+          status: string
+          trigger_type: string
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          errors?: Json | null
+          id?: string
+          report_data?: Json
+          run_ended_at?: string | null
+          run_started_at: string
+          status?: string
+          trigger_type?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          errors?: Json | null
+          id?: string
+          report_data?: Json
+          run_ended_at?: string | null
+          run_started_at?: string
+          status?: string
+          trigger_type?: string
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       marketplace_bookings: {
         Row: {
           amount_cents: number
@@ -3764,6 +3803,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications_archive: {
+        Row: {
+          actor_id: string | null
+          archived_at: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string | null
+          title: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          archived_at?: string
+          created_at?: string | null
+          id: string
+          is_read?: boolean | null
+          message?: string | null
+          title?: string | null
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          archived_at?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          title?: string | null
+          type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       parent_athlete_links: {
         Row: {
