@@ -172,7 +172,7 @@ const NotificationBell = ({ userId }: NotificationBellProps) => {
     } else if (notification.type === "course_update") {
       destination = "/courses";
     } else if (notification.type === "coach_message") {
-      destination = "/dashboard";
+      destination = "/coach/lessons";
     } else if (notification.type === "coach_feedback") {
       destination = "/profile";
     } else if (notification.actor_id && notification.actor_id !== userId) {
