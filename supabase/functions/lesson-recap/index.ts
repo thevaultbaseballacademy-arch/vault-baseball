@@ -107,7 +107,7 @@ Generate TWO sections:
 - How each drill connects to what was covered in the lesson
 - Any metrics to track
 
-Keep the tone encouraging but direct. Use baseball-specific terminology. Format with markdown.`;
+Keep the tone encouraging but direct. Use ${sportLabel}-specific terminology. Format with markdown.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
