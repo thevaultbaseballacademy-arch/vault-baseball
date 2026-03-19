@@ -103,6 +103,9 @@ const SoftballAnalytics = () => {
                   </div>
                   <Progress value={skill.current_score} className="h-2" />
                   <p className="text-[10px] text-muted-foreground mt-1">{skill.sessions_count} sessions · Last: {new Date(skill.last_session_at).toLocaleDateString()}</p>
+                </CardContent>
+              </Card>
+            )) : (
               <Card className="border-border md:col-span-2">
                 <CardContent className="py-10 text-center">
                   <BarChart3 className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
