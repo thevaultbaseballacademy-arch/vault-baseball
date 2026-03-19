@@ -6,14 +6,29 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ArrowLeft, ArrowRight, BookOpen, Shield } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Loader2 } from "lucide-react";
 import { softballDrillLibrary } from "@/lib/softball/drills";
 import { softballPositions } from "@/lib/softball/positions";
+import { useSoftballProfile } from "@/hooks/useSoftballProfile";
+import { isDrillVisibleForFormat, isDrillVisibleForAge, applySoftballTerminology } from "@/lib/softball/rules";
 
 const SoftballFielding = () => {
   const navigate = useNavigate();
-  const fieldingDrills = softballDrillLibrary.filter(d => d.category === "fielding");
+  const { format, ageGroup, visibility, loading } = useSoftballProfile();
+
   const fieldingPositions = softballPositions.filter(p => p.id !== "hitting");
+  const fieldingDrills = softballDrillLibrary
+    .filter(d => d.category === "fielding")
+    .filter(d => isDrillVisibleForFormat(d.id, format))
+    .filter(d => isDrillVisibleForAge(d.ageRange, ageGroup));
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -24,15 +39,32 @@ const SoftballFielding = () => {
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Softball
           </Button>
 
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
             <p className="text-xs font-display tracking-[0.3em] text-muted-foreground mb-2">VAULT SOFTBALL</p>
             <h1 className="text-3xl md:text-4xl font-display tracking-tight text-foreground">
               POSITION-SPECIFIC FIELDING
             </h1>
             <p className="text-muted-foreground mt-2 text-sm max-w-xl">
-              Elite defensive development for every position — infield, outfield, catching, and pitchers fielding their position.
+              {applySoftballTerminology("Elite defensive development for every position — infield, outfield, catching, and pitchers fielding their position.")}
             </p>
           </motion.div>
+
+          <div className="flex gap-2 mb-6">
+            <Badge variant="outline" className="text-[10px] font-display capitalize">{format}</Badge>
+            {ageGroup && <Badge variant="secondary" className="text-[10px] font-display">{ageGroup}</Badge>}
+          </div>
+
+          {/* Slowpitch-specific: deep outfield positioning callout */}
+          {visibility.deepOutfieldPositioning && (
+            <Card className="border-border mb-6">
+              <CardContent className="p-4">
+                <h4 className="font-display text-sm text-foreground mb-1">DEEP OUTFIELD POSITIONING</h4>
+                <p className="text-xs text-muted-foreground">
+                  Slowpitch outfielders play deeper than fastpitch. Positioning starts at the fence line and adjusts forward based on the batter. Focus on reading the arc off the bat.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           <Tabs defaultValue="positions" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
@@ -56,7 +88,7 @@ const SoftballFielding = () => {
                             </div>
                             <div>
                               <h3 className="font-display text-foreground">{pos.name}</h3>
-                              <p className="text-xs text-muted-foreground">{pos.description}</p>
+                              <p className="text-xs text-muted-foreground">{applySoftballTerminology(pos.description)}</p>
                             </div>
                           </div>
                           {pos.hasNewContent && (
@@ -77,10 +109,10 @@ const SoftballFielding = () => {
                     <Card className="border-border">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-display text-sm text-foreground">{drill.name}</h4>
+                          <h4 className="font-display text-sm text-foreground">{applySoftballTerminology(drill.name)}</h4>
                           <Badge variant="secondary" className="text-[10px]">{drill.difficulty}</Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2">{drill.description}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">{applySoftballTerminology(drill.description)}</p>
                         <div className="flex gap-2 mt-2 text-[10px] text-muted-foreground">
                           <span>⏱ {drill.duration}</span>
                           <span>👤 {drill.ageRange}</span>
