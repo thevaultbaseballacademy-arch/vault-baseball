@@ -128,6 +128,7 @@ import SoftballPitching from "./pages/softball/SoftballPitching";
 import SoftballHitting from "./pages/softball/SoftballHitting";
 import SoftballFielding from "./pages/softball/SoftballFielding";
 import SoftballAnalytics from "./pages/softball/SoftballAnalytics";
+import SoftballPositionTracks from "./pages/softball/SoftballPositionTracks";
 import RecruitingHub from "./pages/recruiting/RecruitingHub";
 import RecruitingProfilePage from "./pages/recruiting/RecruitingProfile";
 import RecruitingShowcases from "./pages/recruiting/RecruitingShowcases";
@@ -377,6 +378,7 @@ const App = () => (
             <Route path="/softball/hitting" element={<SoftballHitting />} />
             <Route path="/softball/fielding" element={<SoftballFielding />} />
             <Route path="/softball/analytics" element={<SoftballAnalytics />} />
+            <Route path="/softball/position-tracks" element={<SoftballPositionTracks />} />
             
             {/* Recruiting Readiness Engine */}
             <Route path="/recruiting" element={
