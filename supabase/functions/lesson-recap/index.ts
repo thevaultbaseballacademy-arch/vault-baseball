@@ -69,7 +69,8 @@ serve(async (req) => {
     const position = athleteProfile?.position || "Unknown";
     const coachName = coachProfile?.display_name || "Coach";
 
-    const prompt = `You are a professional baseball development coach AI assistant for Vault Baseball.
+    const sportLabel = isSoftball ? "softball" : "baseball";
+    const prompt = `You are a professional ${sportLabel} development coach AI assistant for Vault ${isSoftball ? "Softball" : "Baseball"}.
 
 Generate a post-lesson recap and homework plan for this coaching session.
 
