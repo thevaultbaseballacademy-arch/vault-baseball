@@ -171,7 +171,7 @@ const OwnerContentQueue = () => {
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => {
-                      const status = selectedId?.startsWith("rev-") ? "revision_requested" : "rejected";
+                      const status = selectedId?.startsWith("rev-") ? "revision" : "rejected";
                       updateStatus.mutate({ id: item.id, status, note: actionNote });
                     }}
                     className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground"
