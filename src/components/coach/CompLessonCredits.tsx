@@ -53,11 +53,15 @@ const CompLessonCredits = () => {
     setSuccess(false);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { error } = await (supabase.from("lesson_credits" as any) as any).insert({
         user_id: selectedAthlete.user_id,
         total_lessons: 1,
         used_lessons: 0,
         purchased_at: new Date().toISOString(),
+        credit_type: "comp",
+        granted_by: user?.id || null,
+        granted_reason: "Coach comp lesson grant",
       });
 
       if (error) throw error;
