@@ -199,6 +199,9 @@ const App = () => (
                 <Dashboard />
               </TrialProtectedRoute>
             } />
+            <Route path="/downloads" element={
+              <TrialProtectedRoute><AthleteDownloads /></TrialProtectedRoute>
+            } />
             <Route path="/vault" element={
               <TrialProtectedRoute>
                 <VaultDashboard />
