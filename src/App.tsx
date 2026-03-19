@@ -277,6 +277,9 @@ const App = () => (
               <Route path="coach-management" element={
                 <RoleGuard requires="view_all_users"><CoachManagement /></RoleGuard>
               } />
+              <Route path="exports" element={
+                <RoleGuard requires="view_revenue_dashboard"><OwnerExports /></RoleGuard>
+              } />
             </Route>
             <Route path="/community" element={
               <TrialProtectedRoute>
