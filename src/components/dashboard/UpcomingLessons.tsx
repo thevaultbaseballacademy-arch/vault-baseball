@@ -150,8 +150,11 @@ const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
             UPCOMING LESSONS
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">No upcoming lessons scheduled.</p>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">No lessons scheduled.</p>
+          <Button variant="vault" size="sm" className="w-full" onClick={() => navigate("/book-session")}>
+            Book Now
+          </Button>
         </CardContent>
       </Card>
     );
