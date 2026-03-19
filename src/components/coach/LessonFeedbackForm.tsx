@@ -131,11 +131,13 @@ export const LessonFeedbackForm = ({
   const generateAIAnalysis = async (feedbackId: string) => {
     setGeneratingAI(true);
     try {
-      await supabase.functions.invoke("generate-lesson-analysis", {
-        body: { feedbackId },
-      });
+      // Run AI analysis and intelligence hook in parallel
+      await Promise.all([
+        supabase.functions.invoke("generate-lesson-analysis", { body: { feedbackId } }),
+        supabase.functions.invoke("post-lesson-intelligence", { body: { feedbackId } }),
+      ]);
     } catch (err) {
-      console.error("AI analysis generation failed:", err);
+      console.error("AI analysis/intelligence generation failed:", err);
     } finally {
       setGeneratingAI(false);
     }
