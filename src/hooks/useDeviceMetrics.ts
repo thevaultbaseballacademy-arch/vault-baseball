@@ -44,7 +44,7 @@ export function useDeviceMetrics(userId?: string, category?: string, deviceType?
         query = query.eq('metric_category', category);
       }
       if (deviceType) {
-        query = query.eq('device_type', deviceType);
+        query = query.eq('device_type', deviceType as any);
       }
       
       const { data, error } = await query;
