@@ -49,6 +49,8 @@ type Step = "coach" | "datetime" | "form" | "confirm";
 const BookSession = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { sport } = useSport();
+  const POSITIONS = sport === 'softball' ? SOFTBALL_POSITIONS : BASEBALL_POSITIONS;
   const [step, setStep] = useState<Step>("coach");
   const [coaches, setCoaches] = useState<CoachOption[]>([]);
   const [loadingCoaches, setLoadingCoaches] = useState(true);
