@@ -134,6 +134,12 @@ import RecruitingShowcases from "./pages/recruiting/RecruitingShowcases";
 import RecruitingContacts from "./pages/recruiting/RecruitingContacts";
 import RecruitingChecklist from "./pages/recruiting/RecruitingChecklist";
 import RecruitingAssistantPage from "./pages/recruiting/RecruitingAssistantPage";
+import ParentDashboardLayout from "./components/parent/ParentDashboardLayout";
+import ParentAthletes from "./pages/parent/ParentAthletes";
+import ParentProgress from "./pages/parent/ParentProgress";
+import ParentLessons from "./pages/parent/ParentLessons";
+import ParentRecruiting from "./pages/parent/ParentRecruiting";
+import ParentWellness from "./pages/parent/ParentWellness";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
