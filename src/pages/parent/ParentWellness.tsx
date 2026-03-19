@@ -80,6 +80,25 @@ const ParentWellness = () => {
         </div>
       </div>
 
+      {/* Pitch Count Alert Banner (for pitchers) */}
+      {isPitcher && weeklyPitches > 150 && (
+        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+          className={`flex items-start gap-3 p-4 rounded-xl border ${
+            weeklyPitches > 200
+              ? "bg-red-500/10 border-red-500/30"
+              : "bg-amber-500/10 border-amber-500/30"
+          }`}>
+          <AlertTriangle className={`w-5 h-5 mt-0.5 ${weeklyPitches > 200 ? "text-red-500" : "text-amber-500"}`} />
+          <div>
+            <p className={`font-display ${weeklyPitches > 200 ? "text-red-500" : "text-amber-500"}`}>
+              {weeklyPitches > 200
+                ? `🔴 ${profile?.display_name} has exceeded their safe pitch count this week. No pitching recommended until rest is complete.`
+                : `⚠️ ${profile?.display_name} is approaching their weekly pitch limit. Rest day recommended before next session.`}
+            </p>
+          </div>
+        </motion.div>
+      )}
+
       {/* Rest Status Banner */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
         className={`flex items-center gap-3 p-4 rounded-xl border ${restStatus.bg} border-transparent`}>
