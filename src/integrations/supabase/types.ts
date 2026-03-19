@@ -967,6 +967,7 @@ export type Database = {
           lesson_id: string
           next_development_focus: string | null
           recommended_drills: Json | null
+          sport_type: string
           strengths_observed: string | null
           submitted_at: string | null
           updated_at: string | null
@@ -987,6 +988,7 @@ export type Database = {
           lesson_id: string
           next_development_focus?: string | null
           recommended_drills?: Json | null
+          sport_type?: string
           strengths_observed?: string | null
           submitted_at?: string | null
           updated_at?: string | null
@@ -1007,6 +1009,7 @@ export type Database = {
           lesson_id?: string
           next_development_focus?: string | null
           recommended_drills?: Json | null
+          sport_type?: string
           strengths_observed?: string | null
           submitted_at?: string | null
           updated_at?: string | null
@@ -2971,6 +2974,7 @@ export type Database = {
           notes: string | null
           recap_generated_at: string | null
           scheduled_at: string
+          sport_type: string
           status: string
           updated_at: string
           video_call_link: string | null
@@ -2990,6 +2994,7 @@ export type Database = {
           notes?: string | null
           recap_generated_at?: string | null
           scheduled_at: string
+          sport_type?: string
           status?: string
           updated_at?: string
           video_call_link?: string | null
@@ -3009,6 +3014,7 @@ export type Database = {
           notes?: string | null
           recap_generated_at?: string | null
           scheduled_at?: string
+          sport_type?: string
           status?: string
           updated_at?: string
           video_call_link?: string | null
@@ -3133,6 +3139,7 @@ export type Database = {
           session_date: string
           session_time: string
           session_type: string
+          sport_type: string
           status: string
           updated_at: string
         }
@@ -3156,6 +3163,7 @@ export type Database = {
           session_date: string
           session_time: string
           session_type?: string
+          sport_type?: string
           status?: string
           updated_at?: string
         }
@@ -3179,6 +3187,7 @@ export type Database = {
           session_date?: string
           session_time?: string
           session_type?: string
+          sport_type?: string
           status?: string
           updated_at?: string
         }
