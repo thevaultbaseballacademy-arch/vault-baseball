@@ -98,7 +98,7 @@ const SoftballAnalytics = () => {
                     <div className="flex items-center gap-1">
                       <span className="text-xl font-display text-foreground">{skill.current_score}</span>
                       <span className="text-xs text-muted-foreground">/100</span>
-                      {skill.trend === "improving" && <TrendingUp className="w-3 h-3 text-green-500 ml-1" />}
+                      {skill.trend === "improving" && <TrendingUp className="w-3 h-3 text-primary ml-1" />}
                     </div>
                   </div>
                   <Progress value={skill.current_score} className="h-2" />
