@@ -153,7 +153,9 @@ const CoachCreate = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display tracking-wide">CONTENT CREATION</h1>
-          <p className="text-sm text-muted-foreground mt-1">Create drills and programs for approval</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {drafts.length} drafts · {pending.length} pending · {approved.length} approved · {rejected.length} rejected
+          </p>
         </div>
         <Dialog open={showCreate} onOpenChange={setShowCreate}>
           <DialogTrigger asChild>

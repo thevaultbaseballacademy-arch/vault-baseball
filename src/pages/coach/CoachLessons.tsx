@@ -69,11 +69,32 @@ const CoachLessons = () => {
     return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>;
   }
 
+  const exportCSV = () => {
+    if (!lessons?.length) { toast.error("No lessons to export"); return; }
+    const header = "Date,Athlete,Status,Type\n";
+    const rows = lessons.map((l) =>
+      `"${format(new Date(l.scheduled_at), "yyyy-MM-dd HH:mm")}","${athletes?.get(l.athlete_user_id) || "Unknown"}","${l.status}","${(l as any).lesson_type || "live"}"`
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Vault_LessonHistory_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Lesson history exported");
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display tracking-wide">LESSON MANAGEMENT</h1>
-        <p className="text-sm text-muted-foreground mt-1">{totalCompleted} lessons completed</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-display tracking-wide">LESSON MANAGEMENT</h1>
+          <p className="text-sm text-muted-foreground mt-1">{totalCompleted} lessons completed</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={exportCSV}>
+          <Download className="w-4 h-4 mr-1" /> Export CSV
+        </Button>
       </div>
 
       <Tabs defaultValue="upcoming">

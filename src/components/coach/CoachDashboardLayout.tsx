@@ -81,6 +81,11 @@ const CoachDashboardLayout = () => {
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 {label}
+                {label === "Lessons" && (pendingVideoCount ?? 0) > 0 && (
+                  <Badge variant="destructive" className="ml-auto text-[9px] px-1.5 py-0 h-4 min-w-[18px] flex items-center justify-center">
+                    {pendingVideoCount}
+                  </Badge>
+                )}
               </NavLink>
             ))}
           </nav>
