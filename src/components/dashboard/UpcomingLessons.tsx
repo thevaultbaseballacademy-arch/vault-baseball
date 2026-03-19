@@ -29,7 +29,7 @@ function generateICS(lesson: LessonRow, otherName: string): string {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Vault Baseball//Lessons//EN",
+    "PRODID:-//Vault//Lessons//EN",
     "BEGIN:VEVENT",
     `DTSTART:${fmt(start)}`,
     `DTEND:${fmt(end)}`,

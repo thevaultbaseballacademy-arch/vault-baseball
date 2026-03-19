@@ -109,13 +109,20 @@ const BookSession = () => {
   }, [selectedCoach, selectedDate]);
 
   const fetchCoaches = async () => {
+    const sportLabel = sport === 'softball' ? 'Softball' : 'Baseball';
     const { data } = await supabase
       .from("coaches")
-      .select("user_id, name")
+      .select("user_id, name, specialties")
       .eq("status", "Active")
       .not("user_id", "is", null);
 
-    setCoaches(data?.map(c => ({ user_id: c.user_id!, name: c.name })) || []);
+    // Filter coaches whose specialties include the current sport (or show all if no specialties set)
+    const filtered = data?.filter(c => {
+      if (!c.specialties || c.specialties.length === 0) return true;
+      return c.specialties.some((s: string) => s.toLowerCase().includes(sportLabel.toLowerCase()));
+    }) || [];
+
+    setCoaches(filtered.map(c => ({ user_id: c.user_id!, name: c.name })));
     setLoadingCoaches(false);
   };
 
