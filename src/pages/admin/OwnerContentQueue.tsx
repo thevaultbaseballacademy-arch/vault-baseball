@@ -126,7 +126,7 @@ const OwnerContentQueue = () => {
                   <p className="text-xs text-destructive mt-2 italic">Rejection: {item.rejection_note}</p>
                 )}
                 {item.revision_note && (
-                  <p className="text-xs text-blue-400 mt-2 italic">Revision note: {item.revision_note}</p>
+                  <p className="text-xs text-muted-foreground mt-2 italic">Revision note: {item.revision_note}</p>
                 )}
               </div>
 
