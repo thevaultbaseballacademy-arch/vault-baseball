@@ -144,7 +144,7 @@ const AthleteDownloads = () => {
     try {
       const rows = (lessons || []).map((l: any) => ({
         date: format(new Date(l.created_at), "MMM d, yyyy"),
-        coach: "Coach",
+        coach: coachData?.map?.get(l.coach_user_id) || "Coach",
         type: l.sport_type || "Training",
         sport: l.sport_type === "softball" ? "Softball" : "Baseball",
         skills: l.lesson_focus || "",

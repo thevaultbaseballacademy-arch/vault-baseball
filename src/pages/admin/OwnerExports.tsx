@@ -91,7 +91,7 @@ const OwnerExports = () => {
       });
 
       const rows = (coaches || []).map((c: any) => ({
-        coachName: c.full_name || "—",
+        coachName: c.name || "—",
         totalLessons: lessonCountMap.get(c.user_id) || 0,
         totalEarnings: `$${((payoutMap.get(c.id) || 0) / 100).toFixed(2)}`,
         avgRating: (ratingMap.get(c.id) || 0).toFixed(1),
