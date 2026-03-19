@@ -73,13 +73,13 @@ serve(async (req) => {
             actor_id: isCoach ? lesson.athlete_user_id : lesson.coach_user_id,
           });
 
-          // Track reminder
-          await supabase.from("lesson_reminders").insert({
+          // Track reminder — use upsert to avoid duplicates
+          const { error: trackErr } = await supabase.from("lesson_reminders").upsert({
             lesson_id: lesson.id,
             user_id: userId,
             reminder_type: window.type,
             channel: "in_app",
-          }).onConflict("lesson_id,user_id,reminder_type,channel").ignore();
+          }, { onConflict: "lesson_id,user_id,reminder_type,channel", ignoreDuplicates: true });
 
           totalSent++;
         }
