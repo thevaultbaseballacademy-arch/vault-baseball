@@ -36,7 +36,7 @@ function generateICS(lesson: LessonRow, otherName: string): string {
     `SUMMARY:Vault Lesson with ${otherName}`,
     `DESCRIPTION:${lesson.notes || "Remote coaching session"}${lesson.video_call_link ? "\\nJoin: " + lesson.video_call_link : ""}`,
     lesson.video_call_link ? `URL:${lesson.video_call_link}` : "",
-    `UID:${lesson.id}@vault-baseball.com`,
+    `UID:${lesson.id}@vault-app.com`,
     "STATUS:CONFIRMED",
     "BEGIN:VALARM",
     "TRIGGER:-PT15M",
