@@ -28,6 +28,7 @@ const AthleteOnboarding = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { track } = useActivationTracking();
 
   const [form, setForm] = useState({
     athlete_name: "",
