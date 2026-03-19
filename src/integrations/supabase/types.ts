@@ -2930,6 +2930,7 @@ export type Database = {
           physical_stats_privacy: string
           position: string | null
           sixty_yard_dash: number | null
+          softball_format: string | null
           sport_type: string
           target_schools: string[] | null
           throwing_arm: string | null
@@ -2957,6 +2958,7 @@ export type Database = {
           physical_stats_privacy?: string
           position?: string | null
           sixty_yard_dash?: number | null
+          softball_format?: string | null
           sport_type?: string
           target_schools?: string[] | null
           throwing_arm?: string | null
@@ -2984,6 +2986,7 @@ export type Database = {
           physical_stats_privacy?: string
           position?: string | null
           sixty_yard_dash?: number | null
+          softball_format?: string | null
           sport_type?: string
           target_schools?: string[] | null
           throwing_arm?: string | null
@@ -3072,6 +3075,7 @@ export type Database = {
           created_at: string
           credit_id: string | null
           duration_minutes: number
+          format: string | null
           id: string
           notes: string | null
           recap_generated_at: string | null
@@ -3092,6 +3096,7 @@ export type Database = {
           created_at?: string
           credit_id?: string | null
           duration_minutes?: number
+          format?: string | null
           id?: string
           notes?: string | null
           recap_generated_at?: string | null
@@ -3112,6 +3117,7 @@ export type Database = {
           created_at?: string
           credit_id?: string | null
           duration_minutes?: number
+          format?: string | null
           id?: string
           notes?: string | null
           recap_generated_at?: string | null
@@ -3231,6 +3237,7 @@ export type Database = {
           created_at: string
           duration_minutes: number | null
           email: string
+          format: string | null
           id: string
           location: string | null
           meeting_link: string | null
@@ -3255,6 +3262,7 @@ export type Database = {
           created_at?: string
           duration_minutes?: number | null
           email: string
+          format?: string | null
           id?: string
           location?: string | null
           meeting_link?: string | null
@@ -3279,6 +3287,7 @@ export type Database = {
           created_at?: string
           duration_minutes?: number | null
           email?: string
+          format?: string | null
           id?: string
           location?: string | null
           meeting_link?: string | null
@@ -3627,11 +3636,15 @@ export type Database = {
       }
       video_analyses: {
         Row: {
+          age_group: string | null
           ai_analysis: Json | null
           coach_notes: string | null
           coach_user_id: string | null
           created_at: string
           id: string
+          pitch_type: string | null
+          skill_category: string | null
+          sport_type: string
           status: string
           updated_at: string
           user_id: string
@@ -3639,11 +3652,15 @@ export type Database = {
           video_url: string
         }
         Insert: {
+          age_group?: string | null
           ai_analysis?: Json | null
           coach_notes?: string | null
           coach_user_id?: string | null
           created_at?: string
           id?: string
+          pitch_type?: string | null
+          skill_category?: string | null
+          sport_type?: string
           status?: string
           updated_at?: string
           user_id: string
@@ -3651,11 +3668,15 @@ export type Database = {
           video_url: string
         }
         Update: {
+          age_group?: string | null
           ai_analysis?: Json | null
           coach_notes?: string | null
           coach_user_id?: string | null
           created_at?: string
           id?: string
+          pitch_type?: string | null
+          skill_category?: string | null
+          sport_type?: string
           status?: string
           updated_at?: string
           user_id?: string

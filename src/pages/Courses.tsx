@@ -90,6 +90,7 @@ export const allCourses = [
     pillar: "velocity",
     category: "hitting",
     level: "Advanced",
+    sport_type: "baseball",
     metrics: ["Exit Velocity", "Bat Speed", "Attack Angle"],
     features: [
       "Intent-based hitting sessions",
@@ -100,7 +101,7 @@ export const allCourses = [
     ],
     instructor: "Vault Performance",
     students: 1340,
-    isNew: true, // New content added this week
+    isNew: true,
   },
   {
     id: "pitching-velocity-8week",
@@ -115,6 +116,7 @@ export const allCourses = [
     pillar: "velocity",
     category: "pitching",
     level: "Intermediate",
+    sport_type: "baseball",
     metrics: ["Pitch Velocity", "Hip Lead", "Arm Speed"],
     features: [
       "Pivot picks & rocker throws",
@@ -139,6 +141,7 @@ export const allCourses = [
     pillar: "velocity",
     category: "pitching",
     level: "Advanced",
+    sport_type: "baseball",
     metrics: ["Hip-Shoulder Separation", "Arm Path", "Peak Velocity"],
     features: [
       "Advanced plyo ball progressions",
@@ -165,6 +168,7 @@ export const allCourses = [
     pillar: "athleticism",
     category: "speed",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["60-Yard Dash", "Lateral Speed", "Vertical Jump"],
     features: [
       "Sprint mechanics diagrams",
@@ -189,6 +193,7 @@ export const allCourses = [
     pillar: "athleticism",
     category: "speed",
     level: "Beginner",
+    sport_type: "both",
     metrics: ["Landing Mechanics", "Explosiveness", "Reactive Ability"],
     features: [
       "Snap downs & stick landings",
@@ -213,6 +218,7 @@ export const allCourses = [
     pillar: "athleticism",
     category: "speed",
     level: "Advanced",
+    sport_type: "both",
     metrics: ["Depth Jumps", "Peak Power", "Approach Jump"],
     features: [
       "Elite plyometric library",
@@ -237,6 +243,7 @@ export const allCourses = [
     pillar: "athleticism",
     category: "strength",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["Lower Body Power", "Rotational Speed", "Durability"],
     features: [
       "Foundation phase (weeks 1-4)",
@@ -263,6 +270,7 @@ export const allCourses = [
     pillar: "utility",
     category: "catching",
     level: "Beginner",
+    sport_type: "baseball",
     metrics: ["Receiving", "Blocking", "Footwork"],
     features: [
       "Tennis ball soft-hand work",
@@ -287,6 +295,7 @@ export const allCourses = [
     pillar: "utility",
     category: "catching",
     level: "Advanced",
+    sport_type: "baseball",
     metrics: ["Pop-Time", "Framing", "Transfer Speed"],
     features: [
       "Elite framing patterns",
@@ -311,6 +320,7 @@ export const allCourses = [
     pillar: "utility",
     category: "catching",
     level: "All Levels",
+    sport_type: "baseball",
     metrics: ["Pop-Time", "Game-Calling IQ", "Durability"],
     features: [
       "5-day weekly training structure",
@@ -337,6 +347,7 @@ export const allCourses = [
     pillar: "longevity",
     category: "recovery",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["Availability %", "High-Intent Days", "Velocity Stability"],
     features: [
       "Mobility & activation protocols",
@@ -362,6 +373,7 @@ export const allCourses = [
     pillar: "longevity",
     category: "recovery",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["Throw Volume", "Recovery Score", "Availability %"],
     features: [
       "Daily arm care routines",
@@ -386,6 +398,7 @@ export const allCourses = [
     pillar: "longevity",
     category: "recovery",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["Same-Game Rules", "Recovery Days", "High-Intent Caps"],
     features: [
       "No pitching + catching same game",
@@ -410,6 +423,7 @@ export const allCourses = [
     pillar: "longevity",
     category: "recovery",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["Hip Mobility", "Shoulder Health", "Spine Stability"],
     features: [
       "Position-specific mobility",
@@ -436,6 +450,7 @@ export const allCourses = [
     pillar: "transfer",
     category: "performance",
     level: "All Levels",
+    sport_type: "baseball",
     metrics: ["Transfer Rate", "Decision Speed", "Clutch Performance"],
     features: [
       "60+ game-realistic drill library",
@@ -461,6 +476,7 @@ export const allCourses = [
     pillar: "transfer",
     category: "performance",
     level: "Intermediate",
+    sport_type: "baseball",
     metrics: ["Practice-Game Carryover", "Clutch Rate", "Consistency"],
     features: [
       "Game-speed intent blocks",
@@ -487,6 +503,7 @@ export const allCourses = [
     pillar: "mental",
     category: "mindset",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["Emotional Speed", "Focus", "Competitive Identity"],
     features: [
       "5-minute visualization routine",
@@ -511,6 +528,7 @@ export const allCourses = [
     pillar: "mental",
     category: "mindset",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["Identity", "Confidence", "Leadership"],
     features: [
       "Weekly mental lessons",
@@ -537,6 +555,7 @@ export const allCourses = [
     pillar: "transfer",
     category: "leadership",
     level: "Coach/Admin",
+    sport_type: "both",
     metrics: ["Organizational Alignment", "System Integrity", "Long-Term Development"],
     features: [
       "The VAULT™ Five Pillars",
@@ -561,6 +580,7 @@ export const allCourses = [
     pillar: "athleticism",
     category: "strength",
     level: "All Levels",
+    sport_type: "both",
     metrics: ["Jump Height", "Sprint Improvement", "Output Consistency"],
     features: [
       "Lower-body force production",
@@ -585,6 +605,7 @@ export const allCourses = [
     pillar: "longevity",
     category: "planning",
     level: "Coach/Admin",
+    sport_type: "both",
     metrics: ["Phase Alignment", "Workload Balance", "Recovery Compliance"],
     features: [
       "Post-Season Reset (4-6 weeks)",
@@ -609,6 +630,7 @@ export const allCourses = [
     pillar: "utility",
     category: "fielding",
     level: "All Levels",
+    sport_type: "baseball",
     metrics: ["First-Step Reaction", "Throw Accuracy %", "Routine Play Success"],
     features: [
       "Footwork & base control",
@@ -633,6 +655,7 @@ export const allCourses = [
     pillar: "utility",
     category: "fielding",
     level: "All Levels",
+    sport_type: "baseball",
     metrics: ["First-Step Time", "Route Efficiency", "Throw Accuracy"],
     features: [
       "First-step & ball-off-bat reads",
@@ -806,6 +829,7 @@ const CourseCard = ({ course, index, isEnrolled, enrollment, onEnroll, isEnrolli
 
 const CoursesPage = () => {
   const [activePillar, setActivePillar] = useState("all");
+  const [activeSport, setActiveSport] = useState<"all" | "baseball" | "softball">("all");
   const [userId, setUserId] = useState<string | undefined>();
   
   const { data: enrollments = [] } = useCourseEnrollments(userId);
@@ -826,11 +850,18 @@ const CoursesPage = () => {
     enrollMutation.mutate({ userId, courseId });
   };
 
+  const sportFilteredCourses = activeSport === "all"
+    ? allCourses
+    : allCourses.filter(course => {
+        const st = (course as any).sport_type;
+        return st === activeSport || st === "both";
+      });
+
   const filteredCourses = activePillar === "all" 
-    ? allCourses 
+    ? sportFilteredCourses 
     : activePillar === "enrolled"
-    ? allCourses.filter(course => enrollments.some(e => e.course_id === course.id))
-    : allCourses.filter(course => course.pillar === activePillar);
+    ? sportFilteredCourses.filter(course => enrollments.some(e => e.course_id === course.id))
+    : sportFilteredCourses.filter(course => course.pillar === activePillar);
 
   const enrolledCount = enrollments.length;
   const currentPillar = vaultPillars.find(p => p.id === activePillar);
@@ -876,6 +907,26 @@ const CoursesPage = () => {
           </motion.div>
         </section>
 
+        {/* Sport Filter */}
+        <section className="container mx-auto px-4 mb-4">
+          <div className="flex justify-center gap-2">
+            {([
+              { key: "all" as const, label: "All Sports" },
+              { key: "baseball" as const, label: "⚾ Baseball" },
+              { key: "softball" as const, label: "🥎 Softball" },
+            ]).map(({ key, label }) => (
+              <Button
+                key={key}
+                variant={activeSport === key ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveSport(key)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+        </section>
+
         {/* Pillar Navigation */}
         <section className="container mx-auto px-4 mb-8">
           <div className="flex flex-wrap justify-center gap-2 mb-6">
@@ -906,7 +957,7 @@ const CoursesPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
             {vaultPillars.map((pillar) => {
               const Icon = pillar.icon;
-              const count = allCourses.filter(c => c.pillar === pillar.id).length;
+              const count = sportFilteredCourses.filter(c => c.pillar === pillar.id).length;
               return (
                 <button
                   key={pillar.id}
