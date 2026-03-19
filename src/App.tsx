@@ -146,6 +146,9 @@ import ParentWellness from "./pages/parent/ParentWellness";
 import ParentTraining from "./pages/parent/ParentTraining";
 import ParentMessages from "./pages/parent/ParentMessages";
 import ParentDownloads from "./pages/parent/ParentDownloads";
+import AthleteDownloads from "./pages/AthleteDownloads";
+import CoachDownloads from "./pages/coach/CoachDownloads";
+import OwnerExports from "./pages/admin/OwnerExports";
 import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
 import PitchLog from "./pages/workload/PitchLog";
 import ArmCare from "./pages/workload/ArmCare";
@@ -196,6 +199,9 @@ const App = () => (
                 <Dashboard />
               </TrialProtectedRoute>
             } />
+            <Route path="/downloads" element={
+              <TrialProtectedRoute><AthleteDownloads /></TrialProtectedRoute>
+            } />
             <Route path="/vault" element={
               <TrialProtectedRoute>
                 <VaultDashboard />
@@ -212,6 +218,7 @@ const App = () => (
               <Route path="create" element={<CoachCreate />} />
               <Route path="schedule" element={<CoachSchedule />} />
               <Route path="profile" element={<CoachProfilePage />} />
+              <Route path="downloads" element={<CoachDownloads />} />
             </Route>
             <Route path="/coach-dashboard" element={
               <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboard /></RoleGuard>
@@ -269,6 +276,9 @@ const App = () => (
               } />
               <Route path="coach-management" element={
                 <RoleGuard requires="view_all_users"><CoachManagement /></RoleGuard>
+              } />
+              <Route path="exports" element={
+                <RoleGuard requires="view_revenue_dashboard"><OwnerExports /></RoleGuard>
               } />
             </Route>
             <Route path="/community" element={

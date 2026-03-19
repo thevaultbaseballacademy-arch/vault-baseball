@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useRoleAuth } from "@/hooks/useRoleAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Users, Target, Calendar, BookOpen, PenTool, Clock, UserCircle, ChevronLeft, Menu, X } from "lucide-react";
+import { Loader2, Users, Target, Calendar, BookOpen, PenTool, Clock, UserCircle, ChevronLeft, Menu, X, Download } from "lucide-react";
 import { Navigate } from "react-router-dom";
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { to: "/coach/assignments", label: "Assignments", icon: BookOpen },
   { to: "/coach/create", label: "Create Content", icon: PenTool },
   { to: "/coach/schedule", label: "Schedule", icon: Clock },
+  { to: "/coach/downloads", label: "Downloads", icon: Download },
   { to: "/coach/profile", label: "My Profile", icon: UserCircle },
 ];
 
