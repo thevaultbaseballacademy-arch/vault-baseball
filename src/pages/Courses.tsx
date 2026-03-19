@@ -829,6 +829,7 @@ const CourseCard = ({ course, index, isEnrolled, enrollment, onEnroll, isEnrolli
 
 const CoursesPage = () => {
   const [activePillar, setActivePillar] = useState("all");
+  const [activeSport, setActiveSport] = useState<"all" | "baseball" | "softball">("all");
   const [userId, setUserId] = useState<string | undefined>();
   
   const { data: enrollments = [] } = useCourseEnrollments(userId);
@@ -849,11 +850,18 @@ const CoursesPage = () => {
     enrollMutation.mutate({ userId, courseId });
   };
 
+  const sportFilteredCourses = activeSport === "all"
+    ? allCourses
+    : allCourses.filter(course => {
+        const st = (course as any).sport_type;
+        return st === activeSport || st === "both";
+      });
+
   const filteredCourses = activePillar === "all" 
-    ? allCourses 
+    ? sportFilteredCourses 
     : activePillar === "enrolled"
-    ? allCourses.filter(course => enrollments.some(e => e.course_id === course.id))
-    : allCourses.filter(course => course.pillar === activePillar);
+    ? sportFilteredCourses.filter(course => enrollments.some(e => e.course_id === course.id))
+    : sportFilteredCourses.filter(course => course.pillar === activePillar);
 
   const enrolledCount = enrollments.length;
   const currentPillar = vaultPillars.find(p => p.id === activePillar);
