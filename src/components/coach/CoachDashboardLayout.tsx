@@ -1,9 +1,12 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useRoleAuth } from "@/hooks/useRoleAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Users, Target, Calendar, BookOpen, PenTool, Clock, UserCircle, ChevronLeft, Menu, X } from "lucide-react";
 import { Navigate } from "react-router-dom";
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
+import { Badge } from "@/components/ui/badge";
 
 const NAV_ITEMS = [
   { to: "/coach", label: "My Athletes", icon: Users, end: true },
@@ -19,6 +22,22 @@ const CoachDashboardLayout = () => {
   const { user, isCoach, isOwner, isLoading } = useRoleAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Fetch pending video review count for badge
+  const { data: pendingVideoCount } = useQuery({
+    queryKey: ["coach-pending-videos", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("remote_lessons")
+        .select("id", { count: "exact", head: true })
+        .eq("coach_user_id", user!.id)
+        .eq("status", "pending_review");
+      if (error) return 0;
+      return count || 0;
+    },
+    refetchInterval: 60000,
+  });
 
   if (isLoading) {
     return (
@@ -62,6 +81,11 @@ const CoachDashboardLayout = () => {
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 {label}
+                {label === "Lessons" && (pendingVideoCount ?? 0) > 0 && (
+                  <Badge variant="destructive" className="ml-auto text-[9px] px-1.5 py-0 h-4 min-w-[18px] flex items-center justify-center">
+                    {pendingVideoCount}
+                  </Badge>
+                )}
               </NavLink>
             ))}
           </nav>

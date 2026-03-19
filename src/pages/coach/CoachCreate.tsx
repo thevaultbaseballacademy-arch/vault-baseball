@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSport } from "@/contexts/SportContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,17 +15,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 const CoachCreate = () => {
   const queryClient = useQueryClient();
+  const { sport } = useSport();
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({
     content_type: "drill",
     title: "",
     description: "",
-    sport_type: "baseball",
+    sport_type: sport,
     skill_category: "",
     difficulty: "intermediate",
     age_group: "",
     coaching_points: "",
   });
+
+  // Keep form sport_type in sync with global toggle
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, sport_type: sport }));
+  }, [sport]);
 
   const { data: user } = useQuery({
     queryKey: ["auth-user"],
@@ -68,7 +75,7 @@ const CoachCreate = () => {
       toast.success("Draft saved");
       queryClient.invalidateQueries({ queryKey: ["coach-submissions"] });
       setShowCreate(false);
-      setForm({ content_type: "drill", title: "", description: "", sport_type: "baseball", skill_category: "", difficulty: "intermediate", age_group: "", coaching_points: "" });
+      setForm({ content_type: "drill", title: "", description: "", sport_type: sport, skill_category: "", difficulty: "intermediate", age_group: "", coaching_points: "" });
     },
     onError: (e) => toast.error(e.message),
   });
@@ -153,7 +160,9 @@ const CoachCreate = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display tracking-wide">CONTENT CREATION</h1>
-          <p className="text-sm text-muted-foreground mt-1">Create drills and programs for approval</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {drafts.length} drafts · {pending.length} pending · {approved.length} approved · {rejected.length} rejected
+          </p>
         </div>
         <Dialog open={showCreate} onOpenChange={setShowCreate}>
           <DialogTrigger asChild>
@@ -173,7 +182,7 @@ const CoachCreate = () => {
               <Input placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
               <Textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               <div className="grid grid-cols-2 gap-2">
-                <Select value={form.sport_type} onValueChange={(v) => setForm({ ...form, sport_type: v })}>
+                <Select value={form.sport_type} onValueChange={(v: string) => setForm({ ...form, sport_type: v as "baseball" | "softball" })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="baseball">Baseball</SelectItem>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useSport } from "@/contexts/SportContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ import { format } from "date-fns";
 const CoachAthletes = () => {
   const [search, setSearch] = useState("");
   const [selectedAthleteId, setSelectedAthleteId] = useState<string | null>(null);
+  const { sport } = useSport();
 
   const { data: user } = useQuery({
     queryKey: ["auth-user"],
@@ -157,7 +159,9 @@ const CoachAthletes = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-display tracking-wide">MY ATHLETES</h1>
-        <p className="text-sm text-muted-foreground mt-1">Athletes assigned to you</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Showing {sport === "softball" ? "🥎 Softball" : "⚾ Baseball"} athletes assigned to you
+        </p>
       </div>
 
       <div className="relative">
