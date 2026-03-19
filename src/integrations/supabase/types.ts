@@ -3571,6 +3571,42 @@ export type Database = {
         }
         Relationships: []
       }
+      pitch_type_counts: {
+        Row: {
+          athlete_user_id: string
+          count: number
+          created_at: string
+          id: string
+          pitch_type: string
+          session_date: string
+          session_id: string | null
+          session_source: string
+          sport_type: string
+        }
+        Insert: {
+          athlete_user_id: string
+          count?: number
+          created_at?: string
+          id?: string
+          pitch_type: string
+          session_date?: string
+          session_id?: string | null
+          session_source?: string
+          sport_type?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          count?: number
+          created_at?: string
+          id?: string
+          pitch_type?: string
+          session_date?: string
+          session_id?: string | null
+          session_source?: string
+          sport_type?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           category: string
@@ -4915,6 +4951,122 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      tournament_events: {
+        Row: {
+          athlete_user_id: string
+          created_at: string
+          end_date: string
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          sport_type: string
+          start_date: string
+          total_games_played: number | null
+          total_pitches_thrown: number | null
+          tournament_name: string
+          updated_at: string
+        }
+        Insert: {
+          athlete_user_id: string
+          created_at?: string
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          sport_type?: string
+          start_date: string
+          total_games_played?: number | null
+          total_pitches_thrown?: number | null
+          tournament_name: string
+          updated_at?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          sport_type?: string
+          start_date?: string
+          total_games_played?: number | null
+          total_pitches_thrown?: number | null
+          tournament_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tournament_games: {
+        Row: {
+          athlete_user_id: string
+          created_at: string
+          game_date: string
+          game_number: number
+          game_time: string | null
+          id: string
+          innings_pitched: number | null
+          max_velocity: number | null
+          notes: string | null
+          pain_level: number | null
+          pain_location: string | null
+          pain_reported: boolean | null
+          pitch_types: Json | null
+          pitches_thrown: number | null
+          rest_hours_since_last: number | null
+          safe_to_pitch: boolean | null
+          safe_to_pitch_reason: string | null
+          tournament_id: string
+        }
+        Insert: {
+          athlete_user_id: string
+          created_at?: string
+          game_date: string
+          game_number?: number
+          game_time?: string | null
+          id?: string
+          innings_pitched?: number | null
+          max_velocity?: number | null
+          notes?: string | null
+          pain_level?: number | null
+          pain_location?: string | null
+          pain_reported?: boolean | null
+          pitch_types?: Json | null
+          pitches_thrown?: number | null
+          rest_hours_since_last?: number | null
+          safe_to_pitch?: boolean | null
+          safe_to_pitch_reason?: string | null
+          tournament_id: string
+        }
+        Update: {
+          athlete_user_id?: string
+          created_at?: string
+          game_date?: string
+          game_number?: number
+          game_time?: string | null
+          id?: string
+          innings_pitched?: number | null
+          max_velocity?: number | null
+          notes?: string | null
+          pain_level?: number | null
+          pain_location?: string | null
+          pain_reported?: boolean | null
+          pitch_types?: Json | null
+          pitches_thrown?: number | null
+          rest_hours_since_last?: number | null
+          safe_to_pitch?: boolean | null
+          safe_to_pitch_reason?: string | null
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_games_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trial_feedback: {
         Row: {

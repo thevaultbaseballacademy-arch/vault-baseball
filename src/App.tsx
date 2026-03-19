@@ -146,6 +146,8 @@ import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
 import PitchLog from "./pages/workload/PitchLog";
 import ArmCare from "./pages/workload/ArmCare";
 import InjuryLog from "./pages/workload/InjuryLog";
+import DailyWorkloadLog from "./pages/workload/DailyWorkloadLog";
+import TournamentMode from "./pages/workload/TournamentMode";
 import TeamHub from "./pages/team/TeamHub";
 import TeamRoster from "./pages/team/TeamRoster";
 import TeamSchedule from "./pages/team/TeamSchedule";
@@ -419,6 +421,8 @@ const App = () => (
             <Route path="/workload/pitch-log" element={<TrialProtectedRoute><PitchLog /></TrialProtectedRoute>} />
             <Route path="/workload/arm-care" element={<TrialProtectedRoute><ArmCare /></TrialProtectedRoute>} />
             <Route path="/workload/injuries" element={<TrialProtectedRoute><InjuryLog /></TrialProtectedRoute>} />
+            <Route path="/workload/daily-log" element={<TrialProtectedRoute><DailyWorkloadLog /></TrialProtectedRoute>} />
+            <Route path="/workload/tournament" element={<TrialProtectedRoute><TournamentMode /></TrialProtectedRoute>} />
 
             {/* Team Management */}
             <Route path="/team" element={<TrialProtectedRoute><TeamHub /></TrialProtectedRoute>} />
