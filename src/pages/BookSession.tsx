@@ -10,6 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useSport } from "@/contexts/SportContext";
 import {
   CalendarDays, Clock, User, CheckCircle2, ArrowRight,
   Loader2, ChevronLeft
@@ -28,8 +29,12 @@ const TIME_SLOTS = [
   "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM",
 ];
 
-const POSITIONS = [
+const BASEBALL_POSITIONS = [
   "RHP", "LHP", "C", "1B", "2B", "SS", "3B", "OF", "DH", "Utility"
+];
+
+const SOFTBALL_POSITIONS = [
+  "Pitcher", "Catcher", "1B", "2B", "SS", "3B", "OF", "DP/Flex", "Utility"
 ];
 
 const WEEKDAY_LABELS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -44,6 +49,8 @@ type Step = "coach" | "datetime" | "form" | "confirm";
 const BookSession = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { sport } = useSport();
+  const POSITIONS = sport === 'softball' ? SOFTBALL_POSITIONS : BASEBALL_POSITIONS;
   const [step, setStep] = useState<Step>("coach");
   const [coaches, setCoaches] = useState<CoachOption[]>([]);
   const [loadingCoaches, setLoadingCoaches] = useState(true);
@@ -102,13 +109,20 @@ const BookSession = () => {
   }, [selectedCoach, selectedDate]);
 
   const fetchCoaches = async () => {
+    const sportLabel = sport === 'softball' ? 'Softball' : 'Baseball';
     const { data } = await supabase
       .from("coaches")
-      .select("user_id, name")
+      .select("user_id, name, specialties")
       .eq("status", "Active")
       .not("user_id", "is", null);
 
-    setCoaches(data?.map(c => ({ user_id: c.user_id!, name: c.name })) || []);
+    // Filter coaches whose specialties include the current sport (or show all if no specialties set)
+    const filtered = data?.filter(c => {
+      if (!c.specialties || c.specialties.length === 0) return true;
+      return c.specialties.some((s: string) => s.toLowerCase().includes(sportLabel.toLowerCase()));
+    }) || [];
+
+    setCoaches(filtered.map(c => ({ user_id: c.user_id!, name: c.name })));
     setLoadingCoaches(false);
   };
 
