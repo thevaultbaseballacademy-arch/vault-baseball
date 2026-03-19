@@ -29,6 +29,10 @@ serve(async (req) => {
 
     if (fbErr || !feedback) throw new Error("Feedback not found");
 
+    const sportType = feedback.sport_type || "baseball";
+    const isSoftball = sportType === "softball";
+    const sportLabel = isSoftball ? "softball" : "baseball";
+
     // Fetch athlete profile
     const { data: profile } = await supabase
       .from("profiles")
@@ -39,9 +43,10 @@ serve(async (req) => {
     const athleteName = profile?.display_name || "the athlete";
     const position = profile?.position || "player";
 
-    const prompt = `You are an elite baseball development analyst. Based on the following coach feedback from a recent lesson, generate a concise development report.
+    const prompt = `You are an elite ${sportLabel} development analyst. Based on the following coach feedback from a recent lesson, generate a concise development report.
 
 Athlete: ${athleteName} (${position})
+Sport: ${sportLabel}
 Lesson Focus: ${feedback.lesson_focus || "General training"}
 Strengths: ${feedback.strengths_observed || "Not specified"}
 Areas to Improve: ${feedback.areas_for_improvement || "Not specified"}
@@ -50,10 +55,10 @@ Next Focus: ${feedback.next_development_focus || "Not specified"}
 
 Generate a report with these sections:
 1. **Lesson Summary** - 2-3 sentences about what was covered and key takeaways
-2. **Recommended Drills** - 3-5 specific drills with brief descriptions related to the lesson focus
+2. **Recommended Drills** - 3-5 specific ${sportLabel} drills with brief descriptions related to the lesson focus
 3. **Weekly Homework** - Clear assignments for the player to complete before the next lesson (3 drill sets, progressions, mechanical focus points)
 
-Keep it professional, motivating, and actionable. Use baseball terminology appropriately.`;
+Keep it professional, motivating, and actionable. Use ${sportLabel} terminology appropriately.${isSoftball ? " Use fastpitch-specific mechanics and terminology where relevant (e.g., windmill mechanics, rise ball, drop ball, slap hitting)." : ""}`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
