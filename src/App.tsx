@@ -215,6 +215,7 @@ const App = () => (
               <Route path="create" element={<CoachCreate />} />
               <Route path="schedule" element={<CoachSchedule />} />
               <Route path="profile" element={<CoachProfilePage />} />
+              <Route path="downloads" element={<CoachDownloads />} />
             </Route>
             <Route path="/coach-dashboard" element={
               <RoleGuard requiresRole={["coach", "owner"]}><CoachDashboard /></RoleGuard>
