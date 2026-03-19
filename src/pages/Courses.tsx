@@ -907,6 +907,26 @@ const CoursesPage = () => {
           </motion.div>
         </section>
 
+        {/* Sport Filter */}
+        <section className="container mx-auto px-4 mb-4">
+          <div className="flex justify-center gap-2">
+            {([
+              { key: "all" as const, label: "All Sports" },
+              { key: "baseball" as const, label: "⚾ Baseball" },
+              { key: "softball" as const, label: "🥎 Softball" },
+            ]).map(({ key, label }) => (
+              <Button
+                key={key}
+                variant={activeSport === key ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveSport(key)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+        </section>
+
         {/* Pillar Navigation */}
         <section className="container mx-auto px-4 mb-8">
           <div className="flex flex-wrap justify-center gap-2 mb-6">
