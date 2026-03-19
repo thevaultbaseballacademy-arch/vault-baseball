@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ArrowLeft, ArrowRight, Loader2, Target, Zap, Shield, TrendingUp, BookOpen, Calendar } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Target, Zap, Shield, TrendingUp, BookOpen, Calendar, AlertTriangle } from "lucide-react";
+import { useSoftballProfile } from "@/hooks/useSoftballProfile";
+import { getFormatVisibility } from "@/lib/softball/rules";
 
 interface SkillScore {
   skill_category: string;
@@ -19,29 +21,22 @@ interface SkillScore {
 
 const SoftballProfile = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const { user, profile, format, ageGroup, visibility, ageRules, loading } = useSoftballProfile();
   const [skills, setSkills] = useState<SkillScore[]>([]);
   const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    const load = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { navigate("/auth"); return; }
-      setUser(session.user);
-
-      const profileRes = await supabase.from("profiles").select("*").eq("user_id", session.user.id).single();
-      const skillsRes = await (supabase as any).from("skill_progression").select("*").eq("user_id", session.user.id).eq("sport_type", "softball");
-      const recsRes = await (supabase as any).from("development_recommendations").select("*").eq("athlete_user_id", session.user.id).eq("sport_type", "softball").eq("status", "pending").order("created_at", { ascending: false }).limit(5);
-
-      if (profileRes.data) setProfile(profileRes.data);
+    if (!user) return;
+    const loadData = async () => {
+      const skillsRes = await (supabase as any).from("skill_progression").select("*").eq("user_id", user.id).eq("sport_type", "softball");
+      const recsRes = await (supabase as any).from("development_recommendations").select("*").eq("athlete_user_id", user.id).eq("sport_type", "softball").eq("status", "pending").order("created_at", { ascending: false }).limit(5);
       if (skillsRes.data) setSkills(skillsRes.data as SkillScore[]);
       if (recsRes.data) setRecommendations(recsRes.data);
-      setLoading(false);
+      setDataLoading(false);
     };
-    load();
-  }, [navigate]);
+    loadData();
+  }, [user]);
 
   const skillIcons: Record<string, React.ReactNode> = {
     pitching: <Target className="w-4 h-4" />,
@@ -50,7 +45,28 @@ const SoftballProfile = () => {
     baserunning: <TrendingUp className="w-4 h-4" />,
   };
 
-  if (loading) {
+  // Filter skill categories shown based on format
+  const visibleSkillCategories = skills.filter(s => {
+    // Slowpitch doesn't have a pitching skill track (it's an arc delivery, not a skill to develop)
+    if (format === "slowpitch" && s.skill_category === "pitching") return false;
+    // Slowpitch doesn't track baserunning (no stealing)
+    if (format === "slowpitch" && s.skill_category === "baserunning" && !visibility.stealingDrills) return false;
+    return true;
+  });
+
+  // Build quick actions based on format
+  const quickActions = [
+    { label: "BOOK LESSON", icon: Calendar, path: "/softball/lessons/booking" },
+    { label: "COURSES", icon: BookOpen, path: "/softball/courses" },
+    { label: "ANALYTICS", icon: TrendingUp, path: "/softball/analytics" },
+    ...(visibility.windmillMechanics
+      ? [{ label: "PITCHING", icon: Target, path: "/softball/pitching" }]
+      : []),
+    { label: "HITTING", icon: Zap, path: "/softball/hitting" },
+    { label: "FIELDING", icon: Shield, path: "/softball/fielding" },
+  ];
+
+  if (loading || dataLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -72,20 +88,30 @@ const SoftballProfile = () => {
             <h1 className="text-3xl md:text-4xl font-display tracking-tight text-foreground">
               {profile?.display_name || "Athlete"}'s Development
             </h1>
-            <div className="flex gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               <Badge variant="secondary" className="text-xs font-display">🥎 Softball</Badge>
-              {profile?.softball_format && (
-                <Badge variant="outline" className="text-xs font-display capitalize">{profile.softball_format}</Badge>
-              )}
-              {profile?.position && (
-                <Badge variant="outline" className="text-xs font-display">{profile.position}</Badge>
-              )}
+              <Badge variant="outline" className="text-xs font-display capitalize">{format}</Badge>
+              {ageGroup && <Badge variant="outline" className="text-xs font-display">{ageGroup} · {ageRules.pitchingDistance}</Badge>}
+              {profile?.position && <Badge variant="outline" className="text-xs font-display">{profile.position}</Badge>}
             </div>
           </motion.div>
 
+          {/* Age group context alerts */}
+          {ageGroup === "8U" && (
+            <Card className="border-border mb-6">
+              <CardContent className="p-4 flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-display text-sm text-foreground">Coach Pitch Division</h4>
+                  <p className="text-xs text-muted-foreground">Windmill pitching drills are not shown for 8U athletes. Focus is on fundamentals: throwing, catching, hitting, and fielding.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Skill Scores */}
           <div className="grid md:grid-cols-2 gap-4 mb-8">
-            {skills.length > 0 ? skills.map((skill, i) => (
+            {visibleSkillCategories.length > 0 ? visibleSkillCategories.map((skill, i) => (
               <motion.div key={skill.skill_category} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                 <Card className="border-border">
                   <CardContent className="p-5">
@@ -97,7 +123,7 @@ const SoftballProfile = () => {
                       <div className="flex items-center gap-2">
                         <span className="text-2xl font-display text-foreground">{skill.current_score}</span>
                         <span className="text-xs text-muted-foreground">/100</span>
-                        {skill.trend === "improving" && <TrendingUp className="w-3.5 h-3.5 text-green-500" />}
+                        {skill.trend === "improving" && <TrendingUp className="w-3.5 h-3.5 text-primary" />}
                       </div>
                     </div>
                     <Progress value={skill.current_score} className="h-2" />
@@ -126,7 +152,7 @@ const SoftballProfile = () => {
             <CardContent>
               {recommendations.length > 0 ? (
                 <div className="space-y-3">
-                  {recommendations.map((rec, i) => (
+                  {recommendations.map((rec) => (
                     <div key={rec.id} className="flex items-center justify-between p-3 border border-border rounded-md">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -150,13 +176,8 @@ const SoftballProfile = () => {
           </Card>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { label: "BOOK LESSON", icon: Calendar, path: "/softball/lessons/booking" },
-              { label: "COURSES", icon: BookOpen, path: "/softball/courses" },
-              { label: "ANALYTICS", icon: TrendingUp, path: "/softball/analytics" },
-              { label: "COACHES", icon: Target, path: "/softball/lessons/coaches" },
-            ].map(action => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {quickActions.map(action => (
               <Button key={action.label} variant="outline" className="h-auto py-4 flex flex-col gap-2 font-display tracking-wider text-xs" onClick={() => navigate(action.path)}>
                 <action.icon className="w-5 h-5" />
                 {action.label}
