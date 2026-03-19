@@ -66,7 +66,8 @@ export const LessonFeedbackForm = ({
           lesson_focus: lessonFocus,
           recommended_drills: filteredDrills,
           next_development_focus: nextFocus,
-        })
+          sport_type: sportType,
+        } as any)
         .select()
         .single();
 
