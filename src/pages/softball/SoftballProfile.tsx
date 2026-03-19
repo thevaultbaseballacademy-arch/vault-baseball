@@ -32,8 +32,8 @@ const SoftballProfile = () => {
       setUser(session.user);
 
       const profileRes = await supabase.from("profiles").select("*").eq("user_id", session.user.id).single();
-      const skillsRes = await supabase.from("skill_progression").select("*").eq("user_id", session.user.id).eq("sport_type" as any, "softball");
-      const recsRes = await supabase.from("development_recommendations").select("*").eq("athlete_user_id", session.user.id).eq("sport_type" as any, "softball").eq("status", "pending").order("created_at", { ascending: false }).limit(5);
+      const skillsRes = await (supabase as any).from("skill_progression").select("*").eq("user_id", session.user.id).eq("sport_type", "softball");
+      const recsRes = await (supabase as any).from("development_recommendations").select("*").eq("athlete_user_id", session.user.id).eq("sport_type", "softball").eq("status", "pending").order("created_at", { ascending: false }).limit(5);
 
       if (profileRes.data) setProfile(profileRes.data);
       if (skillsRes.data) setSkills(skillsRes.data as SkillScore[]);
