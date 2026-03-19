@@ -70,7 +70,7 @@ const OwnerExports = () => {
   const exportCoachEarnings = async () => {
     setGen("earnings");
     try {
-      const { data: coaches } = await supabase.from("coaches").select("id, user_id, full_name, status").limit(100);
+      const { data: coaches } = await supabase.from("coaches").select("id, user_id, name, status").limit(100);
       const { data: payouts } = await supabase.from("coach_payouts").select("coach_id, amount_cents").limit(1000);
       const { data: lessons } = await supabase.from("remote_lessons").select("coach_user_id").eq("status", "completed").limit(1000);
       const { data: marketplace } = await supabase.from("coach_marketplace_profiles").select("coach_id, avg_rating").limit(100);
