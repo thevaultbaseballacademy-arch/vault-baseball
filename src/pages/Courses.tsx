@@ -957,7 +957,7 @@ const CoursesPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
             {vaultPillars.map((pillar) => {
               const Icon = pillar.icon;
-              const count = allCourses.filter(c => c.pillar === pillar.id).length;
+              const count = sportFilteredCourses.filter(c => c.pillar === pillar.id).length;
               return (
                 <button
                   key={pillar.id}
