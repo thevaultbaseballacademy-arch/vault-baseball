@@ -2766,6 +2766,7 @@ export type Database = {
           athlete_user_id: string
           coach_notes: string | null
           coach_user_id: string
+          courses_recommended: Json | null
           created_at: string
           drills_assigned: string[] | null
           feedback_id: string | null
@@ -2773,8 +2774,12 @@ export type Database = {
           injury_flags: string[] | null
           kpi_updates: Json | null
           lesson_id: string
+          lesson_type: string | null
+          parent_summary: string | null
+          programs_assigned: Json | null
           session_number: number | null
           skill_category: string
+          skills_worked: string[] | null
           sport_type: string
           strengths_noted: string[] | null
           weaknesses_noted: string[] | null
@@ -2783,6 +2788,7 @@ export type Database = {
           athlete_user_id: string
           coach_notes?: string | null
           coach_user_id: string
+          courses_recommended?: Json | null
           created_at?: string
           drills_assigned?: string[] | null
           feedback_id?: string | null
@@ -2790,8 +2796,12 @@ export type Database = {
           injury_flags?: string[] | null
           kpi_updates?: Json | null
           lesson_id: string
+          lesson_type?: string | null
+          parent_summary?: string | null
+          programs_assigned?: Json | null
           session_number?: number | null
           skill_category: string
+          skills_worked?: string[] | null
           sport_type?: string
           strengths_noted?: string[] | null
           weaknesses_noted?: string[] | null
@@ -2800,6 +2810,7 @@ export type Database = {
           athlete_user_id?: string
           coach_notes?: string | null
           coach_user_id?: string
+          courses_recommended?: Json | null
           created_at?: string
           drills_assigned?: string[] | null
           feedback_id?: string | null
@@ -2807,8 +2818,12 @@ export type Database = {
           injury_flags?: string[] | null
           kpi_updates?: Json | null
           lesson_id?: string
+          lesson_type?: string | null
+          parent_summary?: string | null
+          programs_assigned?: Json | null
           session_number?: number | null
           skill_category?: string
+          skills_worked?: string[] | null
           sport_type?: string
           strengths_noted?: string[] | null
           weaknesses_noted?: string[] | null
