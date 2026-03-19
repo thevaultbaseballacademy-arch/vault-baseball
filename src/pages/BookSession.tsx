@@ -258,7 +258,8 @@ const BookSession = () => {
       session_date: format(selectedDate, "yyyy-MM-dd"),
       session_time: selectedTime,
       duration_minutes: SESSION_TYPES.find(s => s.value === sessionType)?.duration || 60,
-    });
+      sport_type: sport,
+    } as any);
 
     setSubmitting(false);
     if (error) {

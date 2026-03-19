@@ -17,6 +17,7 @@ interface LessonFeedbackFormProps {
   athleteUserId: string;
   athleteName: string;
   coachUserId: string;
+  sportType?: string;
   onSubmitted?: () => void;
 }
 
