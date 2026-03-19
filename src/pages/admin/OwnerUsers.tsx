@@ -55,7 +55,7 @@ const OwnerUsers = () => {
     }
   };
 
-  const getUserRoles = (userId: string) => allRoles.filter(r => r.user_id === userId).map(r => r.role);
+  const getUserRoles = (userId: string) => allRoles.filter(r => r.user_id === userId).map(r => r.role as string);
 
   const filtered = profiles.filter(p => {
     const matchesSearch = !search || 
