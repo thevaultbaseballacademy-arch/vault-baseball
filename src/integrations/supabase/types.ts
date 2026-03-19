@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_denied_logs: {
+        Row: {
+          attempted_permission: string
+          attempted_route: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attempted_permission: string
+          attempted_route: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attempted_permission?: string
+          attempted_route?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       activity_feed: {
         Row: {
           activity_type: string
