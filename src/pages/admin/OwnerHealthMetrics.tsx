@@ -90,9 +90,9 @@ const OwnerHealthMetrics = () => {
         supabase.from("recruiting_profiles").select("*", { count: "exact", head: true }),
         // Profiles graduation_year suggesting 14U+ (grad year <= current year + 4)
         supabase.from("profiles").select("*", { count: "exact", head: true }).not("graduation_year", "is", null).lte("graduation_year", now.getFullYear() + 4),
-        // Parent roles
-        supabase.from("user_roles").select("user_id").eq("role", "parent"),
-        // Parent logins (activity feed within 7 days)
+        // Parent links (parent_athlete_links as proxy for parent users)
+        supabase.from("parent_athlete_links").select("parent_user_id").eq("status", "active"),
+        // Parent logins (sessions within 7 days)
         supabase.from("user_sessions").select("user_id, last_active_at").gte("last_active_at", sevenDaysAgo),
         // Workload records this month
         supabase.from("workload_records").select("*", { count: "exact", head: true }).gte("record_date", thirtyDaysAgo),
