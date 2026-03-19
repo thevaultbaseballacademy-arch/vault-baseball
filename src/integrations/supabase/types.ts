@@ -2659,16 +2659,67 @@ export type Database = {
         }
         Relationships: []
       }
+      intelligence_outputs: {
+        Row: {
+          alerts: Json | null
+          athlete_user_id: string
+          gaps_summary: string[] | null
+          generated_at: string
+          id: string
+          recommended_courses: string[] | null
+          recommended_drills: string[] | null
+          recommended_programs: string[] | null
+          sport_type: string
+          status: string | null
+          strengths_summary: string[] | null
+          top_priorities: string[] | null
+          weekly_focus_plan: Json | null
+        }
+        Insert: {
+          alerts?: Json | null
+          athlete_user_id: string
+          gaps_summary?: string[] | null
+          generated_at?: string
+          id?: string
+          recommended_courses?: string[] | null
+          recommended_drills?: string[] | null
+          recommended_programs?: string[] | null
+          sport_type?: string
+          status?: string | null
+          strengths_summary?: string[] | null
+          top_priorities?: string[] | null
+          weekly_focus_plan?: Json | null
+        }
+        Update: {
+          alerts?: Json | null
+          athlete_user_id?: string
+          gaps_summary?: string[] | null
+          generated_at?: string
+          id?: string
+          recommended_courses?: string[] | null
+          recommended_drills?: string[] | null
+          recommended_programs?: string[] | null
+          sport_type?: string
+          status?: string | null
+          strengths_summary?: string[] | null
+          top_priorities?: string[] | null
+          weekly_focus_plan?: Json | null
+        }
+        Relationships: []
+      }
       intelligence_rules: {
         Row: {
           action_data: Json | null
           action_target: string
           action_type: string
+          actions: Json | null
+          age_group_filter: string[] | null
           condition_field: string
           condition_operator: string
           condition_type: string
           condition_value: string
           condition_window_days: number | null
+          conditions: Json | null
           created_at: string
           created_by: string
           description: string | null
@@ -2676,20 +2727,26 @@ export type Database = {
           is_active: boolean
           last_triggered_at: string | null
           name: string
+          position_filter: string[] | null
           priority: number
+          softball_format: string | null
           sport_type: string | null
           trigger_count: number
+          trigger_history: Json | null
           updated_at: string
         }
         Insert: {
           action_data?: Json | null
           action_target: string
           action_type: string
+          actions?: Json | null
+          age_group_filter?: string[] | null
           condition_field: string
           condition_operator: string
           condition_type: string
           condition_value: string
           condition_window_days?: number | null
+          conditions?: Json | null
           created_at?: string
           created_by: string
           description?: string | null
@@ -2697,20 +2754,26 @@ export type Database = {
           is_active?: boolean
           last_triggered_at?: string | null
           name: string
+          position_filter?: string[] | null
           priority?: number
+          softball_format?: string | null
           sport_type?: string | null
           trigger_count?: number
+          trigger_history?: Json | null
           updated_at?: string
         }
         Update: {
           action_data?: Json | null
           action_target?: string
           action_type?: string
+          actions?: Json | null
+          age_group_filter?: string[] | null
           condition_field?: string
           condition_operator?: string
           condition_type?: string
           condition_value?: string
           condition_window_days?: number | null
+          conditions?: Json | null
           created_at?: string
           created_by?: string
           description?: string | null
@@ -2718,9 +2781,12 @@ export type Database = {
           is_active?: boolean
           last_triggered_at?: string | null
           name?: string
+          position_filter?: string[] | null
           priority?: number
+          softball_format?: string | null
           sport_type?: string | null
           trigger_count?: number
+          trigger_history?: Json | null
           updated_at?: string
         }
         Relationships: []
