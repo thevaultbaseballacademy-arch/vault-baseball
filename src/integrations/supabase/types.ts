@@ -1284,6 +1284,36 @@ export type Database = {
           },
         ]
       }
+      coach_recommendations: {
+        Row: {
+          athlete_user_id: string
+          coach_user_id: string
+          created_at: string
+          id: string
+          is_attached_to_profile: boolean | null
+          recommendation_text: string
+          written_at: string
+        }
+        Insert: {
+          athlete_user_id: string
+          coach_user_id: string
+          created_at?: string
+          id?: string
+          is_attached_to_profile?: boolean | null
+          recommendation_text: string
+          written_at?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          coach_user_id?: string
+          created_at?: string
+          id?: string
+          is_attached_to_profile?: boolean | null
+          recommendation_text?: string
+          written_at?: string
+        }
+        Relationships: []
+      }
       coach_registration_requests: {
         Row: {
           coaching_experience: string | null
@@ -4009,74 +4039,128 @@ export type Database = {
         }
         Relationships: []
       }
+      recruiting_exports: {
+        Row: {
+          athlete_user_id: string
+          created_at: string
+          export_type: string
+          file_url: string | null
+          generated_at: string
+          id: string
+        }
+        Insert: {
+          athlete_user_id: string
+          created_at?: string
+          export_type: string
+          file_url?: string | null
+          generated_at?: string
+          id?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          created_at?: string
+          export_type?: string
+          file_url?: string | null
+          generated_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       recruiting_profiles: {
         Row: {
           academic_interests: string | null
           act_score: number | null
+          coach_recommendation_id: string | null
           commitment_status: string
           committed_at: string | null
           committed_school: string | null
           created_at: string
           division_target: string[] | null
+          eligibility_checklist: Json | null
           extracurriculars: string | null
           gpa: number | null
+          highlight_clip_ids: string[] | null
           highlight_video_url: string | null
           id: string
+          intended_major: string | null
+          last_exported_at: string | null
           ncaa_eligibility_center: boolean | null
           ncaa_id: string | null
           recruiting_notes: string | null
           references_contacts: Json | null
           sat_score: number | null
+          school_interest_list: Json | null
+          shareable_link: string | null
+          showcase_history: Json | null
           skills_video_url: string | null
           sport_type: string
           updated_at: string
           user_id: string
+          verified_stats: Json | null
           visibility: string
         }
         Insert: {
           academic_interests?: string | null
           act_score?: number | null
+          coach_recommendation_id?: string | null
           commitment_status?: string
           committed_at?: string | null
           committed_school?: string | null
           created_at?: string
           division_target?: string[] | null
+          eligibility_checklist?: Json | null
           extracurriculars?: string | null
           gpa?: number | null
+          highlight_clip_ids?: string[] | null
           highlight_video_url?: string | null
           id?: string
+          intended_major?: string | null
+          last_exported_at?: string | null
           ncaa_eligibility_center?: boolean | null
           ncaa_id?: string | null
           recruiting_notes?: string | null
           references_contacts?: Json | null
           sat_score?: number | null
+          school_interest_list?: Json | null
+          shareable_link?: string | null
+          showcase_history?: Json | null
           skills_video_url?: string | null
           sport_type?: string
           updated_at?: string
           user_id: string
+          verified_stats?: Json | null
           visibility?: string
         }
         Update: {
           academic_interests?: string | null
           act_score?: number | null
+          coach_recommendation_id?: string | null
           commitment_status?: string
           committed_at?: string | null
           committed_school?: string | null
           created_at?: string
           division_target?: string[] | null
+          eligibility_checklist?: Json | null
           extracurriculars?: string | null
           gpa?: number | null
+          highlight_clip_ids?: string[] | null
           highlight_video_url?: string | null
           id?: string
+          intended_major?: string | null
+          last_exported_at?: string | null
           ncaa_eligibility_center?: boolean | null
           ncaa_id?: string | null
           recruiting_notes?: string | null
           references_contacts?: Json | null
           sat_score?: number | null
+          school_interest_list?: Json | null
+          shareable_link?: string | null
+          showcase_history?: Json | null
           skills_video_url?: string | null
           sport_type?: string
           updated_at?: string
           user_id?: string
+          verified_stats?: Json | null
           visibility?: string
         }
         Relationships: []
