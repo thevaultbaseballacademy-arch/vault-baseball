@@ -169,9 +169,7 @@ const SoftballAnalytics = () => {
                             <span className="text-xs text-muted-foreground">{outcome.strengths_noted.join(", ")}</span>
                           </div>
                         )}
-                        {outcome.weaknesses_noted?.length > 0 && (
-                          <div>
-                            <span className="text-[10px] text-amber-500 font-display">WORK ON: </span>
+                            <span className="text-[10px] text-accent-foreground font-display">WORK ON: </span>
                             <span className="text-xs text-muted-foreground">{outcome.weaknesses_noted.join(", ")}</span>
                           </div>
                         )}
