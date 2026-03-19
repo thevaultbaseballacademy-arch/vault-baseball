@@ -140,6 +140,10 @@ import ParentProgress from "./pages/parent/ParentProgress";
 import ParentLessons from "./pages/parent/ParentLessons";
 import ParentRecruiting from "./pages/parent/ParentRecruiting";
 import ParentWellness from "./pages/parent/ParentWellness";
+import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
+import PitchLog from "./pages/workload/PitchLog";
+import ArmCare from "./pages/workload/ArmCare";
+import InjuryLog from "./pages/workload/InjuryLog";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
