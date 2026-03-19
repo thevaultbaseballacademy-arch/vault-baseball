@@ -3135,11 +3135,50 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_credit_usage: {
+        Row: {
+          credit_id: string
+          id: string
+          lesson_id: string | null
+          lesson_type: string
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          credit_id: string
+          id?: string
+          lesson_id?: string | null
+          lesson_type?: string
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          credit_id?: string
+          id?: string
+          lesson_id?: string | null
+          lesson_type?: string
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_credit_usage_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_credits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lesson_credits: {
         Row: {
           created_at: string
+          credit_type: string
           expires_at: string | null
+          granted_by: string | null
+          granted_reason: string | null
           id: string
+          last_used_at: string | null
           package_id: string | null
           purchased_at: string
           stripe_session_id: string | null
@@ -3149,8 +3188,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          credit_type?: string
           expires_at?: string | null
+          granted_by?: string | null
+          granted_reason?: string | null
           id?: string
+          last_used_at?: string | null
           package_id?: string | null
           purchased_at?: string
           stripe_session_id?: string | null
@@ -3160,8 +3203,12 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          credit_type?: string
           expires_at?: string | null
+          granted_by?: string | null
+          granted_reason?: string | null
           id?: string
+          last_used_at?: string | null
           package_id?: string | null
           purchased_at?: string
           stripe_session_id?: string | null
