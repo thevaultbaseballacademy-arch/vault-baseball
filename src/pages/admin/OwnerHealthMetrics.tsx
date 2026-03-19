@@ -178,7 +178,7 @@ const OwnerHealthMetrics = () => {
       const baseballBugs = 0;
 
       // 13. Parent Trust Score
-      const parentIds = new Set((parentRoles.data || []).map(p => p.user_id));
+      const parentIds = new Set((parentRoles.data || []).map(p => p.parent_user_id));
       const activeParentSessions = (parentLogins.data || []).filter(s => parentIds.has(s.user_id));
       const activeParents = new Set(activeParentSessions.map(s => s.user_id));
       const parentTrust = parentIds.size > 0 ? Math.round((activeParents.size / parentIds.size) * 100) : 0;
