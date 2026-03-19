@@ -7,6 +7,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import NavSportToggle from "@/components/NavSportToggle";
 
 
 const Navbar = () => {
