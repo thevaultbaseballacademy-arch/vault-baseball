@@ -144,6 +144,11 @@ import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
 import PitchLog from "./pages/workload/PitchLog";
 import ArmCare from "./pages/workload/ArmCare";
 import InjuryLog from "./pages/workload/InjuryLog";
+import TeamHub from "./pages/team/TeamHub";
+import TeamRoster from "./pages/team/TeamRoster";
+import TeamSchedule from "./pages/team/TeamSchedule";
+import TeamAnnouncements from "./pages/team/TeamAnnouncements";
+import TeamAnalytics from "./pages/team/TeamAnalytics";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
