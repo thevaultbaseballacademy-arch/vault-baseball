@@ -68,10 +68,10 @@ const OwnerContentQueue = () => {
 
   const statusColors: Record<string, string> = {
     draft: "bg-secondary text-muted-foreground",
-    pending: "bg-amber-500/10 text-amber-400",
-    approved: "bg-emerald-500/10 text-emerald-400",
+    pending: "bg-accent/20 text-accent-foreground",
+    approved: "bg-primary/10 text-primary",
     rejected: "bg-destructive/10 text-destructive",
-    revision_requested: "bg-blue-500/10 text-blue-400",
+    revision: "bg-secondary text-foreground",
   };
 
   return (
