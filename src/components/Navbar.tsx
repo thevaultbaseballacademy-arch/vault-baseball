@@ -7,6 +7,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import NavSportToggle from "@/components/NavSportToggle";
 
 
 const Navbar = () => {
@@ -238,6 +239,7 @@ const Navbar = () => {
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
               <div className="flex items-center gap-1">
+                <NavSportToggle />
                 <NotificationBell userId={user.id} />
                 {isOwner && (
                   <Button variant="ghost" size="sm" onClick={() => handleNavigate("/owner")} className="text-primary">
@@ -355,6 +357,9 @@ const Navbar = () => {
                   </Button>
                   {user ? (
                     <>
+                      <div className="flex justify-center py-2">
+                        <NavSportToggle />
+                      </div>
                       {isOwner && (
                         <Button variant="ghost" className="justify-center text-primary" onClick={() => handleNavigate("/owner")}>
                           <Crown className="w-4 h-4 mr-2" />
