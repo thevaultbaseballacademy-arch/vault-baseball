@@ -16,6 +16,9 @@ import { PlayerHomeworkChecklist } from "@/components/dashboard/PlayerHomeworkCh
 import { LessonFeedbackReport } from "@/components/dashboard/LessonFeedbackReport";
 import { AthleteDevScore } from "@/components/dashboard/AthleteDevScore";
 import DevelopmentIntelligence from "@/components/intelligence/DevelopmentIntelligence";
+import ActivationChecklist from "@/components/dashboard/ActivationChecklist";
+import UpsellCards from "@/components/dashboard/UpsellCards";
+import { useOnboardingActivation } from "@/hooks/useOnboardingActivation";
 import {
   LineChart,
   Line,
