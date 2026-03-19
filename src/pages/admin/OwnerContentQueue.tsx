@@ -83,7 +83,7 @@ const OwnerContentQueue = () => {
 
       {/* Status filter */}
       <div className="flex gap-1.5 flex-wrap">
-        {["pending", "draft", "approved", "rejected", "revision_requested", "all"].map(s => (
+        {["pending", "draft", "approved", "rejected", "revision", "all"].map(s => (
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
