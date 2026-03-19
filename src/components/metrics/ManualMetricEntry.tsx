@@ -63,7 +63,7 @@ export function ManualMetricEntry({ userId }: ManualMetricEntryProps) {
   const onSubmit = async (data: MetricFormData) => {
     await addMetric.mutateAsync({
       user_id: userId,
-      device_type: data.device_type,
+      device_type: data.device_type as DeviceType,
       metric_category: data.metric_category,
       recorded_at: data.recorded_at || new Date().toISOString(),
       pitch_type: data.pitch_type || null,
