@@ -404,6 +404,13 @@ const App = () => (
               <Route path="wellness" element={<ParentWellness />} />
             </Route>
 
+
+            {/* Workload & Health Management */}
+            <Route path="/workload" element={<TrialProtectedRoute><WorkloadDashboard /></TrialProtectedRoute>} />
+            <Route path="/workload/pitch-log" element={<TrialProtectedRoute><PitchLog /></TrialProtectedRoute>} />
+            <Route path="/workload/arm-care" element={<TrialProtectedRoute><ArmCare /></TrialProtectedRoute>} />
+            <Route path="/workload/injuries" element={<TrialProtectedRoute><InjuryLog /></TrialProtectedRoute>} />
+
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
             <Route path="/training" element={<ShortRedirect />} />
