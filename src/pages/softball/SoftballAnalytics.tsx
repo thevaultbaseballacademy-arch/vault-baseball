@@ -46,14 +46,12 @@ const SoftballAnalytics = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { navigate("/auth"); return; }
 
-      const [kpiRes, outcomeRes, skillRes] = await Promise.all([
-        supabase.from("athlete_kpis").select("kpi_name, kpi_category, kpi_value, kpi_unit, recorded_at")
-          .eq("user_id", session.user.id).order("recorded_at", { ascending: false }).limit(50),
-        supabase.from("lesson_outcomes").select("id, skill_category, strengths_noted, weaknesses_noted, created_at")
-          .eq("athlete_user_id", session.user.id).eq("sport_type", "softball").order("created_at", { ascending: false }).limit(20),
-        supabase.from("skill_progression").select("*")
-          .eq("user_id", session.user.id).eq("sport_type", "softball"),
-      ]);
+      const kpiRes = await supabase.from("athlete_kpis").select("kpi_name, kpi_category, kpi_value, kpi_unit, recorded_at")
+        .eq("user_id", session.user.id).order("recorded_at", { ascending: false }).limit(50);
+      const outcomeRes = await supabase.from("lesson_outcomes").select("id, skill_category, strengths_noted, weaknesses_noted, created_at")
+        .eq("athlete_user_id", session.user.id).eq("sport_type" as any, "softball").order("created_at", { ascending: false }).limit(20);
+      const skillRes = await supabase.from("skill_progression").select("*")
+        .eq("user_id", session.user.id).eq("sport_type" as any, "softball");
 
       if (kpiRes.data) setKpis(kpiRes.data as KpiEntry[]);
       if (outcomeRes.data) setOutcomes(outcomeRes.data as LessonOutcome[]);
