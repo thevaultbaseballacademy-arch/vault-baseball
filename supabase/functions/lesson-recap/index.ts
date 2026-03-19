@@ -29,6 +29,9 @@ serve(async (req) => {
 
     if (lessonErr || !lesson) throw new Error("Lesson not found");
 
+    const sportType = lesson.sport_type || "baseball";
+    const isSoftball = sportType === "softball";
+
     // Get athlete profile
     const { data: athleteProfile } = await supabase
       .from("profiles")
