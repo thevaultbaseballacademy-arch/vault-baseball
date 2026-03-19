@@ -92,9 +92,9 @@ const CoachCreate = () => {
 
   const statusIcon = (s: string) => {
     switch (s) {
-      case "approved": return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case "approved": return <CheckCircle className="w-4 h-4 text-primary" />;
       case "rejected": return <XCircle className="w-4 h-4 text-destructive" />;
-      case "pending": return <Send className="w-4 h-4 text-amber-500" />;
+      case "pending": return <Send className="w-4 h-4 text-accent-foreground" />;
       default: return <FileText className="w-4 h-4 text-muted-foreground" />;
     }
   };
