@@ -239,6 +239,7 @@ const Navbar = () => {
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             ) : user ? (
               <div className="flex items-center gap-1">
+                <NavSportToggle />
                 <NotificationBell userId={user.id} />
                 {isOwner && (
                   <Button variant="ghost" size="sm" onClick={() => handleNavigate("/owner")} className="text-primary">
