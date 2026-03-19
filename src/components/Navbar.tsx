@@ -360,6 +360,7 @@ const Navbar = () => {
                       <div className="flex justify-center py-2">
                         <NavSportToggle />
                       </div>
+                      {isOwner && (
                         <Button variant="ghost" className="justify-center text-primary" onClick={() => handleNavigate("/owner")}>
                           <Crown className="w-4 h-4 mr-2" />
                           Owner Command Center
