@@ -135,7 +135,7 @@ const OwnerContentQueue = () => {
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     onClick={() => updateStatus.mutate({ id: item.id, status: "approved" })}
-                    className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                    className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                     title="Approve"
                   >
                     <Check className="w-4 h-4" />
