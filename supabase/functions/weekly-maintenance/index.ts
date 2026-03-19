@@ -26,14 +26,21 @@ Deno.serve(async (req) => {
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
 
-  // Auth check: cron secret or admin JWT
+  // Auth check: cron (anon key + source:cron body), cron secret, or admin JWT
   const authHeader = req.headers.get("Authorization");
   const cronSecret = Deno.env.get("CRON_SECRET");
   let isAuthorized = false;
   let triggeredBy: string | null = null;
   let triggerType = "scheduled";
 
+  // Parse body for source field
+  let body: any = {};
+  try { body = await req.clone().json(); } catch { /* empty body OK */ }
+
   if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    isAuthorized = true;
+  } else if (body?.source === "cron" && authHeader === `Bearer ${anonKey}`) {
+    // Called by pg_cron with anon key
     isAuthorized = true;
   } else if (authHeader?.startsWith("Bearer ")) {
     const authClient = createClient(supabaseUrl, anonKey);
