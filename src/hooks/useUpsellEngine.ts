@@ -142,13 +142,13 @@ export const useUpsellEngine = (userId: string | undefined) => {
       .eq('user_id', userId)
       .in('offer_key', newOffers.map(o => o.offer_key));
 
-    const existingKeys = new Set((existing || []).map(e => e.offer_key));
+    const existingKeys = new Set((existing || []).map((e: any) => e.offer_key));
     const toInsert = newOffers
       .filter(o => !existingKeys.has(o.offer_key))
       .map(o => ({ ...o, user_id: userId }));
 
     if (toInsert.length > 0) {
-      await supabase.from('upsell_offers').insert(toInsert);
+      await supabase.from('upsell_offers').insert(toInsert as any);
       fetchOffers();
     }
   }, [userId, subscriptionTier, fetchOffers]);

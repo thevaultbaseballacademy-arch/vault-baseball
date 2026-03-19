@@ -105,6 +105,7 @@ const AthleteOnboarding = () => {
       }
 
       setSubmitted(true);
+      track('onboarding_complete', { position: form.position, level: form.current_level });
     } catch (err) {
       console.error(err);
       toast({ title: "Error", description: "Failed to submit. Please try again.", variant: "destructive" });
