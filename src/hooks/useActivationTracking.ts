@@ -24,11 +24,11 @@ export const useActivationTracking = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
 
-      await supabase.from('activation_events').insert({
+      await supabase.from('activation_events').insert([{
         user_id: session.user.id,
         event_type: eventType,
-        event_data: eventData,
-      });
+        event_data: eventData as any,
+      }]);
     } catch (err) {
       console.error('Activation tracking error:', err);
     }
