@@ -182,7 +182,7 @@ const CoachCreate = () => {
               <Input placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
               <Textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               <div className="grid grid-cols-2 gap-2">
-                <Select value={form.sport_type} onValueChange={(v) => setForm({ ...form, sport_type: v })}>
+                <Select value={form.sport_type} onValueChange={(v: string) => setForm({ ...form, sport_type: v as "baseball" | "softball" })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="baseball">Baseball</SelectItem>
