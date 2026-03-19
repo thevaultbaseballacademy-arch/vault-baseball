@@ -50,7 +50,7 @@ const OwnerContentQueue = () => {
       };
       if (status === "approved") updates.published_at = new Date().toISOString();
       if (status === "rejected") updates.rejection_note = note || null;
-      if (status === "revision_requested") updates.revision_note = note || null;
+      if (status === "revision") updates.revision_note = note || null;
 
       const { error } = await supabase.from("content_submissions").update(updates).eq("id", id);
       if (error) throw error;
