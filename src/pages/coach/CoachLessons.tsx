@@ -2,9 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Calendar, Video, FileText } from "lucide-react";
+import { Loader2, Calendar, Video, FileText, Download } from "lucide-react";
 import { format, isPast, isFuture } from "date-fns";
+import { toast } from "sonner";
 
 const CoachLessons = () => {
   const { data: user } = useQuery({
