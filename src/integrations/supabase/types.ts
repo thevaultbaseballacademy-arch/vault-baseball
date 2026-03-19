@@ -1856,6 +1856,54 @@ export type Database = {
         }
         Relationships: []
       }
+      development_recommendations: {
+        Row: {
+          approved_by: string | null
+          athlete_user_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          priority: string | null
+          reason: string | null
+          recommendation_type: string
+          resolved_at: string | null
+          source_outcome_ids: string[] | null
+          sport_type: string
+          status: string
+          title: string
+        }
+        Insert: {
+          approved_by?: string | null
+          athlete_user_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          priority?: string | null
+          reason?: string | null
+          recommendation_type: string
+          resolved_at?: string | null
+          source_outcome_ids?: string[] | null
+          sport_type?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          approved_by?: string | null
+          athlete_user_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          priority?: string | null
+          reason?: string | null
+          recommendation_type?: string
+          resolved_at?: string | null
+          source_outcome_ids?: string[] | null
+          sport_type?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       device_integrations: {
         Row: {
           access_token: string | null
@@ -2358,6 +2406,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lesson_outcomes: {
+        Row: {
+          athlete_user_id: string
+          coach_notes: string | null
+          coach_user_id: string
+          created_at: string
+          drills_assigned: string[] | null
+          feedback_id: string | null
+          id: string
+          injury_flags: string[] | null
+          kpi_updates: Json | null
+          lesson_id: string
+          session_number: number | null
+          skill_category: string
+          sport_type: string
+          strengths_noted: string[] | null
+          weaknesses_noted: string[] | null
+        }
+        Insert: {
+          athlete_user_id: string
+          coach_notes?: string | null
+          coach_user_id: string
+          created_at?: string
+          drills_assigned?: string[] | null
+          feedback_id?: string | null
+          id?: string
+          injury_flags?: string[] | null
+          kpi_updates?: Json | null
+          lesson_id: string
+          session_number?: number | null
+          skill_category: string
+          sport_type?: string
+          strengths_noted?: string[] | null
+          weaknesses_noted?: string[] | null
+        }
+        Update: {
+          athlete_user_id?: string
+          coach_notes?: string | null
+          coach_user_id?: string
+          created_at?: string
+          drills_assigned?: string[] | null
+          feedback_id?: string | null
+          id?: string
+          injury_flags?: string[] | null
+          kpi_updates?: Json | null
+          lesson_id?: string
+          session_number?: number | null
+          skill_category?: string
+          sport_type?: string
+          strengths_noted?: string[] | null
+          weaknesses_noted?: string[] | null
+        }
+        Relationships: []
       }
       lesson_packages: {
         Row: {
@@ -3223,6 +3325,51 @@ export type Database = {
           notes?: string | null
           recording_url?: string
           session_id?: string | null
+        }
+        Relationships: []
+      }
+      skill_progression: {
+        Row: {
+          athlete_user_id: string
+          created_at: string
+          current_score: number | null
+          id: string
+          last_session_at: string | null
+          previous_score: number | null
+          sessions_count: number | null
+          skill_category: string
+          skill_name: string
+          sport_type: string
+          trend: string | null
+          updated_at: string
+        }
+        Insert: {
+          athlete_user_id: string
+          created_at?: string
+          current_score?: number | null
+          id?: string
+          last_session_at?: string | null
+          previous_score?: number | null
+          sessions_count?: number | null
+          skill_category: string
+          skill_name: string
+          sport_type?: string
+          trend?: string | null
+          updated_at?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          created_at?: string
+          current_score?: number | null
+          id?: string
+          last_session_at?: string | null
+          previous_score?: number | null
+          sessions_count?: number | null
+          skill_category?: string
+          skill_name?: string
+          sport_type?: string
+          trend?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

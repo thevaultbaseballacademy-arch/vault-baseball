@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.eddie-ai]
 verify_jwt = false
+
+[functions.post-lesson-intelligence]
+verify_jwt = false
