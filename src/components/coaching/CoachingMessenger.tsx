@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Paperclip, ArrowLeft, Loader2 } from "lucide-react";
+import { Send, ArrowLeft, Loader2, Search, CheckCheck, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCoachingMessages, useConversationList } from "@/hooks/useCoachingMessages";
@@ -15,6 +15,7 @@ const CoachingMessenger = ({ userId, defaultPartnerId }: Props) => {
   const [activePartner, setActivePartner] = useState<string | null>(defaultPartnerId || null);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
   const { conversations, loading: convosLoading } = useConversationList(userId);
@@ -43,6 +44,12 @@ const CoachingMessenger = ({ userId, defaultPartnerId }: Props) => {
     }
   };
 
+  // Filter conversations by search
+  const filteredConversations = conversations.filter((c) =>
+    !searchQuery || c.partnerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Conversation list view
   if (!activePartner) {
     return (
@@ -51,19 +58,35 @@ const CoachingMessenger = ({ userId, defaultPartnerId }: Props) => {
           <h2 className="font-display text-lg text-foreground">MESSAGES</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Direct communication with your coach or athlete</p>
         </div>
+        {/* Search */}
+        <div className="p-3 border-b border-border">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name or keyword..."
+              className="pl-9"
+            />
+          </div>
+        </div>
         <ScrollArea className="flex-1">
           {convosLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             </div>
-          ) : conversations.length === 0 ? (
+          ) : filteredConversations.length === 0 ? (
             <div className="text-center py-12 px-4">
-              <p className="text-muted-foreground text-sm">No conversations yet.</p>
-              <p className="text-muted-foreground text-xs mt-1">Messages with your coach or athletes will appear here.</p>
+              <p className="text-muted-foreground text-sm">
+                {searchQuery ? "No conversations match your search." : "No conversations yet."}
+              </p>
+              {!searchQuery && (
+                <p className="text-muted-foreground text-xs mt-1">Messages with your coach or athletes will appear here.</p>
+              )}
             </div>
           ) : (
             <div className="divide-y divide-border">
-              {conversations.map((c) => (
+              {filteredConversations.map((c) => (
                 <button
                   key={c.partnerId}
                   onClick={() => setActivePartner(c.partnerId)}
@@ -139,9 +162,17 @@ const CoachingMessenger = ({ userId, defaultPartnerId }: Props) => {
                         📎 Attachment
                       </a>
                     )}
-                    <p className={`text-[10px] mt-1 ${isOwn ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
-                      {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
-                    </p>
+                    <div className={`flex items-center gap-1 mt-1 ${isOwn ? "justify-end" : ""}`}>
+                      <p className={`text-[10px] ${isOwn ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                        {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
+                      </p>
+                      {/* Read receipt for own messages */}
+                      {isOwn && (
+                        msg.is_read
+                          ? <CheckCheck className={`w-3 h-3 text-primary-foreground/80`} />
+                          : <Check className={`w-3 h-3 text-primary-foreground/40`} />
+                      )}
+                    </div>
                   </div>
                 </div>
               );
