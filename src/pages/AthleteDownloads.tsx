@@ -79,16 +79,20 @@ const AthleteDownloads = () => {
     },
   });
 
-  const { data: coachName } = useQuery({
-    queryKey: ["my-coach-name", user?.id],
+  const { data: coachData } = useQuery({
+    queryKey: ["my-coach-data", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data: assignment } = await supabase.from("coach_athlete_assignments").select("coach_user_id").eq("athlete_user_id", user!.id).eq("is_active", true).maybeSingle();
-      if (!assignment) return null;
-      const { data: p } = await supabase.rpc("get_public_profile", { target_user_id: assignment.coach_user_id });
-      return (p as any)?.[0]?.display_name || null;
+      const { data: assignments } = await supabase.from("coach_athlete_assignments").select("coach_user_id").eq("athlete_user_id", user!.id).eq("is_active", true);
+      if (!assignments?.length) return { name: null, map: new Map<string, string>() };
+      const coachIds = assignments.map(a => a.coach_user_id);
+      const { data: profiles } = await supabase.rpc("get_public_profiles_by_ids", { user_ids: coachIds });
+      const map = new Map((profiles || []).map((p: any) => [p.user_id, p.display_name]));
+      return { name: map.values().next().value || null, map };
     },
   });
+
+  const coachName = coachData?.name || null;
 
   const handleDevReport = async () => {
     setGenDev(true);
