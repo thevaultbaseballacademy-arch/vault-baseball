@@ -32,6 +32,13 @@ export interface LinkedAthleteData {
     lessons_missed: number;
     homework_completed: number;
     homework_total: number;
+    improvement_status: string | null;
+    readiness_score: number | null;
+    strengths_summary: string[] | null;
+    gaps_summary: string[] | null;
+    top_priorities: string[] | null;
+    consistency_score: number | null;
+    compliance_score: number | null;
   } | null;
   recent_kpis: Array<{
     kpi_name: string;
@@ -46,6 +53,7 @@ export interface LinkedAthleteData {
     strengths_observed: string | null;
     areas_for_improvement: string | null;
     ai_summary: string | null;
+    sport_type: string | null;
     created_at: string;
   }> | null;
   checkins: Array<{
@@ -54,13 +62,44 @@ export interface LinkedAthleteData {
     mood: number | null;
     training_completed: boolean | null;
     soreness_level: number | null;
+    sleep_hours: number | null;
   }> | null;
   recruiting: {
     commitment_status: string;
     committed_school: string | null;
     gpa: number | null;
     division_target: string[];
+    school_interest_list: any[] | null;
+    verified_stats: any[] | null;
+    eligibility_checklist: any[] | null;
+    shareable_link: string | null;
+    visibility: string | null;
+    sat_act_score: string | null;
+    intended_major: string | null;
   } | null;
+  workload: Array<{
+    record_date: string;
+    pitch_count: number;
+    throwing_count: number;
+    training_minutes: number;
+    recovery_status: string;
+    soreness_level: number;
+    readiness_score: number;
+    overuse_flag: boolean;
+    overuse_alert: string | null;
+    sleep_hours: number;
+  }> | null;
+  homework: {
+    assigned_this_week: number;
+    completed_this_week: number;
+    lifetime_assigned: number;
+    lifetime_completed: number;
+  } | null;
+  coach_recommendations: Array<{
+    recommendation_text: string;
+    written_at: string;
+    is_attached_to_profile: boolean;
+  }> | null;
 }
 
 export const useParentPortal = () => {
@@ -96,7 +135,6 @@ export const useParentPortal = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) return;
 
-    // Find athlete by email via profiles
     const { data: profileData } = await supabase
       .from("profiles")
       .select("user_id")
