@@ -4451,6 +4451,156 @@ export type Database = {
         }
         Relationships: []
       }
+      softball_pitch_types: {
+        Row: {
+          category: string
+          id: string
+          movement_direction: string | null
+          name: string
+          spin_type: string | null
+          velocity_benchmarks: Json | null
+        }
+        Insert: {
+          category: string
+          id?: string
+          movement_direction?: string | null
+          name: string
+          spin_type?: string | null
+          velocity_benchmarks?: Json | null
+        }
+        Update: {
+          category?: string
+          id?: string
+          movement_direction?: string | null
+          name?: string
+          spin_type?: string | null
+          velocity_benchmarks?: Json | null
+        }
+        Relationships: []
+      }
+      softball_pitching_sessions: {
+        Row: {
+          athlete_user_id: string
+          coach_user_id: string | null
+          created_at: string
+          id: string
+          injury_risk_level: string | null
+          mechanics_flags: string[] | null
+          notes: string | null
+          phase_scores: Json | null
+          pitches_thrown: Json | null
+          session_date: string
+          total_pitch_count: number | null
+          weekly_running_total: number | null
+        }
+        Insert: {
+          athlete_user_id: string
+          coach_user_id?: string | null
+          created_at?: string
+          id?: string
+          injury_risk_level?: string | null
+          mechanics_flags?: string[] | null
+          notes?: string | null
+          phase_scores?: Json | null
+          pitches_thrown?: Json | null
+          session_date?: string
+          total_pitch_count?: number | null
+          weekly_running_total?: number | null
+        }
+        Update: {
+          athlete_user_id?: string
+          coach_user_id?: string | null
+          created_at?: string
+          id?: string
+          injury_risk_level?: string | null
+          mechanics_flags?: string[] | null
+          notes?: string | null
+          phase_scores?: Json | null
+          pitches_thrown?: Json | null
+          session_date?: string
+          total_pitch_count?: number | null
+          weekly_running_total?: number | null
+        }
+        Relationships: []
+      }
+      softball_positions: {
+        Row: {
+          abbreviation: string
+          fastpitch_relevant: boolean | null
+          id: string
+          name: string
+          slowpitch_relevant: boolean | null
+          sport_type: string
+        }
+        Insert: {
+          abbreviation: string
+          fastpitch_relevant?: boolean | null
+          id?: string
+          name: string
+          slowpitch_relevant?: boolean | null
+          sport_type?: string
+        }
+        Update: {
+          abbreviation?: string
+          fastpitch_relevant?: boolean | null
+          id?: string
+          name?: string
+          slowpitch_relevant?: boolean | null
+          sport_type?: string
+        }
+        Relationships: []
+      }
+      softball_slap_sessions: {
+        Row: {
+          athlete_user_id: string
+          attempts_total: number | null
+          coach_user_id: string | null
+          created_at: string
+          drills_assigned: string[] | null
+          errors_observed: string[] | null
+          footwork_score: number | null
+          id: string
+          notes: string | null
+          placement_accuracy: number | null
+          session_date: string
+          slap_type: string
+          success_rate: number | null
+          timing_score: number | null
+        }
+        Insert: {
+          athlete_user_id: string
+          attempts_total?: number | null
+          coach_user_id?: string | null
+          created_at?: string
+          drills_assigned?: string[] | null
+          errors_observed?: string[] | null
+          footwork_score?: number | null
+          id?: string
+          notes?: string | null
+          placement_accuracy?: number | null
+          session_date?: string
+          slap_type: string
+          success_rate?: number | null
+          timing_score?: number | null
+        }
+        Update: {
+          athlete_user_id?: string
+          attempts_total?: number | null
+          coach_user_id?: string | null
+          created_at?: string
+          drills_assigned?: string[] | null
+          errors_observed?: string[] | null
+          footwork_score?: number | null
+          id?: string
+          notes?: string | null
+          placement_accuracy?: number | null
+          session_date?: string
+          slap_type?: string
+          success_rate?: number | null
+          timing_score?: number | null
+        }
+        Relationships: []
+      }
       team_announcements: {
         Row: {
           author_user_id: string
