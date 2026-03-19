@@ -103,6 +103,12 @@ import SoftballDevelopment from "./pages/SoftballDevelopment";
 import SoftballLessonBooking from "./pages/softball/SoftballLessonBooking";
 import SoftballCoaches from "./pages/softball/SoftballCoaches";
 import SoftballLessonNotes from "./pages/softball/SoftballLessonNotes";
+import SoftballCourses from "./pages/softball/SoftballCourses";
+import SoftballProfile from "./pages/softball/SoftballProfile";
+import SoftballPitching from "./pages/softball/SoftballPitching";
+import SoftballHitting from "./pages/softball/SoftballHitting";
+import SoftballFielding from "./pages/softball/SoftballFielding";
+import SoftballAnalytics from "./pages/softball/SoftballAnalytics";
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
@@ -268,6 +274,12 @@ const App = () => (
             <Route path="/softball/lessons/booking" element={<SoftballLessonBooking />} />
             <Route path="/softball/lessons/coaches" element={<SoftballCoaches />} />
             <Route path="/softball/lessons/notes" element={<SoftballLessonNotes />} />
+            <Route path="/softball/courses" element={<SoftballCourses />} />
+            <Route path="/softball/profile" element={<SoftballProfile />} />
+            <Route path="/softball/pitching" element={<SoftballPitching />} />
+            <Route path="/softball/hitting" element={<SoftballHitting />} />
+            <Route path="/softball/fielding" element={<SoftballFielding />} />
+            <Route path="/softball/analytics" element={<SoftballAnalytics />} />
             
             
             {/* Short URL redirects for social sharing */}
