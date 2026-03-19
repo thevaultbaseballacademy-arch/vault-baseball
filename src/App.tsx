@@ -128,6 +128,7 @@ import SoftballPitching from "./pages/softball/SoftballPitching";
 import SoftballHitting from "./pages/softball/SoftballHitting";
 import SoftballFielding from "./pages/softball/SoftballFielding";
 import SoftballAnalytics from "./pages/softball/SoftballAnalytics";
+import SoftballPositionTracks from "./pages/softball/SoftballPositionTracks";
 import RecruitingHub from "./pages/recruiting/RecruitingHub";
 import RecruitingProfilePage from "./pages/recruiting/RecruitingProfile";
 import RecruitingShowcases from "./pages/recruiting/RecruitingShowcases";
