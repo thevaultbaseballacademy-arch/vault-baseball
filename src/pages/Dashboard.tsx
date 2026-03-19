@@ -427,6 +427,8 @@ const Dashboard = () => {
             {/* Sidebar - Live Activity Feed */}
             <div className="lg:col-span-1 space-y-6">
               <div className="sticky top-24 space-y-6">
+                {user && <ActivationChecklist userId={user.id} />}
+                {user && <UpsellCards userId={user.id} />}
                 {user && <DevelopmentIntelligence userId={user.id} />}
                 {user && <AthleteDevScore userId={user.id} />}
                 {user && <SelectCoachWidget userId={user.id} />}
