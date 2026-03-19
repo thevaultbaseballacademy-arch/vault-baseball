@@ -146,7 +146,7 @@ export function useBulkAddMetrics() {
       }));
       const { data, error } = await supabase
         .from('device_metrics')
-        .insert(insertData)
+        .insert(insertData as any)
         .select();
       
       if (error) throw error;
