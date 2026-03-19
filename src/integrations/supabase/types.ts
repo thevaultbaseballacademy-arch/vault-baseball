@@ -5231,6 +5231,66 @@ export type Database = {
         }
         Relationships: []
       }
+      workload_records: {
+        Row: {
+          athlete_user_id: string
+          created_at: string
+          drill_sets_completed: number | null
+          id: string
+          lesson_minutes: number | null
+          overuse_alert: string | null
+          overuse_flag: boolean | null
+          pitch_count: number | null
+          readiness_score: number | null
+          record_date: string
+          recovery_status: string | null
+          sleep_hours: number | null
+          soreness_level: number | null
+          sport_type: string
+          throwing_count: number | null
+          training_minutes: number | null
+          updated_at: string
+        }
+        Insert: {
+          athlete_user_id: string
+          created_at?: string
+          drill_sets_completed?: number | null
+          id?: string
+          lesson_minutes?: number | null
+          overuse_alert?: string | null
+          overuse_flag?: boolean | null
+          pitch_count?: number | null
+          readiness_score?: number | null
+          record_date?: string
+          recovery_status?: string | null
+          sleep_hours?: number | null
+          soreness_level?: number | null
+          sport_type?: string
+          throwing_count?: number | null
+          training_minutes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          created_at?: string
+          drill_sets_completed?: number | null
+          id?: string
+          lesson_minutes?: number | null
+          overuse_alert?: string | null
+          overuse_flag?: boolean | null
+          pitch_count?: number | null
+          readiness_score?: number | null
+          record_date?: string
+          recovery_status?: string | null
+          sleep_hours?: number | null
+          soreness_level?: number | null
+          sport_type?: string
+          throwing_count?: number | null
+          training_minutes?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       workload_rules: {
         Row: {
           age_max: number
@@ -5270,6 +5330,48 @@ export type Database = {
           notes?: string | null
           required_rest_days_after_high?: number
           sport_type?: string
+        }
+        Relationships: []
+      }
+      workload_thresholds: {
+        Row: {
+          age_group: string
+          created_at: string
+          id: string
+          max_pitches_per_day: number | null
+          max_pitches_per_week: number | null
+          max_training_minutes_per_week: number | null
+          owner_configurable: boolean | null
+          position: string | null
+          required_rest_days_after: Json | null
+          sport_type: string
+          updated_at: string
+        }
+        Insert: {
+          age_group: string
+          created_at?: string
+          id?: string
+          max_pitches_per_day?: number | null
+          max_pitches_per_week?: number | null
+          max_training_minutes_per_week?: number | null
+          owner_configurable?: boolean | null
+          position?: string | null
+          required_rest_days_after?: Json | null
+          sport_type?: string
+          updated_at?: string
+        }
+        Update: {
+          age_group?: string
+          created_at?: string
+          id?: string
+          max_pitches_per_day?: number | null
+          max_pitches_per_week?: number | null
+          max_training_minutes_per_week?: number | null
+          owner_configurable?: boolean | null
+          position?: string | null
+          required_rest_days_after?: Json | null
+          sport_type?: string
+          updated_at?: string
         }
         Relationships: []
       }
