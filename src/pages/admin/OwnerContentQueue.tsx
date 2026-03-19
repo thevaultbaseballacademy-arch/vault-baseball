@@ -147,9 +147,9 @@ const OwnerContentQueue = () => {
                   >
                     <X className="w-4 h-4" />
                   </button>
-                  <button
+                   <button
                     onClick={() => setSelectedId(selectedId === `rev-${item.id}` ? null : `rev-${item.id}`)}
-                    className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                    className="p-2 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors"
                     title="Request revision"
                   >
                     <RotateCcw className="w-4 h-4" />
