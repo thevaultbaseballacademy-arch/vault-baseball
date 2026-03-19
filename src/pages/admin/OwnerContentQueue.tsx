@@ -50,7 +50,7 @@ const OwnerContentQueue = () => {
       };
       if (status === "approved") updates.published_at = new Date().toISOString();
       if (status === "rejected") updates.rejection_note = note || null;
-      if (status === "revision_requested") updates.revision_note = note || null;
+      if (status === "revision") updates.revision_note = note || null;
 
       const { error } = await supabase.from("content_submissions").update(updates).eq("id", id);
       if (error) throw error;
@@ -68,10 +68,10 @@ const OwnerContentQueue = () => {
 
   const statusColors: Record<string, string> = {
     draft: "bg-secondary text-muted-foreground",
-    pending: "bg-amber-500/10 text-amber-400",
-    approved: "bg-emerald-500/10 text-emerald-400",
+    pending: "bg-accent/20 text-accent-foreground",
+    approved: "bg-primary/10 text-primary",
     rejected: "bg-destructive/10 text-destructive",
-    revision_requested: "bg-blue-500/10 text-blue-400",
+    revision: "bg-secondary text-foreground",
   };
 
   return (
@@ -83,7 +83,7 @@ const OwnerContentQueue = () => {
 
       {/* Status filter */}
       <div className="flex gap-1.5 flex-wrap">
-        {["pending", "draft", "approved", "rejected", "revision_requested", "all"].map(s => (
+        {["pending", "draft", "approved", "rejected", "revision", "all"].map(s => (
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
@@ -126,7 +126,7 @@ const OwnerContentQueue = () => {
                   <p className="text-xs text-destructive mt-2 italic">Rejection: {item.rejection_note}</p>
                 )}
                 {item.revision_note && (
-                  <p className="text-xs text-blue-400 mt-2 italic">Revision note: {item.revision_note}</p>
+                  <p className="text-xs text-muted-foreground mt-2 italic">Revision note: {item.revision_note}</p>
                 )}
               </div>
 
@@ -135,7 +135,7 @@ const OwnerContentQueue = () => {
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     onClick={() => updateStatus.mutate({ id: item.id, status: "approved" })}
-                    className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                    className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                     title="Approve"
                   >
                     <Check className="w-4 h-4" />
@@ -147,9 +147,9 @@ const OwnerContentQueue = () => {
                   >
                     <X className="w-4 h-4" />
                   </button>
-                  <button
+                   <button
                     onClick={() => setSelectedId(selectedId === `rev-${item.id}` ? null : `rev-${item.id}`)}
-                    className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                    className="p-2 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors"
                     title="Request revision"
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -171,7 +171,7 @@ const OwnerContentQueue = () => {
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => {
-                      const status = selectedId?.startsWith("rev-") ? "revision_requested" : "rejected";
+                      const status = selectedId?.startsWith("rev-") ? "revision" : "rejected";
                       updateStatus.mutate({ id: item.id, status, note: actionNote });
                     }}
                     className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground"
