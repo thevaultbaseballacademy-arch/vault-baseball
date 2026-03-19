@@ -8,6 +8,7 @@ import { SportProvider } from "@/contexts/SportContext";
 import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
 import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
+import RoleGuard from "@/components/RoleGuard";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
