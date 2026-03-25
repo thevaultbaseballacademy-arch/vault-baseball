@@ -6596,6 +6596,9 @@ export type Database = {
         | "Catcher"
         | "Infield"
         | "Outfield"
+        | "Softball Hitting Foundations"
+        | "Softball Hitting Performance"
+        | "Softball Slap Specialist"
       app_role: "admin" | "coach" | "athlete"
       certification_status: "active" | "expired" | "revoked"
       certification_type:
@@ -6609,6 +6612,9 @@ export type Database = {
         | "softball_pitching_specialist"
         | "softball_hitting_specialist"
         | "softball_defense_specialist"
+        | "softball_hitting_foundations"
+        | "softball_hitting_performance"
+        | "softball_slap_specialist"
       coach_role: "Coach" | "Director" | "OrgAdmin" | "VAULTHQ"
       coach_status: "Active" | "Suspended"
       device_type:
@@ -6751,6 +6757,9 @@ export const Constants = {
         "Catcher",
         "Infield",
         "Outfield",
+        "Softball Hitting Foundations",
+        "Softball Hitting Performance",
+        "Softball Slap Specialist",
       ],
       app_role: ["admin", "coach", "athlete"],
       certification_status: ["active", "expired", "revoked"],
@@ -6765,6 +6774,9 @@ export const Constants = {
         "softball_pitching_specialist",
         "softball_hitting_specialist",
         "softball_defense_specialist",
+        "softball_hitting_foundations",
+        "softball_hitting_performance",
+        "softball_slap_specialist",
       ],
       coach_role: ["Coach", "Director", "OrgAdmin", "VAULTHQ"],
       coach_status: ["Active", "Suspended"],
