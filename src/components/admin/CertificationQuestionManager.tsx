@@ -92,7 +92,7 @@ const CertificationQuestionManager = () => {
         const { error } = await supabase
           .from('certification_questions')
           .update({
-            certification_type: data.certification_type,
+            certification_type: data.certification_type as any,
             section: data.section,
             question_text: data.question_text,
             options: JSON.stringify(data.options),
@@ -101,7 +101,7 @@ const CertificationQuestionManager = () => {
             is_scenario: data.is_scenario,
             display_order: data.display_order,
             is_active: data.is_active,
-          })
+          } as any)
           .eq('id', id);
         if (error) throw error;
       } else {
