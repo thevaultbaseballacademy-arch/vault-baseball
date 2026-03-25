@@ -356,9 +356,15 @@ const Certifications = () => {
     );
   }
 
-  const requiredCerts = definitions.filter(d => d.is_required);
-  const advancedCerts = definitions.filter(d => !d.is_required && d.certification_type === 'performance');
-  const specialistCerts = definitions.filter(d => d.certification_type.includes('specialist'));
+  // Baseball certifications
+  const baseballRequired = definitions.filter(d => d.is_required && !d.certification_type.startsWith('softball'));
+  const baseballAdvanced = definitions.filter(d => !d.is_required && d.certification_type === 'performance');
+  const baseballSpecialists = definitions.filter(d => d.certification_type.includes('specialist') && !d.certification_type.startsWith('softball'));
+  
+  // Softball certifications
+  const softballRequired = definitions.filter(d => d.is_required && d.certification_type.startsWith('softball'));
+  const softballAdvanced = definitions.filter(d => !d.is_required && d.certification_type === 'softball_performance');
+  const softballSpecialists = definitions.filter(d => d.certification_type.startsWith('softball') && d.certification_type.includes('specialist'));
 
   return (
     <div className="min-h-screen bg-background">
