@@ -134,7 +134,7 @@ export const useCertificationQuestions = (certType: CertificationType | null) =>
       const { data, error } = await supabase
         .from('certification_questions')
         .select('*')
-        .eq('certification_type', certType)
+        .eq('certification_type', certType as any)
         .eq('is_active', true)
         .order('display_order');
 
