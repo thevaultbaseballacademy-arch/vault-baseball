@@ -10,43 +10,162 @@ export const softballCourseContent: Record<string, CourseContent> = {
   "softball-org-manual": {
     courseId: "softball-org-manual",
     modules: [
+      // SECTION 1 — THE VAULT™ SOFTBALL PHILOSOPHY
+      {
+        id: "som-exec",
+        title: "Executive Introduction",
+        description: "Why softball organizations struggle — and how VAULT™ corrects it",
+        lessons: [
+          { id: "som-0-1", title: "The Alignment Problem", description: "Softball orgs don't struggle from lack of effort — they struggle from misalignment and misunderstanding of the game's demands.", duration: "10 min", videoUrl: "", isFree: true },
+          { id: "som-0-2", title: "What VAULT™ Softball Solves", description: "How VAULT™ aligns coaches, protects athletes, builds sustainable performance, and scales without losing identity.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "som-0-3", title: "The Pitcher-Dominated Reality", description: "Softball is a high-speed, pitcher-dominated game. Your system must reflect that reality.", duration: "8 min", videoUrl: "", isFree: true },
+        ],
+      },
       {
         id: "som-philosophy",
-        title: "Pitcher-Centric Game Model",
-        description: "Understanding how pitching controls the entire game in softball",
+        title: "Section 1: The VAULT™ Softball Philosophy",
+        description: "Development must be intentional, measurable, and sustainable",
         lessons: [
-          { id: "som-1-1", title: "The Pitcher-Centric Philosophy", description: "Why pitching dominance defines the softball game model and organizational strategy.", duration: "12 min", videoUrl: "", isFree: true },
-          { id: "som-1-2", title: "Pitcher Workload Dominance Model", description: "Managing your ace across a season with structured rest, volume caps, and secondary options.", duration: "14 min", videoUrl: "", isFree: true },
-          { id: "som-1-3", title: "Building Around the Circle", description: "How defense, offense, and baserunning align around your pitching staff.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "som-1-1", title: "The Core Principle", description: "Development must be intentional, measurable, and sustainable. Every decision reflects this.", duration: "10 min", videoUrl: "", isFree: true },
+          { id: "som-1-2", title: "What Makes Softball Different", description: "Pitching controls outcomes more heavily, reaction windows are shorter, offensive strategy includes short game and slapping, and pitchers throw more frequently.", duration: "14 min", videoUrl: "", isFree: true },
+          { id: "som-1-3", title: "Faster Decisions, Higher Repetition", description: "Softball requires faster decisions, higher repetition, greater workload management, and more emphasis on skill transfer.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 2 — THE VAULT™ 5 PILLARS (SOFTBALL APPLICATION)
       {
-        id: "som-shortgame",
-        title: "Short-Game Philosophy",
-        description: "Why the short game separates elite softball programs",
+        id: "som-pillars",
+        title: "Section 2: The VAULT™ 5 Pillars — Softball Application",
+        description: "The language of your organization: Velocity, Athleticism, Utility, Longevity, Transfer",
         lessons: [
-          { id: "som-2-1", title: "Short-Game as Identity", description: "Building an organizational identity around bunting, slapping, and pressure offense.", duration: "12 min", videoUrl: "", isFree: false },
-          { id: "som-2-2", title: "Situational Offense Framework", description: "Defining when to bunt, slap, hit-and-run, and play for runs vs. big innings.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "som-2-1", title: "Velocity Pillar", description: "Exit velocity (hitting), pitch velocity + spin (pitching), and throwing efficiency.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "som-2-2", title: "Athleticism Pillar", description: "Speed, first-step reaction, agility and deceleration.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "som-2-3", title: "Utility Pillar", description: "Multi-position development, role adaptability, and defensive versatility.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "som-2-4", title: "Longevity Pillar (CRITICAL)", description: "Pitch workload management, arm care systems, and recovery compliance — the most important pillar in softball.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "som-2-5", title: "Transfer Pillar", description: "Decision-making speed, game IQ, and pressure execution.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 3 — ORGANIZATIONAL STRUCTURE
       {
-        id: "som-lineup",
-        title: "Lineup Strategy",
-        description: "Constructing lineups that balance slap, power, and speed",
+        id: "som-org-structure",
+        title: "Section 3: Organizational Structure",
+        description: "Roles, responsibilities, and non-negotiable rules",
         lessons: [
-          { id: "som-3-1", title: "Slap / Power / Speed Mix", description: "How to build a lineup that creates constant pressure through varied offensive weapons.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "som-3-2", title: "DP/Flex Strategy & Rules", description: "Understanding and implementing DP/Flex substitution rules for maximum roster flexibility.", duration: "12 min", videoUrl: "", isFree: false },
-          { id: "som-3-3", title: "In-Game Adjustments", description: "Reading the opposing pitcher and making lineup adjustments mid-game.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "som-3-1", title: "Ownership & Leadership", description: "Adopt VAULT™ as standard, enforce long-term development, protect athletes over outcomes.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "som-3-2", title: "Director of Softball Development", description: "Manage pitcher workload across all teams, ensure system alignment, monitor KPIs and injury risk, oversee certifications.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "som-3-3", title: "Coach Responsibilities", description: "Execute VAULT™ daily, track workload and performance, follow system rules. NON-NEGOTIABLE: No coach overrides pitcher workload rules.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 4 — DEVELOPMENT PATHWAYS
       {
-        id: "som-alignment",
-        title: "Organizational Alignment",
-        description: "Building consistent standards across your softball program",
+        id: "som-pathways",
+        title: "Section 4: Development Pathways",
+        description: "Youth → Academy → Elite progression with age-appropriate focus",
         lessons: [
-          { id: "som-4-1", title: "VAULT Softball Standards", description: "Core principles every coach and athlete must follow for program alignment.", duration: "10 min", videoUrl: "", isFree: false },
-          { id: "som-4-2", title: "Long-Term Development Path", description: "Age-appropriate development from 10U through college with consistent philosophy.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "som-4-3", title: "Coach Accountability Framework", description: "How coaches are evaluated, developed, and held accountable to organizational standards.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "som-4-1", title: "Youth Pathway (Ages 8–12)", description: "Movement quality, basic mechanics, FUN + confidence. No heavy pitching volume, no specialization pressure.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "som-4-2", title: "Academy Pathway (Ages 13–17)", description: "Pitching mechanics, strength & power, skill refinement. Monitor pitcher usage closely, introduce structured workloads.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "som-4-3", title: "Elite Pathway (18+)", description: "Performance optimization, role clarity, recovery dominance. Elite softball is about availability + execution.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 5 — PITCHER-CENTRIC MODEL
+      {
+        id: "som-pitcher-model",
+        title: "Section 5: Pitcher-Centric Model",
+        description: "Softball organizations must be built around pitching — the core difference",
+        lessons: [
+          { id: "som-5-1", title: "Why Pitching Controls Everything", description: "Pitchers control pace, outcomes, and face the highest injury risk. Your org must reflect this.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "som-5-2", title: "Pitching Management Rules", description: "No consecutive high-intent days. Pitch count ≠ workload — track ALL throws. Tournament play must be monitored.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "som-5-3", title: "Organizational Pitching Requirements", description: "Every team must log pitching workload, follow VAULT™ Arm Health system, and report recovery status.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 6 — OFFENSIVE PHILOSOPHY
+      {
+        id: "som-offense",
+        title: "Section 6: Offensive Philosophy",
+        description: "Speed-driven, pressure-driven, situational. The goal is pressure and advancement.",
+        lessons: [
+          { id: "som-6-1", title: "Softball Offensive Identity", description: "Softball offense is speed-driven, pressure-driven, and situational. The goal is not hits — the goal is pressure and advancement.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "som-6-2", title: "Core Offensive Components", description: "Power hitting, slap hitting, bunting system, and situational execution working together.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 7 — DEFENSIVE PHILOSOPHY
+      {
+        id: "som-defense",
+        title: "Section 7: Defensive Philosophy",
+        description: "Fast, efficient, reliable defense with softball-specific adjustments",
+        lessons: [
+          { id: "som-7-1", title: "Infield Defensive Principles", description: "Quick release, decision speed, and accuracy. Softball infielders face shorter reaction windows.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "som-7-2", title: "Outfield Defensive Principles", description: "First-step reads, route efficiency, and throw alignment for softball outfielders.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 8 — STRENGTH & CONDITIONING
+      {
+        id: "som-strength",
+        title: "Section 8: Strength & Conditioning",
+        description: "Strength must enhance performance, not fatigue athletes",
+        lessons: [
+          { id: "som-8-1", title: "Strength for Softball", description: "Lower body force, rotational power, deceleration, and core stability — what matters for softball athletes.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "som-8-2", title: "The Performance Rule", description: "Strength must enhance performance, not fatigue athletes. Programming with purpose.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 9 — ARM HEALTH & WORKLOAD
+      {
+        id: "som-armhealth",
+        title: "Section 9: Arm Health & Workload System",
+        description: "NON-NEGOTIABLE: If recovery declines → workload decreases",
+        lessons: [
+          { id: "som-9-1", title: "Required Tracking Standards", description: "Throw volume, intent level, and recovery compliance — every throw counts.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "som-9-2", title: "Red Flags & Response Protocol", description: "Loss of command, soreness, decreased velocity, fatigue patterns — how to identify and respond.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "som-9-3", title: "The Recovery Rule", description: "If recovery declines → workload decreases. No exceptions, no overrides.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 10 — KPIs
+      {
+        id: "som-kpis",
+        title: "Section 10: KPIs — Organizational Health",
+        description: "Availability %, workload compliance, velocity stability, decision-making, injury incidence",
+        lessons: [
+          { id: "som-10-1", title: "Primary Softball KPIs", description: "Availability %, pitcher workload compliance, velocity stability, decision-making success, and injury incidence.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "som-10-2", title: "Tracking & Reporting Standards", description: "How to measure, track, and report organizational health metrics consistently.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 11 — COACH ALIGNMENT & CERTIFICATION
+      {
+        id: "som-certification",
+        title: "Section 11: Coach Alignment & Certification",
+        description: "Expired certification = restricted access. Non-compliance = removal.",
+        lessons: [
+          { id: "som-11-1", title: "Certification Requirements", description: "All coaches must complete VAULT™ Certification — Foundations, Performance, and position-specific levels.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "som-11-2", title: "Enforcement & Accountability", description: "Expired certification = restricted access. Non-compliance = removal from system. No exceptions.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 12 — PARENT COMMUNICATION
+      {
+        id: "som-parents",
+        title: "Section 12: Parent Communication",
+        description: "Clear communication reduces conflict",
+        lessons: [
+          { id: "som-12-1", title: "Parent Education Framework", description: "Parents must understand: long-term development > short-term wins. Pitcher protection is critical. Workload rules are enforced.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "som-12-2", title: "Communication Systems", description: "Clear, consistent communication protocols that reduce conflict and build trust.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 13 — SCALABILITY & GROWTH
+      {
+        id: "som-scale",
+        title: "Section 13: Scalability & Growth",
+        description: "Growth without systems creates failure. VAULT™ ensures controlled growth.",
+        lessons: [
+          { id: "som-13-1", title: "Multi-Team & Multi-Location Alignment", description: "VAULT™ allows multi-team alignment, multi-location growth, and consistent standards across your organization.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "som-13-2", title: "Controlled Growth Model", description: "Growth without systems creates failure. VAULT™ ensures controlled, sustainable growth.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 14 — DECISION-MAKING MODEL + FINAL STATEMENT
+      {
+        id: "som-decisions",
+        title: "Section 14: Decision-Making Model",
+        description: "Every decision must align with the 5 pillars, protect athlete health, and maintain system integrity",
+        lessons: [
+          { id: "som-14-1", title: "The 3-Question Decision Filter", description: "Does it align with the 5 pillars? Does it protect long-term athlete health? Does it maintain system integrity? If not → it is rejected.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "som-14-2", title: "Building Elite Softball Organizations", description: "Elite softball organizations are built on structure, discipline, and protection of athletes. VAULT™ delivers alignment, accountability, and sustainability.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
     ],
