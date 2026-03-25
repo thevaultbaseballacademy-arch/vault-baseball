@@ -1,10 +1,17 @@
 // Stripe price IDs for certification purchases
-export const CERTIFICATION_PRICES = {
+export const CERTIFICATION_PRICES: Record<string, string | null> = {
+  // Baseball certifications
   foundations: null, // Free - included
   performance: 'price_1SkSfyPhXS410TO5oO4XZv3P',
   catcher_specialist: 'price_1SkSg0PhXS410TO5cbeWFnRu',
   infield_specialist: 'price_1SkSg1PhXS410TO5BpfCyUhH',
   outfield_specialist: 'price_1SkSg2PhXS410TO5KaFDaZpo',
+  // Softball certifications (Stripe price IDs to be configured)
+  softball_foundations: null, // Free - included
+  softball_performance: null, // Will be configured when Stripe product is created
+  softball_pitching_specialist: null,
+  softball_hitting_specialist: null,
+  softball_defense_specialist: null,
 } as const;
 
 export const CERTIFICATION_PRODUCT_IDS = {
@@ -14,7 +21,17 @@ export const CERTIFICATION_PRODUCT_IDS = {
   outfield_specialist: 'prod_ThsQi0ZOt2xxPJ',
 } as const;
 
-export type CertificationType = 'foundations' | 'performance' | 'catcher_specialist' | 'infield_specialist' | 'outfield_specialist';
+export type CertificationType = 
+  | 'foundations' 
+  | 'performance' 
+  | 'catcher_specialist' 
+  | 'infield_specialist' 
+  | 'outfield_specialist'
+  | 'softball_foundations'
+  | 'softball_performance'
+  | 'softball_pitching_specialist'
+  | 'softball_hitting_specialist'
+  | 'softball_defense_specialist';
 
 export const getCertificationDisplayName = (type: CertificationType): string => {
   const names: Record<CertificationType, string> = {
@@ -23,6 +40,11 @@ export const getCertificationDisplayName = (type: CertificationType): string => 
     catcher_specialist: 'Catcher Specialist',
     infield_specialist: 'Infield Specialist',
     outfield_specialist: 'Outfield Specialist',
+    softball_foundations: 'VAULT™ Softball Foundations',
+    softball_performance: 'VAULT™ Softball Performance',
+    softball_pitching_specialist: 'Softball Pitching Specialist',
+    softball_hitting_specialist: 'Softball Hitting Specialist',
+    softball_defense_specialist: 'Softball Defense Specialist',
   };
   return names[type];
 };
@@ -34,6 +56,21 @@ export const getCertificationPrice = (type: CertificationType): number => {
     catcher_specialist: 1500,
     infield_specialist: 1500,
     outfield_specialist: 1500,
+    softball_foundations: 0,
+    softball_performance: 2500,
+    softball_pitching_specialist: 2500,  // HIGH VALUE - most coaches don't understand windmill
+    softball_hitting_specialist: 1500,
+    softball_defense_specialist: 1500,
   };
   return prices[type];
+};
+
+// Helper to determine if a certification is softball-specific
+export const isSoftballCertification = (type: CertificationType): boolean => {
+  return type.startsWith('softball_');
+};
+
+// Helper to determine if a certification is baseball-specific
+export const isBaseballCertification = (type: CertificationType): boolean => {
+  return !type.startsWith('softball_');
 };
