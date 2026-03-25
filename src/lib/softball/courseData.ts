@@ -172,80 +172,225 @@ export const softballCourseContent: Record<string, CourseContent> = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // 2️⃣ SOFTBALL HITTING SYSTEM (COMPLETE)
+  // 2️⃣ VAULT™ ELITE SOFTBALL HITTING SYSTEM
+  //    Power, timing, adjustability, and game transfer
   // ═══════════════════════════════════════════════════════════════
   "softball-hitting-complete": {
     courseId: "softball-hitting-complete",
     modules: [
+      // EXECUTIVE PHILOSOPHY
       {
-        id: "shc-stance",
-        title: "Stance & Balance",
-        description: "Building the foundation for a repeatable, powerful swing",
+        id: "shc-exec",
+        title: "Executive Philosophy",
+        description: "Elite softball hitting is built on timing control, efficient sequencing, barrel accuracy, and game transfer",
         lessons: [
-          { id: "shc-1-1", title: "Athletic Stance Setup", description: "Proper stance width, weight distribution, and foot alignment for power and balance.", duration: "12 min", videoUrl: "", isFree: true },
-          { id: "shc-1-2", title: "Balance & Stability Drills", description: "One-leg drills, balance board work, and stability exercises for swing consistency.", duration: "14 min", videoUrl: "", isFree: true },
-          { id: "shc-1-3", title: "Hand Position & Grip", description: "Optimal grip pressure, hand position, and pre-swing hand path.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "shc-0-1", title: "The VAULT™ Hitting Philosophy", description: "VAULT hitting does not chase pretty swings. It builds swings that are on time, repeatable, and dangerous.", duration: "10 min", videoUrl: "", isFree: true },
+          { id: "shc-0-2", title: "NFCA-Aligned Foundations", description: "Timing, sequencing, contact-point consistency, and target-based intent — the research-backed approach to elite hitting.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "shc-0-3", title: "The Individualized Swing", description: "The softball swing is a coordinated 3D motion with consistent core patterns but meaningful hitter-to-hitter variation.", duration: "10 min", videoUrl: "", isFree: true },
         ],
       },
+      // SECTION 1 — VAULT HITTING MODEL (5 PILLARS)
       {
-        id: "shc-load",
-        title: "Load & Timing",
-        description: "Generating power through proper load mechanics",
+        id: "shc-model",
+        title: "Section 1: The VAULT™ Hitting Model",
+        description: "Five hitting pillars: Posture & Balance, Timing & Rhythm, Sequencing, Bat Speed & Adjustability, Approach & Transfer",
         lessons: [
-          { id: "shc-2-1", title: "Load Mechanics", description: "Weight shift, stride timing, and creating separation for power.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "shc-2-2", title: "Timing the Windmill Pitcher", description: "Adapting timing mechanisms to the windmill delivery and pitch speed differences.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "shc-2-3", title: "Rhythm & Tempo Drills", description: "Building consistent pre-swing rhythm for repeatable at-bats.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "shc-1-1", title: "Pillar 1: Posture and Balance", description: "The hitter must own stable posture and a repeatable launch environment before any power work matters.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "shc-1-2", title: "Pillar 2: Timing and Rhythm", description: "A hitter can own good mechanics and still fail if timing breaks down. Timing is a major driver of quality contact.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "shc-1-3", title: "Pillar 3: Sequencing", description: "Hips → core → shoulders → hands/barrel. The proximal-to-distal energy transfer sequence.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "shc-1-4", title: "Pillar 4: Bat Speed and Adjustability", description: "Bat speed matters, but only if it is connected to barrel control and decision-making.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "shc-1-5", title: "Pillar 5: Approach and Transfer", description: "The swing must survive different speeds, locations, counts, and game plans.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 2 — MECHANICS SYSTEM
       {
-        id: "shc-rotation",
-        title: "Hip Rotation Engine",
-        description: "Hip-driven swing = power. The engine of the softball swing.",
+        id: "shc-mechanics",
+        title: "Section 2: Mechanics System",
+        description: "Stance, load, foot-down timing, sequencing, contact, and finish — the complete mechanical framework",
         lessons: [
-          { id: "shc-3-1", title: "Hip-Driven Power Mechanics", description: "How hip rotation generates bat speed and exit velocity in the softball swing.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "shc-3-2", title: "Rotational Sequencing", description: "Hips → torso → hands → bat. The kinetic chain for maximum output.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "shc-3-3", title: "Power Drills & Med Ball Work", description: "Rotational med ball throws and resistance drills for hip speed development.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "shc-2-1", title: "2.1 Stance and Setup", description: "Athletic base, quiet head, tension-free upper body, stacked spine, hands in launchable position, eyes level and calm.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "shc-2-2", title: "2.2 Load and Gather", description: "The load is a timing tool, not decoration. Create rhythm, collect force, preserve adjustability. Avoid drifting forward, over-coiling, or collapsing posture.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "shc-2-3", title: "2.3 Foot Down and Launch Timing", description: "Land under control, be on time to different pitch speeds, keep adjustability late. Variable-pace drill approach.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "shc-2-4", title: "2.4 Sequencing and Turn", description: "Hips initiate, torso follows, shoulders and hands deliver, barrel enters efficiently. Coordinated proximal-to-distal energy transfer.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "shc-2-5", title: "2.5 Contact and Direction", description: "Own contact point, match barrel path to pitch location, produce intended ball flight. NFCA 'Road Map' concept for ideal contact spot.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "shc-2-6", title: "2.6 Finish and Balance", description: "The finish is feedback — did the hitter stay through the ball? Did posture hold? Did the move stay athletic?", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 3 — ADVANCED HITTING CATEGORIES
       {
-        id: "shc-contact",
-        title: "Bat Path & Contact",
-        description: "Optimal swing plane and contact point training",
+        id: "shc-tracks",
+        title: "Section 3: Advanced Hitting Categories",
+        description: "Power hitter track, contact/adjustability track, and hybrid track development",
         lessons: [
-          { id: "shc-4-1", title: "Swing Plane Optimization", description: "Matching bat path to the pitch plane for consistent hard contact.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "shc-4-2", title: "Contact Zones: Inside, Middle, Outside", description: "Adjusting contact points for pitch location with game-situation application.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "shc-4-3", title: "Early Mechanics for Injury Prevention", description: "Building swing mechanics that prevent elbow and wrist strain.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "shc-3-1", title: "A. Power Hitter Track", description: "Middle-order bats with strong rotational athletes. Emphasis: bat speed, rotational force, gap-to-gap damage, miss-hit management.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "shc-3-2", title: "B. Contact/Adjustability Track", description: "Top/middle lineup with high-contact athletes. Emphasis: timing windows, barrel accuracy, two-strike adjustability, opposite-field discipline.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "shc-3-3", title: "C. Hybrid Track", description: "Most advanced HS/college hitters. Emphasis: bat speed plus strike-zone control, targeted contact outcomes, count-based intent.", duration: "14 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 4 — DRILL PROGRESSION MODEL
       {
-        id: "shc-slap",
-        title: "Slap Hitting System",
-        description: "CRITICAL for softball — the complete slap hitting development system",
+        id: "shc-drills",
+        title: "Section 4: Drill Progression Model",
+        description: "4-phase progression: Patterning → Controlled Contact → Decision Training → Transfer",
         lessons: [
-          { id: "shc-5-1", title: "Slap Hitting Fundamentals", description: "Footwork, timing, and contact point for the left-side slap.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "shc-5-2", title: "Soft Slap & Hard Slap Variations", description: "Developing both soft and hard slap options based on defensive alignment.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "shc-5-3", title: "Slap Bunting Combinations", description: "Using the slap-bunt threat to keep defenses guessing.", duration: "12 min", videoUrl: "", isFree: false },
-          { id: "shc-5-4", title: "Game-Speed Slap Drills", description: "Live-speed practice and scrimmage reps for slap confidence.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "shc-4-1", title: "Phase 1: Patterning", description: "Mirror work, PVC/short-bat sequencing, posture and load holds, dry swing timing reps.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "shc-4-2", title: "Phase 2: Controlled Contact", description: "Tee work by contact zone, front toss with timing variation, target hitting. NFCA target-based work for intent.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "shc-4-3", title: "Phase 3: Decision Training", description: "Fast/slow mix, inside/outside recognition, take/attack rounds, count-based rounds.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "shc-4-4", title: "Phase 4: Transfer", description: "Live BP, machine variance, game-speed situational rounds, pressure scoring.", duration: "18 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 5 — ELITE WEEKLY STRUCTURE
       {
-        id: "shc-recognition",
-        title: "Pitch Recognition & Decision Training",
-        description: "Reading the windmill delivery and making swing decisions",
+        id: "shc-weekly",
+        title: "Section 5: Elite Weekly Structure",
+        description: "Off-season, preseason, and in-season programming for hitters",
         lessons: [
-          { id: "shc-6-1", title: "Reading the Windmill Release", description: "Identifying pitch type and location from the windmill release point.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "shc-6-2", title: "Rise Ball vs. Drop Ball Reads", description: "Distinguishing rise ball from drop ball early in the pitch flight.", duration: "12 min", videoUrl: "", isFree: false },
-          { id: "shc-6-3", title: "Swing/Take Decision Framework", description: "Building a consistent decision tree for every at-bat.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "shc-5-1", title: "Off-Season Structure", description: "3–4 exposures/week: 1 mechanics-heavy day, 1 sequencing/bat-speed day, 1 approach/decision day, 1 optional transfer day.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "shc-5-2", title: "Preseason Structure", description: "Reduce mechanical volume, increase timing and velocity exposure, more machine/live reps.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "shc-5-3", title: "In-Season Structure", description: "Maintain timing, preserve confidence, reduce total swing volume, emphasize game plan and adjustability.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 6 — HITTING KPIs
       {
-        id: "shc-transfer",
-        title: "Game Transfer",
-        description: "Converting practice performance into game production",
+        id: "shc-kpis",
+        title: "Section 6: Hitting KPIs",
+        description: "Primary and secondary KPIs for tracking hitting development",
         lessons: [
-          { id: "shc-7-1", title: "Live At-Bat Execution", description: "Applying mechanics and decision-making under game pressure.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "shc-7-2", title: "Situational Hitting Plan", description: "Approach adjustments based on count, runners, and game context.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "shc-7-3", title: "Two-Strike Approach", description: "Shortening up and maximizing contact with two strikes.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "shc-6-1", title: "Primary Hitting KPIs", description: "Hard contact %, quality swing decision %, on-time contact rate, exit velocity trend, line-drive rate, two-strike contact %, competitive round score.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "shc-6-2", title: "Secondary Hitting KPIs", description: "Contact-point consistency, chase rate in training, opposite-field execution, count-specific outcome rate.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "shc-6-3", title: "Using KPIs to Drive Development", description: "How to interpret KPI trends and adjust training programs based on data.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // 2.5️⃣ VAULT™ ELITE SOFTBALL SLAP SYSTEM
+  //    Speed, pressure, precision, and chaos creation
+  // ═══════════════════════════════════════════════════════════════
+  "softball-slap-system": {
+    courseId: "softball-slap-system",
+    modules: [
+      // EXECUTIVE PHILOSOPHY
+      {
+        id: "sls-exec",
+        title: "Executive Philosophy",
+        description: "A great slapper is a triple threat: bunt, soft slap, power slap. Slapping is an offensive system.",
+        lessons: [
+          { id: "sls-0-1", title: "The Triple Threat Slapper", description: "A great slapper is not just fast. A great slapper can bunt, soft slap, and power slap — forcing the defense to defend all four weapons.", duration: "10 min", videoUrl: "", isFree: true },
+          { id: "sls-0-2", title: "NFCA Slapping Framework", description: "NFCA's slapping instruction emphasizes target-based soft-slap and hard-slap work. USA Softball's rulebook defines legal slap actions.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "sls-0-3", title: "Slapping as an Offensive System", description: "Slapping is not a trick. It is built on timing, footwork, placement, and pressure.", duration: "10 min", videoUrl: "", isFree: true },
+        ],
+      },
+      // SECTION 1 — THE VAULT SLAP MODEL
+      {
+        id: "sls-model",
+        title: "Section 1: The VAULT™ Slap Model",
+        description: "The four offensive weapons: Bunt, Soft Slap, Hard Slap, Power Slash",
+        lessons: [
+          { id: "sls-1-1", title: "The Four Offensive Weapons", description: "Bunt, soft slap, hard slap, and power slash/full swing option. The slapper must force the defense to defend all four.", duration: "14 min", videoUrl: "", isFree: true },
+          { id: "sls-1-2", title: "When Each Weapon Wins", description: "Understanding when to deploy each option based on defensive alignment, count, and game situation.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 2 — CORE SLAP MECHANICS
+      {
+        id: "sls-mechanics",
+        title: "Section 2: Core Slap Mechanics",
+        description: "Stance, preparatory step, footwork, barrel path, contact, and run-through",
+        lessons: [
+          { id: "sls-2-1", title: "2.1 Stance and Identity", description: "Setup that allows disguise, rhythm, movement into the box, and adjustability.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "sls-2-2", title: "2.2 Preparatory Step", description: "Create rhythm into movement, organize footwork early, establish timing to contact, preserve direction to first base.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "sls-2-3", title: "2.3 Footwork Pattern", description: "Efficient crossover/run start, stable visual control, body under control at contact, no wasted steps.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "sls-2-4", title: "2.4 Barrel Path", description: "Inside path, controlled top hand direction, ability to deaden or accelerate barrel intentionally. Working the knob to the inside of the ball.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "sls-2-5", title: "2.5 Contact Point", description: "Control where contact happens, how the body is moving at contact, and what type of ball is intended.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "sls-2-6", title: "2.6 Run-Through & First-Step Acceleration", description: "Accelerate through the box, recover posture immediately, force rushed defensive decisions. Speed pressure completes the slap.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 3 — THE THREE CORE SLAP TYPES
+      {
+        id: "sls-types",
+        title: "Section 3: The Three Core Slap Types",
+        description: "Soft slap, hard slap, and bunt/slash — mastering each weapon",
+        lessons: [
+          { id: "sls-3-1", title: "A. Soft Slap", description: "Beat the infield with placement and speed. Create topspin/one-hop pressure. Exploit corner or middle infield depth. Left side dribble, one-hop through 5–6 hole.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "sls-3-2", title: "B. Hard Slap", description: "Create firmer ground ball or low liner through windows. Punish defenses overplaying soft contact. NFCA hard-slap target work for line drives and backspin outcomes.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "sls-3-3", title: "C. Bunt/Slash", description: "Keep defenses honest, exploit over-shifts, create free bases. The bunt/slash as strategic weapon.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 4 — SLAPPER DEVELOPMENT STAGES
+      {
+        id: "sls-stages",
+        title: "Section 4: Slapper Development Stages",
+        description: "Foundation → Development → Elite progression",
+        lessons: [
+          { id: "sls-4-1", title: "Foundation Stage", description: "Rhythm, movement into the box, visual control, and footwork mastery.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "sls-4-2", title: "Development Stage", description: "Soft slap placement, bunt/slap choice, and timing against speed variation.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "sls-4-3", title: "Elite Stage", description: "Full triple-threat ownership, hard-slap command, count-based decision making, and defensive read exploitation.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 5 — ELITE SLAP DRILL STACK
+      {
+        id: "sls-drills",
+        title: "Section 5: Elite Slap Drill Stack",
+        description: "Footwork, barrel pattern, target work, triple-threat, and read-and-react progressions",
+        lessons: [
+          { id: "sls-5-1", title: "1. Footwork Progression", description: "Walk-throughs, crossover timing, controlled run-through starts, stride pattern consistency.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "sls-5-2", title: "2. Barrel Pattern Progression", description: "Short-contact slaps, inside-ball path reps, soft-hand topspin work, hard-slap intent rounds.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "sls-5-3", title: "3. Target Work", description: "3B line dribble, 5–6 hole one-hop, middle-topspin pressure ball, outfield low liner. Target-based training sharpens intent.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "sls-5-4", title: "4. Triple-Threat Progression", description: "Bunt round, soft slap round, hard slap round, random cue round.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "sls-5-5", title: "5. Read-and-React Progression", description: "Corner in/back, middle pinched/normal, slap call by count, coach-held visual cue.", duration: "16 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 6 — WEEKLY ELITE SLAP STRUCTURE
+      {
+        id: "sls-weekly",
+        title: "Section 6: Weekly Elite Slap Structure",
+        description: "Off-season, preseason, and in-season programming for slappers",
+        lessons: [
+          { id: "sls-6-1", title: "Off-Season Structure", description: "3 skill exposures/week: 1 footwork day, 1 barrel/target day, 1 decision + pressure day.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "sls-6-2", title: "Preseason Structure", description: "Increase speed-of-play, randomize defensive looks, increase live reads.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "sls-6-3", title: "In-Season Structure", description: "Maintain timing and target ownership, reduce total volume, emphasize game planning.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 7 — SLAP KPIs
+      {
+        id: "sls-kpis",
+        title: "Section 7: Slap KPIs",
+        description: "Primary and secondary KPIs for tracking slap development",
+        lessons: [
+          { id: "sls-7-1", title: "Primary Slap KPIs", description: "Bunt success %, soft slap target hit %, hard slap target hit %, first-base time, on-base pressure rate, triple-threat execution score.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "sls-7-2", title: "Secondary Slap KPIs", description: "Contact-point consistency, topspin ground-ball %, defensive-read correct choice %, run-through efficiency.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 8 — GAME APPLICATION RULES
+      {
+        id: "sls-game",
+        title: "Section 8: Game Application Rules",
+        description: "When to soft slap, hard slap, bunt, or full swing — situational decision-making",
+        lessons: [
+          { id: "sls-8-1", title: "When to Soft Slap", description: "Corners deep/hesitant, left-side defender slow to charge, runner-pressure situations.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "sls-8-2", title: "When to Hard Slap", description: "Gap available, defense cheating soft, need to push ball through infield with pace.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "sls-8-3", title: "When to Bunt", description: "Corners back, free base opportunity, force rushed exchange.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "sls-8-4", title: "When to Full Swing/Slash", description: "Defenders overcommit to slap look, hitter owns damage count, need bigger ball than pressure ball.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 9 — COACH IMPLEMENTATION RULES
+      {
+        id: "sls-coach",
+        title: "Section 9: Coach Implementation Rules",
+        description: "What coaches may and may not do within the VAULT™ slap system",
+        lessons: [
+          { id: "sls-9-1", title: "Coaches May", description: "Individualize footwork pattern, adjust target maps, sequence skill progressions by athlete type.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "sls-9-2", title: "Coaches May NOT", description: "Skip triple-threat development, train slap as 'just get fast', ignore visual timing and pitch decision, reduce all reps to machine-only.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 10 — HOW THIS FITS IN VAULT™
+      {
+        id: "sls-integration",
+        title: "Section 10: VAULT™ Integration",
+        description: "How the slap system maps to the 5 VAULT™ pillars",
+        lessons: [
+          { id: "sls-10-1", title: "Slapping Across the 5 Pillars", description: "Velocity: bat speed, hard-slap output. Athleticism: first-step explosion, run-through speed. Utility: offensive versatility. Longevity: volume management. Transfer: decision speed, target execution.", duration: "14 min", videoUrl: "", isFree: false },
         ],
       },
     ],
