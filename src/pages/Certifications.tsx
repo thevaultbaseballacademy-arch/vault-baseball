@@ -427,71 +427,78 @@ const Certifications = () => {
               </CardContent>
             </Card>
 
-            {/* Required Certification */}
+            {/* ⚾ BASEBALL CERTIFICATIONS */}
             <div className="space-y-4">
               <h2 className="text-xl font-display text-foreground flex items-center gap-2">
                 <span className="w-1 h-6 bg-primary rounded-full" />
-                Required Certification
+                ⚾ Baseball — Required
               </h2>
               <div className="grid md:grid-cols-1 gap-4">
-                {requiredCerts.map(def => (
-                  <CertificationCard
-                    key={def.id}
-                    definition={def}
-                    userCert={userCerts.find(c => c.certification_type === def.certification_type)}
-                    allDefinitions={definitions}
-                    allUserCerts={userCerts}
-                    onStartExam={handleStartExam}
-                    onPurchase={handlePurchase}
-                    isLoading={purchaseLoading === def.certification_type}
-                    coachName={coachName}
-                  />
+                {baseballRequired.map(def => (
+                  <CertificationCard key={def.id} definition={def} userCert={userCerts.find(c => c.certification_type === def.certification_type)} allDefinitions={definitions} allUserCerts={userCerts} onStartExam={handleStartExam} onPurchase={handlePurchase} isLoading={purchaseLoading === def.certification_type} coachName={coachName} />
                 ))}
               </div>
             </div>
 
-            {/* Advanced Certification */}
             <div className="space-y-4">
               <h2 className="text-xl font-display text-foreground flex items-center gap-2">
                 <span className="w-1 h-6 bg-accent rounded-full" />
-                Performance Certification
+                ⚾ Baseball — Performance
               </h2>
               <div className="grid md:grid-cols-1 gap-4">
-                {advancedCerts.map(def => (
-                  <CertificationCard
-                    key={def.id}
-                    definition={def}
-                    userCert={userCerts.find(c => c.certification_type === def.certification_type)}
-                    allDefinitions={definitions}
-                    allUserCerts={userCerts}
-                    onStartExam={handleStartExam}
-                    onPurchase={handlePurchase}
-                    isLoading={purchaseLoading === def.certification_type}
-                    coachName={coachName}
-                  />
+                {baseballAdvanced.map(def => (
+                  <CertificationCard key={def.id} definition={def} userCert={userCerts.find(c => c.certification_type === def.certification_type)} allDefinitions={definitions} allUserCerts={userCerts} onStartExam={handleStartExam} onPurchase={handlePurchase} isLoading={purchaseLoading === def.certification_type} coachName={coachName} />
                 ))}
               </div>
             </div>
 
-            {/* Position Specialists */}
             <div className="space-y-4">
               <h2 className="text-xl font-display text-foreground flex items-center gap-2">
-                <span className="w-1 h-6 bg-green-500 rounded-full" />
-                Position Specialist Certifications
+                <span className="w-1 h-6 bg-emerald-500 rounded-full" />
+                ⚾ Baseball — Position Specialists
               </h2>
               <div className="grid md:grid-cols-3 gap-4">
-                {specialistCerts.map(def => (
-                  <CertificationCard
-                    key={def.id}
-                    definition={def}
-                    userCert={userCerts.find(c => c.certification_type === def.certification_type)}
-                    allDefinitions={definitions}
-                    allUserCerts={userCerts}
-                    onStartExam={handleStartExam}
-                    onPurchase={handlePurchase}
-                    isLoading={purchaseLoading === def.certification_type}
-                    coachName={coachName}
-                  />
+                {baseballSpecialists.map(def => (
+                  <CertificationCard key={def.id} definition={def} userCert={userCerts.find(c => c.certification_type === def.certification_type)} allDefinitions={definitions} allUserCerts={userCerts} onStartExam={handleStartExam} onPurchase={handlePurchase} isLoading={purchaseLoading === def.certification_type} coachName={coachName} />
+                ))}
+              </div>
+            </div>
+
+            {/* 🥎 SOFTBALL CERTIFICATIONS */}
+            <div className="space-y-4 pt-6 border-t border-border">
+              <h2 className="text-xl font-display text-foreground flex items-center gap-2">
+                <span className="w-1 h-6 bg-pink-500 rounded-full" />
+                🥎 Softball — Required
+              </h2>
+              <div className="grid md:grid-cols-1 gap-4">
+                {softballRequired.map(def => (
+                  <CertificationCard key={def.id} definition={def} userCert={userCerts.find(c => c.certification_type === def.certification_type)} allDefinitions={definitions} allUserCerts={userCerts} onStartExam={handleStartExam} onPurchase={handlePurchase} isLoading={purchaseLoading === def.certification_type} coachName={coachName} />
+                ))}
+              </div>
+            </div>
+
+            {softballAdvanced.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-display text-foreground flex items-center gap-2">
+                  <span className="w-1 h-6 bg-purple-500 rounded-full" />
+                  🥎 Softball — Performance
+                </h2>
+                <div className="grid md:grid-cols-1 gap-4">
+                  {softballAdvanced.map(def => (
+                    <CertificationCard key={def.id} definition={def} userCert={userCerts.find(c => c.certification_type === def.certification_type)} allDefinitions={definitions} allUserCerts={userCerts} onStartExam={handleStartExam} onPurchase={handlePurchase} isLoading={purchaseLoading === def.certification_type} coachName={coachName} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <h2 className="text-xl font-display text-foreground flex items-center gap-2">
+                <span className="w-1 h-6 bg-amber-500 rounded-full" />
+                🥎 Softball — Specialists
+              </h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                {softballSpecialists.map(def => (
+                  <CertificationCard key={def.id} definition={def} userCert={userCerts.find(c => c.certification_type === def.certification_type)} allDefinitions={definitions} allUserCerts={userCerts} onStartExam={handleStartExam} onPurchase={handlePurchase} isLoading={purchaseLoading === def.certification_type} coachName={coachName} />
                 ))}
               </div>
             </div>
