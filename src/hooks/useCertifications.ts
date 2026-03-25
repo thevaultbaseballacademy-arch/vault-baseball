@@ -164,9 +164,9 @@ export const useStartExamAttempt = () => {
         .from('certification_attempts')
         .insert({
           user_id: user.id,
-          certification_type: certType,
+          certification_type: certType as any,
           question_ids: questionIds,
-        })
+        } as any)
         .select()
         .single();
 
