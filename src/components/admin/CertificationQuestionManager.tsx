@@ -117,7 +117,7 @@ const CertificationQuestionManager = () => {
             is_scenario: data.is_scenario,
             display_order: data.display_order,
             is_active: data.is_active,
-          });
+          } as any);
         if (error) throw error;
       }
     },
