@@ -106,7 +106,7 @@ export const useExamQuestions = (certType: CertificationType | null) => {
       if (!certType) return [];
 
       const { data, error } = await supabase.rpc('get_exam_questions', {
-        p_certification_type: certType,
+        p_certification_type: certType as any,
         p_limit: 40
       });
 
