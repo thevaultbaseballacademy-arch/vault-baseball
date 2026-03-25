@@ -6604,6 +6604,11 @@ export type Database = {
         | "catcher_specialist"
         | "infield_specialist"
         | "outfield_specialist"
+        | "softball_foundations"
+        | "softball_performance"
+        | "softball_pitching_specialist"
+        | "softball_hitting_specialist"
+        | "softball_defense_specialist"
       coach_role: "Coach" | "Director" | "OrgAdmin" | "VAULTHQ"
       coach_status: "Active" | "Suspended"
       device_type:
@@ -6755,6 +6760,11 @@ export const Constants = {
         "catcher_specialist",
         "infield_specialist",
         "outfield_specialist",
+        "softball_foundations",
+        "softball_performance",
+        "softball_pitching_specialist",
+        "softball_hitting_specialist",
+        "softball_defense_specialist",
       ],
       coach_role: ["Coach", "Director", "OrgAdmin", "VAULTHQ"],
       coach_status: ["Active", "Suspended"],
