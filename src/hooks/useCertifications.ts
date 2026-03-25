@@ -106,7 +106,7 @@ export const useExamQuestions = (certType: CertificationType | null) => {
       if (!certType) return [];
 
       const { data, error } = await supabase.rpc('get_exam_questions', {
-        p_certification_type: certType,
+        p_certification_type: certType as any,
         p_limit: 40
       });
 
@@ -134,7 +134,7 @@ export const useCertificationQuestions = (certType: CertificationType | null) =>
       const { data, error } = await supabase
         .from('certification_questions')
         .select('*')
-        .eq('certification_type', certType)
+        .eq('certification_type', certType as any)
         .eq('is_active', true)
         .order('display_order');
 
@@ -164,9 +164,9 @@ export const useStartExamAttempt = () => {
         .from('certification_attempts')
         .insert({
           user_id: user.id,
-          certification_type: certType,
+          certification_type: certType as any,
           question_ids: questionIds,
-        })
+        } as any)
         .select()
         .single();
 
@@ -262,7 +262,7 @@ export const useBulkImportQuestions = () => {
         .insert(questions.map(q => ({
           ...q,
           options: JSON.stringify(q.options),
-        })))
+        })) as any)
         .select();
 
       if (error) throw error;

@@ -56,7 +56,7 @@ const CertificationQuestionManager = () => {
       const { data, error } = await supabase
         .from('certification_questions')
         .select('*')
-        .eq('certification_type', selectedCertType)
+        .eq('certification_type', selectedCertType as any)
         .order('section')
         .order('display_order');
 
@@ -92,7 +92,7 @@ const CertificationQuestionManager = () => {
         const { error } = await supabase
           .from('certification_questions')
           .update({
-            certification_type: data.certification_type,
+            certification_type: data.certification_type as any,
             section: data.section,
             question_text: data.question_text,
             options: JSON.stringify(data.options),
@@ -101,7 +101,7 @@ const CertificationQuestionManager = () => {
             is_scenario: data.is_scenario,
             display_order: data.display_order,
             is_active: data.is_active,
-          })
+          } as any)
           .eq('id', id);
         if (error) throw error;
       } else {
@@ -117,7 +117,7 @@ const CertificationQuestionManager = () => {
             is_scenario: data.is_scenario,
             display_order: data.display_order,
             is_active: data.is_active,
-          });
+          } as any);
         if (error) throw error;
       }
     },
@@ -167,7 +167,7 @@ const CertificationQuestionManager = () => {
       
       const { data, error } = await supabase
         .from('certification_questions')
-        .insert(payload)
+        .insert(payload as any)
         .select();
       if (error) throw error;
       return data;
