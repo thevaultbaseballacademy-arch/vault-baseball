@@ -167,7 +167,7 @@ const CertificationQuestionManager = () => {
       
       const { data, error } = await supabase
         .from('certification_questions')
-        .insert(payload)
+        .insert(payload as any)
         .select();
       if (error) throw error;
       return data;
