@@ -262,7 +262,7 @@ export const useBulkImportQuestions = () => {
         .insert(questions.map(q => ({
           ...q,
           options: JSON.stringify(q.options),
-        })))
+        })) as any)
         .select();
 
       if (error) throw error;
