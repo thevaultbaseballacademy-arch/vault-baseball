@@ -252,92 +252,177 @@ export const softballCourseContent: Record<string, CourseContent> = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // 3️⃣ SOFTBALL PITCHING SYSTEM (ELITE — MOST IMPORTANT)
+  // 3️⃣ VAULT™ SOFTBALL PITCHING DEVELOPMENT SYSTEM
+  //    Velocity • Command • Durability • Dominance
   // ═══════════════════════════════════════════════════════════════
   "softball-pitching-elite": {
     courseId: "softball-pitching-elite",
     modules: [
+      // EXECUTIVE OVERVIEW
       {
-        id: "spe-windup",
-        title: "Phase 1: Wind-Up Mechanics",
-        description: "The first phase — establishing rhythm, posture, and power position",
+        id: "spe-exec",
+        title: "Executive Overview",
+        description: "Why softball is a pitcher-dominated sport and how VAULT™ builds sustainable dominance",
         lessons: [
-          { id: "spe-1-1", title: "Wind-Up Posture & Alignment", description: "Setting up on the pitcher's circle with proper posture and foot alignment.", duration: "12 min", videoUrl: "", isFree: true },
-          { id: "spe-1-2", title: "Weight Shift & Balance Point", description: "Creating a stable balance point to initiate the arm circle.", duration: "14 min", videoUrl: "", isFree: true },
-          { id: "spe-1-3", title: "Pre-Pitch Routine Development", description: "Building a consistent pre-pitch routine for focus and timing.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "spe-0-1", title: "The Pitcher-Dominated Reality", description: "Pitchers throw more frequently, control tempo and outcomes, and carry the highest injury risk. The goal is sustainable dominance.", duration: "10 min", videoUrl: "", isFree: true },
+          { id: "spe-0-2", title: "Why Most Systems Fail", description: "Chasing velocity without managing workload, ignoring windmill biomechanics, overusing athletes in tournaments, treating arm care as optional.", duration: "12 min", videoUrl: "", isFree: true },
+          { id: "spe-0-3", title: "The VAULT™ Pitching Integration", description: "Mechanics, Workload, Strength, Recovery, and Game Transfer — all five must work together.", duration: "10 min", videoUrl: "", isFree: true },
         ],
       },
+      // SECTION 1 — THE VAULT™ PITCHING MODEL
       {
-        id: "spe-stride",
-        title: "Phase 2: Stride Mechanics",
-        description: "Power comes from the stride — landing, direction, and force",
+        id: "spe-model",
+        title: "Section 1: The VAULT™ Pitching Model",
+        description: "The 4 pillars of pitching performance: Mechanics, Velocity, Command & Spin, Workload & Recovery",
         lessons: [
-          { id: "spe-2-1", title: "Stride Length & Direction", description: "Optimal stride length and directional accuracy toward the target.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "spe-2-2", title: "Drive Leg Power", description: "Generating force through the back leg push for velocity.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "spe-2-3", title: "Landing Mechanics", description: "Front foot landing position, angle, and stability for power transfer.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "spe-1-1", title: "4 Pillars of Pitching Performance", description: "Mechanics, Velocity Development, Command & Spin, and Workload & Recovery — all four must progress together.", duration: "14 min", videoUrl: "", isFree: true },
+          { id: "spe-1-2", title: "Integrated Development Philosophy", description: "Why isolating one pillar creates imbalance and how VAULT™ ensures synchronized progress.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 2 — BIOMECHANICS OF THE WINDMILL PITCH
       {
-        id: "spe-accel",
-        title: "Phase 3: Acceleration",
-        description: "The arm circle — where velocity and spin are created",
+        id: "spe-biomechanics",
+        title: "Section 2: Biomechanics of the Windmill Pitch",
+        description: "The windmill pitch is a full-body explosive movement, not an arm action",
         lessons: [
-          { id: "spe-3-1", title: "Arm Circle Path & Timing", description: "Efficient arm circle that stays close to the body for maximum speed.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "spe-3-2", title: "Hip-to-Hand Connection", description: "Transferring lower-body force through the core into the arm circle.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "spe-3-3", title: "Wrist Snap & Release Point", description: "Maximizing velocity through wrist snap timing and release consistency.", duration: "18 min", videoUrl: "", isFree: false },
-          { id: "spe-3-4", title: "Elbow Extension at Release", description: "Proper elbow mechanics to prevent hyperextension and injury.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "spe-2-1", title: "Phase 1: Wind-Up", description: "Controlled start and rhythm initiation. Establishing the tempo for the entire pitch.", duration: "14 min", videoUrl: "", isFree: true },
+          { id: "spe-2-2", title: "Phase 2: Stride", description: "Linear force production and lower-body drive. Where power begins.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-2-3", title: "Phase 3: Acceleration", description: "Hip-to-shoulder separation and arm whip mechanics. The velocity zone.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "spe-2-4", title: "Phase 4: Follow-Through", description: "Deceleration and energy dissipation. Protecting the arm through proper finish.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-2-5", title: "The Ground-Up Principle", description: "Power starts from the ground — not the arm. Understanding the kinetic chain of the windmill.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 3 — MECHANICS SYSTEM (VAULT™ STANDARD)
       {
-        id: "spe-follow",
-        title: "Phase 4: Follow-Through",
-        description: "Deceleration, fielding position, and arm health",
+        id: "spe-mechanics",
+        title: "Section 3: Mechanics System — VAULT™ Standard",
+        description: "Lower body engine, hip rotation, arm path, release & finish",
         lessons: [
-          { id: "spe-4-1", title: "Follow-Through Mechanics", description: "Proper deceleration patterns to reduce shoulder stress.", duration: "12 min", videoUrl: "", isFree: false },
-          { id: "spe-4-2", title: "Fielding Position Recovery", description: "Getting into fielding-ready position immediately after release.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "spe-3-1", title: "Lower Body Engine", description: "Drive off back leg, strong stride direction, and stable landing position.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-3-2", title: "Hip Rotation", description: "Early hip engagement and separation from upper body for maximum force transfer.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-3-3", title: "Arm Path — Windmill Efficiency", description: "Smooth circular path with no forced acceleration. Natural whip for velocity.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "spe-3-4", title: "Release & Finish", description: "Consistent release point, controlled follow-through, and deceleration awareness.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-3-5", title: "The Non-Negotiable Rule", description: "Mechanics must NEVER be sacrificed for velocity. This is the foundation of VAULT™ pitching.", duration: "10 min", videoUrl: "", isFree: false },
         ],
       },
-      {
-        id: "spe-spin",
-        title: "Spin Creation & Pitch Arsenal",
-        description: "Developing rise ball, drop ball, curve, and change-up",
-        lessons: [
-          { id: "spe-5-1", title: "Rise Ball Mechanics & Spin", description: "Creating backspin for the rise ball with proper wrist position and release angle.", duration: "18 min", videoUrl: "", isFree: false },
-          { id: "spe-5-2", title: "Drop Ball Development", description: "Topspin mechanics for the drop ball — the most reliable out pitch.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "spe-5-3", title: "Curveball & Screwball", description: "Lateral spin pitches for expanding the arsenal.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "spe-5-4", title: "Change-Up Deception", description: "Arm speed deception with reduced velocity for timing disruption.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "spe-5-5", title: "Pitch Sequencing Strategy", description: "Setting up hitters with pitch combinations and count leverage.", duration: "16 min", videoUrl: "", isFree: false },
-        ],
-      },
-      {
-        id: "spe-command",
-        title: "Command Training",
-        description: "Locating pitches consistently to all zones",
-        lessons: [
-          { id: "spe-6-1", title: "Fastball Location Work", description: "Command drills for fastball placement to all 4 quadrants.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "spe-6-2", title: "Breaking Ball Command", description: "Locating rise, drop, and curve to specific zones.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "spe-6-3", title: "Game-Situation Command", description: "Pitching with intent in game-realistic scenarios.", duration: "16 min", videoUrl: "", isFree: false },
-        ],
-      },
+      // SECTION 4 — VELOCITY DEVELOPMENT SYSTEM
       {
         id: "spe-velocity",
-        title: "Velocity Progression",
-        description: "Safe, systematic velocity development for windmill pitchers",
+        title: "Section 4: Velocity Development System",
+        description: "Ground force, hip speed, sequencing, and arm speed — the velocity drivers",
         lessons: [
-          { id: "spe-7-1", title: "Velocity Assessment & Baseline", description: "Establishing current velocity baseline and setting realistic goals.", duration: "12 min", videoUrl: "", isFree: false },
-          { id: "spe-7-2", title: "Overload/Underload Training", description: "Weighted ball protocols adapted for windmill mechanics.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "spe-7-3", title: "Power Development Exercises", description: "Lower-body and core exercises that directly transfer to pitch velocity.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "spe-4-1", title: "Velocity Drivers", description: "Lower body strength, rotational speed, elastic energy, and timing — the four sources of velocity.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-4-2", title: "Lower Body Strength for Velocity", description: "Force production from the legs that translates directly to pitch speed.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-4-3", title: "Rotational Speed & Elastic Energy", description: "Hip speed and stretch-shortening cycle for explosive acceleration.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-4-4", title: "Weekly Velocity Structure", description: "1–2 high-intent days with controlled progression and enforced recovery. No consecutive high-intent days.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-4-5", title: "Velocity Assessment & Goal Setting", description: "Establishing current baseline and setting realistic velocity progression targets.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
+      // SECTION 5 — SPIN & COMMAND SYSTEM
+      {
+        id: "spe-spin-command",
+        title: "Section 5: Spin & Command System",
+        description: "Movement, location, deception — movement without command = ineffective",
+        lessons: [
+          { id: "spe-5-1", title: "Rise Ball Mechanics & Spin", description: "Steep backspin with proper wrist position and release angle for upward movement.", duration: "18 min", videoUrl: "", isFree: false },
+          { id: "spe-5-2", title: "Drop Ball Development", description: "Topspin mechanics — the most reliable out pitch in windmill pitching.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-5-3", title: "Curveball & Screwball", description: "Lateral spin pitches for expanding the arsenal and creating deception.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-5-4", title: "Change-Up Deception", description: "Arm speed deception with reduced velocity for timing disruption.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-5-5", title: "Command Training: Target-Based", description: "Target-based throwing, zone control, and repeatable release for consistent location.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-5-6", title: "Spin Development: Grip & Wrist", description: "Grip efficiency, wrist action, and finger pressure for maximum spin rate.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 6 — WORKLOAD MANAGEMENT SYSTEM (CRITICAL)
       {
         id: "spe-workload",
-        title: "Workload & Recovery",
-        description: "Underhand ≠ safe — shoulder stress is near bodyweight force",
+        title: "Section 6: Workload Management System",
+        description: "CRITICAL — this is where most programs fail. Track everything, enforce recovery.",
         lessons: [
-          { id: "spe-8-1", title: "Pitch Count Protocols", description: "Age-based and season-based pitch count limits for windmill pitchers.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "spe-8-2", title: "Tournament Workload Management", description: "Multi-game weekend protocols when pitchers throw at high frequency.", duration: "16 min", videoUrl: "", isFree: false },
-          { id: "spe-8-3", title: "Recovery Protocols", description: "Post-game and between-start recovery routines for pitchers.", duration: "14 min", videoUrl: "", isFree: false },
-          { id: "spe-8-4", title: "Shoulder Health & Maintenance", description: "Daily maintenance routines to protect the throwing shoulder.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "spe-6-1", title: "What Must Be Tracked", description: "Game pitches, bullpen throws, warm-up throws, practice throws — ALL throwing counts.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-6-2", title: "Workload Variables", description: "Volume, intent, and frequency — the three variables that determine arm stress.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "spe-6-3", title: "Tournament Workload Rules", description: "Limit total innings, enforce recovery windows, and monitor fatigue in multi-game weekends.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-6-4", title: "The Non-Negotiable Recovery Rule", description: "If recovery declines → workload decreases. No exceptions. This rule protects careers.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 7 — ARM HEALTH & DURABILITY SYSTEM
+      {
+        id: "spe-arm-health",
+        title: "Section 7: Arm Health & Durability System",
+        description: "Softball pitchers throw more frequently and experience high shoulder stress",
+        lessons: [
+          { id: "spe-7-1", title: "Daily Requirements", description: "Mobility, activation, and recovery protocols that must be completed every day.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-7-2", title: "Weekly Requirements", description: "Strength training, deceleration work, and structured recovery protocols.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-7-3", title: "Red Flags & Warning Signs", description: "Soreness, velocity drop, and command loss — recognizing problems before injury occurs.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "spe-7-4", title: "Pitcher–Position Overlap", description: "Managing workload when pitchers also play other positions between appearances.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 8 — STRENGTH & POWER FOR PITCHERS
+      {
+        id: "spe-strength",
+        title: "Section 8: Strength & Power for Pitchers",
+        description: "Lower-body force, core stability, rotational power, deceleration — strength protects the arm",
+        lessons: [
+          { id: "spe-8-1", title: "Lower-Body Force Production", description: "Split squats, single-leg work, and posterior chain development for ground force.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-8-2", title: "Core Stability & Anti-Rotation", description: "Core stability exercises and anti-rotation work for trunk control through the windmill.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-8-3", title: "Rotational Power Development", description: "Med ball throws and rotational exercises that transfer directly to pitching.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-8-4", title: "Eccentric Loading & Deceleration", description: "Eccentric exercises to train the body to decelerate safely after release.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 9 — WEEKLY STRUCTURE (PITCHERS)
+      {
+        id: "spe-weekly",
+        title: "Section 9: Weekly Structure for Pitchers",
+        description: "Off-season, pre-season, and in-season programming for windmill pitchers",
+        lessons: [
+          { id: "spe-9-1", title: "Off-Season Structure", description: "3–4 throwing sessions, 2 high-intent days, strength priority. Building the foundation.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-9-2", title: "Pre-Season Structure", description: "Increase intent, add live reps, reduce strength volume. Preparing for competition.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-9-3", title: "In-Season Structure", description: "Maintain velocity, reduce volume, maximize recovery. Availability is the priority.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-9-4", title: "Periodization for Pitchers", description: "Long-term planning across the annual calendar for peak performance.", duration: "12 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 10 — KPIs (PITCHERS)
+      {
+        id: "spe-kpis",
+        title: "Section 10: KPIs for Pitchers",
+        description: "Velocity, Command %, Spin Efficiency, Availability %, Workload Compliance",
+        lessons: [
+          { id: "spe-10-1", title: "Primary KPIs", description: "Velocity (Performance), Command % (Control), Spin Efficiency (Movement), Availability % (Durability), Workload Compliance (Injury Prevention).", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-10-2", title: "Secondary KPIs & Fatigue Markers", description: "Recovery compliance, fatigue markers, and pitch efficiency — tracking the full picture.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "spe-10-3", title: "Using KPIs for Development Decisions", description: "How to interpret KPI trends and adjust training based on data.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 11 — COACH IMPLEMENTATION RULES
+      {
+        id: "spe-coach-rules",
+        title: "Section 11: Coach Implementation Rules",
+        description: "What coaches may and may NOT do within the VAULT™ pitching system",
+        lessons: [
+          { id: "spe-11-1", title: "What Coaches May Do", description: "Adjust drills, modify intensity, and individualize within the system.", duration: "10 min", videoUrl: "", isFree: false },
+          { id: "spe-11-2", title: "What Coaches May NOT Do", description: "Stack high-intent days, ignore workload tracking, chase velocity recklessly, or override recovery.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "spe-11-3", title: "System Compliance & Enforcement", description: "How compliance is monitored and what happens when rules are broken.", duration: "10 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 12 — MENTAL PERFORMANCE (PITCHERS)
+      {
+        id: "spe-mental",
+        title: "Section 12: Mental Performance for Pitchers",
+        description: "Confidence, emotional control, and reset ability under pressure",
+        lessons: [
+          { id: "spe-12-1", title: "Pitch-by-Pitch Reset", description: "The ability to release the previous pitch and focus entirely on the next one.", duration: "12 min", videoUrl: "", isFree: false },
+          { id: "spe-12-2", title: "Competitive Mindset", description: "Building the aggressive but controlled mentality of a dominant pitcher.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-12-3", title: "Pressure Management", description: "Performing under high-pressure situations — full count, runners in scoring position, big games.", duration: "14 min", videoUrl: "", isFree: false },
+        ],
+      },
+      // SECTION 13 — GAME TRANSFER
+      {
+        id: "spe-game-transfer",
+        title: "Section 13: Game Transfer",
+        description: "Pitching success = execution under pressure. Replicate game conditions in training.",
+        lessons: [
+          { id: "spe-13-1", title: "Live Hitter Sessions", description: "Facing live batters in practice to bridge the gap between bullpen and game.", duration: "16 min", videoUrl: "", isFree: false },
+          { id: "spe-13-2", title: "Situational Pitching", description: "Runner on third, two outs — training specific game scenarios with intent.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-13-3", title: "Count-Based Decision Making", description: "Pitch selection and approach based on count, hitter tendencies, and game context.", duration: "14 min", videoUrl: "", isFree: false },
+          { id: "spe-13-4", title: "The VAULT™ Standard: Consistent Dominance", description: "The best pitchers don't just throw hard — they dominate consistently. Durable arms, elite velocity, command under pressure, long-term success.", duration: "12 min", videoUrl: "", isFree: false },
         ],
       },
     ],
