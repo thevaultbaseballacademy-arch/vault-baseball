@@ -22,7 +22,7 @@ import {
 import { CERT_TYPES, type ExamQuestion } from "@/hooks/useExamQuestionManagement";
 
 const questionFormSchema = z.object({
-  cert_type: z.enum(["Foundations", "Performance", "Catcher", "Infield", "Outfield"]),
+  cert_type: z.enum(["Foundations", "Performance", "Catcher", "Infield", "Outfield", "Softball Hitting Foundations", "Softball Hitting Performance", "Softball Slap Specialist"]),
   question_id: z.string().min(1, "Question ID is required"),
   question: z.string().min(10, "Question must be at least 10 characters"),
   option_a: z.string().min(1, "Option A is required"),
