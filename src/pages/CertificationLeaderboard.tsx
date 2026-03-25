@@ -54,7 +54,7 @@ const CertificationLeaderboard = () => {
         .order('score', { ascending: false });
 
       if (selectedCert !== 'all') {
-        query = query.eq('certification_type', selectedCert);
+        query = query.eq('certification_type', selectedCert as any);
       }
 
       const { data: certs, error } = await query.limit(50);

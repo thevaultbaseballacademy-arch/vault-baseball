@@ -56,7 +56,7 @@ const CertificationQuestionManager = () => {
       const { data, error } = await supabase
         .from('certification_questions')
         .select('*')
-        .eq('certification_type', selectedCertType)
+        .eq('certification_type', selectedCertType as any)
         .order('section')
         .order('display_order');
 
