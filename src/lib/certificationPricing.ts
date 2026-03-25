@@ -12,6 +12,10 @@ export const CERTIFICATION_PRICES: Record<string, string | null> = {
   softball_pitching_specialist: null,
   softball_hitting_specialist: null,
   softball_defense_specialist: null,
+  // Softball Hitting & Slap certifications
+  softball_hitting_foundations: null, // Free - included
+  softball_hitting_performance: null, // Will be configured when Stripe product is created
+  softball_slap_specialist: null, // Will be configured when Stripe product is created
 } as const;
 
 export const CERTIFICATION_PRODUCT_IDS = {
@@ -31,7 +35,10 @@ export type CertificationType =
   | 'softball_performance'
   | 'softball_pitching_specialist'
   | 'softball_hitting_specialist'
-  | 'softball_defense_specialist';
+  | 'softball_defense_specialist'
+  | 'softball_hitting_foundations'
+  | 'softball_hitting_performance'
+  | 'softball_slap_specialist';
 
 export const getCertificationDisplayName = (type: CertificationType): string => {
   const names: Record<CertificationType, string> = {
@@ -45,6 +52,9 @@ export const getCertificationDisplayName = (type: CertificationType): string => 
     softball_pitching_specialist: 'Softball Pitching Specialist',
     softball_hitting_specialist: 'Softball Hitting Specialist',
     softball_defense_specialist: 'Softball Defense Specialist',
+    softball_hitting_foundations: 'Softball Hitting Foundations',
+    softball_hitting_performance: 'Softball Hitting Performance',
+    softball_slap_specialist: 'Softball Slap Specialist',
   };
   return names[type];
 };
@@ -61,6 +71,9 @@ export const getCertificationPrice = (type: CertificationType): number => {
     softball_pitching_specialist: 2500,  // HIGH VALUE - most coaches don't understand windmill
     softball_hitting_specialist: 1500,
     softball_defense_specialist: 1500,
+    softball_hitting_foundations: 0, // Free - required for all coaches
+    softball_hitting_performance: 2500,
+    softball_slap_specialist: 2500, // HIGH VALUE - premium slap certification
   };
   return prices[type];
 };
