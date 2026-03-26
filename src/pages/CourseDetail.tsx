@@ -39,6 +39,7 @@ const CourseDetailPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { logAccess } = useContentAccessLog();
   const [userId, setUserId] = useState<string | undefined>();
   const [userName, setUserName] = useState<string>("");
   const [openModules, setOpenModules] = useState<number[]>([0]);
