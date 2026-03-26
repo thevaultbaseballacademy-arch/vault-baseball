@@ -151,12 +151,13 @@ const CoachMarketplaceProfile = () => {
                     <h1 className="text-3xl md:text-4xl font-display tracking-wide text-foreground mb-2">
                       {coach.coach_name}
                     </h1>
-                    <div className="mb-3">
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
                       <CoachBadges
                         isCertified={coach.is_certified}
                         isBypassCertified={coach.is_bypass_certified}
                         isStaff={coach.is_staff}
                       />
+                      <CertBadgeInline userId={coach.user_id} />
                     </div>
 
                     {coach.tagline && <p className="text-muted-foreground mb-3">{coach.tagline}</p>}
