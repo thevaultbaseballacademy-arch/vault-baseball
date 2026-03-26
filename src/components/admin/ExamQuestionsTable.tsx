@@ -91,7 +91,8 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">ID</TableHead>
-              <TableHead className="w-[120px]">Type</TableHead>
+              <TableHead className="w-[120px]">Cert Type</TableHead>
+              <TableHead className="w-[90px]">Q Type</TableHead>
               <TableHead>Question</TableHead>
               <TableHead className="w-[80px]">Answer</TableHead>
               <TableHead className="w-[70px]">Actions</TableHead>
