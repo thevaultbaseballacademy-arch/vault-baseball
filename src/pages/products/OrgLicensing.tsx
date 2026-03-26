@@ -153,9 +153,9 @@ const OrgLicensing = () => {
                   </div>
 
                   <Button
-                    onClick={() => checkout("org_licensing")}
-                    disabled={loading}
-                    className={`w-full ${pkg.highlight ? "" : "variant-outline"}`}
+                    onClick={() => checkout("org_starter_pack")}
+                    disabled={!!loading}
+                    className="w-full"
                     variant={pkg.highlight ? "default" : "outline"}
                     size="lg"
                   >
