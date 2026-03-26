@@ -150,6 +150,9 @@ const Dashboard = () => {
       <TrialStatusBanner />
 
       <main className="pt-24 pb-16">
+        <div className="container mx-auto px-4 max-w-7xl mb-4">
+          <CertificationDisclaimer variant="compact" />
+        </div>
         <div className="container mx-auto px-4 max-w-7xl">
           <Button variant="ghost" className="mb-6" onClick={() => navigate("/")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
