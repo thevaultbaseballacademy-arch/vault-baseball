@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2, CheckCircle } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, CheckCircle, Video } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -63,6 +63,12 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
         return "bg-green-600";
       case "Outfield":
         return "bg-teal-600";
+      case "Softball Hitting Foundations":
+        return "bg-pink-600";
+      case "Softball Hitting Performance":
+        return "bg-rose-600";
+      case "Softball Slap Specialist":
+        return "bg-amber-600";
       default:
         return "";
     }
@@ -105,9 +111,14 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
                     </Badge>
                   </TableCell>
                   <TableCell className="max-w-md">
-                    <span title={question.question}>
-                      {truncateText(question.question, 80)}
-                    </span>
+                    <div className="flex items-start gap-2">
+                      {question.video_url && (
+                        <Video className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                      )}
+                      <span title={question.question}>
+                        {truncateText(question.question, 80)}
+                      </span>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="font-mono">

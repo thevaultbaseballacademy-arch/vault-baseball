@@ -2653,6 +2653,7 @@ export type Database = {
           question: string
           question_id: string
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           cert_type: Database["public"]["Enums"]["admin_cert_type"]
@@ -2666,6 +2667,7 @@ export type Database = {
           question: string
           question_id: string
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           cert_type?: Database["public"]["Enums"]["admin_cert_type"]
@@ -2679,6 +2681,7 @@ export type Database = {
           question?: string
           question_id?: string
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }

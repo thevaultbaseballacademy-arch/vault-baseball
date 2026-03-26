@@ -30,6 +30,7 @@ const questionFormSchema = z.object({
   option_c: z.string().min(1, "Option C is required"),
   option_d: z.string().min(1, "Option D is required"),
   correct_answer: z.enum(["A", "B", "C", "D"]),
+  video_url: z.string().optional(),
 });
 
 type QuestionFormValues = z.infer<typeof questionFormSchema>;
@@ -53,6 +54,7 @@ export const ExamQuestionForm = ({ question, onSubmit, onCancel, isSubmitting }:
       option_c: question?.option_c || "",
       option_d: question?.option_d || "",
       correct_answer: (question?.correct_answer as "A" | "B" | "C" | "D") || "A",
+      video_url: question?.video_url || "",
     },
   });
 
@@ -168,6 +170,20 @@ export const ExamQuestionForm = ({ question, onSubmit, onCancel, isSubmitting }:
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="video_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Video URL (optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="https://... or pending-upload://..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
