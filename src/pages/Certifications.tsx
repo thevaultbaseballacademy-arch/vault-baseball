@@ -520,4 +520,86 @@ const Certifications = () => {
   );
 };
 
+const VIDEO_CERT_TYPES = [
+  { type: "Softball Hitting Foundations", label: "Hitting Foundations Video Cert" },
+  { type: "Softball Hitting Performance", label: "Hitting Performance Video Cert" },
+  { type: "Softball Slap Specialist", label: "Slap Specialist Video Cert" },
+];
+
+const VideoExamSection = ({ navigate }: { navigate: (path: string) => void }) => {
+  const { data: attempts = [] } = useVideoExamAttempts();
+
+  return (
+    <div className="space-y-4 pt-6 border-t border-border">
+      <h2 className="text-xl font-display text-foreground flex items-center gap-2">
+        <span className="w-1 h-6 bg-red-500 rounded-full" />
+        🎥 Video Certification (PRO Required)
+      </h2>
+      <p className="text-sm text-muted-foreground">
+        Watch real coaching scenarios. Identify the issue, cause, fix, and KPI. 80%+ to pass.
+      </p>
+      <div className="grid md:grid-cols-3 gap-4">
+        {VIDEO_CERT_TYPES.map(({ type, label }) => {
+          const passed = attempts.some(a => a.certification_type === type && a.passed);
+          const best = attempts
+            .filter(a => a.certification_type === type && a.score !== null && a.total_points !== null)
+            .sort((a, b) => (b.score || 0) - (a.score || 0))[0];
+          return (
+            <Card key={type} className={passed ? "border-green-500/50" : ""}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <Video className="w-5 h-5 text-primary" />
+                  {passed && <Badge className="bg-green-600 text-white gap-1"><CheckCircle className="w-3 h-3" />Passed</Badge>}
+                </div>
+                <CardTitle className="text-base">{label}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {best && (
+                  <p className="text-sm text-muted-foreground">
+                    Best: {best.score}/{best.total_points} ({best.total_points ? Math.round(((best.score || 0) / best.total_points) * 100) : 0}%)
+                  </p>
+                )}
+                <Button
+                  variant={passed ? "outline" : "vault"}
+                  size="sm"
+                  className="w-full"
+                  onClick={() => navigate(`/certifications/video-exam/${encodeURIComponent(type)}`)}
+                >
+                  {passed ? "Retake" : "Start Video Exam"}
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const BadgeSummarySection = () => {
+  const { data: badge } = useMyBadge();
+  if (!badge?.badge_level) return null;
+
+  return (
+    <div className="pt-6 border-t border-border">
+      <Card className="bg-gradient-to-r from-primary/5 to-accent/5">
+        <CardContent className="py-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h3 className="font-display text-lg text-foreground flex items-center gap-2">
+                <Star className="w-5 h-5 text-primary" />
+                Your Certification Badge
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Certified • Verified • Performance Validated
+              </p>
+            </div>
+            <CertificationBadge badgeLevel={badge.badge_level} badgeName={badge.badge_name} />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 export default Certifications;
