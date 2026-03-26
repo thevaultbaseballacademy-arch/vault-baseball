@@ -345,6 +345,7 @@ const App = () => (
             <Route path="/products/showcase-prep" element={<ShowcasePrep />} />
             <Route path="/products/video-analysis" element={<VideoAnalysis />} />
             <Route path="/products/org-starter-pack" element={<OrgStarterPack />} />
+            <Route path="/products/org-licensing" element={<OrgLicensing />} />
             <Route path="/products/remote-training" element={<RemoteTraining />} />
             <Route path="/products/founders-access" element={<FoundersAccess />} />
             <Route path="/products/athlete-assessment" element={<AthleteAssessment />} />
