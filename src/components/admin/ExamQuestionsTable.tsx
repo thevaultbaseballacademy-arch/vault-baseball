@@ -116,6 +116,11 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
                       {question.cert_type}
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={getQuestionTypeBadge((question as any).question_type || 'standard')}>
+                      {((question as any).question_type || 'standard').replace("_", " ")}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="max-w-md">
                     <div className="flex items-start gap-2">
                       {question.video_url && (
