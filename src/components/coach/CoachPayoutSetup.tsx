@@ -74,11 +74,11 @@ const CoachPayoutSetup = ({ coachId, userId }: Props) => {
             <p className="text-xs text-muted-foreground">Link your bank for automatic payouts</p>
           </div>
           {stripeAccountId ? (
-            <Badge className="ml-auto bg-green-600 text-white">
+            <Badge className="ml-auto bg-primary text-primary-foreground">
               <CheckCircle2 className="w-3 h-3 mr-1" /> Connected
             </Badge>
           ) : (
-            <Badge variant="outline" className="ml-auto border-yellow-500 text-yellow-500">
+            <Badge variant="outline" className="ml-auto border-destructive text-destructive">
               <AlertCircle className="w-3 h-3 mr-1" /> Not Connected
             </Badge>
           )}
