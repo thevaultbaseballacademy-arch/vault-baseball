@@ -321,6 +321,7 @@ const App = () => (
             } />
             <Route path="/certifications" element={<Certifications />} />
             <Route path="/certifications/exam/:certType" element={<CertificationExam />} />
+            <Route path="/certifications/video-exam/:certType" element={<VideoExam />} />
             <Route path="/certifications/leaderboard" element={<CertificationLeaderboard />} />
             <Route path="/verify" element={<VerifyCertification />} />
             <Route path="/privacy-settings" element={<PrivacySettings />} />
