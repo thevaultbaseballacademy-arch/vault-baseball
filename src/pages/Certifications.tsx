@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Award, Shield, CheckCircle, Clock, Lock, Play, 
-  ArrowRight, Loader2, AlertCircle, RefreshCw, Trophy
+  ArrowRight, Loader2, AlertCircle, RefreshCw, Trophy, Video, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
