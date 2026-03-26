@@ -52,6 +52,7 @@ import LongevityDashboard from "./pages/LongevityDashboard";
 import WeeklyCalendar from "./pages/WeeklyCalendar";
 import Certifications from "./pages/Certifications";
 import CertificationExam from "./pages/CertificationExam";
+import VideoExam from "./pages/VideoExam";
 import VerifyCertification from "./pages/VerifyCertification";
 import CertificationLeaderboard from "./pages/CertificationLeaderboard";
 import PrivacySettings from "./pages/PrivacySettings";
@@ -320,6 +321,7 @@ const App = () => (
             } />
             <Route path="/certifications" element={<Certifications />} />
             <Route path="/certifications/exam/:certType" element={<CertificationExam />} />
+            <Route path="/certifications/video-exam/:certType" element={<VideoExam />} />
             <Route path="/certifications/leaderboard" element={<CertificationLeaderboard />} />
             <Route path="/verify" element={<VerifyCertification />} />
             <Route path="/privacy-settings" element={<PrivacySettings />} />

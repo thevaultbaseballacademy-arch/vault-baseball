@@ -16,6 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachBadges from "@/components/marketplace/CoachBadges";
+import CertificationBadge from "@/components/certifications/CertificationBadge";
+import { useCoachBadge } from "@/hooks/useCoachBadge";
 import {
   useCoachProfile,
   useCoachServices,
@@ -149,12 +151,13 @@ const CoachMarketplaceProfile = () => {
                     <h1 className="text-3xl md:text-4xl font-display tracking-wide text-foreground mb-2">
                       {coach.coach_name}
                     </h1>
-                    <div className="mb-3">
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
                       <CoachBadges
                         isCertified={coach.is_certified}
                         isBypassCertified={coach.is_bypass_certified}
                         isStaff={coach.is_staff}
                       />
+                      <CertBadgeInline userId={coach.user_id} />
                     </div>
 
                     {coach.tagline && <p className="text-muted-foreground mb-3">{coach.tagline}</p>}
@@ -397,6 +400,13 @@ const CoachMarketplaceProfile = () => {
       <Footer />
     </main>
   );
+};
+
+// Inline badge component to avoid hooks-in-conditionals
+const CertBadgeInline = ({ userId }: { userId?: string }) => {
+  const { data: badge } = useCoachBadge(userId || null);
+  if (!badge?.badge_level) return null;
+  return <CertificationBadge badgeLevel={badge.badge_level} badgeName={badge.badge_name} compact />;
 };
 
 export default CoachMarketplaceProfile;
