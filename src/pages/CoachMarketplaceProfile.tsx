@@ -16,6 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachBadges from "@/components/marketplace/CoachBadges";
+import CertificationBadge from "@/components/certifications/CertificationBadge";
+import { useCoachBadge } from "@/hooks/useCoachBadge";
 import {
   useCoachProfile,
   useCoachServices,
