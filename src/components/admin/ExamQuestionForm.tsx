@@ -112,7 +112,104 @@ export const ExamQuestionForm = ({ question, onSubmit, onCancel, isSubmitting }:
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="question_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Question Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {QUESTION_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="difficulty_level"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Difficulty</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {DIFFICULTY_LEVELS.map((level) => (
+                      <SelectItem key={level} value={level}>
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
+
+        {(questionType === "scenario" || questionType === "multi_step") && (
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="scenario_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Scenario ID</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., IF-SC1" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="step_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Step Number</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="1" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
+        {questionType === "kpi" && (
+          <FormField
+            control={form.control}
+            name="kpi_category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>KPI Category</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g., transfer_time, route_efficiency" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
