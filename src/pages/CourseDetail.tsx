@@ -96,6 +96,13 @@ const CourseDetailPage = () => {
     });
   }, []);
 
+  // Log content access for IP protection
+  useEffect(() => {
+    if (courseId) {
+      logAccess({ contentType: "course", contentId: courseId, moduleName: course?.title });
+    }
+  }, [courseId]);
+
   const course = allCourses.find(c => c.id === courseId);
   const staticCourseContent = courseId ? courseContent[courseId] : undefined;
   const enrollment = enrollments.find(e => e.course_id === courseId);
