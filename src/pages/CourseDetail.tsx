@@ -33,6 +33,7 @@ import { courseContent } from "@/lib/courseData";
 import { useToast } from "@/hooks/use-toast";
 import VideoPlayer from "@/components/courses/VideoPlayer";
 import CourseCertificate from "@/components/certifications/CourseCertificate";
+import { useContentAccessLog } from "@/hooks/useContentAccessLog";
 
 const CourseDetailPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
