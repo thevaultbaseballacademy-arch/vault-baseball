@@ -60,8 +60,15 @@ export const ExamQuestionForm = ({ question, onSubmit, onCancel, isSubmitting }:
       option_d: question?.option_d || "",
       correct_answer: (question?.correct_answer as "A" | "B" | "C" | "D") || "A",
       video_url: question?.video_url || "",
+      question_type: (question as any)?.question_type || "standard",
+      scenario_id: (question as any)?.scenario_id || "",
+      step_number: (question as any)?.step_number || undefined,
+      kpi_category: (question as any)?.kpi_category || "",
+      difficulty_level: (question as any)?.difficulty_level || "standard",
     },
   });
+
+  const questionType = form.watch("question_type");
 
   return (
     <Form {...form}>
