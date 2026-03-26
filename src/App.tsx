@@ -52,6 +52,7 @@ import LongevityDashboard from "./pages/LongevityDashboard";
 import WeeklyCalendar from "./pages/WeeklyCalendar";
 import Certifications from "./pages/Certifications";
 import CertificationExam from "./pages/CertificationExam";
+import VideoExam from "./pages/VideoExam";
 import VerifyCertification from "./pages/VerifyCertification";
 import CertificationLeaderboard from "./pages/CertificationLeaderboard";
 import PrivacySettings from "./pages/PrivacySettings";
