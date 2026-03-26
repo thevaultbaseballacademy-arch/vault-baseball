@@ -173,6 +173,20 @@ export const ExamQuestionForm = ({ question, onSubmit, onCancel, isSubmitting }:
 
         <FormField
           control={form.control}
+          name="video_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Video URL (optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="https://... or pending-upload://..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="correct_answer"
           render={({ field }) => (
             <FormItem>

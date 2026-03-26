@@ -398,6 +398,23 @@ const CertificationExam = () => {
                         {flaggedQuestions.has(currentQuestion.id) ? 'Flagged' : 'Flag'}
                       </Button>
                     </div>
+                    {/* Video player for video-based questions */}
+                    {(currentQuestion as any).video_url && !(currentQuestion as any).video_url.startsWith('pending-upload://') && (
+                      <div className="mt-3 rounded-lg overflow-hidden border bg-black">
+                        <video
+                          src={(currentQuestion as any).video_url}
+                          controls
+                          className="w-full max-h-64 object-contain"
+                          preload="metadata"
+                        />
+                      </div>
+                    )}
+                    {(currentQuestion as any).video_url && (currentQuestion as any).video_url.startsWith('pending-upload://') && (
+                      <div className="mt-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 p-6 flex flex-col items-center gap-2">
+                        <Video className="w-8 h-8 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">Video clip pending upload</p>
+                      </div>
+                    )}
                     <CardTitle className="text-xl leading-relaxed">
                       {currentQuestion.question_text}
                     </CardTitle>

@@ -111,9 +111,14 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
                     </Badge>
                   </TableCell>
                   <TableCell className="max-w-md">
-                    <span title={question.question}>
-                      {truncateText(question.question, 80)}
-                    </span>
+                    <div className="flex items-start gap-2">
+                      {question.video_url && (
+                        <Video className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                      )}
+                      <span title={question.question}>
+                        {truncateText(question.question, 80)}
+                      </span>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="font-mono">
