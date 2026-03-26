@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LiveActivityFeed from "@/components/dashboard/LiveActivityFeed";
+import SportAwareHeader from "@/components/dashboard/SportAwareHeader";
 import WeeklyTipCard from "@/components/dashboard/WeeklyTipCard";
 import TrialStatusBanner from "@/components/trial/TrialStatusBanner";
 import CertificationDisclaimer from "@/components/legal/CertificationDisclaimer";
