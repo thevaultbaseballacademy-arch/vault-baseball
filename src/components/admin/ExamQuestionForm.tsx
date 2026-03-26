@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CERT_TYPES, type ExamQuestion } from "@/hooks/useExamQuestionManagement";
+import { CERT_TYPES, QUESTION_TYPES, DIFFICULTY_LEVELS, type ExamQuestion } from "@/hooks/useExamQuestionManagement";
 
 const questionFormSchema = z.object({
   cert_type: z.enum(["Foundations", "Performance", "Catcher", "Infield", "Outfield", "Softball Hitting Foundations", "Softball Hitting Performance", "Softball Slap Specialist", "Catcher Specialist", "Infield Specialist", "Outfield Specialist"]),
@@ -31,6 +31,11 @@ const questionFormSchema = z.object({
   option_d: z.string().min(1, "Option D is required"),
   correct_answer: z.enum(["A", "B", "C", "D"]),
   video_url: z.string().optional(),
+  question_type: z.enum(["standard", "scenario", "multi_step", "kpi", "video"]),
+  scenario_id: z.string().optional(),
+  step_number: z.coerce.number().optional(),
+  kpi_category: z.string().optional(),
+  difficulty_level: z.enum(["standard", "advanced", "elite"]),
 });
 
 type QuestionFormValues = z.infer<typeof questionFormSchema>;
