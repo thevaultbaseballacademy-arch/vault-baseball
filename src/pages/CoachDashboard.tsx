@@ -337,12 +337,10 @@ const CoachDashboard = () => {
           >
             {/* Header with Global Search */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-display text-foreground mb-1">
-                  COACH COMMAND CENTER
-                </h1>
-                <p className="text-muted-foreground">Find any drill in 3 clicks or less</p>
-              </div>
+              <SportAwareHeader 
+                baseTitle="COACH COMMAND CENTER" 
+                subtitle="Find any drill in 3 clicks or less" 
+              />
               <div className="flex items-center gap-3">
                 <GlobalSearch />
                 <WeeklySummaryReport />
