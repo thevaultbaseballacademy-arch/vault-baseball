@@ -98,6 +98,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { EddieAIChat } from "@/components/EddieAIChat";
 import DeviceMetrics from "./pages/DeviceMetrics";
 import DeviceIngestionPage from "./pages/DeviceIngestion";
+import OrgLicensing from "./pages/products/OrgLicensing";
 import SharedMetricsView from "./pages/SharedMetricsView";
 import Trial from "./pages/Trial";
 import VelocityBaseline from "./pages/VelocityBaseline";
@@ -344,6 +345,7 @@ const App = () => (
             <Route path="/products/showcase-prep" element={<ShowcasePrep />} />
             <Route path="/products/video-analysis" element={<VideoAnalysis />} />
             <Route path="/products/org-starter-pack" element={<OrgStarterPack />} />
+            <Route path="/products/org-licensing" element={<OrgLicensing />} />
             <Route path="/products/remote-training" element={<RemoteTraining />} />
             <Route path="/products/founders-access" element={<FoundersAccess />} />
             <Route path="/products/athlete-assessment" element={<AthleteAssessment />} />

@@ -1817,6 +1817,42 @@ export type Database = {
         }
         Relationships: []
       }
+      content_access_logs: {
+        Row: {
+          accessed_at: string
+          content_id: string
+          content_type: string
+          id: string
+          ip_hash: string | null
+          module_name: string | null
+          session_id: string | null
+          sport_type: string | null
+          user_id: string
+        }
+        Insert: {
+          accessed_at?: string
+          content_id: string
+          content_type: string
+          id?: string
+          ip_hash?: string | null
+          module_name?: string | null
+          session_id?: string | null
+          sport_type?: string | null
+          user_id: string
+        }
+        Update: {
+          accessed_at?: string
+          content_id?: string
+          content_type?: string
+          id?: string
+          ip_hash?: string | null
+          module_name?: string | null
+          session_id?: string | null
+          sport_type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       content_submissions: {
         Row: {
           age_group: string | null
@@ -6510,6 +6546,10 @@ export type Database = {
             Returns: boolean
           }
       decrypt_credential: { Args: { ciphertext: string }; Returns: string }
+      detect_concurrent_sessions: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       encrypt_credential: { Args: { plaintext: string }; Returns: string }
       generate_certificate_number: { Args: never; Returns: string }
       get_assigned_athlete_profiles: {

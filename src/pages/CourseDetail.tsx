@@ -33,11 +33,13 @@ import { courseContent } from "@/lib/courseData";
 import { useToast } from "@/hooks/use-toast";
 import VideoPlayer from "@/components/courses/VideoPlayer";
 import CourseCertificate from "@/components/certifications/CourseCertificate";
+import { useContentAccessLog } from "@/hooks/useContentAccessLog";
 
 const CourseDetailPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { logAccess } = useContentAccessLog();
   const [userId, setUserId] = useState<string | undefined>();
   const [userName, setUserName] = useState<string>("");
   const [openModules, setOpenModules] = useState<number[]>([0]);
@@ -93,6 +95,13 @@ const CourseDetailPage = () => {
       }
     });
   }, []);
+
+  // Log content access for IP protection
+  useEffect(() => {
+    if (courseId) {
+      logAccess({ contentType: "course", contentId: courseId, moduleName: course?.title });
+    }
+  }, [courseId]);
 
   const course = allCourses.find(c => c.id === courseId);
   const staticCourseContent = courseId ? courseContent[courseId] : undefined;
