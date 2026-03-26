@@ -7,7 +7,7 @@ export type ExamQuestion = Tables<"exam_questions">;
 export type ExamQuestionInsert = TablesInsert<"exam_questions">;
 export type ExamQuestionUpdate = TablesUpdate<"exam_questions">;
 
-export const CERT_TYPES = ["Foundations", "Performance", "Catcher", "Infield", "Outfield", "Softball Hitting Foundations", "Softball Hitting Performance", "Softball Slap Specialist"] as const;
+export const CERT_TYPES = ["Foundations", "Performance", "Catcher", "Infield", "Outfield", "Softball Hitting Foundations", "Softball Hitting Performance", "Softball Slap Specialist", "Catcher Specialist", "Infield Specialist", "Outfield Specialist"] as const;
 export type CertType = typeof CERT_TYPES[number];
 
 export const useExamQuestionManagement = (certTypeFilter?: CertType) => {
