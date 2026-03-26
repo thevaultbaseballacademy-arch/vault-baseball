@@ -54,6 +54,7 @@ export const ExamQuestionForm = ({ question, onSubmit, onCancel, isSubmitting }:
       option_c: question?.option_c || "",
       option_d: question?.option_d || "",
       correct_answer: (question?.correct_answer as "A" | "B" | "C" | "D") || "A",
+      video_url: question?.video_url || "",
     },
   });
 
