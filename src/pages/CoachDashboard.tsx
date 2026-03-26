@@ -31,6 +31,7 @@ import { CoachDevelopmentReview } from "@/components/coach/CoachDevelopmentRevie
 import { AthleteScoreOverview } from "@/components/coach/AthleteScoreOverview";
 import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashboard";
 import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
+import CoachPayoutSetup from "@/components/coach/CoachPayoutSetup";
 import CoachIntelligencePanel from "@/components/intelligence/CoachIntelligencePanel";
 import {
   LineChart,
