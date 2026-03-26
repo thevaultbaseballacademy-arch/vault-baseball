@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, ArrowRight, CheckCircle, XCircle, Clock, 
-  AlertTriangle, Loader2, Flag, BookOpen
+  AlertTriangle, Loader2, Flag, BookOpen, Video
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
