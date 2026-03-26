@@ -1016,6 +1016,54 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_badges: {
+        Row: {
+          badge_level: Database["public"]["Enums"]["badge_level"]
+          badge_name: string
+          badge_status: string
+          certification_score: number | null
+          compliance_status: string | null
+          created_at: string | null
+          earned_at: string | null
+          expires_at: string | null
+          id: string
+          kpi_validated: boolean | null
+          last_validated_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          badge_level: Database["public"]["Enums"]["badge_level"]
+          badge_name: string
+          badge_status?: string
+          certification_score?: number | null
+          compliance_status?: string | null
+          created_at?: string | null
+          earned_at?: string | null
+          expires_at?: string | null
+          id?: string
+          kpi_validated?: boolean | null
+          last_validated_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          badge_level?: Database["public"]["Enums"]["badge_level"]
+          badge_name?: string
+          badge_status?: string
+          certification_score?: number | null
+          compliance_status?: string | null
+          created_at?: string | null
+          earned_at?: string | null
+          expires_at?: string | null
+          id?: string
+          kpi_validated?: boolean | null
+          last_validated_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       coach_invite_tokens: {
         Row: {
           created_at: string
@@ -5982,6 +6030,102 @@ export type Database = {
         }
         Relationships: []
       }
+      video_exam_attempts: {
+        Row: {
+          answers: Json
+          certification_type: string
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          passed: boolean | null
+          score: number | null
+          total_points: number | null
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          certification_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          passed?: boolean | null
+          score?: number | null
+          total_points?: number | null
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          certification_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          passed?: boolean | null
+          score?: number | null
+          total_points?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      video_questions: {
+        Row: {
+          certification_type: string
+          correct_answers: Json
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          options_1: Json
+          options_2: Json
+          options_3: Json
+          options_4: Json
+          question_1: string
+          question_2: string
+          question_3: string
+          question_4: string
+          scenario_description: string | null
+          updated_at: string | null
+          video_url: string
+        }
+        Insert: {
+          certification_type: string
+          correct_answers?: Json
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          options_1?: Json
+          options_2?: Json
+          options_3?: Json
+          options_4?: Json
+          question_1: string
+          question_2: string
+          question_3: string
+          question_4: string
+          scenario_description?: string | null
+          updated_at?: string | null
+          video_url: string
+        }
+        Update: {
+          certification_type?: string
+          correct_answers?: Json
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          options_1?: Json
+          options_2?: Json
+          options_3?: Json
+          options_4?: Json
+          question_1?: string
+          question_2?: string
+          question_3?: string
+          question_4?: string
+          scenario_description?: string | null
+          updated_at?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       weekly_tips: {
         Row: {
           category: string
@@ -6413,6 +6557,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_coach_badge_level: { Args: { _user_id: string }; Returns: Json }
       get_coach_user_id_by_name: {
         Args: { _coach_name: string }
         Returns: string
@@ -6603,6 +6748,12 @@ export type Database = {
         | "Softball Hitting Performance"
         | "Softball Slap Specialist"
       app_role: "admin" | "coach" | "athlete"
+      badge_level:
+        | "foundations"
+        | "performance"
+        | "specialist"
+        | "pro"
+        | "director"
       certification_status: "active" | "expired" | "revoked"
       certification_type:
         | "foundations"
@@ -6765,6 +6916,13 @@ export const Constants = {
         "Softball Slap Specialist",
       ],
       app_role: ["admin", "coach", "athlete"],
+      badge_level: [
+        "foundations",
+        "performance",
+        "specialist",
+        "pro",
+        "director",
+      ],
       certification_status: ["active", "expired", "revoked"],
       certification_type: [
         "foundations",
