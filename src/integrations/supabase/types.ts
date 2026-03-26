@@ -2693,13 +2693,18 @@ export type Database = {
           cert_type: Database["public"]["Enums"]["admin_cert_type"]
           correct_answer: string
           created_at: string
+          difficulty_level: string
           id: string
+          kpi_category: string | null
           option_a: string
           option_b: string
           option_c: string
           option_d: string
           question: string
           question_id: string
+          question_type: string
+          scenario_id: string | null
+          step_number: number | null
           updated_at: string
           video_url: string | null
         }
@@ -2707,13 +2712,18 @@ export type Database = {
           cert_type: Database["public"]["Enums"]["admin_cert_type"]
           correct_answer: string
           created_at?: string
+          difficulty_level?: string
           id?: string
+          kpi_category?: string | null
           option_a: string
           option_b: string
           option_c: string
           option_d: string
           question: string
           question_id: string
+          question_type?: string
+          scenario_id?: string | null
+          step_number?: number | null
           updated_at?: string
           video_url?: string | null
         }
@@ -2721,13 +2731,18 @@ export type Database = {
           cert_type?: Database["public"]["Enums"]["admin_cert_type"]
           correct_answer?: string
           created_at?: string
+          difficulty_level?: string
           id?: string
+          kpi_category?: string | null
           option_a?: string
           option_b?: string
           option_c?: string
           option_d?: string
           question?: string
           question_id?: string
+          question_type?: string
+          scenario_id?: string | null
+          step_number?: number | null
           updated_at?: string
           video_url?: string | null
         }
