@@ -95,7 +95,7 @@ const CoachPayoutSetup = ({ coachId, userId }: Props) => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="bg-secondary/30 rounded-lg p-3 text-center">
-                <DollarSign className="w-4 h-4 text-green-500 mx-auto mb-1" />
+                <DollarSign className="w-4 h-4 text-primary mx-auto mb-1" />
                 <p className="text-[11px] text-muted-foreground">Revenue Split</p>
                 <p className="font-display text-foreground">70 / 30</p>
               </div>
