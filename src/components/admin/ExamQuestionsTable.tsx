@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2, CheckCircle } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, CheckCircle, Video } from "lucide-react";
 import {
   Table,
   TableBody,
