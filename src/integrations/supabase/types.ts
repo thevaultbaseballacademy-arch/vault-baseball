@@ -6747,6 +6747,9 @@ export type Database = {
         | "Softball Hitting Foundations"
         | "Softball Hitting Performance"
         | "Softball Slap Specialist"
+        | "Catcher Specialist"
+        | "Infield Specialist"
+        | "Outfield Specialist"
       app_role: "admin" | "coach" | "athlete"
       badge_level:
         | "foundations"
@@ -6914,6 +6917,9 @@ export const Constants = {
         "Softball Hitting Foundations",
         "Softball Hitting Performance",
         "Softball Slap Specialist",
+        "Catcher Specialist",
+        "Infield Specialist",
+        "Outfield Specialist",
       ],
       app_role: ["admin", "coach", "athlete"],
       badge_level: [
