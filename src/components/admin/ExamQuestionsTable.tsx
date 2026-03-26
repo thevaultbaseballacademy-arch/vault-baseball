@@ -63,6 +63,12 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
         return "bg-green-600";
       case "Outfield":
         return "bg-teal-600";
+      case "Softball Hitting Foundations":
+        return "bg-pink-600";
+      case "Softball Hitting Performance":
+        return "bg-rose-600";
+      case "Softball Slap Specialist":
+        return "bg-amber-600";
       default:
         return "";
     }
