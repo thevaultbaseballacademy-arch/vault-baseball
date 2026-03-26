@@ -189,6 +189,7 @@ const App = () => (
           {/* Site-wide Founder's Pricing Urgency Banner */}
           <FoundersPricingBanner />
           <SessionExpiryHandler />
+          <BiometricGate />
           
           <Routes>
             <Route path="/" element={<Index />} />

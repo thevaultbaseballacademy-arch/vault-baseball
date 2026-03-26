@@ -276,6 +276,9 @@ const Account = () => {
               </div>
             </div>
 
+            {/* Biometric Security */}
+            <BiometricToggle />
+
             {/* Two-Factor Authentication (Admin Only) */}
             <MFASettings userId={user?.id} />
 
