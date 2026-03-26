@@ -31,7 +31,9 @@ import { CoachDevelopmentReview } from "@/components/coach/CoachDevelopmentRevie
 import { AthleteScoreOverview } from "@/components/coach/AthleteScoreOverview";
 import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashboard";
 import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
+import CoachPayoutSetup from "@/components/coach/CoachPayoutSetup";
 import CoachIntelligencePanel from "@/components/intelligence/CoachIntelligencePanel";
+import SportAwareHeader from "@/components/dashboard/SportAwareHeader";
 import {
   LineChart,
   Line,
@@ -335,12 +337,10 @@ const CoachDashboard = () => {
           >
             {/* Header with Global Search */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-display text-foreground mb-1">
-                  COACH COMMAND CENTER
-                </h1>
-                <p className="text-muted-foreground">Find any drill in 3 clicks or less</p>
-              </div>
+              <SportAwareHeader 
+                baseTitle="COACH COMMAND CENTER" 
+                subtitle="Find any drill in 3 clicks or less" 
+              />
               <div className="flex items-center gap-3">
                 <GlobalSearch />
                 <WeeklySummaryReport />
@@ -469,8 +469,11 @@ const CoachDashboard = () => {
               </TabsContent>
 
               <TabsContent value="earnings" className="space-y-6">
-                <h2 className="font-display text-xl text-foreground">MARKETPLACE EARNINGS</h2>
-                <p className="text-sm text-muted-foreground">Track your session income and payout history. Platform fee: 30% / Coach: 70%.</p>
+                <h2 className="font-display text-xl text-foreground">EARNINGS & PAYOUTS</h2>
+                <p className="text-sm text-muted-foreground">Track your session income, link your bank account, and manage payouts. Platform fee: 30% / Coach: 70%.</p>
+                {coachRecordId && user?.id && (
+                  <CoachPayoutSetup coachId={coachRecordId} userId={user.id} />
+                )}
                 {coachRecordId ? (
                   <CoachEarningsDashboard coachId={coachRecordId} />
                 ) : (

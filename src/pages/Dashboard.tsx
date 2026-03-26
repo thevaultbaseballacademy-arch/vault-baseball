@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LiveActivityFeed from "@/components/dashboard/LiveActivityFeed";
+import SportAwareHeader from "@/components/dashboard/SportAwareHeader";
 import WeeklyTipCard from "@/components/dashboard/WeeklyTipCard";
 import TrialStatusBanner from "@/components/trial/TrialStatusBanner";
 import CertificationDisclaimer from "@/components/legal/CertificationDisclaimer";
@@ -171,12 +172,10 @@ const Dashboard = () => {
           >
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-display text-foreground mb-1">
-                  PROGRESS DASHBOARD
-                </h1>
-                <p className="text-muted-foreground">Track your training & wellness trends</p>
-              </div>
+              <SportAwareHeader 
+                baseTitle="PROGRESS DASHBOARD" 
+                subtitle="Track your training & wellness trends" 
+              />
               <div className="flex gap-2">
                 {([7, 14, 30] as const).map((days) => (
                   <Button
