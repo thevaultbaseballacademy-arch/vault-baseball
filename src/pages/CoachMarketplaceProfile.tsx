@@ -402,4 +402,11 @@ const CoachMarketplaceProfile = () => {
   );
 };
 
+// Inline badge component to avoid hooks-in-conditionals
+const CertBadgeInline = ({ userId }: { userId?: string }) => {
+  const { data: badge } = useCoachBadge(userId || null);
+  if (!badge?.badge_level) return null;
+  return <CertificationBadge badgeLevel={badge.badge_level} badgeName={badge.badge_name} compact />;
+};
+
 export default CoachMarketplaceProfile;
