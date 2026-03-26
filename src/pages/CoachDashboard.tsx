@@ -33,6 +33,7 @@ import CoachEarningsDashboard from "@/components/marketplace/CoachEarningsDashbo
 import CoachMarketplaceSetup from "@/components/marketplace/CoachMarketplaceSetup";
 import CoachPayoutSetup from "@/components/coach/CoachPayoutSetup";
 import CoachIntelligencePanel from "@/components/intelligence/CoachIntelligencePanel";
+import SportAwareHeader from "@/components/dashboard/SportAwareHeader";
 import {
   LineChart,
   Line,
