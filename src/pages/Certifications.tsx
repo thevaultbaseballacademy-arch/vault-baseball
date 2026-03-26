@@ -27,6 +27,9 @@ import {
   type CertificationType 
 } from "@/lib/certificationPricing";
 import CertificateGenerator from "@/components/certifications/CertificateGenerator";
+import CertificationBadge from "@/components/certifications/CertificationBadge";
+import { useMyBadge } from "@/hooks/useCoachBadge";
+import { useVideoExamAttempts } from "@/hooks/useVideoExam";
 
 const CertificationCard = ({ 
   definition, 
