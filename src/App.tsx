@@ -98,6 +98,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { EddieAIChat } from "@/components/EddieAIChat";
 import DeviceMetrics from "./pages/DeviceMetrics";
 import DeviceIngestionPage from "./pages/DeviceIngestion";
+import OrgLicensing from "./pages/products/OrgLicensing";
 import SharedMetricsView from "./pages/SharedMetricsView";
 import Trial from "./pages/Trial";
 import VelocityBaseline from "./pages/VelocityBaseline";
