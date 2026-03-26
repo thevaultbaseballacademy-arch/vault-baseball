@@ -10,6 +10,12 @@ export type ExamQuestionUpdate = TablesUpdate<"exam_questions">;
 export const CERT_TYPES = ["Foundations", "Performance", "Catcher", "Infield", "Outfield", "Softball Hitting Foundations", "Softball Hitting Performance", "Softball Slap Specialist", "Catcher Specialist", "Infield Specialist", "Outfield Specialist"] as const;
 export type CertType = typeof CERT_TYPES[number];
 
+export const QUESTION_TYPES = ["standard", "scenario", "multi_step", "kpi", "video"] as const;
+export type QuestionType = typeof QUESTION_TYPES[number];
+
+export const DIFFICULTY_LEVELS = ["standard", "advanced", "elite"] as const;
+export type DifficultyLevel = typeof DIFFICULTY_LEVELS[number];
+
 export const useExamQuestionManagement = (certTypeFilter?: CertType) => {
   const queryClient = useQueryClient();
 

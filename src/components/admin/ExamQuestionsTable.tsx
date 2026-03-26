@@ -52,26 +52,31 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
   };
 
   const getCertTypeBadgeClass = (certType: string) => {
-    switch (certType) {
-      case "Foundations":
-        return "bg-blue-600";
-      case "Performance":
-        return "bg-purple-600";
-      case "Catcher":
-        return "bg-orange-600";
-      case "Infield":
-        return "bg-green-600";
-      case "Outfield":
-        return "bg-teal-600";
-      case "Softball Hitting Foundations":
-        return "bg-pink-600";
-      case "Softball Hitting Performance":
-        return "bg-rose-600";
-      case "Softball Slap Specialist":
-        return "bg-amber-600";
-      default:
-        return "";
-    }
+    const map: Record<string, string> = {
+      "Foundations": "bg-blue-600",
+      "Performance": "bg-purple-600",
+      "Catcher": "bg-orange-600",
+      "Infield": "bg-green-600",
+      "Outfield": "bg-teal-600",
+      "Softball Hitting Foundations": "bg-pink-600",
+      "Softball Hitting Performance": "bg-rose-600",
+      "Softball Slap Specialist": "bg-amber-600",
+      "Catcher Specialist": "bg-red-600",
+      "Infield Specialist": "bg-emerald-600",
+      "Outfield Specialist": "bg-cyan-600",
+    };
+    return map[certType] || "";
+  };
+
+  const getQuestionTypeBadge = (type: string) => {
+    const map: Record<string, string> = {
+      standard: "bg-muted text-muted-foreground",
+      scenario: "bg-yellow-600/20 text-yellow-400 border-yellow-600/30",
+      multi_step: "bg-orange-600/20 text-orange-400 border-orange-600/30",
+      kpi: "bg-blue-600/20 text-blue-400 border-blue-600/30",
+      video: "bg-purple-600/20 text-purple-400 border-purple-600/30",
+    };
+    return map[type] || "";
   };
 
   const truncateText = (text: string, maxLength: number) => {
@@ -86,7 +91,8 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">ID</TableHead>
-              <TableHead className="w-[120px]">Type</TableHead>
+              <TableHead className="w-[120px]">Cert Type</TableHead>
+              <TableHead className="w-[90px]">Q Type</TableHead>
               <TableHead>Question</TableHead>
               <TableHead className="w-[80px]">Answer</TableHead>
               <TableHead className="w-[70px]">Actions</TableHead>
@@ -95,7 +101,7 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
           <TableBody>
             {questions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                   No questions found. Add questions manually or import from CSV.
                 </TableCell>
               </TableRow>
@@ -108,6 +114,11 @@ export const ExamQuestionsTable = ({ questions, onEdit, onDelete }: ExamQuestion
                   <TableCell>
                     <Badge className={getCertTypeBadgeClass(question.cert_type)}>
                       {question.cert_type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={getQuestionTypeBadge((question as any).question_type || 'standard')}>
+                      {((question as any).question_type || 'standard').replace("_", " ")}
                     </Badge>
                   </TableCell>
                   <TableCell className="max-w-md">

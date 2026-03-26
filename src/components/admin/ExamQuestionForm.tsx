@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CERT_TYPES, type ExamQuestion } from "@/hooks/useExamQuestionManagement";
+import { CERT_TYPES, QUESTION_TYPES, DIFFICULTY_LEVELS, type ExamQuestion } from "@/hooks/useExamQuestionManagement";
 
 const questionFormSchema = z.object({
   cert_type: z.enum(["Foundations", "Performance", "Catcher", "Infield", "Outfield", "Softball Hitting Foundations", "Softball Hitting Performance", "Softball Slap Specialist", "Catcher Specialist", "Infield Specialist", "Outfield Specialist"]),
@@ -31,6 +31,11 @@ const questionFormSchema = z.object({
   option_d: z.string().min(1, "Option D is required"),
   correct_answer: z.enum(["A", "B", "C", "D"]),
   video_url: z.string().optional(),
+  question_type: z.enum(["standard", "scenario", "multi_step", "kpi", "video"]),
+  scenario_id: z.string().optional(),
+  step_number: z.coerce.number().optional(),
+  kpi_category: z.string().optional(),
+  difficulty_level: z.enum(["standard", "advanced", "elite"]),
 });
 
 type QuestionFormValues = z.infer<typeof questionFormSchema>;
@@ -55,8 +60,15 @@ export const ExamQuestionForm = ({ question, onSubmit, onCancel, isSubmitting }:
       option_d: question?.option_d || "",
       correct_answer: (question?.correct_answer as "A" | "B" | "C" | "D") || "A",
       video_url: question?.video_url || "",
+      question_type: (question as any)?.question_type || "standard",
+      scenario_id: (question as any)?.scenario_id || "",
+      step_number: (question as any)?.step_number || undefined,
+      kpi_category: (question as any)?.kpi_category || "",
+      difficulty_level: (question as any)?.difficulty_level || "standard",
     },
   });
+
+  const questionType = form.watch("question_type");
 
   return (
     <Form {...form}>
@@ -100,7 +112,104 @@ export const ExamQuestionForm = ({ question, onSubmit, onCancel, isSubmitting }:
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="question_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Question Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {QUESTION_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="difficulty_level"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Difficulty</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {DIFFICULTY_LEVELS.map((level) => (
+                      <SelectItem key={level} value={level}>
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
+
+        {(questionType === "scenario" || questionType === "multi_step") && (
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="scenario_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Scenario ID</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., IF-SC1" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="step_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Step Number</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="1" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
+        {questionType === "kpi" && (
+          <FormField
+            control={form.control}
+            name="kpi_category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>KPI Category</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g., transfer_time, route_efficiency" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
