@@ -30,6 +30,7 @@ const questionFormSchema = z.object({
   option_c: z.string().min(1, "Option C is required"),
   option_d: z.string().min(1, "Option D is required"),
   correct_answer: z.enum(["A", "B", "C", "D"]),
+  video_url: z.string().optional(),
 });
 
 type QuestionFormValues = z.infer<typeof questionFormSchema>;
