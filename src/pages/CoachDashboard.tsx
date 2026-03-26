@@ -470,8 +470,11 @@ const CoachDashboard = () => {
               </TabsContent>
 
               <TabsContent value="earnings" className="space-y-6">
-                <h2 className="font-display text-xl text-foreground">MARKETPLACE EARNINGS</h2>
-                <p className="text-sm text-muted-foreground">Track your session income and payout history. Platform fee: 30% / Coach: 70%.</p>
+                <h2 className="font-display text-xl text-foreground">EARNINGS & PAYOUTS</h2>
+                <p className="text-sm text-muted-foreground">Track your session income, link your bank account, and manage payouts. Platform fee: 30% / Coach: 70%.</p>
+                {coachRecordId && user?.id && (
+                  <CoachPayoutSetup coachId={coachRecordId} userId={user.id} />
+                )}
                 {coachRecordId ? (
                   <CoachEarningsDashboard coachId={coachRecordId} />
                 ) : (
