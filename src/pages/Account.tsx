@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import NotificationSettings from "@/components/notifications/NotificationSettings";
 import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequests";
 import MFASettings from "@/components/auth/MFASettings";
+import BiometricToggle from "@/components/account/BiometricToggle";
 import SessionManagement from "@/components/account/SessionManagement";
 import DataExportPanel from "@/components/account/DataExportPanel";
 import DataDeletionPanel from "@/components/account/DataDeletionPanel";
