@@ -505,6 +505,12 @@ const Certifications = () => {
                 ))}
               </div>
             </div>
+
+            {/* 🎥 VIDEO CERTIFICATION */}
+            <VideoExamSection navigate={navigate} />
+
+            {/* 🏆 YOUR BADGE */}
+            <BadgeSummarySection />
           </motion.div>
         </div>
       </main>
