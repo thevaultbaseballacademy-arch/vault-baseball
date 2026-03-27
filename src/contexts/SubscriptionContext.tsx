@@ -139,12 +139,12 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
     });
 
-    // Auto-refresh subscription every minute
+    // Auto-refresh subscription every 5 minutes (was 1 min — reduced API calls)
     const interval = setInterval(() => {
       if (session?.access_token) {
         checkSubscription(session.access_token, user?.email);
       }
-    }, 60000);
+    }, 300000);
 
     return () => {
       subscription.unsubscribe();
