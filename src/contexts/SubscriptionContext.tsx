@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -33,40 +33,35 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasTeamAccess, setHasTeamAccess] = useState(false);
 
-  // Initialize push notifications when user is logged in
+  // Use refs to avoid stale closures in interval
+  const sessionRef = useRef<Session | null>(null);
+  const userRef = useRef<User | null>(null);
+
   usePushNotifications(user?.id);
 
-  const checkTeamAccess = async (email: string | undefined) => {
-    if (!email) {
-      setHasTeamAccess(false);
-      return;
-    }
-    
+  const checkTeamAccess = useCallback(async (email: string | undefined) => {
+    if (!email) { setHasTeamAccess(false); return; }
     try {
       const { data } = await supabase
         .from("team_whitelist")
         .select("full_access")
         .eq("email", email.toLowerCase())
         .maybeSingle();
-      
       setHasTeamAccess(data?.full_access ?? false);
-    } catch (error) {
-      console.error("Error checking team access:", error);
-      setHasTeamAccess(false);
-    }
-  };
+    } catch { setHasTeamAccess(false); }
+  }, []);
 
-  const checkSubscription = async (accessToken: string, userEmail?: string) => {
+  const checkSubscription = useCallback(async (accessToken: string, userEmail?: string) => {
     try {
-      // Check team whitelist first
-      await checkTeamAccess(userEmail);
-      
-      const { data, error } = await supabase.functions.invoke("check-subscription", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      // Run team check and subscription check in parallel
+      const [, subResult] = await Promise.all([
+        checkTeamAccess(userEmail),
+        supabase.functions.invoke("check-subscription", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
+      ]);
 
+      const { data, error } = subResult;
       if (error) throw error;
 
       setIsSubscribed(data?.subscribed ?? false);
@@ -78,24 +73,23 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       setSubscriptionTier(null);
       setSubscriptionEnd(null);
     }
-  };
+  }, [checkTeamAccess]);
 
-  const refreshSubscription = async () => {
-    if (session?.access_token) {
-      await checkSubscription(session.access_token, user?.email);
+  const refreshSubscription = useCallback(async () => {
+    if (sessionRef.current?.access_token) {
+      await checkSubscription(sessionRef.current.access_token, userRef.current?.email);
     }
-  };
+  }, [checkSubscription]);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Issue #8: Handle session expiry & token refresh failures
-        if (event === "TOKEN_REFRESHED" && !session) {
-          // Token refresh failed — force re-login
+      (event, newSession) => {
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        sessionRef.current = newSession;
+        userRef.current = newSession?.user ?? null;
+
+        if (event === "TOKEN_REFRESHED" && !newSession) {
           setIsSubscribed(false);
           setSubscriptionTier(null);
           setSubscriptionEnd(null);
@@ -112,11 +106,10 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
           setIsLoading(false);
           return;
         }
-        
-        if (session?.access_token) {
-          // Defer subscription check to avoid deadlock
+
+        if (newSession?.access_token) {
           setTimeout(() => {
-            checkSubscription(session.access_token, session.user?.email);
+            checkSubscription(newSession.access_token, newSession.user?.email);
           }, 0);
         } else {
           setIsSubscribed(false);
@@ -128,21 +121,22 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.access_token) {
-        checkSubscription(session.access_token, session.user?.email);
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s);
+      setUser(s?.user ?? null);
+      sessionRef.current = s;
+      userRef.current = s?.user ?? null;
+
+      if (s?.access_token) {
+        checkSubscription(s.access_token, s.user?.email);
       }
       setIsLoading(false);
     });
 
-    // Auto-refresh subscription every 5 minutes (was 1 min — reduced API calls)
+    // Use refs for interval to avoid stale closure
     const interval = setInterval(() => {
-      if (session?.access_token) {
-        checkSubscription(session.access_token, user?.email);
+      if (sessionRef.current?.access_token) {
+        checkSubscription(sessionRef.current.access_token, userRef.current?.email);
       }
     }, 300000);
 
@@ -150,15 +144,15 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       subscription.unsubscribe();
       clearInterval(interval);
     };
-  }, []);
+  }, [checkSubscription]);
 
   return (
     <SubscriptionContext.Provider
       value={{
         user,
         session,
-        isSubscribed: isSubscribed || hasTeamAccess, // Team access = full subscription
-        subscriptionTier: hasTeamAccess ? "elite" : subscriptionTier, // Team gets elite tier
+        isSubscribed: isSubscribed || hasTeamAccess,
+        subscriptionTier: hasTeamAccess ? "elite" : subscriptionTier,
         subscriptionEnd,
         isLoading,
         hasTeamAccess,

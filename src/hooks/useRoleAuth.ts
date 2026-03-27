@@ -1,115 +1,90 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "@supabase/supabase-js";
 import { VaultRole, Permission, hasPermission, getPrimaryRole, getDashboardRoute } from "@/lib/permissions";
-
-interface RoleAuthState {
-  user: User | null;
-  roles: VaultRole[];
-  primaryRole: VaultRole | null;
-  isLoading: boolean;
-}
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 /**
- * Unified hook for role-based auth. Loads from user_roles + team_whitelist.
- * Replaces ad-hoc role checks scattered across useAdminAuth / useOwnerAuth.
+ * Unified hook for role-based auth. Uses React Query for caching.
  */
 export const useRoleAuth = () => {
-  const [state, setState] = useState<RoleAuthState>({
-    user: null,
-    roles: [],
-    primaryRole: null,
-    isLoading: true,
-  });
+  const { user } = useSubscription();
 
-  useEffect(() => {
-    const loadRoles = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setState({ user: null, roles: [], primaryRole: null, isLoading: false });
-          return;
-        }
+  const { data, isLoading } = useQuery({
+    queryKey: ["user-roles", user?.id],
+    queryFn: async () => {
+      if (!user) return { roles: [] as VaultRole[] };
 
-        // Fetch roles from user_roles table
-        const { data: roleRows } = await supabase
+      // Batch all three queries in parallel
+      const [rolesResult, whitelistResult, coachResult] = await Promise.all([
+        supabase
           .from("user_roles")
           .select("role")
-          .eq("user_id", user.id);
-
-        const roles: VaultRole[] = (roleRows || [])
-          .map((r) => r.role as string)
-          .filter((r): r is VaultRole =>
-            ["owner", "admin", "coach", "athlete", "parent"].includes(r)
-          );
-
-        // Also check team_whitelist for owner/admin (parallel system)
-        if (user.email) {
-          const { data: tw } = await supabase
-            .from("team_whitelist")
-            .select("admin_access, full_access")
-            .eq("email", user.email.toLowerCase())
-            .maybeSingle();
-
-          if (tw?.admin_access && tw?.full_access && !roles.includes("owner")) {
-            roles.push("owner");
-          }
-          if (tw?.admin_access && !tw?.full_access && !roles.includes("admin")) {
-            roles.push("admin");
-          }
-        }
-
-        // Check coaches table for coach role (backward compat)
-        const { data: coachData } = await supabase
+          .eq("user_id", user.id),
+        user.email
+          ? supabase
+              .from("team_whitelist")
+              .select("admin_access, full_access")
+              .eq("email", user.email.toLowerCase())
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
+        supabase
           .from("coaches")
           .select("id")
           .eq("user_id", user.id)
           .eq("status", "Active")
-          .maybeSingle();
+          .maybeSingle(),
+      ]);
 
-        if (coachData && !roles.includes("coach")) {
-          roles.push("coach");
-        }
+      const roles: VaultRole[] = (rolesResult.data || [])
+        .map((r) => r.role as string)
+        .filter((r): r is VaultRole =>
+          ["owner", "admin", "coach", "athlete", "parent"].includes(r)
+        );
 
-        setState({
-          user,
-          roles,
-          primaryRole: getPrimaryRole(roles),
-          isLoading: false,
-        });
-      } catch (error) {
-        console.error("useRoleAuth error:", error);
-        setState({ user: null, roles: [], primaryRole: null, isLoading: false });
+      const tw = whitelistResult.data;
+      if (tw?.admin_access && tw?.full_access && !roles.includes("owner")) {
+        roles.push("owner");
       }
-    };
+      if (tw?.admin_access && !tw?.full_access && !roles.includes("admin")) {
+        roles.push("admin");
+      }
 
-    loadRoles();
+      if (coachResult.data && !roles.includes("coach")) {
+        roles.push("coach");
+      }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      loadRoles();
-    });
+      return { roles };
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 
-    return () => subscription.unsubscribe();
-  }, []);
+  const roles = data?.roles ?? [];
+  const primaryRole = useMemo(() => getPrimaryRole(roles), [roles]);
 
   const can = useCallback(
-    (permission: Permission) => hasPermission(state.roles, permission),
-    [state.roles]
+    (permission: Permission) => hasPermission(roles, permission),
+    [roles]
   );
 
   const dashboardRoute = useMemo(
-    () => getDashboardRoute(state.primaryRole),
-    [state.primaryRole]
+    () => getDashboardRoute(primaryRole),
+    [primaryRole]
   );
 
   return {
-    ...state,
+    user: user ?? null,
+    roles,
+    primaryRole,
+    isLoading,
     can,
     dashboardRoute,
-    isOwner: state.roles.includes("owner"),
-    isAdmin: state.roles.includes("admin") || state.roles.includes("owner"),
-    isCoach: state.roles.includes("coach"),
-    isAthlete: state.roles.includes("athlete"),
-    isParent: state.roles.includes("parent"),
+    isOwner: roles.includes("owner"),
+    isAdmin: roles.includes("admin") || roles.includes("owner"),
+    isCoach: roles.includes("coach"),
+    isAthlete: roles.includes("athlete"),
+    isParent: roles.includes("parent"),
   };
 };
