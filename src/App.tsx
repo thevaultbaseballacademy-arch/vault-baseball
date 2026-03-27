@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,165 +11,179 @@ import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import BiometricGate from "@/components/auth/BiometricGate";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import RoleGuard from "@/components/RoleGuard";
+import { Loader2 } from "lucide-react";
+
+// Only eagerly load the landing page and auth
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import AuthCallback from "./pages/AuthCallback";
-import Account from "./pages/Account";
-import Schedule from "./pages/Schedule";
-import Checkin from "./pages/Checkin";
-import Dashboard from "./pages/Dashboard";
-import VaultDashboard from "./pages/VaultDashboard";
-import CoachDashboard from "./pages/CoachDashboard";
-import CoachDashboardLayout from "./components/coach/CoachDashboardLayout";
-import CoachAthletes from "./pages/coach/CoachAthletes";
-import CoachKPIs from "./pages/coach/CoachKPIs";
-import CoachLessons from "./pages/coach/CoachLessons";
-import CoachAssignments from "./pages/coach/CoachAssignments";
-import CoachCreate from "./pages/coach/CoachCreate";
-import CoachSchedule from "./pages/coach/CoachSchedule";
-import CoachProfilePage from "./pages/coach/CoachProfile";
-import Admin from "./pages/Admin";
-import OwnerDashboardLayout from "./components/admin/OwnerDashboardLayout";
-import OwnerOverview from "./pages/admin/OwnerOverview";
-import OwnerRevenue from "./pages/admin/OwnerRevenue";
-import OwnerUsers from "./pages/admin/OwnerUsers";
-import OwnerContentQueue from "./pages/admin/OwnerContentQueue";
-import OwnerContent from "./pages/admin/OwnerContent";
-import OwnerIntelligence from "./pages/admin/OwnerIntelligence";
-import OwnerSettings from "./pages/admin/OwnerSettings";
-import OwnerMaintenance from "./pages/admin/OwnerMaintenance";
-import OwnerAnalytics from "./pages/admin/OwnerAnalytics";
-import OwnerHealthMetrics from "./pages/admin/OwnerHealthMetrics";
-import OwnerAudit from "./pages/admin/OwnerAudit";
-import Community from "./pages/Community";
-import Profile from "./pages/Profile";
-import Courses from "./pages/Courses";
-import CourseDetail from "./pages/CourseDetail";
-import MyPrograms from "./pages/MyPrograms";
-import Notifications from "./pages/Notifications";
-import NotFound from "./pages/NotFound";
-import YouthPathway from "./pages/YouthPathway";
-import AcademyPathway from "./pages/AcademyPathway";
-import LongevityDashboard from "./pages/LongevityDashboard";
-import WeeklyCalendar from "./pages/WeeklyCalendar";
-import Certifications from "./pages/Certifications";
-import CertificationExam from "./pages/CertificationExam";
-import VideoExam from "./pages/VideoExam";
-import VerifyCertification from "./pages/VerifyCertification";
-import CertificationLeaderboard from "./pages/CertificationLeaderboard";
-import PrivacySettings from "./pages/PrivacySettings";
-import CertificationAnalytics from "./pages/admin/CertificationAnalytics";
-import AdminCoaches from "./pages/admin/AdminCoaches";
-import AdminExams from "./pages/admin/AdminExams";
-import AdminCertifications from "./pages/admin/AdminCertifications";
-import AdminPayouts from "./pages/admin/AdminPayouts";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentCanceled from "./pages/PaymentCanceled";
-import LongevitySystem from "./pages/products/LongevitySystem";
-import TransferSystem from "./pages/products/TransferSystem";
-import VelocitySystem from "./pages/products/VelocitySystem";
-import VelocityAccelerator from "./pages/products/VelocityAccelerator";
-import TeamLicenses from "./pages/products/TeamLicenses";
-import VeloCheck from "./pages/products/VeloCheck";
-import Bundles from "./pages/products/Bundles";
-import RecruitmentAudit from "./pages/products/RecruitmentAudit";
-import CertifiedCoach from "./pages/products/CertifiedCoach";
-import TransferIntensive from "./pages/products/TransferIntensive";
-import VaultVerifiedCoach from "./pages/products/VaultVerifiedCoach";
-import ShowcasePrep from "./pages/products/ShowcasePrep";
-import VideoAnalysis from "./pages/products/VideoAnalysis";
-import OrgStarterPack from "./pages/products/OrgStarterPack";
-import FoundersAccess from "./pages/products/FoundersAccess";
-import AthleteAssessment from "./pages/products/AthleteAssessment";
-import RemoteTraining from "./pages/products/RemoteTraining";
-import PartnerClaim from "./pages/PartnerClaim";
-import WallOfWins from "./pages/WallOfWins";
-import Products from "./pages/Products";
-import FindCoach from "./pages/FindCoach";
-import SharedProfile from "./pages/SharedProfile";
-import VerifyCourseCertificate from "./pages/VerifyCourseCertificate";
-import CertificateLeaderboard from "./pages/CertificateLeaderboard";
-import TermsOfService from "./pages/TermsOfService";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import RefundPolicy from "./pages/RefundPolicy";
-import AthleteWaiver from "./pages/AthleteWaiver";
-import CookieSettings from "./pages/CookieSettings";
-import Contact from "./pages/Contact";
-import FAQ from "./pages/FAQ";
-import { CookieConsent } from "@/components/CookieConsent";
-import { EddieAIChat } from "@/components/EddieAIChat";
-import DeviceMetrics from "./pages/DeviceMetrics";
-import DeviceIngestionPage from "./pages/DeviceIngestion";
-import OrgLicensing from "./pages/products/OrgLicensing";
-import SharedMetricsView from "./pages/SharedMetricsView";
-import Trial from "./pages/Trial";
-import VelocityBaseline from "./pages/VelocityBaseline";
-import TrialExpired from "./pages/TrialExpired";
-import WhitePaper from "./pages/WhitePaper";
-import BaselineAudit from "./pages/BaselineAudit";
-import PerformanceBlueprint from "./pages/PerformanceBlueprint";
-import CoachRegister from "./pages/CoachRegister";
-import CoachOnboarding from "./pages/CoachOnboarding";
-import LessonPackages from "./pages/LessonPackages";
-import RemoteLessons from "./pages/RemoteLessons";
-import GroupSessions from "./pages/GroupSessions";
-import FreeVelocityGuide from "./pages/FreeVelocityGuide";
-import FreeEvaluation from "./pages/FreeEvaluation";
-import AthleteOnboarding from "./pages/AthleteOnboarding";
-import RemoteTrainingHub from "./pages/RemoteTrainingHub";
-import Marketplace from "./pages/Marketplace";
-import CoachMarketplaceProfile from "./pages/CoachMarketplaceProfile";
-import Claim22MAccess from "./pages/Claim22MAccess";
-import ShortRedirect from "./pages/ShortRedirect";
-import CoachManagement from "./pages/CoachManagement";
-import OwnerCommandCenter from "./pages/OwnerCommandCenter";
-import ProgressReport from "./pages/ProgressReport";
-import BookSession from "./pages/BookSession";
-import SoftballDevelopment from "./pages/SoftballDevelopment";
-import SoftballLessonBooking from "./pages/softball/SoftballLessonBooking";
-import SoftballCoaches from "./pages/softball/SoftballCoaches";
-import SoftballLessonNotes from "./pages/softball/SoftballLessonNotes";
-import SoftballCourses from "./pages/softball/SoftballCourses";
-import SoftballProfile from "./pages/softball/SoftballProfile";
-import SoftballPitching from "./pages/softball/SoftballPitching";
-import SoftballHitting from "./pages/softball/SoftballHitting";
-import SoftballFielding from "./pages/softball/SoftballFielding";
-import SoftballAnalytics from "./pages/softball/SoftballAnalytics";
-import SoftballPositionTracks from "./pages/softball/SoftballPositionTracks";
-import RecruitingHub from "./pages/recruiting/RecruitingHub";
-import RecruitingProfilePage from "./pages/recruiting/RecruitingProfile";
-import RecruitingShowcases from "./pages/recruiting/RecruitingShowcases";
-import RecruitingContacts from "./pages/recruiting/RecruitingContacts";
-import RecruitingChecklist from "./pages/recruiting/RecruitingChecklist";
-import RecruitingAssistantPage from "./pages/recruiting/RecruitingAssistantPage";
-import ParentDashboardLayout from "./components/parent/ParentDashboardLayout";
-import ParentAthletes from "./pages/parent/ParentAthletes";
-import ParentProgress from "./pages/parent/ParentProgress";
-import ParentLessons from "./pages/parent/ParentLessons";
-import ParentRecruiting from "./pages/parent/ParentRecruiting";
-import ParentWellness from "./pages/parent/ParentWellness";
-import ParentTraining from "./pages/parent/ParentTraining";
-import ParentMessages from "./pages/parent/ParentMessages";
-import ParentDownloads from "./pages/parent/ParentDownloads";
-import AthleteDownloads from "./pages/AthleteDownloads";
-import CoachDownloads from "./pages/coach/CoachDownloads";
-import OwnerExports from "./pages/admin/OwnerExports";
-import WorkloadDashboard from "./pages/workload/WorkloadDashboard";
-import PitchLog from "./pages/workload/PitchLog";
-import ArmCare from "./pages/workload/ArmCare";
-import InjuryLog from "./pages/workload/InjuryLog";
-import DailyWorkloadLog from "./pages/workload/DailyWorkloadLog";
-import TournamentMode from "./pages/workload/TournamentMode";
-import TeamHub from "./pages/team/TeamHub";
-import TeamRoster from "./pages/team/TeamRoster";
-import TeamSchedule from "./pages/team/TeamSchedule";
-import TeamAnnouncements from "./pages/team/TeamAnnouncements";
-import TeamAnalytics from "./pages/team/TeamAnalytics";
-import MentalPerformance from "./pages/MentalPerformance";
-import StrengthConditioning from "./pages/StrengthConditioning";
-import PracticePlanBuilder from "./pages/team/PracticePlanBuilder";
-import DPFlexBuilder from "./pages/softball/DPFlexBuilder";
-import ResetPassword from "./pages/ResetPassword";
+
+// Global loading fallback
+const PageLoader = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  </div>
+);
+
+// Lazy load everything else
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Account = lazy(() => import("./pages/Account"));
+const Schedule = lazy(() => import("./pages/Schedule"));
+const Checkin = lazy(() => import("./pages/Checkin"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const VaultDashboard = lazy(() => import("./pages/VaultDashboard"));
+const CoachDashboard = lazy(() => import("./pages/CoachDashboard"));
+const CoachDashboardLayout = lazy(() => import("./components/coach/CoachDashboardLayout"));
+const CoachAthletes = lazy(() => import("./pages/coach/CoachAthletes"));
+const CoachKPIs = lazy(() => import("./pages/coach/CoachKPIs"));
+const CoachLessons = lazy(() => import("./pages/coach/CoachLessons"));
+const CoachAssignments = lazy(() => import("./pages/coach/CoachAssignments"));
+const CoachCreate = lazy(() => import("./pages/coach/CoachCreate"));
+const CoachSchedule = lazy(() => import("./pages/coach/CoachSchedule"));
+const CoachProfilePage = lazy(() => import("./pages/coach/CoachProfile"));
+const CoachDownloads = lazy(() => import("./pages/coach/CoachDownloads"));
+const Admin = lazy(() => import("./pages/Admin"));
+const OwnerDashboardLayout = lazy(() => import("./components/admin/OwnerDashboardLayout"));
+const OwnerOverview = lazy(() => import("./pages/admin/OwnerOverview"));
+const OwnerRevenue = lazy(() => import("./pages/admin/OwnerRevenue"));
+const OwnerUsers = lazy(() => import("./pages/admin/OwnerUsers"));
+const OwnerContentQueue = lazy(() => import("./pages/admin/OwnerContentQueue"));
+const OwnerContent = lazy(() => import("./pages/admin/OwnerContent"));
+const OwnerIntelligence = lazy(() => import("./pages/admin/OwnerIntelligence"));
+const OwnerSettings = lazy(() => import("./pages/admin/OwnerSettings"));
+const OwnerMaintenance = lazy(() => import("./pages/admin/OwnerMaintenance"));
+const OwnerAnalytics = lazy(() => import("./pages/admin/OwnerAnalytics"));
+const OwnerHealthMetrics = lazy(() => import("./pages/admin/OwnerHealthMetrics"));
+const OwnerAudit = lazy(() => import("./pages/admin/OwnerAudit"));
+const OwnerExports = lazy(() => import("./pages/admin/OwnerExports"));
+const Community = lazy(() => import("./pages/Community"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Courses = lazy(() => import("./pages/Courses"));
+const CourseDetail = lazy(() => import("./pages/CourseDetail"));
+const MyPrograms = lazy(() => import("./pages/MyPrograms"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const YouthPathway = lazy(() => import("./pages/YouthPathway"));
+const AcademyPathway = lazy(() => import("./pages/AcademyPathway"));
+const LongevityDashboard = lazy(() => import("./pages/LongevityDashboard"));
+const WeeklyCalendar = lazy(() => import("./pages/WeeklyCalendar"));
+const Certifications = lazy(() => import("./pages/Certifications"));
+const CertificationExam = lazy(() => import("./pages/CertificationExam"));
+const VideoExam = lazy(() => import("./pages/VideoExam"));
+const VerifyCertification = lazy(() => import("./pages/VerifyCertification"));
+const CertificationLeaderboard = lazy(() => import("./pages/CertificationLeaderboard"));
+const PrivacySettings = lazy(() => import("./pages/PrivacySettings"));
+const CertificationAnalytics = lazy(() => import("./pages/admin/CertificationAnalytics"));
+const AdminCoaches = lazy(() => import("./pages/admin/AdminCoaches"));
+const AdminExams = lazy(() => import("./pages/admin/AdminExams"));
+const AdminCertifications = lazy(() => import("./pages/admin/AdminCertifications"));
+const AdminPayouts = lazy(() => import("./pages/admin/AdminPayouts"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
+const LongevitySystem = lazy(() => import("./pages/products/LongevitySystem"));
+const TransferSystem = lazy(() => import("./pages/products/TransferSystem"));
+const VelocitySystem = lazy(() => import("./pages/products/VelocitySystem"));
+const VelocityAccelerator = lazy(() => import("./pages/products/VelocityAccelerator"));
+const TeamLicenses = lazy(() => import("./pages/products/TeamLicenses"));
+const VeloCheck = lazy(() => import("./pages/products/VeloCheck"));
+const Bundles = lazy(() => import("./pages/products/Bundles"));
+const RecruitmentAudit = lazy(() => import("./pages/products/RecruitmentAudit"));
+const CertifiedCoach = lazy(() => import("./pages/products/CertifiedCoach"));
+const TransferIntensive = lazy(() => import("./pages/products/TransferIntensive"));
+const VaultVerifiedCoach = lazy(() => import("./pages/products/VaultVerifiedCoach"));
+const ShowcasePrep = lazy(() => import("./pages/products/ShowcasePrep"));
+const VideoAnalysis = lazy(() => import("./pages/products/VideoAnalysis"));
+const OrgStarterPack = lazy(() => import("./pages/products/OrgStarterPack"));
+const OrgLicensing = lazy(() => import("./pages/products/OrgLicensing"));
+const RemoteTraining = lazy(() => import("./pages/products/RemoteTraining"));
+const FoundersAccess = lazy(() => import("./pages/products/FoundersAccess"));
+const AthleteAssessment = lazy(() => import("./pages/products/AthleteAssessment"));
+const PartnerClaim = lazy(() => import("./pages/PartnerClaim"));
+const WallOfWins = lazy(() => import("./pages/WallOfWins"));
+const Products = lazy(() => import("./pages/Products"));
+const FindCoach = lazy(() => import("./pages/FindCoach"));
+const SharedProfile = lazy(() => import("./pages/SharedProfile"));
+const VerifyCourseCertificate = lazy(() => import("./pages/VerifyCourseCertificate"));
+const CertificateLeaderboard = lazy(() => import("./pages/CertificateLeaderboard"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const AthleteWaiver = lazy(() => import("./pages/AthleteWaiver"));
+const CookieSettings = lazy(() => import("./pages/CookieSettings"));
+const Contact = lazy(() => import("./pages/Contact"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const DeviceMetrics = lazy(() => import("./pages/DeviceMetrics"));
+const DeviceIngestionPage = lazy(() => import("./pages/DeviceIngestion"));
+const SharedMetricsView = lazy(() => import("./pages/SharedMetricsView"));
+const Trial = lazy(() => import("./pages/Trial"));
+const VelocityBaseline = lazy(() => import("./pages/VelocityBaseline"));
+const TrialExpired = lazy(() => import("./pages/TrialExpired"));
+const WhitePaper = lazy(() => import("./pages/WhitePaper"));
+const BaselineAudit = lazy(() => import("./pages/BaselineAudit"));
+const PerformanceBlueprint = lazy(() => import("./pages/PerformanceBlueprint"));
+const CoachRegister = lazy(() => import("./pages/CoachRegister"));
+const CoachOnboarding = lazy(() => import("./pages/CoachOnboarding"));
+const LessonPackages = lazy(() => import("./pages/LessonPackages"));
+const RemoteLessons = lazy(() => import("./pages/RemoteLessons"));
+const GroupSessions = lazy(() => import("./pages/GroupSessions"));
+const FreeVelocityGuide = lazy(() => import("./pages/FreeVelocityGuide"));
+const FreeEvaluation = lazy(() => import("./pages/FreeEvaluation"));
+const AthleteOnboarding = lazy(() => import("./pages/AthleteOnboarding"));
+const RemoteTrainingHub = lazy(() => import("./pages/RemoteTrainingHub"));
+const Marketplace = lazy(() => import("./pages/Marketplace"));
+const CoachMarketplaceProfile = lazy(() => import("./pages/CoachMarketplaceProfile"));
+const Claim22MAccess = lazy(() => import("./pages/Claim22MAccess"));
+const ShortRedirect = lazy(() => import("./pages/ShortRedirect"));
+const CoachManagement = lazy(() => import("./pages/CoachManagement"));
+const OwnerCommandCenter = lazy(() => import("./pages/OwnerCommandCenter"));
+const ProgressReport = lazy(() => import("./pages/ProgressReport"));
+const BookSession = lazy(() => import("./pages/BookSession"));
+const SoftballDevelopment = lazy(() => import("./pages/SoftballDevelopment"));
+const SoftballLessonBooking = lazy(() => import("./pages/softball/SoftballLessonBooking"));
+const SoftballCoaches = lazy(() => import("./pages/softball/SoftballCoaches"));
+const SoftballLessonNotes = lazy(() => import("./pages/softball/SoftballLessonNotes"));
+const SoftballCourses = lazy(() => import("./pages/softball/SoftballCourses"));
+const SoftballProfile = lazy(() => import("./pages/softball/SoftballProfile"));
+const SoftballPitching = lazy(() => import("./pages/softball/SoftballPitching"));
+const SoftballHitting = lazy(() => import("./pages/softball/SoftballHitting"));
+const SoftballFielding = lazy(() => import("./pages/softball/SoftballFielding"));
+const SoftballAnalytics = lazy(() => import("./pages/softball/SoftballAnalytics"));
+const SoftballPositionTracks = lazy(() => import("./pages/softball/SoftballPositionTracks"));
+const RecruitingHub = lazy(() => import("./pages/recruiting/RecruitingHub"));
+const RecruitingProfilePage = lazy(() => import("./pages/recruiting/RecruitingProfile"));
+const RecruitingShowcases = lazy(() => import("./pages/recruiting/RecruitingShowcases"));
+const RecruitingContacts = lazy(() => import("./pages/recruiting/RecruitingContacts"));
+const RecruitingChecklist = lazy(() => import("./pages/recruiting/RecruitingChecklist"));
+const RecruitingAssistantPage = lazy(() => import("./pages/recruiting/RecruitingAssistantPage"));
+const ParentDashboardLayout = lazy(() => import("./components/parent/ParentDashboardLayout"));
+const ParentAthletes = lazy(() => import("./pages/parent/ParentAthletes"));
+const ParentProgress = lazy(() => import("./pages/parent/ParentProgress"));
+const ParentLessons = lazy(() => import("./pages/parent/ParentLessons"));
+const ParentRecruiting = lazy(() => import("./pages/parent/ParentRecruiting"));
+const ParentWellness = lazy(() => import("./pages/parent/ParentWellness"));
+const ParentTraining = lazy(() => import("./pages/parent/ParentTraining"));
+const ParentMessages = lazy(() => import("./pages/parent/ParentMessages"));
+const ParentDownloads = lazy(() => import("./pages/parent/ParentDownloads"));
+const AthleteDownloads = lazy(() => import("./pages/AthleteDownloads"));
+const WorkloadDashboard = lazy(() => import("./pages/workload/WorkloadDashboard"));
+const PitchLog = lazy(() => import("./pages/workload/PitchLog"));
+const ArmCare = lazy(() => import("./pages/workload/ArmCare"));
+const InjuryLog = lazy(() => import("./pages/workload/InjuryLog"));
+const DailyWorkloadLog = lazy(() => import("./pages/workload/DailyWorkloadLog"));
+const TournamentMode = lazy(() => import("./pages/workload/TournamentMode"));
+const TeamHub = lazy(() => import("./pages/team/TeamHub"));
+const TeamRoster = lazy(() => import("./pages/team/TeamRoster"));
+const TeamSchedule = lazy(() => import("./pages/team/TeamSchedule"));
+const TeamAnnouncements = lazy(() => import("./pages/team/TeamAnnouncements"));
+const TeamAnalytics = lazy(() => import("./pages/team/TeamAnalytics"));
+const MentalPerformance = lazy(() => import("./pages/MentalPerformance"));
+const StrengthConditioning = lazy(() => import("./pages/StrengthConditioning"));
+const PracticePlanBuilder = lazy(() => import("./pages/team/PracticePlanBuilder"));
+const DPFlexBuilder = lazy(() => import("./pages/softball/DPFlexBuilder"));
+
+// Lazy load global widgets that aren't needed on first paint
+const CookieConsent = lazy(() => import("@/components/CookieConsent").then(m => ({ default: m.CookieConsent })));
+const EddieAIChat = lazy(() => import("@/components/EddieAIChat").then(m => ({ default: m.EddieAIChat })));
 
 // Redirect /courses/:id to /course/:id
 const CoursesRedirect = () => {
@@ -176,7 +191,16 @@ const CoursesRedirect = () => {
   return <Navigate to={`/course/${courseId}`} replace />;
 };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes  
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -191,6 +215,7 @@ const App = () => (
           <SessionExpiryHandler />
           <BiometricGate />
           
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -451,7 +476,6 @@ const App = () => (
               <Route path="downloads" element={<ParentDownloads />} />
             </Route>
 
-
             {/* Workload & Health Management */}
             <Route path="/workload" element={<TrialProtectedRoute><WorkloadDashboard /></TrialProtectedRoute>} />
             <Route path="/workload/pitch-log" element={<TrialProtectedRoute><PitchLog /></TrialProtectedRoute>} />
@@ -490,8 +514,11 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <CookieConsent />
-          <EddieAIChat />
+          </Suspense>
+          <Suspense fallback={null}>
+            <CookieConsent />
+            <EddieAIChat />
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
       </SportProvider>
