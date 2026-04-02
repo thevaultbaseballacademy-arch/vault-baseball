@@ -73,35 +73,48 @@ const ProgressReport = () => {
     const fetchReport = async () => {
       if (!token) { setError("Invalid report link"); setLoading(false); return; }
 
-      // Try authenticated first, then anon
-      const { data, error: fetchErr } = await supabase
-        .from("athlete_progress_reports")
-        .select("*")
-        .eq("share_token", token)
-        .eq("is_published", true)
-        .maybeSingle();
+      try {
+        // Use edge function for secure share-token access
+        const { data, error: invokeErr } = await supabase.functions.invoke("get-progress-report", {
+          body: null,
+          headers: {},
+          method: "GET",
+        });
 
-      if (fetchErr || !data) {
-        setError("Report not found or not yet published.");
-        setLoading(false);
-        return;
-      }
+        // supabase.functions.invoke doesn't support query params easily, 
+        // so we use fetch directly
+        const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        
+        const headers: Record<string, string> = {
+          "apikey": anonKey,
+          "Content-Type": "application/json",
+        };
 
-      setReport(data);
-
-      // Mark parent view
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        if (user.id === data.athlete_user_id) {
-          await supabase.from("athlete_progress_reports").update({ athlete_viewed_at: new Date().toISOString() }).eq("id", data.id);
-        } else {
-          await supabase.from("athlete_progress_reports").update({ parent_viewed_at: new Date().toISOString() }).eq("id", data.id);
+        // Include auth token if available
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
         }
-      }
 
-      // Get athlete profile
-      const { data: profile } = await supabase.rpc("get_public_profile", { target_user_id: data.athlete_user_id });
-      if (profile && profile.length > 0) setAthleteProfile(profile[0]);
+        const response = await fetch(
+          `${supabaseUrl}/functions/v1/get-progress-report?token=${encodeURIComponent(token)}`,
+          { headers }
+        );
+
+        if (!response.ok) {
+          setError("Report not found or not yet published.");
+          setLoading(false);
+          return;
+        }
+
+        const result = await response.json();
+        setReport(result.report);
+        if (result.athleteProfile) setAthleteProfile(result.athleteProfile);
+      } catch (err) {
+        setError("Report not found or not yet published.");
+      }
 
       setLoading(false);
     };
