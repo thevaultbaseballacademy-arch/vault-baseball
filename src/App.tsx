@@ -186,6 +186,7 @@ const StrengthConditioning = lazy(() => import("./pages/StrengthConditioning"));
 const PracticePlanBuilder = lazy(() => import("./pages/team/PracticePlanBuilder"));
 const DPFlexBuilder = lazy(() => import("./pages/softball/DPFlexBuilder"));
 const ProspectGrader = lazy(() => import("./pages/ProspectGrader"));
+const PerformanceAnalytics = lazy(() => import("./pages/PerformanceAnalytics"));
 
 // Lazy load global widgets that aren't needed on first paint
 const EddieAIChat = lazy(() => import("@/components/EddieAIChat").then(m => ({ default: m.EddieAIChat })));
@@ -415,6 +416,7 @@ const App = () => (
             <Route path="/white-paper" element={<WhitePaper />} />
             <Route path="/baseline-audit" element={<BaselineAudit />} />
             <Route path="/performance-blueprint" element={<PerformanceBlueprint />} />
+            <Route path="/performance-analytics" element={<TrialProtectedRoute><PerformanceAnalytics /></TrialProtectedRoute>} />
             <Route path="/coach-register" element={<CoachRegister />} />
             <Route path="/coach-onboarding" element={<CoachOnboarding />} />
             <Route path="/lesson-packages" element={<LessonPackages />} />
