@@ -14,6 +14,7 @@ const PRODUCT_PATTERNS: { pattern: RegExp; href: string; label: string }[] = [
   { pattern: /\/products\/velo-check/i, href: "/products/velo-check", label: "GET VELO-CHECK — $97" },
   { pattern: /\/products\/velocity-system/i, href: "/products/velocity-system", label: "START THE VELOCITY SYSTEM — $397" },
   { pattern: /\/products\/remote-training/i, href: "/products/remote-training", label: "JOIN REMOTE TRAINING — $199/MO" },
+  { pattern: /\/products\/athlete-assessment/i, href: "/products/athlete-assessment", label: "START THE ASSESSMENT — $97" },
 ];
 
 function extractProductCTAs(content: string) {
@@ -53,10 +54,47 @@ const TypingIndicator = () => (
   </div>
 );
 
-// ── Eddie's pre-loaded greeting (no API call needed) ──
-const EDDIE_GREETING = `Welcome to Vault Baseball. I'm Eddie AI.
+// ── Quick prompts by sport ──
+const BASEBALL_QUICK_STARTERS = [
+  { text: "I'm a parent exploring training options", icon: "👨‍👩‍👦" },
+  { text: "I'm a pitcher — I want to add velocity", icon: "⚾" },
+  { text: "I'm a coach looking for a system", icon: "📋" },
+  { text: "I'm not sure where to start", icon: "🤔" },
+];
+
+const SOFTBALL_QUICK_STARTERS = [
+  { text: "I'm a parent exploring softball training", icon: "👨‍👩‍👧" },
+  { text: "I'm a pitcher — windmill velocity help", icon: "🥎" },
+  { text: "I'm a coach looking for a softball system", icon: "📋" },
+  { text: "I'm not sure where to start", icon: "🤔" },
+];
+
+const BASEBALL_QUICK_PROMPTS = [
+  { text: "Grade my hitting tools", icon: "🎯" },
+  { text: "What do D1 coaches look for?", icon: "🏫" },
+  { text: "Build my recruiting plan", icon: "📝" },
+  { text: "Analyze my pitching metrics", icon: "📊" },
+  { text: "Create my workout plan", icon: "💪" },
+];
+
+const SOFTBALL_QUICK_PROMPTS = [
+  { text: "Grade my softball tools", icon: "🎯" },
+  { text: "Pitching velocity benchmarks", icon: "🥎" },
+  { text: "Title IX scholarship guide", icon: "⚖️" },
+  { text: "Softball recruiting timeline", icon: "📅" },
+  { text: "Build my pitching arsenal", icon: "🔥" },
+];
+
+// ── Greetings ──
+const BASEBALL_GREETING = `Welcome to Vault Baseball. I'm Eddie AI.
 
 I help athletes and parents figure out the right next step for velocity, arm care, and long-term baseball development.
+
+Let's start with a few quick questions so I can point you in the right direction.`;
+
+const SOFTBALL_GREETING = `Welcome to Vault Softball. I'm Eddie AI.
+
+I help softball athletes and parents figure out the right next step for pitching development, hitting, recruiting, and long-term athletic growth.
 
 Let's start with a few quick questions so I can point you in the right direction.`;
 
@@ -64,9 +102,12 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
-  const { messages, isLoading, error, sendMessage, clearChat, injectMessage } = useEddieChat();
+  const [showQuickPrompts, setShowQuickPrompts] = useState(false);
+  const { messages, isLoading, error, sendMessage, clearChat, injectMessage, sport } = useEddieChat();
   const [chatInput, setChatInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const isSoftball = sport === "softball";
 
   // Auto-scroll
   useEffect(() => {
@@ -79,7 +120,7 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
     setIsOpen(true);
     setIsMinimized(false);
     if (!hasGreeted && messages.length === 0) {
-      injectMessage({ role: "assistant", content: EDDIE_GREETING });
+      injectMessage({ role: "assistant", content: isSoftball ? SOFTBALL_GREETING : BASEBALL_GREETING });
       setHasGreeted(true);
     }
   };
@@ -89,23 +130,26 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
     if (chatInput.trim()) {
       sendMessage(chatInput);
       setChatInput("");
+      setShowQuickPrompts(false);
     }
+  };
+
+  const handleQuickSend = (text: string) => {
+    sendMessage(text);
+    setShowQuickPrompts(false);
   };
 
   const handleClear = () => {
     clearChat();
     setHasGreeted(false);
+    setShowQuickPrompts(false);
   };
 
   // Hide on /contact
   if (typeof window !== "undefined" && window.location.pathname === "/contact") return null;
 
-  const quickStarters = [
-    { text: "I'm a parent exploring training options", icon: "👨‍👩‍👦" },
-    { text: "I'm a pitcher — I want to add velocity", icon: "⚾" },
-    { text: "I'm a coach looking for a system", icon: "📋" },
-    { text: "I'm not sure where to start", icon: "🤔" },
-  ];
+  const quickStarters = isSoftball ? SOFTBALL_QUICK_STARTERS : BASEBALL_QUICK_STARTERS;
+  const quickPrompts = isSoftball ? SOFTBALL_QUICK_PROMPTS : BASEBALL_QUICK_PROMPTS;
 
   return (
     <>
@@ -132,14 +176,19 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-foreground text-background shrink-0">
+          <div className={cn(
+            "flex items-center justify-between px-4 py-3 shrink-0",
+            isSoftball ? "bg-purple-900 text-purple-50" : "bg-foreground text-background"
+          )}>
             <div className="flex items-center gap-3" onClick={() => isMinimized && setIsMinimized(false)}>
-              <div className="w-8 h-8 bg-background/12 flex items-center justify-center">
+              <div className={cn("w-8 h-8 flex items-center justify-center", isSoftball ? "bg-purple-700/50" : "bg-background/12")}>
                 <span className="text-sm font-display">E</span>
               </div>
               <div>
                 <span className="font-display text-sm tracking-wider">EDDIE MEJIA</span>
-                <p className="text-[10px] opacity-50 tracking-wider font-display">DEVELOPMENT ARCHITECT</p>
+                <p className="text-[10px] opacity-50 tracking-wider font-display">
+                  {isSoftball ? "SOFTBALL DEVELOPMENT ARCHITECT" : "DEVELOPMENT ARCHITECT"}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-0.5">
@@ -167,7 +216,10 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
                     return (
                       <div key={idx} className={cn("flex gap-2", msg.role === "user" ? "justify-end" : "justify-start")}>
                         {msg.role === "assistant" && (
-                          <div className="w-6 h-6 bg-foreground/8 flex items-center justify-center shrink-0 mt-1">
+                          <div className={cn(
+                            "w-6 h-6 flex items-center justify-center shrink-0 mt-1",
+                            isSoftball ? "bg-purple-500/15" : "bg-foreground/8"
+                          )}>
                             <span className="text-[10px] font-display text-foreground">E</span>
                           </div>
                         )}
@@ -175,7 +227,7 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
                           <div className={cn(
                             "px-3 py-2.5 text-[13px] leading-relaxed",
                             msg.role === "user"
-                              ? "bg-foreground text-background"
+                              ? isSoftball ? "bg-purple-700 text-purple-50" : "bg-foreground text-background"
                               : "bg-muted text-foreground"
                           )}>
                             {msg.role === "assistant" ? (
@@ -218,7 +270,7 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
                       {quickStarters.map((q) => (
                         <button
                           key={q.text}
-                          onClick={() => sendMessage(q.text)}
+                          onClick={() => handleQuickSend(q.text)}
                           className="w-full flex items-center gap-2 text-xs px-3 py-2.5 bg-card border border-border text-foreground text-left hover:border-foreground/20 transition-colors"
                         >
                           <span className="text-sm">{q.icon}</span>
@@ -235,6 +287,31 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
                 </div>
               </ScrollArea>
 
+              {/* Quick prompts bar */}
+              {showQuickPrompts && messages.length >= 2 && !isLoading && (
+                <div className="px-3 py-2 border-t border-border bg-muted/30 shrink-0">
+                  <p className="text-[10px] text-muted-foreground mb-1.5 font-display tracking-wider">
+                    {isSoftball ? "SOFTBALL QUICK PROMPTS" : "BASEBALL QUICK PROMPTS"}
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {quickPrompts.map((q) => (
+                      <button
+                        key={q.text}
+                        onClick={() => handleQuickSend(q.text)}
+                        className={cn(
+                          "text-[11px] px-2.5 py-1.5 border rounded-sm transition-colors",
+                          isSoftball
+                            ? "border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
+                            : "border-primary/30 text-primary hover:bg-primary/10"
+                        )}
+                      >
+                        {q.icon} {q.text}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {error && (
                 <div className="px-3 py-2 text-xs text-destructive bg-destructive/5 border-t border-border shrink-0">
                   {error}
@@ -247,16 +324,28 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
                   <Input
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Tell Eddie about your situation..."
+                    placeholder={isSoftball ? "Ask about softball development..." : "Tell Eddie about your situation..."}
                     disabled={isLoading}
                     className="flex-1 text-sm h-10"
                   />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowQuickPrompts(!showQuickPrompts)}
+                    className={cn("h-10 w-10 p-0 text-lg", showQuickPrompts && "bg-muted")}
+                    title="Quick prompts"
+                  >
+                    ⚡
+                  </Button>
                   <Button type="submit" size="sm" disabled={isLoading || !chatInput.trim()} className="h-10 w-10 p-0">
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-2 text-center">
-                  Eddie will recommend the right Vault product for your athlete.
+                  {isSoftball
+                    ? "Eddie will help with softball development, recruiting, and training."
+                    : "Eddie will recommend the right Vault product for your athlete."}
                 </p>
               </form>
             </div>
