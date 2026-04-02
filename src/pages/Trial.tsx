@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { openCheckout } from "@/lib/openCheckout";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Shield, Mail, Lock, User, Loader2, Eye, EyeOff, Zap, Target, TrendingUp, Clock, CreditCard } from "lucide-react";
