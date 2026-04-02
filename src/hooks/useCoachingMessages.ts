@@ -52,24 +52,15 @@ export const useCoachingMessages = (userId: string | null, partnerId: string | n
     fetchUnread();
   }, [fetchMessages, fetchUnread]);
 
-  // Realtime subscription
+  // Poll for new messages every 5 seconds
   useEffect(() => {
     if (!conversationId) return;
-    const channel = supabase
-      .channel(`messages-${conversationId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "coaching_messages", filter: `conversation_id=eq.${conversationId}` },
-        (payload) => {
-          setMessages((prev) => [...prev, payload.new as CoachingMessage]);
-          if ((payload.new as CoachingMessage).recipient_id === userId) {
-            setUnreadCount((c) => c + 1);
-          }
-        }
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [conversationId, userId]);
+    const interval = setInterval(() => {
+      fetchMessages();
+      fetchUnread();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [conversationId, fetchMessages, fetchUnread]);
 
   const sendMessage = async (content: string, attachmentUrl?: string, attachmentType?: string) => {
     if (!userId || !partnerId || !conversationId) return;
