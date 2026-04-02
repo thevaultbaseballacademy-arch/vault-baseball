@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Browser } from '@capacitor/browser';
+import { openCheckout } from "@/lib/openCheckout";
 import { motion } from "framer-motion";
 import { 
   Award, Shield, CheckCircle, Clock, Lock, Play, 
