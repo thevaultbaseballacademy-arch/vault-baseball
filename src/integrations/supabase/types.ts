@@ -4436,6 +4436,44 @@ export type Database = {
           },
         ]
       }
+      program_exercise_completions: {
+        Row: {
+          completed_at: string
+          day_index: number
+          exercise_index: number
+          id: string
+          notes: string | null
+          program_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          day_index: number
+          exercise_index: number
+          id?: string
+          notes?: string | null
+          program_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          day_index?: number
+          exercise_index?: number
+          id?: string
+          notes?: string | null
+          program_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_exercise_completions_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "training_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       programs: {
         Row: {
           age_group: string[] | null
@@ -5747,6 +5785,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      training_programs: {
+        Row: {
+          age_group: string | null
+          assigned_by: string | null
+          athlete_user_id: string | null
+          available_days: number
+          compliance_pct: number | null
+          created_at: string
+          equipment: string
+          experience_level: string | null
+          id: string
+          is_active: boolean
+          position: string | null
+          program_data: Json
+          season_phase: string
+          sport: string
+          title: string
+          updated_at: string
+          user_id: string
+          week_number: number
+        }
+        Insert: {
+          age_group?: string | null
+          assigned_by?: string | null
+          athlete_user_id?: string | null
+          available_days?: number
+          compliance_pct?: number | null
+          created_at?: string
+          equipment?: string
+          experience_level?: string | null
+          id?: string
+          is_active?: boolean
+          position?: string | null
+          program_data?: Json
+          season_phase?: string
+          sport?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          week_number?: number
+        }
+        Update: {
+          age_group?: string | null
+          assigned_by?: string | null
+          athlete_user_id?: string | null
+          available_days?: number
+          compliance_pct?: number | null
+          created_at?: string
+          equipment?: string
+          experience_level?: string | null
+          id?: string
+          is_active?: boolean
+          position?: string | null
+          program_data?: Json
+          season_phase?: string
+          sport?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          week_number?: number
+        }
+        Relationships: []
       }
       trial_feedback: {
         Row: {
