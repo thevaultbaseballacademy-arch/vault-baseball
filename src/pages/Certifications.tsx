@@ -337,29 +337,6 @@ const Certifications = () => {
     );
   }
 
-  if (!isCoach) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="pt-24 pb-16">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <div className="bg-card border border-border rounded-2xl p-12 text-center">
-              <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-xl font-display text-foreground mb-2">Coach Access Required</h2>
-              <p className="text-muted-foreground mb-6">
-                Certifications are available for coaches only.
-              </p>
-              <Button variant="vault" onClick={() => navigate("/")}>
-                Go Home
-              </Button>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
   // Baseball certifications
   const baseballRequired = definitions.filter(d => d.is_required && !d.certification_type.startsWith('softball'));
   const baseballAdvanced = definitions.filter(d => !d.is_required && d.certification_type === 'performance');
