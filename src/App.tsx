@@ -112,6 +112,7 @@ const AthleteWaiver = lazy(() => import("./pages/AthleteWaiver"));
 const CookieSettings = lazy(() => import("./pages/CookieSettings"));
 const Contact = lazy(() => import("./pages/Contact"));
 const FAQ = lazy(() => import("./pages/FAQ"));
+const WeeklyProgramGenerator = lazy(() => import("./pages/WeeklyProgramGenerator"));
 const DeviceMetrics = lazy(() => import("./pages/DeviceMetrics"));
 const DeviceIngestionPage = lazy(() => import("./pages/DeviceIngestion"));
 const SharedMetricsView = lazy(() => import("./pages/SharedMetricsView"));
