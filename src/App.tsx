@@ -180,6 +180,7 @@ const MentalPerformance = lazy(() => import("./pages/MentalPerformance"));
 const StrengthConditioning = lazy(() => import("./pages/StrengthConditioning"));
 const PracticePlanBuilder = lazy(() => import("./pages/team/PracticePlanBuilder"));
 const DPFlexBuilder = lazy(() => import("./pages/softball/DPFlexBuilder"));
+const ProspectGrader = lazy(() => import("./pages/ProspectGrader"));
 
 // Lazy load global widgets that aren't needed on first paint
 const EddieAIChat = lazy(() => import("@/components/EddieAIChat").then(m => ({ default: m.EddieAIChat })));
