@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useSport } from "@/contexts/SportContext";
 
 const EDDIE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/eddie-ai`;
 
@@ -8,6 +9,8 @@ export const useEddieChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prospectGrades, setProspectGrades] = useState<Record<string, number> | null>(null);
+  const { sport } = useSport();
 
   const streamChat = async ({
     messages,
@@ -24,7 +27,11 @@ export const useEddieChat = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({
+        messages,
+        sport,
+        prospectGrades,
+      }),
     });
 
     if (!resp.ok) {
@@ -66,7 +73,6 @@ export const useEddieChat = () => {
       }
     }
 
-    // Flush remaining buffer
     if (textBuffer.trim()) {
       for (let raw of textBuffer.split("\n")) {
         if (!raw) continue;
@@ -86,7 +92,6 @@ export const useEddieChat = () => {
     onDone();
   };
 
-  // Inject a message without triggering API (for greeting)
   const injectMessage = useCallback((msg: Message) => {
     setMessages(prev => [...prev, msg]);
   }, []);
@@ -121,12 +126,16 @@ export const useEddieChat = () => {
       setError(e instanceof Error ? e.message : "Failed to send message");
       setIsLoading(false);
     }
-  }, [messages, isLoading]);
+  }, [messages, isLoading, sport, prospectGrades]);
 
   const clearChat = useCallback(() => {
     setMessages([]);
     setError(null);
   }, []);
 
-  return { messages, isLoading, error, sendMessage, clearChat, injectMessage };
+  const updateProspectGrades = useCallback((grades: Record<string, number>) => {
+    setProspectGrades(grades);
+  }, []);
+
+  return { messages, isLoading, error, sendMessage, clearChat, injectMessage, updateProspectGrades, sport };
 };
