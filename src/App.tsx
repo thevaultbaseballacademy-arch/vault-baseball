@@ -424,6 +424,9 @@ const App = () => (
             <Route path="/athlete-onboarding" element={<AthleteOnboarding />} />
             <Route path="/evaluate" element={<FreeEvaluation />} />
             <Route path="/training-hub" element={<RemoteTrainingHub />} />
+            <Route path="/weekly-program" element={
+              <TrialProtectedRoute allowTrialAccess><WeeklyProgramGenerator /></TrialProtectedRoute>
+            } />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
             <Route path="/progress-report/:token" element={<ProgressReport />} />
