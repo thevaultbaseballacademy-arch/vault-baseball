@@ -35,6 +35,9 @@ const CoachManagement = () => {
   const { payouts, eligibleCoaches, getCoachPayoutTotal } = useCoachPayouts();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -47,6 +50,9 @@ const CoachManagement = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session?.user) navigate("/auth");
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);

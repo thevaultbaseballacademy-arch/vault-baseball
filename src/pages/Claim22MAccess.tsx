@@ -30,6 +30,9 @@ const Claim22MAccess = () => {
   const activateTrial = useActivate22MTrial();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth", {

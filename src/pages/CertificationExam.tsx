@@ -47,6 +47,9 @@ const CertificationExam = () => {
   const definition = definitions.find(d => d.certification_type === certType);
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");

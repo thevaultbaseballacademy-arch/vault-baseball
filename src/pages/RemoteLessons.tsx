@@ -53,6 +53,9 @@ const RemoteLessons = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) { navigate('/auth'); return; }
       setUser(session.user);

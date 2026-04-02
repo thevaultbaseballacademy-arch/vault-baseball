@@ -39,6 +39,9 @@ const Schedule = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -57,6 +60,9 @@ const Schedule = () => {
       }
       setUser(session.user);
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);

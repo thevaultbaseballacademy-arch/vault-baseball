@@ -31,6 +31,9 @@ const Navbar = () => {
   }, [location.pathname]);
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -51,6 +54,9 @@ const Navbar = () => {
         setIsOwner(false);
       }
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, []);

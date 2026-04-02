@@ -42,6 +42,9 @@ const CoachRegister = () => {
   const inviteToken = searchParams.get("invite");
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth", {

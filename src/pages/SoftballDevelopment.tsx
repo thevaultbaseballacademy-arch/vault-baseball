@@ -20,6 +20,9 @@ const SoftballDevelopment = () => {
   const { sport } = useSport();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");

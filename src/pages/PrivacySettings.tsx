@@ -46,6 +46,9 @@ const PrivacySettings = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");

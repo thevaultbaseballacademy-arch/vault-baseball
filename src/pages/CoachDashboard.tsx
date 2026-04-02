@@ -89,6 +89,9 @@ const CoachDashboard = () => {
   } = useCoachAlerts(user?.id || null);
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -104,6 +107,9 @@ const CoachDashboard = () => {
       }
       setUser(session?.user ?? null);
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);
