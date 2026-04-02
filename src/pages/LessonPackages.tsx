@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { openCheckout } from "@/lib/openCheckout";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Package, Video, Users, Zap, CheckCircle, Loader2, ArrowLeft } from "lucide-react";
