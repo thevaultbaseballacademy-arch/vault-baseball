@@ -149,6 +149,7 @@ const SoftballHitting = lazy(() => import("./pages/softball/SoftballHitting"));
 const SoftballFielding = lazy(() => import("./pages/softball/SoftballFielding"));
 const SoftballAnalytics = lazy(() => import("./pages/softball/SoftballAnalytics"));
 const SoftballPositionTracks = lazy(() => import("./pages/softball/SoftballPositionTracks"));
+const SoftballProspectGrader = lazy(() => import("./pages/softball/SoftballProspectGrader"));
 const RecruitingHub = lazy(() => import("./pages/recruiting/RecruitingHub"));
 const RecruitingProfilePage = lazy(() => import("./pages/recruiting/RecruitingProfile"));
 const RecruitingShowcases = lazy(() => import("./pages/recruiting/RecruitingShowcases"));
