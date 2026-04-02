@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Browser } from '@capacitor/browser';
 import { motion } from "framer-motion";
 import { 
   Award, Shield, CheckCircle, Clock, Lock, Play, 
@@ -229,7 +230,7 @@ const Certifications = () => {
   const [user, setUser] = useState<any>(null);
   const [coachName, setCoachName] = useState<string>("");
   const [isCoach, setIsCoach] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [purchaseLoading, setPurchaseLoading] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -319,7 +320,11 @@ const Certifications = () => {
 
       if (error) throw error;
       if (data.url) {
-        window.location.href = data.url;
+        if ((window as any).Capacitor) {
+          await Browser.open({ url: data.url });
+        } else {
+          window.location.href = data.url;
+        }
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to start checkout');
@@ -328,33 +333,10 @@ const Certifications = () => {
     }
   };
 
-  if (loading || defsLoading || certsLoading) {
+  if (defsLoading || certsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!isCoach) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="pt-24 pb-16">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <div className="bg-card border border-border rounded-2xl p-12 text-center">
-              <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-xl font-display text-foreground mb-2">Coach Access Required</h2>
-              <p className="text-muted-foreground mb-6">
-                Certifications are available for coaches only.
-              </p>
-              <Button variant="vault" onClick={() => navigate("/")}>
-                Go Home
-              </Button>
-            </div>
-          </div>
-        </main>
-        <Footer />
       </div>
     );
   }
