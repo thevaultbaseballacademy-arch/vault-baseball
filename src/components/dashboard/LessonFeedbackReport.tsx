@@ -21,7 +21,7 @@ interface FeedbackReport {
 
 export const LessonFeedbackReport = ({ userId }: { userId: string }) => {
   const [reports, setReports] = useState<FeedbackReport[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!userId) return;

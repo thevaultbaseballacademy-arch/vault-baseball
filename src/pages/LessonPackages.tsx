@@ -23,7 +23,7 @@ interface LessonPackage {
 
 const LessonPackages = () => {
   const [packages, setPackages] = useState<LessonPackage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const { remainingLessons } = useLessonCredits();
   const navigate = useNavigate();

@@ -19,7 +19,7 @@ const TRIAL_BENEFITS = [
 
 const Claim22MAccess = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activating, setActivating] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();

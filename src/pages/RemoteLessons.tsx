@@ -40,7 +40,7 @@ const RemoteLessons = () => {
   const [isCoach, setIsCoach] = useState(false);
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [lessons, setLessons] = useState<RemoteLesson[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [selectedCoach, setSelectedCoach] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState('');

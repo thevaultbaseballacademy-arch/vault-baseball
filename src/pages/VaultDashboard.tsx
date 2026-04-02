@@ -32,7 +32,7 @@ interface PillarScore {
 
 const VaultDashboard = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [checkinData, setCheckinData] = useState<any[]>([]);
   const navigate = useNavigate();
 

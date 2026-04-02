@@ -18,7 +18,7 @@ interface Props {
 
 const CoachMarketplaceSetup = ({ userId }: Props) => {
   const queryClient = useQueryClient();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [coachRecord, setCoachRecord] = useState<any>(null);
   const [profile, setProfile] = useState({

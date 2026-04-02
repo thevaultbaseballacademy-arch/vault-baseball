@@ -26,7 +26,7 @@ interface Session {
 
 const Schedule = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isElite, setIsElite] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [showBooking, setShowBooking] = useState(false);

@@ -33,7 +33,7 @@ const scoreBadge = (score: number) => {
 
 export const AthleteScoreOverview = ({ coachUserId }: { coachUserId: string }) => {
   const [athletes, setAthletes] = useState<AthleteScore[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {

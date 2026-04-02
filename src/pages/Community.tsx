@@ -11,7 +11,7 @@ import { Trophy, Video, GraduationCap, Users } from "lucide-react";
 
 const Community = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const navigate = useNavigate();
 

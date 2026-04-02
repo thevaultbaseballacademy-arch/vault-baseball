@@ -93,7 +93,7 @@ const WeeklyCalendar = () => {
   const [viewMode, setViewMode] = useState<"week" | "day">("week");
   const [assignedSchedules, setAssignedSchedules] = useState<AssignedSchedule[]>([]);
   const [selectedAssignedSchedule, setSelectedAssignedSchedule] = useState<string | null>(null);
-  const [loadingAssigned, setLoadingAssigned] = useState(true);
+  const [loadingAssigned, setLoadingAssigned] = useState(false);
 
   // Fetch assigned schedules for the current user
   useEffect(() => {

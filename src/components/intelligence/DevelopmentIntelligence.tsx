@@ -22,7 +22,7 @@ const statusConfig: Record<DevelopmentStatus, { label: string; color: string; ic
 
 const DevelopmentIntelligence = ({ userId }: Props) => {
   const [output, setOutput] = useState<IntelligenceOutput | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { sport } = useSport();
 
   useEffect(() => { fetchAndAnalyze(); }, [userId, sport]);

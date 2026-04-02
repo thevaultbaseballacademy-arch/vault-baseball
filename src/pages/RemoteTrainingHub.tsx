@@ -39,7 +39,7 @@ interface CoachProfile {
 
 const RemoteTrainingHub = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [coach, setCoach] = useState<CoachProfile | null>(null);
   const [activeTab, setActiveTab] = useState("overview");

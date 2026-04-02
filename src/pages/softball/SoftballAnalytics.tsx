@@ -47,7 +47,7 @@ const SoftballAnalytics = () => {
   const [kpis, setKpis] = useState<KpiEntry[]>([]);
   const [outcomes, setOutcomes] = useState<LessonOutcome[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;

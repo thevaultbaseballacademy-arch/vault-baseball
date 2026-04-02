@@ -26,7 +26,7 @@ interface SoftballCoach {
 const SoftballCoaches = () => {
   const navigate = useNavigate();
   const [coaches, setCoaches] = useState<SoftballCoach[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchSoftballCoaches = async () => {

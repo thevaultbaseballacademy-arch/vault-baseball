@@ -32,7 +32,7 @@ interface RegistrationRequest {
 export function CoachInviteManager() {
   const [tokens, setTokens] = useState<InviteToken[]>([]);
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [label, setLabel] = useState("");
   const [maxUses, setMaxUses] = useState("10");

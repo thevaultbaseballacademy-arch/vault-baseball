@@ -15,7 +15,7 @@ interface WeeklyTip {
 const WeeklyTipCard = () => {
   const [tips, setTips] = useState<WeeklyTip[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchTips();

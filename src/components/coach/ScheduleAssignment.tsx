@@ -40,7 +40,7 @@ const PRESET_DURATIONS = [
 export function ScheduleAssignment({ scheduleId, scheduleName, onClose }: ScheduleAssignmentProps) {
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
   const [selectedAthlete, setSelectedAthlete] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());

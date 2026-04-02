@@ -45,7 +45,7 @@ const defaultCheckin: CheckinData = {
 
 const Checkin = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [checkin, setCheckin] = useState<CheckinData>(defaultCheckin);

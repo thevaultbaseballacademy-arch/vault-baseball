@@ -69,7 +69,7 @@ interface AthleteWeeklyData {
 
 export function WeeklySummaryReport() {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [athleteData, setAthleteData] = useState<AthleteWeeklyData[]>([]);

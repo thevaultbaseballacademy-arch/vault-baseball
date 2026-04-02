@@ -36,7 +36,7 @@ interface MaintenanceLog {
 export function SystemHealthDashboard() {
   const [metrics, setMetrics] = useState<HealthMetrics | null>(null);
   const [maintenanceLogs, setMaintenanceLogs] = useState<MaintenanceLog[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isRunningMaintenance, setIsRunningMaintenance] = useState(false);
   const { toast } = useToast();

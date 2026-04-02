@@ -37,7 +37,7 @@ interface TypeBreakdown {
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(142, 76%, 36%)', 'hsl(45, 93%, 47%)'];
 
 const NotificationAnalytics = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<AnalyticsSummary>({
     totalDelivered: 0,
     totalOpened: 0,

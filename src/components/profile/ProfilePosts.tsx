@@ -26,7 +26,7 @@ interface ProfilePostsProps {
 
 const ProfilePosts = ({ userId, currentUserId, filterType }: ProfilePostsProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchPosts = async () => {
     try {

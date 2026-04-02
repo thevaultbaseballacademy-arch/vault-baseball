@@ -24,7 +24,7 @@ interface CommunityFeedProps {
 
 const CommunityFeed = ({ currentUserId, filter }: CommunityFeedProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchPosts = async () => {
     try {

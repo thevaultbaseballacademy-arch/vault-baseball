@@ -29,7 +29,7 @@ const WHO_IS_FOR = [
 
 const CoachRegister = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [existingRequest, setExistingRequest] = useState<any>(null);
   const [isAlreadyCoach, setIsAlreadyCoach] = useState(false);
   const [inviteValid, setInviteValid] = useState<boolean | null>(null);

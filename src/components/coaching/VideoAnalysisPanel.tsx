@@ -64,7 +64,7 @@ const VideoAnalysisPanel = ({ userId }: VideoAnalysisPanelProps) => {
   const [uploading, setUploading] = useState(false);
   const [videoType, setVideoType] = useState("pitching");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("overview");
   const { toast } = useToast();
 

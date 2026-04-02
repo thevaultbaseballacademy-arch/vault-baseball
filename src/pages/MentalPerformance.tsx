@@ -56,7 +56,7 @@ const MentalPerformance = () => {
   const [logs, setLogs] = useState<MentalLog[]>([]);
   const [goals, setGoals] = useState<MentalGoal[]>([]);
   const [journal, setJournal] = useState<JournalEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Form state

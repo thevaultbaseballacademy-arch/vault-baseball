@@ -26,7 +26,7 @@ interface PendingFeedback {
 export const CoachDevelopmentReview = ({ coachUserId }: { coachUserId: string }) => {
   const [homeworkByAthlete, setHomeworkByAthlete] = useState<AthleteHomework[]>([]);
   const [pendingFeedback, setPendingFeedback] = useState<PendingFeedback[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {

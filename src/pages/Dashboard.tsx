@@ -50,7 +50,7 @@ interface CheckinData {
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [checkins, setCheckins] = useState<CheckinData[]>([]);
   const [timeRange, setTimeRange] = useState<7 | 14 | 30>(14);
   const navigate = useNavigate();

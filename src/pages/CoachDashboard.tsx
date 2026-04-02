@@ -68,7 +68,7 @@ interface CheckinData {
 
 const CoachDashboard = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isCoach, setIsCoach] = useState(false);
   const [coachRecordId, setCoachRecordId] = useState<string | null>(null);
   const [athletes, setAthletes] = useState<AthleteProfile[]>([]);

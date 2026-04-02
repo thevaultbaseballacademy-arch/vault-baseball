@@ -18,7 +18,7 @@ interface Props {
 
 const ActivationChecklist = ({ userId }: Props) => {
   const [steps, setSteps] = useState<ActivationStep[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {

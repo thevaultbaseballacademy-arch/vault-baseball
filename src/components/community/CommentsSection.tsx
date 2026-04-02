@@ -26,7 +26,7 @@ interface CommentsSectionProps {
 const CommentsSection = ({ postId, postOwnerId, currentUserId, onCommentsCountChange }: CommentsSectionProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const fetchComments = async () => {

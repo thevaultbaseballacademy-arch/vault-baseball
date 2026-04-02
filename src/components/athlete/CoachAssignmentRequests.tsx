@@ -16,7 +16,7 @@ interface PendingAssignment {
 
 export const CoachAssignmentRequests = ({ userId }: { userId: string }) => {
   const [pendingAssignments, setPendingAssignments] = useState<PendingAssignment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const { toast } = useToast();
 

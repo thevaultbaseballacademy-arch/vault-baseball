@@ -43,7 +43,7 @@ const MEDAL_COLORS = ['text-yellow-500', 'text-gray-400', 'text-amber-600'];
 const MEDAL_BG = ['bg-yellow-500/10', 'bg-gray-400/10', 'bg-amber-600/10'];
 
 export const KPILeaderboards = ({ coachUserId }: { coachUserId: string }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [athletes, setAthletes] = useState<AthleteKPI[]>([]);
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");

@@ -24,7 +24,7 @@ const VideoExam = () => {
   const decodedCertType = certType ? decodeURIComponent(certType) : null;
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   // answers: { [videoId]: { q1: idx, q2: idx, q3: idx, q4: idx } }

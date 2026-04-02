@@ -62,7 +62,7 @@ const BroadcastPanel = ({ userCount }: BroadcastPanelProps) => {
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [scheduledBroadcasts, setScheduledBroadcasts] = useState<ScheduledBroadcast[]>([]);
-  const [loadingScheduled, setLoadingScheduled] = useState(true);
+  const [loadingScheduled, setLoadingScheduled] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {

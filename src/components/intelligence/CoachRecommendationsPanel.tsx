@@ -26,7 +26,7 @@ interface AthleteOverview {
 const CoachRecommendationsPanel = ({ coachUserId }: Props) => {
   const { sport } = useSport();
   const [athletes, setAthletes] = useState<AthleteOverview[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {

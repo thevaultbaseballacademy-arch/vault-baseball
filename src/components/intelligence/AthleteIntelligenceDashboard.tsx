@@ -56,7 +56,7 @@ const AthleteIntelligenceDashboard = ({ userId }: Props) => {
   const [skills, setSkills] = useState<SkillProgression[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [recentOutcome, setRecentOutcome] = useState<LessonOutcome | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadData();

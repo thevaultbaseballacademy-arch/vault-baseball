@@ -20,7 +20,7 @@ interface WeeklyStats {
 
 const ProfileStats = ({ userId }: ProfileStatsProps) => {
   const [stats, setStats] = useState<WeeklyStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {

@@ -21,7 +21,7 @@ interface OnboardingStep {
 
 const CoachOnboarding = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [onboarding, setOnboarding] = useState<any>(null);
   const navigate = useNavigate();
 

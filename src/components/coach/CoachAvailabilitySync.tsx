@@ -76,7 +76,7 @@ interface CoachAvailabilitySyncProps {
 
 const CoachAvailabilitySync = ({ coachUserId }: CoachAvailabilitySyncProps) => {
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [newDay, setNewDay] = useState("1");
   const [newStart, setNewStart] = useState("09:00");

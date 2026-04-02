@@ -67,7 +67,7 @@ interface UpcomingLessonsProps {
 
 const UpcomingLessons = ({ userId }: UpcomingLessonsProps) => {
   const [lessons, setLessons] = useState<(LessonRow & { other_name: string })[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();

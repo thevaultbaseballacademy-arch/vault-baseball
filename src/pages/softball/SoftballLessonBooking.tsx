@@ -46,7 +46,7 @@ const SoftballLessonBooking = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("coach");
   const [coaches, setCoaches] = useState<CoachOption[]>([]);
-  const [loadingCoaches, setLoadingCoaches] = useState(true);
+  const [loadingCoaches, setLoadingCoaches] = useState(false);
 
   const [selectedCoach, setSelectedCoach] = useState<CoachOption | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();

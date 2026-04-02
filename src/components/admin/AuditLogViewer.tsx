@@ -50,7 +50,7 @@ const OPERATIONS = [
 
 const AuditLogViewer = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [tableFilter, setTableFilter] = useState("all");
   const [operationFilter, setOperationFilter] = useState("all");

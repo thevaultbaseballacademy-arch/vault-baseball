@@ -54,7 +54,7 @@ const DPFlexBuilder = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [lineups, setLineups] = useState<DPFlexLineup[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Form

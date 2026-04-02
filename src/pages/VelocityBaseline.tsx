@@ -27,7 +27,7 @@ interface TrialData {
 
 const VelocityBaseline = () => {
   const [trial, setTrial] = useState<TrialData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();

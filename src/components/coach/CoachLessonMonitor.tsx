@@ -92,7 +92,7 @@ function downloadLessonICS(lesson: Lesson) {
 }
 
 export const CoachLessonMonitor = ({ coachUserId }: { coachUserId: string }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [groupSessions, setGroupSessions] = useState<GroupSessionRow[]>([]);
   const [courseProgress, setCourseProgress] = useState<CourseProgressRow[]>([]);

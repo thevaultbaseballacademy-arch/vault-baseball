@@ -32,7 +32,7 @@ interface SelectCoachWidgetProps {
 const SelectCoachWidget = ({ userId }: SelectCoachWidgetProps) => {
   const [currentCoach, setCurrentCoach] = useState<CurrentCoach | null>(null);
   const [availableCoaches, setAvailableCoaches] = useState<CoachOption[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selecting, setSelecting] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [confirmCoach, setConfirmCoach] = useState<CoachOption | null>(null);

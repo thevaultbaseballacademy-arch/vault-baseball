@@ -44,7 +44,7 @@ const scoreLabel = (score: number) => {
 
 export const AthleteDevScore = ({ userId }: { userId: string }) => {
   const [score, setScore] = useState<ScoreData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [recalculating, setRecalculating] = useState(false);
 
   useEffect(() => {
