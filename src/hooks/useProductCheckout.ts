@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PRODUCT_PRICES, ProductKey } from '@/lib/productPricing';
+import { openCheckout } from '@/lib/openCheckout';
 
 interface CheckoutError {
   error: string;
