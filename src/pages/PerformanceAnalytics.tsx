@@ -164,7 +164,7 @@ function KPITrendCard({ title, data, unit, icon }: { title: string; data: { mont
 }
 
 export default function PerformanceAnalytics() {
-  const { sport } = useSportContext();
+  const { sport } = useSport();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("kpi");
 
