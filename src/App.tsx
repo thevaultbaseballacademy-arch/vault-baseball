@@ -182,7 +182,6 @@ const PracticePlanBuilder = lazy(() => import("./pages/team/PracticePlanBuilder"
 const DPFlexBuilder = lazy(() => import("./pages/softball/DPFlexBuilder"));
 
 // Lazy load global widgets that aren't needed on first paint
-const CookieConsent = lazy(() => import("@/components/CookieConsent").then(m => ({ default: m.CookieConsent })));
 const EddieAIChat = lazy(() => import("@/components/EddieAIChat").then(m => ({ default: m.EddieAIChat })));
 
 // Redirect /courses/:id to /course/:id
@@ -516,7 +515,6 @@ const App = () => (
           </Routes>
           </Suspense>
           <Suspense fallback={null}>
-            <CookieConsent />
             <EddieAIChat />
           </Suspense>
         </BrowserRouter>
