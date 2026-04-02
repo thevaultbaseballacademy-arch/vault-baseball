@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { openCheckout } from "@/lib/openCheckout";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Shield, Mail, Lock, User, Loader2, Eye, EyeOff, Zap, Target, TrendingUp, Clock, CreditCard } from "lucide-react";
@@ -115,8 +116,7 @@ const Trial = () => {
           if (error) throw error;
           
           if (data?.url) {
-            // Redirect to Stripe checkout (avoid popup blockers)
-            window.location.href = data.url;
+            await openCheckout(data.url);
           }
         } else {
           // Fallback: redirect to velocity baseline if no session

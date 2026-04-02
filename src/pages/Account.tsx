@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { openCheckout } from "@/lib/openCheckout";
 import { motion } from "framer-motion";
 import { User, CreditCard, Calendar, Loader2, ArrowLeft, RefreshCw, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -112,7 +113,7 @@ const Account = () => {
 
       if (error) throw error;
       if (data?.url) {
-        window.location.href = data.url;
+        await openCheckout(data.url);
       }
     } catch (error: any) {
       toast({

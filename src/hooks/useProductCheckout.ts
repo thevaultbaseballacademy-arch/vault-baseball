@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PRODUCT_PRICES, ProductKey } from '@/lib/productPricing';
+import { openCheckout } from '@/lib/openCheckout';
 
 interface CheckoutError {
   error: string;
@@ -88,8 +89,7 @@ export const useProductCheckout = () => {
       }
       
       if (data?.url) {
-        // Redirect to Stripe checkout (avoid popup blockers)
-        window.location.href = data.url;
+        await openCheckout(data.url);
       } else {
         throw new Error('No checkout URL received');
       }

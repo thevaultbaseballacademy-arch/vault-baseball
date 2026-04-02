@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Browser } from '@capacitor/browser';
+import { openCheckout } from "@/lib/openCheckout";
 import { motion } from "framer-motion";
 import { 
   Award, Shield, CheckCircle, Clock, Lock, Play, 
@@ -320,11 +320,7 @@ const Certifications = () => {
 
       if (error) throw error;
       if (data.url) {
-        if ((window as any).Capacitor) {
-          await Browser.open({ url: data.url });
-        } else {
-          window.location.href = data.url;
-        }
+        await openCheckout(data.url);
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to start checkout');

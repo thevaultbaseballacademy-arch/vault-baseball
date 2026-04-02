@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { openCheckout } from "@/lib/openCheckout";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Package, Video, Users, Zap, CheckCircle, Loader2, ArrowLeft } from "lucide-react";
@@ -57,7 +58,7 @@ const LessonPackages = () => {
       });
 
       if (error) throw error;
-      if (data?.url) window.location.href = data.url;
+      if (data?.url) await openCheckout(data.url);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
