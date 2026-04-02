@@ -116,8 +116,7 @@ const Trial = () => {
           if (error) throw error;
           
           if (data?.url) {
-            // Redirect to Stripe checkout (avoid popup blockers)
-            window.location.href = data.url;
+            await openCheckout(data.url);
           }
         } else {
           // Fallback: redirect to velocity baseline if no session

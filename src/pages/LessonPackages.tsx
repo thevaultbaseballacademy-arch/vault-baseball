@@ -58,7 +58,7 @@ const LessonPackages = () => {
       });
 
       if (error) throw error;
-      if (data?.url) window.location.href = data.url;
+      if (data?.url) await openCheckout(data.url);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {

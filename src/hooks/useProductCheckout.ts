@@ -89,8 +89,7 @@ export const useProductCheckout = () => {
       }
       
       if (data?.url) {
-        // Redirect to Stripe checkout (avoid popup blockers)
-        window.location.href = data.url;
+        await openCheckout(data.url);
       } else {
         throw new Error('No checkout URL received');
       }
