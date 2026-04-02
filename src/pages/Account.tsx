@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { openCheckout } from "@/lib/openCheckout";
 import { motion } from "framer-motion";
 import { User, CreditCard, Calendar, Loader2, ArrowLeft, RefreshCw, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
