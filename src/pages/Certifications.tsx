@@ -320,7 +320,11 @@ const Certifications = () => {
 
       if (error) throw error;
       if (data.url) {
-        window.location.href = data.url;
+        if ((window as any).Capacitor) {
+          await Browser.open({ url: data.url });
+        } else {
+          window.location.href = data.url;
+        }
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to start checkout');
