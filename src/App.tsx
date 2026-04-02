@@ -502,6 +502,7 @@ const App = () => (
             <Route path="/softball/dp-flex" element={<RoleGuard requiresRole={["coach", "owner"]}><DPFlexBuilder /></RoleGuard>} />
             <Route path="/prospect-grader" element={<ProspectGrader />} />
             <Route path="/softball/prospect-grader" element={<SoftballProspectGrader />} />
+            <Route path="/softball/recruitment-audit" element={<SoftballRecruitmentAudit />} />
 
             {/* Short URL redirects for social sharing */}
             <Route path="/app" element={<ShortRedirect />} />
