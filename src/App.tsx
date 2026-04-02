@@ -515,7 +515,6 @@ const App = () => (
           </Routes>
           </Suspense>
           <Suspense fallback={null}>
-            <CookieConsent />
             <EddieAIChat />
           </Suspense>
         </BrowserRouter>
