@@ -166,6 +166,8 @@ const ParentWellness = lazy(() => import("./pages/parent/ParentWellness"));
 const ParentTraining = lazy(() => import("./pages/parent/ParentTraining"));
 const ParentMessages = lazy(() => import("./pages/parent/ParentMessages"));
 const ParentDownloads = lazy(() => import("./pages/parent/ParentDownloads"));
+const ParentRecruitingEducation = lazy(() => import("./pages/parent/ParentRecruitingEducation"));
+const ParentFinancialPlanning = lazy(() => import("./pages/parent/ParentFinancialPlanning"));
 const AthleteDownloads = lazy(() => import("./pages/AthleteDownloads"));
 const WorkloadDashboard = lazy(() => import("./pages/workload/WorkloadDashboard"));
 const PitchLog = lazy(() => import("./pages/workload/PitchLog"));
