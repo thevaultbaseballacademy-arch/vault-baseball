@@ -416,6 +416,7 @@ const App = () => (
             <Route path="/white-paper" element={<WhitePaper />} />
             <Route path="/baseline-audit" element={<BaselineAudit />} />
             <Route path="/performance-blueprint" element={<PerformanceBlueprint />} />
+            <Route path="/performance-analytics" element={<TrialProtectedRoute><PerformanceAnalytics /></TrialProtectedRoute>} />
             <Route path="/coach-register" element={<CoachRegister />} />
             <Route path="/coach-onboarding" element={<CoachOnboarding />} />
             <Route path="/lesson-packages" element={<LessonPackages />} />
