@@ -31,7 +31,7 @@ interface Assignment {
 }
 
 const CoachAthleteAssignments = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);

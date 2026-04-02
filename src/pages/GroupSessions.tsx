@@ -36,7 +36,7 @@ const GroupSessions = () => {
   const [user, setUser] = useState<any>(null);
   const [isCoach, setIsCoach] = useState(false);
   const [sessions, setSessions] = useState<GroupSession[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [enrolling, setEnrolling] = useState<string | null>(null);
   const [newSession, setNewSession] = useState({ title: '', description: '', date: '', time: '', duration: '90', maxParticipants: '10', focusArea: 'general', skillLevel: 'all', videoLink: '' });
@@ -46,6 +46,9 @@ const GroupSessions = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) { navigate('/auth'); return; }
       setUser(session.user);

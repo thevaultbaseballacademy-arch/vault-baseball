@@ -40,7 +40,7 @@ const SUBSCRIPTION_TIERS = {
 
 const Account = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [subscriptionData, setSubscriptionData] = useState<{
     subscribed: boolean;
     product_id: string | null;
@@ -52,6 +52,9 @@ const Account = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -69,6 +72,9 @@ const Account = () => {
       }
       setUser(session.user);
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);

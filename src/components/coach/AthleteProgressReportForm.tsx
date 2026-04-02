@@ -51,7 +51,7 @@ const AthleteProgressReportForm = () => {
   const [savedReportId, setSavedReportId] = useState<string | null>(null);
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [reports, setReports] = useState<any[]>([]);
-  const [loadingReports, setLoadingReports] = useState(true);
+  const [loadingReports, setLoadingReports] = useState(false);
 
   useEffect(() => {
     fetchAthletes();

@@ -68,7 +68,7 @@ interface CheckinData {
 
 const CoachDashboard = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isCoach, setIsCoach] = useState(false);
   const [coachRecordId, setCoachRecordId] = useState<string | null>(null);
   const [athletes, setAthletes] = useState<AthleteProfile[]>([]);
@@ -89,6 +89,9 @@ const CoachDashboard = () => {
   } = useCoachAlerts(user?.id || null);
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -104,6 +107,9 @@ const CoachDashboard = () => {
       }
       setUser(session?.user ?? null);
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);

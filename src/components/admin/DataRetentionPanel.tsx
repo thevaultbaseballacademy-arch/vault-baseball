@@ -28,7 +28,7 @@ interface CleanupHistory {
 
 const DataRetentionPanel = () => {
   const [stats, setStats] = useState<RetentionStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
   const [lastRun, setLastRun] = useState<CleanupHistory | null>(null);
   const { toast } = useToast();

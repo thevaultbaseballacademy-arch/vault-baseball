@@ -20,7 +20,7 @@ interface HomeworkItem {
 
 export const PlayerHomeworkChecklist = ({ userId }: { userId: string }) => {
   const [items, setItems] = useState<HomeworkItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {

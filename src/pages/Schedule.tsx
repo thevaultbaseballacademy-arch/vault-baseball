@@ -26,7 +26,7 @@ interface Session {
 
 const Schedule = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isElite, setIsElite] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [showBooking, setShowBooking] = useState(false);
@@ -39,6 +39,9 @@ const Schedule = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -57,6 +60,9 @@ const Schedule = () => {
       }
       setUser(session.user);
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);

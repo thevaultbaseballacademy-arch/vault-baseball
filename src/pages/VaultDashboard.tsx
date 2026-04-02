@@ -32,11 +32,14 @@ interface PillarScore {
 
 const VaultDashboard = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [checkinData, setCheckinData] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -52,6 +55,9 @@ const VaultDashboard = () => {
       }
       setUser(session?.user ?? null);
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);

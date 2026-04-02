@@ -45,7 +45,7 @@ const gradeColors: Record<string, string> = {
 
 const CoachAnalysisReview = ({ coachUserId, athleteUserId, athleteName }: CoachAnalysisReviewProps) => {
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");

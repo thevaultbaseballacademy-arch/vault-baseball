@@ -19,10 +19,10 @@ interface WhitelistEntry {
 
 const TeamWhitelistManager = () => {
   const [entries, setEntries] = useState<WhitelistEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [newNotes, setNewNotes] = useState("");
-  const [newFullAccess, setNewFullAccess] = useState(true);
+  const [newFullAccess, setNewFullAccess] = useState(false);
   const [newAdminAccess, setNewAdminAccess] = useState(false);
   const [adding, setAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);

@@ -66,7 +66,7 @@ const ProgressReport = () => {
   const { token } = useParams<{ token: string }>();
   const [report, setReport] = useState<any>(null);
   const [athleteProfile, setAthleteProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {

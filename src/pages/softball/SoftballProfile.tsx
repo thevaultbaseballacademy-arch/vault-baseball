@@ -24,7 +24,7 @@ const SoftballProfile = () => {
   const { user, profile, format, ageGroup, visibility, ageRules, loading } = useSoftballProfile();
   const [skills, setSkills] = useState<SkillScore[]>([]);
   const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;

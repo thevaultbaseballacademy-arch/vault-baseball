@@ -45,7 +45,7 @@ const defaultCheckin: CheckinData = {
 
 const Checkin = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [checkin, setCheckin] = useState<CheckinData>(defaultCheckin);
@@ -55,6 +55,9 @@ const Checkin = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -70,6 +73,9 @@ const Checkin = () => {
       }
       setUser(session?.user ?? null);
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);

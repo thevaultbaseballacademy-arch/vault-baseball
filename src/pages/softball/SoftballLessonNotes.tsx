@@ -53,7 +53,7 @@ const SoftballLessonNotes = () => {
   const lessonId = searchParams.get("lesson");
 
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [lessons, setLessons] = useState<LessonWithDetails[]>([]);
   const [selectedLesson, setSelectedLesson] = useState<LessonWithDetails | null>(null);
   const [feedback, setFeedback] = useState<FeedbackRecord | null>(null);

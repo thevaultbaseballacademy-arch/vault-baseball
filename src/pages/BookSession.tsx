@@ -53,7 +53,7 @@ const BookSession = () => {
   const POSITIONS = sport === 'softball' ? SOFTBALL_POSITIONS : BASEBALL_POSITIONS;
   const [step, setStep] = useState<Step>("coach");
   const [coaches, setCoaches] = useState<CoachOption[]>([]);
-  const [loadingCoaches, setLoadingCoaches] = useState(true);
+  const [loadingCoaches, setLoadingCoaches] = useState(false);
 
   // Selections
   const [selectedCoach, setSelectedCoach] = useState<CoachOption | null>(null);

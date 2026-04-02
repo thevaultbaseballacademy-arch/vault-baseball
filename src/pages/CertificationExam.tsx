@@ -28,7 +28,7 @@ const CertificationExam = () => {
   const navigate = useNavigate();
   
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [examStarted, setExamStarted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -47,6 +47,9 @@ const CertificationExam = () => {
   const definition = definitions.find(d => d.certification_type === certType);
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");

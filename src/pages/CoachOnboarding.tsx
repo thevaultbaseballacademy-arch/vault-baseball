@@ -21,11 +21,14 @@ interface OnboardingStep {
 
 const CoachOnboarding = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [onboarding, setOnboarding] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");

@@ -38,7 +38,7 @@ interface Factor {
 }
 
 const MFASettings = ({ userId }: MFASettingsProps) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [factors, setFactors] = useState<Factor[]>([]);
   const [showSetup, setShowSetup] = useState(false);

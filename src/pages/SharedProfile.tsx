@@ -58,7 +58,7 @@ const formatHeight = (inches: number | null) => {
 export default function SharedProfile() {
   const { token } = useParams<{ token: string }>();
   const [data, setData] = useState<SharedProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

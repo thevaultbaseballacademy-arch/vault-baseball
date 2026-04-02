@@ -23,7 +23,7 @@ interface CustomSchedule {
 
 export function CoachScheduleManager() {
   const [schedules, setSchedules] = useState<CustomSchedule[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showBuilder, setShowBuilder] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<CustomSchedule | null>(null);
   const [assigningSchedule, setAssigningSchedule] = useState<CustomSchedule | null>(null);

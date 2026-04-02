@@ -52,7 +52,7 @@ const generateToken = () => {
 
 export function KPIShareManager({ userId }: KPIShareManagerProps) {
   const [tokens, setTokens] = useState<ShareToken[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [qrToken, setQrToken] = useState<ShareToken | null>(null);
@@ -64,8 +64,8 @@ export function KPIShareManager({ userId }: KPIShareManagerProps) {
   
   // New token settings
   const [label, setLabel] = useState("");
-  const [includeGoals, setIncludeGoals] = useState(true);
-  const [includeStats, setIncludeStats] = useState(true);
+  const [includeGoals, setIncludeGoals] = useState(false);
+  const [includeStats, setIncludeStats] = useState(false);
   const [includeVideos, setIncludeVideos] = useState(false);
   const [expiration, setExpiration] = useState("never");
 

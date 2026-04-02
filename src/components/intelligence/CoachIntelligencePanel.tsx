@@ -35,7 +35,7 @@ const statusBadge: Record<DevelopmentStatus, { label: string; cls: string }> = {
 
 const CoachIntelligencePanel = ({ coachUserId }: Props) => {
   const [athletes, setAthletes] = useState<AthleteIntelligence[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [allAlerts, setAllAlerts] = useState<(IntelligenceAlert & { athleteName: string })[]>([]);
   const { sport } = useSport();

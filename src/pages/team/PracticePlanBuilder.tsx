@@ -50,7 +50,7 @@ const PracticePlanBuilder = () => {
   const { sport } = useSport();
   const { teams } = useTeamManagement();
   const [plans, setPlans] = useState<PracticePlan[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Form

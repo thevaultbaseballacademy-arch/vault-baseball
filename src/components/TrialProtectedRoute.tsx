@@ -16,7 +16,7 @@ const TrialProtectedRoute = ({
   const { isTrialUser, isTrialExpired, isFullMember, loading } = useTrialStatus();
   const location = useLocation();
   const [user, setUser] = useState<any>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

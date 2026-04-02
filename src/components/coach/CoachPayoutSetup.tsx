@@ -15,7 +15,7 @@ const CoachPayoutSetup = ({ coachId, userId }: Props) => {
   const [stripeAccountId, setStripeAccountId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadStripeAccount();

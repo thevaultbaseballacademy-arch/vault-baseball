@@ -41,7 +41,7 @@ const CATEGORIES = [
 
 const WeeklyTipsManager = () => {
   const [tips, setTips] = useState<WeeklyTip[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingTip, setEditingTip] = useState<WeeklyTip | null>(null);
   const [isCreating, setIsCreating] = useState(false);

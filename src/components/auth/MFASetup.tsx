@@ -18,7 +18,7 @@ interface MFASetupProps {
 type SetupStep = "qr" | "verify" | "backup";
 
 const MFASetup = ({ onComplete, onCancel }: MFASetupProps) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [step, setStep] = useState<SetupStep>("qr");
   const [factorId, setFactorId] = useState<string | null>(null);

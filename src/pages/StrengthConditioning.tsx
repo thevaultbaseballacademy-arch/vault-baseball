@@ -53,7 +53,7 @@ const MentalPerformance = () => {
   const { sport } = useSport();
   const [programs, setPrograms] = useState<SCProgram[]>([]);
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState("all");
   const [activeProgram, setActiveProgram] = useState<SCProgram | null>(null);

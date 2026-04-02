@@ -44,7 +44,7 @@ interface ComplianceMetrics {
 
 const GDPRComplianceDashboard = () => {
   const [metrics, setMetrics] = useState<ComplianceMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { toast } = useToast();
 

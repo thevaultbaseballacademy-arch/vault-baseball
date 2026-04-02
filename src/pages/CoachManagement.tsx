@@ -22,7 +22,7 @@ import { format } from "date-fns";
 
 const CoachManagement = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +35,9 @@ const CoachManagement = () => {
   const { payouts, eligibleCoaches, getCoachPayoutTotal } = useCoachPayouts();
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -47,6 +50,9 @@ const CoachManagement = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session?.user) navigate("/auth");
     });
+
+    clearTimeout(safetyTimeout);
+
 
     return () => subscription.unsubscribe();
   }, [navigate]);

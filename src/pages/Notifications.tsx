@@ -46,12 +46,15 @@ const typeConfig: Record<string, { icon: typeof Heart; color: string; bg: string
 const Notifications = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [actorProfiles, setActorProfiles] = useState<Record<string, { display_name: string | null; avatar_url: string | null }>>({});
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth");
@@ -120,6 +123,9 @@ const Notifications = () => {
         }
       )
       .subscribe();
+
+    clearTimeout(safetyTimeout);
+
 
     return () => {
       supabase.removeChannel(channel);

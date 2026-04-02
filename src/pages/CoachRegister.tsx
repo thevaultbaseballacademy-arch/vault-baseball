@@ -29,7 +29,7 @@ const WHO_IS_FOR = [
 
 const CoachRegister = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [existingRequest, setExistingRequest] = useState<any>(null);
   const [isAlreadyCoach, setIsAlreadyCoach] = useState(false);
   const [inviteValid, setInviteValid] = useState<boolean | null>(null);
@@ -42,6 +42,9 @@ const CoachRegister = () => {
   const inviteToken = searchParams.get("invite");
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         navigate("/auth", {
