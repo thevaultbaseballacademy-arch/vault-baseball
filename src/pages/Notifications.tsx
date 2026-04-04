@@ -124,7 +124,6 @@ const Notifications = () => {
       )
       .subscribe();
 
-    clearTimeout(safetyTimeout);
 
 
     return () => {
