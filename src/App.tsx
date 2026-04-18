@@ -190,6 +190,7 @@ const PracticePlanBuilder = lazy(() => import("./pages/team/PracticePlanBuilder"
 const DPFlexBuilder = lazy(() => import("./pages/softball/DPFlexBuilder"));
 const ProspectGrader = lazy(() => import("./pages/ProspectGrader"));
 const PerformanceAnalytics = lazy(() => import("./pages/PerformanceAnalytics"));
+const FacilityScheduling = lazy(() => import("./pages/facility/FacilityScheduling"));
 
 // Lazy load global widgets that aren't needed on first paint
 const EddieAIChat = lazy(() => import("@/components/EddieAIChat").then(m => ({ default: m.EddieAIChat })));
@@ -441,6 +442,7 @@ const App = () => (
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
             <Route path="/progress-report/:token" element={<ProgressReport />} />
             <Route path="/book-session" element={<BookSession />} />
+            <Route path="/facility/scheduling" element={<FacilityScheduling />} />
             <Route path="/claim-22m" element={<Claim22MAccess />} />
             
             {/* Softball Development */}
