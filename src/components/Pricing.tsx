@@ -420,6 +420,13 @@ const Pricing = () => {
             </Button>
           </div>
         </motion.div>
+
+        {isIOS() && (
+          <div className="mt-10 max-w-3xl mx-auto p-4 border border-border bg-card flex items-start gap-3">
+            <Apple className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground leading-relaxed">{IOS_SUBSCRIPTION_NOTICE}</p>
+          </div>
+        )}
       </div>
     </section>
   );
