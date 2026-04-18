@@ -293,7 +293,7 @@ const Pricing = () => {
                     </div>
                   </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-display text-foreground">${plan.price}</span>
+                    <span className="text-5xl font-display text-foreground">${plan.price.toFixed(2)}</span>
                     <span className="text-muted-foreground text-sm">{plan.period}</span>
                   </div>
                   {/* Annual Anchor Text for $59 tier */}
