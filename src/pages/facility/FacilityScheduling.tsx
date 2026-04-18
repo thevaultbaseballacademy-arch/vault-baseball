@@ -485,6 +485,10 @@ const ConfirmPanel = ({
             {formatTime(slot)} · {lesson.durationMinutes} min
           </span>
         </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Coach</span>
+          <span className="text-foreground">{coachName ?? "Any available"}</span>
+        </div>
         <div className="flex justify-between border-t border-border pt-2 mt-2">
           <span className="text-muted-foreground">Total</span>
           <span className="text-primary font-display text-lg">{formatPrice(lesson.priceCents)}</span>
