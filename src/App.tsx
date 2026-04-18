@@ -309,10 +309,10 @@ const App = () => (
                 <RoleGuard requires="view_audit_log"><OwnerAudit /></RoleGuard>
               } />
               <Route path="facility" element={
-                <RoleGuard requires="view_platform_settings"><OwnerFacility /></RoleGuard>
+                <RoleGuard requires="view_facility_schedule"><OwnerFacility /></RoleGuard>
               } />
               <Route path="essa-bookings" element={
-                <RoleGuard requires="view_platform_settings"><OwnerEssaBookings /></RoleGuard>
+                <RoleGuard requires="view_facility_schedule"><OwnerEssaBookings /></RoleGuard>
               } />
               {/* Legacy sub-routes */}
               <Route path="certification-analytics" element={

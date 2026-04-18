@@ -29,7 +29,7 @@ export type Permission =
   | "edit_recommendation_logic"
   | "edit_scoring_systems"
   | "edit_automation_triggers"
-  // ── Owner-only: Platform ──
+// ── Owner-only: Platform ──
   | "view_platform_settings"
   | "edit_platform_settings"
   | "manage_feature_flags"
@@ -40,6 +40,11 @@ export type Permission =
   | "override_any_account"
   | "view_audit_log"
   | "view_platform_analytics"
+  // ── Owner + Admin: Facility ──
+  | "view_facility_schedule"
+  | "manage_facility_spaces"
+  | "manage_facility_hours"
+  | "manage_facility_bookings"
   // ── Owner-only: Content (full) ──
   | "approve_content"
   | "reject_content"
@@ -123,6 +128,8 @@ const OWNER_PERMISSIONS: readonly Permission[] = [
   "view_own_courses", "view_own_kpis", "view_own_progress", "book_lesson", "message_own_coach",
   // Dashboards
   "dashboard.owner", "dashboard.admin", "dashboard.coach", "dashboard.athlete",
+  // Facility
+  "view_facility_schedule", "manage_facility_spaces", "manage_facility_hours", "manage_facility_bookings",
 ];
 
 // ─── ADMIN PERMISSIONS ────────────────────────────────────────────────
@@ -149,6 +156,8 @@ const ADMIN_PERMISSIONS: readonly Permission[] = [
   "view_own_courses", "view_own_kpis", "view_own_progress", "book_lesson", "message_own_coach",
   // Dashboards
   "dashboard.admin", "dashboard.coach", "dashboard.athlete",
+  // Facility (admin access)
+  "view_facility_schedule", "manage_facility_spaces", "manage_facility_hours", "manage_facility_bookings",
 ];
 
 // ─── COACH PERMISSIONS ────────────────────────────────────────────────
