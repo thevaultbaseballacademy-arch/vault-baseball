@@ -32,6 +32,8 @@ import {
 import { useEssaCheckout } from "@/hooks/useEssaCheckout";
 import { useFacilityReservations, useFacilitySpaces } from "@/hooks/useFacilitySchedule";
 import { useEssaCredits, useMyEssaBookings, useBookWithCredit } from "@/hooks/useEssaCredits";
+import { useCoachEssaSlots } from "@/hooks/useEssaCoaches";
+import EssaCoachPicker from "@/components/facility/EssaCoachPicker";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
