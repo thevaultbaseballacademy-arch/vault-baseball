@@ -1,0 +1,1 @@
+DELETE FROM public.team_whitelist WHERE lower(email) = 'emejia9991@icloud.com';
