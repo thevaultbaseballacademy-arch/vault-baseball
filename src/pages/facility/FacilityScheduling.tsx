@@ -532,17 +532,23 @@ const FacilityScheduling = () => {
   const [selectedLesson, setSelectedLesson] = useState<PrivateLesson | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
 
+  useEffect(() => {
+    const prev = document.title;
+    document.title = "ESSA Facility Scheduling | VAULT OS";
+    const meta = document.querySelector('meta[name="description"]');
+    const prevDesc = meta?.getAttribute("content") ?? null;
+    meta?.setAttribute(
+      "content",
+      "Book private lessons, packages, clinics and team rentals at Edward's Sports Science Academy. Real-time availability and instant checkout.",
+    );
+    return () => {
+      document.title = prev;
+      if (prevDesc !== null) meta?.setAttribute("content", prevDesc);
+    };
+  }, []);
+
   return (
     <>
-      <Helmet>
-        <title>ESSA Facility Scheduling | VAULT OS</title>
-        <meta
-          name="description"
-          content="Book private lessons, packages, clinics and team rentals at Edward's Sports Science Academy. Real-time availability and instant checkout."
-        />
-        <link rel="canonical" href="https://vault-baseball.lovable.app/facility/scheduling" />
-      </Helmet>
-
       <Navbar />
       <main className="bg-background min-h-[100dvh]">
         <Header />
