@@ -386,7 +386,7 @@ const SlotPicker = ({
         <p className="text-[11px] text-muted-foreground mt-2">Loading coach availability...</p>
       )}
       {coachUserId && !loadingCoachSlots && coachSlots.length === 0 && (
-        <p className="text-[11px] text-amber-600 mt-2">
+        <p className="text-[11px] text-warning mt-2">
           This coach has no remaining slots on this day. Pick another day or coach.
         </p>
       )}
