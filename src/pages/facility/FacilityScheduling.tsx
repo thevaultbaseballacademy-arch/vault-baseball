@@ -360,7 +360,8 @@ const SlotPicker = ({
         {slots.map((slot) => {
           const booked = isSlotBooked(slot);
           const past = isPast(slot);
-          const disabled = booked || past;
+          const outsideCoach = isOutsideCoachAvail(slot);
+          const disabled = booked || past || outsideCoach;
           const selected = selectedSlot && selectedSlot.getTime() === slot.getTime();
           return (
             <button
@@ -380,6 +381,15 @@ const SlotPicker = ({
           );
         })}
       </div>
+
+      {coachUserId && loadingCoachSlots && (
+        <p className="text-[11px] text-muted-foreground mt-2">Loading coach availability...</p>
+      )}
+      {coachUserId && !loadingCoachSlots && coachSlots.length === 0 && (
+        <p className="text-[11px] text-amber-600 mt-2">
+          This coach has no remaining slots on this day. Pick another day or coach.
+        </p>
+      )}
 
       {!selectedLesson && (
         <p className="text-[11px] text-muted-foreground mt-3 flex items-center gap-1.5">
