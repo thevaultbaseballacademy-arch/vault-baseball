@@ -14,6 +14,7 @@ import RoleSelector from "@/components/auth/RoleSelector";
 import SportSelector from "@/components/auth/SportSelector";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
 import { SportType } from "@/lib/sportTypes";
+import { lovable } from "@/integrations/lovable";
 import vaultLogo from "@/assets/vault-logo-new.webp";
 
 const authSchema = z.object({
