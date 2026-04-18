@@ -258,10 +258,12 @@ const SlotPicker = ({
   selectedLesson,
   onSlotPick,
   selectedSlot,
+  coachUserId,
 }: {
   selectedLesson: PrivateLesson | null;
   selectedSlot: Date | null;
   onSlotPick: (d: Date) => void;
+  coachUserId: string | null;
 }) => {
   const [date, setDate] = useState(() => {
     const d = new Date();
@@ -280,8 +282,18 @@ const SlotPicker = ({
     dayStart.toISOString(),
     dayEnd.toISOString(),
   );
+  const { data: coachSlots = [], isLoading: loadingCoachSlots } = useCoachEssaSlots(
+    coachUserId,
+    date,
+    selectedLesson?.durationMinutes ?? SLOT_MINUTES,
+  );
 
   const activeSpaceCount = spaces.filter((s) => s.is_active).length || 1;
+
+  const coachSlotSet = useMemo(() => {
+    if (!coachUserId) return null;
+    return new Set(coachSlots.map((s) => new Date(s.slot_start).getTime()));
+  }, [coachUserId, coachSlots]);
 
   const isSlotBooked = (slotStart: Date) => {
     const slotEnd = new Date(slotStart.getTime() + SLOT_MINUTES * 60_000);
@@ -293,6 +305,9 @@ const SlotPicker = ({
     );
     return conflicting.length >= activeSpaceCount;
   };
+
+  const isOutsideCoachAvail = (slot: Date) =>
+    coachSlotSet !== null && !coachSlotSet.has(slot.getTime());
 
   const isPast = (slot: Date) => slot.getTime() < Date.now();
 
