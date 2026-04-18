@@ -430,6 +430,15 @@ const Auth = () => {
           </Button>
 
           <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 hover:text-background border-foreground"
+            disabled={loading}
+            onClick={async () => {
+              setLoading(true);
+              try {
+                const result = await lovable.auth.signInWithOAuth("apple", {
                   redirect_uri: window.location.origin,
                 });
                 if (result.redirected) return;
