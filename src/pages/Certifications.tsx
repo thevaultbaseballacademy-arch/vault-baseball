@@ -417,6 +417,9 @@ const Certifications = () => {
               </CardContent>
             </Card>
 
+            {/* 🏪 VAULT OS CERTIFICATION STOREFRONT */}
+            <CertStorefrontSection />
+
             {/* ⚾ BASEBALL CERTIFICATIONS */}
             <div className="space-y-4">
               <h2 className="text-xl font-display text-foreground flex items-center gap-2">
