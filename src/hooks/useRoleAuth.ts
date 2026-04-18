@@ -8,14 +8,13 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
  * Unified hook for role-based auth. Uses React Query for caching.
  */
 export const useRoleAuth = () => {
-  const { user } = useSubscription();
+  const { user, isLoading: authLoading } = useSubscription();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading: rolesLoading } = useQuery({
     queryKey: ["user-roles", user?.id],
     queryFn: async () => {
       if (!user) return { roles: [] as VaultRole[] };
 
-      // Batch all three queries in parallel
       const [rolesResult, whitelistResult, coachResult] = await Promise.all([
         supabase
           .from("user_roles")
@@ -56,7 +55,7 @@ export const useRoleAuth = () => {
 
       return { roles };
     },
-    enabled: !!user,
+    enabled: !authLoading && !!user,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -78,7 +77,7 @@ export const useRoleAuth = () => {
     user: user ?? null,
     roles,
     primaryRole,
-    isLoading,
+    isLoading: authLoading || rolesLoading,
     can,
     dashboardRoute,
     isOwner: roles.includes("owner"),
