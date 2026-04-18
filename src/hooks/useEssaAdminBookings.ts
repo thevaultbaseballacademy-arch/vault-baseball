@@ -31,7 +31,7 @@ export const useAdminEssaBookings = (filters: EssaBookingFilters = {}) => {
     queryFn: async (): Promise<AdminEssaBooking[]> => {
       let q = supabase
         .from("facility_reservations" as any)
-        .select("id,title,notes,starts_at,ends_at,status,space_id,created_by,attendee_count")
+        .select("id,title,notes,starts_at,ends_at,status,space_id,created_by,coach_user_id,attendee_count")
         .like("notes", "ESSA:%")
         .order("starts_at", { ascending: false })
         .limit(500);
