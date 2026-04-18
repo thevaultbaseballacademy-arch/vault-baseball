@@ -2670,6 +2670,53 @@ export type Database = {
         }
         Relationships: []
       }
+      essa_package_purchases: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          credit_id: string | null
+          fulfilled_at: string
+          id: string
+          lesson_count: number
+          package_id: string
+          stripe_price_id: string
+          stripe_session_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          credit_id?: string | null
+          fulfilled_at?: string
+          id?: string
+          lesson_count: number
+          package_id: string
+          stripe_price_id: string
+          stripe_session_id: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          credit_id?: string | null
+          fulfilled_at?: string
+          id?: string
+          lesson_count?: number
+          package_id?: string
+          stripe_price_id?: string
+          stripe_session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "essa_package_purchases_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_credits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evaluation_leads: {
         Row: {
           age: number | null
@@ -3495,6 +3542,7 @@ export type Database = {
           last_used_at: string | null
           package_id: string | null
           purchased_at: string
+          source: string
           stripe_session_id: string | null
           total_lessons: number
           used_lessons: number
@@ -3510,6 +3558,7 @@ export type Database = {
           last_used_at?: string | null
           package_id?: string | null
           purchased_at?: string
+          source?: string
           stripe_session_id?: string | null
           total_lessons: number
           used_lessons?: number
@@ -3525,6 +3574,7 @@ export type Database = {
           last_used_at?: string | null
           package_id?: string | null
           purchased_at?: string
+          source?: string
           stripe_session_id?: string | null
           total_lessons?: number
           used_lessons?: number

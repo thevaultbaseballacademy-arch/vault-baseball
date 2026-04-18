@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.weekly-maintenance]
 verify_jwt = false
+
+[functions.essa-stripe-webhook]
+verify_jwt = false
