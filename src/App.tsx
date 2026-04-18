@@ -56,6 +56,7 @@ const OwnerAnalytics = lazy(() => import("./pages/admin/OwnerAnalytics"));
 const OwnerHealthMetrics = lazy(() => import("./pages/admin/OwnerHealthMetrics"));
 const OwnerAudit = lazy(() => import("./pages/admin/OwnerAudit"));
 const OwnerExports = lazy(() => import("./pages/admin/OwnerExports"));
+const OwnerFacility = lazy(() => import("./pages/admin/OwnerFacility"));
 const Community = lazy(() => import("./pages/Community"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Courses = lazy(() => import("./pages/Courses"));
@@ -298,6 +299,9 @@ const App = () => (
               } />
               <Route path="audit" element={
                 <RoleGuard requires="view_audit_log"><OwnerAudit /></RoleGuard>
+              } />
+              <Route path="facility" element={
+                <RoleGuard requires="view_platform_settings"><OwnerFacility /></RoleGuard>
               } />
               {/* Legacy sub-routes */}
               <Route path="certification-analytics" element={

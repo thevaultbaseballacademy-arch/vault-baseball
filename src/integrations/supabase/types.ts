@@ -2784,6 +2784,194 @@ export type Database = {
         }
         Relationships: []
       }
+      facility_hours: {
+        Row: {
+          close_time: string
+          created_at: string
+          day_of_week: number
+          id: string
+          is_closed: boolean
+          open_time: string
+          updated_at: string
+        }
+        Insert: {
+          close_time?: string
+          created_at?: string
+          day_of_week: number
+          id?: string
+          is_closed?: boolean
+          open_time?: string
+          updated_at?: string
+        }
+        Update: {
+          close_time?: string
+          created_at?: string
+          day_of_week?: number
+          id?: string
+          is_closed?: boolean
+          open_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      facility_reservations: {
+        Row: {
+          attendee_count: number | null
+          color: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          notes: string | null
+          recurrence_group_id: string | null
+          recurrence_rule: string | null
+          reserved_for: string | null
+          space_id: string
+          starts_at: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          attendee_count?: number | null
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          notes?: string | null
+          recurrence_group_id?: string | null
+          recurrence_rule?: string | null
+          reserved_for?: string | null
+          space_id: string
+          starts_at: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          attendee_count?: number | null
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          notes?: string | null
+          recurrence_group_id?: string | null
+          recurrence_rule?: string | null
+          reserved_for?: string | null
+          space_id?: string
+          starts_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "facility_reservations_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "facility_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      facility_settings: {
+        Row: {
+          advance_booking_days: number
+          created_at: string
+          enforce_advance_window: boolean
+          enforce_hours: boolean
+          enforce_max_length: boolean
+          id: string
+          max_booking_minutes: number
+          min_booking_minutes: number
+          slot_size_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          advance_booking_days?: number
+          created_at?: string
+          enforce_advance_window?: boolean
+          enforce_hours?: boolean
+          enforce_max_length?: boolean
+          id?: string
+          max_booking_minutes?: number
+          min_booking_minutes?: number
+          slot_size_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          advance_booking_days?: number
+          created_at?: string
+          enforce_advance_window?: boolean
+          enforce_hours?: boolean
+          enforce_max_length?: boolean
+          id?: string
+          max_booking_minutes?: number
+          min_booking_minutes?: number
+          slot_size_minutes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      facility_spaces: {
+        Row: {
+          capacity: number
+          color: string
+          created_at: string
+          created_by: string | null
+          display_order: number
+          grid_h: number
+          grid_w: number
+          grid_x: number
+          grid_y: number
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          space_type: string
+          updated_at: string
+          zone: string | null
+        }
+        Insert: {
+          capacity?: number
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          grid_h?: number
+          grid_w?: number
+          grid_x?: number
+          grid_y?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          space_type?: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Update: {
+          capacity?: number
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          grid_h?: number
+          grid_w?: number
+          grid_x?: number
+          grid_y?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          space_type?: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Relationships: []
+      }
       group_session_enrollments: {
         Row: {
           athlete_user_id: string
