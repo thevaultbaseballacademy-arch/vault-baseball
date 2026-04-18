@@ -11,9 +11,11 @@ export type AdminEssaBooking = {
   status: string;
   space_id: string;
   created_by: string | null;
+  coach_user_id: string | null;
   attendee_count: number | null;
   athlete_name?: string | null;
   athlete_email?: string | null;
+  coach_name?: string | null;
 };
 
 export type EssaBookingFilters = {
