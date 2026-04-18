@@ -407,11 +407,15 @@ const SlotPicker = ({
 const ConfirmPanel = ({
   lesson,
   slot,
+  coachUserId,
+  coachName,
   onClear,
   onBooked,
 }: {
   lesson: PrivateLesson | null;
   slot: Date | null;
+  coachUserId: string | null;
+  coachName: string | null;
   onClear: () => void;
   onBooked: () => void;
 }) => {
@@ -439,6 +443,8 @@ const ConfirmPanel = ({
         lessonName: lesson.shortName,
         durationMinutes: lesson.durationMinutes,
         slot,
+        coachUserId,
+        coachName,
       });
       onBooked();
     } catch {
@@ -449,7 +455,11 @@ const ConfirmPanel = ({
   const handlePay = () =>
     startCheckout({
       priceId: lesson.stripePriceId,
-      metadata: { lesson_id: lesson.id, requested_start: slot.toISOString() },
+      metadata: {
+        lesson_id: lesson.id,
+        requested_start: slot.toISOString(),
+        coach_user_id: coachUserId ?? "",
+      },
     });
 
   return (
