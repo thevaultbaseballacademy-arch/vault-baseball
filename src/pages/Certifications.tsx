@@ -27,6 +27,15 @@ import {
   getCertificationPrice,
   type CertificationType 
 } from "@/lib/certificationPricing";
+import {
+  CERTIFICATION_CATALOG,
+  CERTIFICATION_BUNDLES,
+  MOST_POPULAR_CERT_IDS,
+  formatPriceUSD,
+  type CertificationCatalogItem,
+  type CertificationBundle,
+} from "@/lib/certificationPricing";
+import { isIOS, IOS_RENEWAL_NOTICE } from "@/lib/appleIAP";
 import CertificateGenerator from "@/components/certifications/CertificateGenerator";
 import CertificationBadge from "@/components/certifications/CertificationBadge";
 import { useMyBadge } from "@/hooks/useCoachBadge";
