@@ -128,6 +128,8 @@ const OWNER_PERMISSIONS: readonly Permission[] = [
   "view_own_courses", "view_own_kpis", "view_own_progress", "book_lesson", "message_own_coach",
   // Dashboards
   "dashboard.owner", "dashboard.admin", "dashboard.coach", "dashboard.athlete",
+  // Facility
+  "view_facility_schedule", "manage_facility_spaces", "manage_facility_hours", "manage_facility_bookings",
 ];
 
 // ─── ADMIN PERMISSIONS ────────────────────────────────────────────────
@@ -154,6 +156,8 @@ const ADMIN_PERMISSIONS: readonly Permission[] = [
   "view_own_courses", "view_own_kpis", "view_own_progress", "book_lesson", "message_own_coach",
   // Dashboards
   "dashboard.admin", "dashboard.coach", "dashboard.athlete",
+  // Facility (admin access)
+  "view_facility_schedule", "manage_facility_spaces", "manage_facility_hours", "manage_facility_bookings",
 ];
 
 // ─── COACH PERMISSIONS ────────────────────────────────────────────────
