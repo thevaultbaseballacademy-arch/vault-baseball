@@ -792,11 +792,20 @@ const FacilityScheduling = () => {
 
                 <div className="lg:col-span-1 space-y-3">
                   <h2 className="font-display text-sm tracking-wide uppercase text-foreground/80 mb-2">
-                    2 · Pick Time
+                    2 · Pick Coach & Time
                   </h2>
+                  <EssaCoachPicker
+                    value={coachUserId}
+                    onChange={(id, name) => {
+                      setCoachUserId(id);
+                      setCoachName(name);
+                      setSelectedSlot(null);
+                    }}
+                  />
                   <SlotPicker
                     selectedLesson={selectedLesson}
                     selectedSlot={selectedSlot}
+                    coachUserId={coachUserId}
                     onSlotPick={(d) => selectedLesson && setSelectedSlot(d)}
                   />
                 </div>
@@ -808,6 +817,8 @@ const FacilityScheduling = () => {
                   <ConfirmPanel
                     lesson={selectedLesson}
                     slot={selectedSlot}
+                    coachUserId={coachUserId}
+                    coachName={coachName}
                     onClear={clearSelection}
                     onBooked={clearSelection}
                   />
