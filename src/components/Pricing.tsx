@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Check, Loader2, Power, Zap, Shield, Award } from "lucide-react";
+import { Check, Loader2, Power, Zap, Shield, Award, Apple } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { isIOS, IOS_SUBSCRIPTION_NOTICE } from "@/lib/appleIAP";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -25,7 +26,7 @@ const plans = [
     id: 1,
     name: "Athlete",
     description: "Core system access for individual athletes",
-    price: 29,
+    price: 29.99,
     period: "/month",
     icon: Zap,
     features: [
@@ -43,7 +44,7 @@ const plans = [
     id: 2,
     name: "Performance",
     description: "Full suite for serious competitors",
-    price: 59,
+    price: 59.99,
     period: "/month",
     icon: Shield,
     features: [
@@ -66,7 +67,7 @@ const plans = [
     id: 3,
     name: "Elite",
     description: "Complete framework for next-level athletes",
-    price: 149,
+    price: 149.99,
     period: "/month",
     icon: Award,
     features: [
@@ -292,7 +293,7 @@ const Pricing = () => {
                     </div>
                   </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-display text-foreground">${plan.price}</span>
+                    <span className="text-5xl font-display text-foreground">${plan.price.toFixed(2)}</span>
                     <span className="text-muted-foreground text-sm">{plan.period}</span>
                   </div>
                   {/* Annual Anchor Text for $59 tier */}
@@ -419,6 +420,13 @@ const Pricing = () => {
             </Button>
           </div>
         </motion.div>
+
+        {isIOS() && (
+          <div className="mt-10 max-w-3xl mx-auto p-4 border border-border bg-card flex items-start gap-3">
+            <Apple className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground leading-relaxed">{IOS_SUBSCRIPTION_NOTICE}</p>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -27,6 +27,15 @@ import {
   getCertificationPrice,
   type CertificationType 
 } from "@/lib/certificationPricing";
+import {
+  CERTIFICATION_CATALOG,
+  CERTIFICATION_BUNDLES,
+  MOST_POPULAR_CERT_IDS,
+  formatPriceUSD,
+  type CertificationCatalogItem,
+  type CertificationBundle,
+} from "@/lib/certificationPricing";
+import { isIOS, IOS_RENEWAL_NOTICE } from "@/lib/appleIAP";
 import CertificateGenerator from "@/components/certifications/CertificateGenerator";
 import CertificationBadge from "@/components/certifications/CertificationBadge";
 import { useMyBadge } from "@/hooks/useCoachBadge";
@@ -408,6 +417,9 @@ const Certifications = () => {
               </CardContent>
             </Card>
 
+            {/* 🏪 VAULT OS CERTIFICATION STOREFRONT */}
+            <CertStorefrontSection />
+
             {/* ⚾ BASEBALL CERTIFICATIONS */}
             <div className="space-y-4">
               <h2 className="text-xl font-display text-foreground flex items-center gap-2">
@@ -576,6 +588,140 @@ const BadgeSummarySection = () => {
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+};
+
+// =============================================================================
+// VAULT OS Storefront — .99 catalog with bundles, renewals, and iOS notice.
+// =============================================================================
+
+const GOLD = "text-vault-utility";
+const GOLD_BG = "bg-vault-utility/10 border-vault-utility/40";
+
+const CertCatalogCard = ({ item }: { item: CertificationCatalogItem }) => {
+  const isMostPopular = MOST_POPULAR_CERT_IDS.has(item.id);
+  const ios = isIOS();
+
+  const handlePurchase = () => {
+    toast.info("Checkout for this certification opens shortly.");
+  };
+
+  const handleRenew = () => {
+    toast.info("Renewal checkout opens shortly.");
+  };
+
+  return (
+    <Card className={`relative ${isMostPopular ? "border-vault-utility/60" : ""}`}>
+      {isMostPopular && (
+        <div className="absolute -top-3 left-4 z-10">
+          <Badge className="bg-vault-utility text-background uppercase tracking-wider shadow-[0_0_18px_hsl(var(--vault-utility)/0.6)]">
+            Most Popular
+          </Badge>
+        </div>
+      )}
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">{item.name}</CardTitle>
+        <CardDescription>{item.description}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex items-baseline gap-2">
+          <span className={`text-3xl font-display ${GOLD}`}>{formatPriceUSD(item.price)}</span>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          Renewal: {formatPriceUSD(item.renewalPrice)}/yr
+        </div>
+        {ios && (
+          <p className="text-[11px] text-muted-foreground italic">{IOS_RENEWAL_NOTICE}</p>
+        )}
+        <Button variant="vault" className="w-full" onClick={handlePurchase}>
+          Purchase
+        </Button>
+        {!ios && (
+          <Button variant="outline" size="sm" className="w-full" onClick={handleRenew}>
+            <RefreshCw className="w-3 h-3 mr-2" />
+            Renew Now
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+const BundleCard = ({ bundle }: { bundle: CertificationBundle }) => {
+  const isElite = bundle.badge === "best_value";
+  const handleBuy = () => {
+    toast.info("Bundle checkout opens shortly.");
+  };
+
+  return (
+    <Card
+      className={`relative ${isElite ? "border-vault-utility shadow-[0_0_24px_hsl(var(--vault-utility)/0.35)] md:scale-[1.02]" : "border-vault-utility/40"}`}
+    >
+      {isElite && (
+        <div className="absolute -top-3 right-4 z-10">
+          <Badge className="bg-vault-utility text-background uppercase tracking-wider shadow-[0_0_18px_hsl(var(--vault-utility)/0.6)]">
+            Best Value
+          </Badge>
+        </div>
+      )}
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">{bundle.name}</CardTitle>
+          <Badge className={`${GOLD_BG} ${GOLD} border`}>
+            Save ${bundle.savings}
+          </Badge>
+        </div>
+        <CardDescription>{bundle.description}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className={`text-4xl font-display ${GOLD}`}>{formatPriceUSD(bundle.price)}</div>
+        <p className={`text-sm font-medium ${GOLD}`}>You save ${bundle.savings} vs buying individually</p>
+        <Button variant="vault" className="w-full" onClick={handleBuy}>
+          Get Bundle
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+const CertStorefrontSection = () => {
+  const ios = isIOS();
+  return (
+    <div className="space-y-10 pt-6 border-t border-border">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-display text-foreground flex items-center gap-2">
+          <span className={`w-1 h-7 bg-vault-utility rounded-full`} />
+          Certification Catalog
+        </h2>
+        <p className="text-sm text-muted-foreground max-w-2xl">
+          Build your coaching authority. Annual renewals keep your certification active.
+        </p>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {CERTIFICATION_CATALOG.map(item => (
+            <CertCatalogCard key={item.id} item={item} />
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-2xl font-display text-foreground flex items-center gap-2">
+          <span className="w-1 h-7 bg-vault-utility rounded-full" />
+          Bundle Packages
+        </h2>
+        <p className={`text-sm ${GOLD}`}>Bundle and save — every package is a one-time purchase.</p>
+        <div className="grid md:grid-cols-2 gap-5">
+          {CERTIFICATION_BUNDLES.map(bundle => (
+            <BundleCard key={bundle.id} bundle={bundle} />
+          ))}
+        </div>
+      </div>
+
+      {ios && (
+        <div className="p-4 border border-border bg-card text-xs text-muted-foreground">
+          {IOS_RENEWAL_NOTICE} — annual certification renewals are processed on the web.
+        </div>
+      )}
     </div>
   );
 };
