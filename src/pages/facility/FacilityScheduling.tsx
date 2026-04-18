@@ -9,6 +9,7 @@ import {
   ShieldAlert,
   Sparkles,
   Star,
+  Ticket,
   Users,
 } from "lucide-react";
 
@@ -30,6 +31,7 @@ import {
 } from "@/lib/essaPricing";
 import { useEssaCheckout } from "@/hooks/useEssaCheckout";
 import { useFacilityReservations, useFacilitySpaces } from "@/hooks/useFacilitySchedule";
+import { useEssaCredits, useMyEssaBookings, useBookWithCredit } from "@/hooks/useEssaCredits";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -38,8 +40,8 @@ import Footer from "@/components/Footer";
 /* -------------------------------------------------------------------------- */
 
 const SLOT_MINUTES = 30;
-const DAY_START_HOUR = 9; // 9 AM
-const DAY_END_HOUR = 21; // 9 PM
+const DAY_START_HOUR = 9;
+const DAY_END_HOUR = 21;
 
 const buildSlots = (date: Date): Date[] => {
   const start = new Date(date);
@@ -84,6 +86,43 @@ const Header = () => (
     </div>
   </div>
 );
+
+/* -------------------------------------------------------------------------- */
+/*  Credits banner                                                             */
+/* -------------------------------------------------------------------------- */
+
+const CreditsBanner = () => {
+  const { data: credits = [] } = useEssaCredits();
+  const totalRemaining = credits.reduce((s, c) => s + c.remaining, 0);
+  if (totalRemaining === 0) return null;
+
+  const nextExpiry = credits
+    .filter((c) => c.expires_at)
+    .sort((a, b) => (a.expires_at! < b.expires_at! ? -1 : 1))[0];
+
+  return (
+    <Card className="p-4 bg-primary/10 border-primary/40 mb-6 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+          <Ticket className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <div className="font-display text-base text-foreground">
+            {totalRemaining} lesson{totalRemaining === 1 ? "" : "s"} ready to book
+          </div>
+          {nextExpiry && (
+            <div className="text-[11px] text-muted-foreground">
+              Soonest expiry: {new Date(nextExpiry.expires_at!).toLocaleDateString()}
+            </div>
+          )}
+        </div>
+      </div>
+      <Badge variant="outline" className="border-primary/40 text-primary text-[10px] uppercase tracking-wider">
+        Pay-with-credit enabled
+      </Badge>
+    </Card>
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /*  Lesson card                                                                */
@@ -179,13 +218,13 @@ const PackageCard = ({ pkg }: { pkg: LessonPackage }) => {
 
       <ul className="space-y-1.5 mb-5 text-xs text-muted-foreground">
         <li className="flex items-center gap-2">
-          <CheckCircle2 className="w-3.5 h-3.5 text-primary" /> Use across {pkg.appliesTo.length} categories
+          <CheckCircle2 className="w-3.5 h-3.5 text-primary" /> Credits added instantly after checkout
         </li>
         <li className="flex items-center gap-2">
           <CheckCircle2 className="w-3.5 h-3.5 text-primary" /> 6-month expiration
         </li>
         <li className="flex items-center gap-2">
-          <CheckCircle2 className="w-3.5 h-3.5 text-primary" /> Transferable between siblings
+          <CheckCircle2 className="w-3.5 h-3.5 text-primary" /> Book any private lesson with credits
         </li>
       </ul>
 
@@ -210,7 +249,7 @@ const PackageCard = ({ pkg }: { pkg: LessonPackage }) => {
 };
 
 /* -------------------------------------------------------------------------- */
-/*  Slot picker (calendar + day grid)                                          */
+/*  Slot picker                                                                */
 /* -------------------------------------------------------------------------- */
 
 const SlotPicker = ({
@@ -244,7 +283,6 @@ const SlotPicker = ({
 
   const isSlotBooked = (slotStart: Date) => {
     const slotEnd = new Date(slotStart.getTime() + SLOT_MINUTES * 60_000);
-    // If every active space has a conflicting reservation, the slot is full
     const conflicting = reservations.filter(
       (r) =>
         r.status !== "cancelled" &&
@@ -275,7 +313,6 @@ const SlotPicker = ({
         </h3>
       </div>
 
-      {/* Day strip */}
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex gap-2 pb-3">
           {next7Days.map((d) => {
@@ -302,7 +339,6 @@ const SlotPicker = ({
 
       <div className="text-xs text-muted-foreground mb-3">{formatDayLabel(date)}</div>
 
-      {/* Slot grid */}
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[320px] overflow-y-auto">
         {slots.map((slot) => {
           const booked = isSlotBooked(slot);
@@ -345,12 +381,18 @@ const ConfirmPanel = ({
   lesson,
   slot,
   onClear,
+  onBooked,
 }: {
   lesson: PrivateLesson | null;
   slot: Date | null;
   onClear: () => void;
+  onBooked: () => void;
 }) => {
-  const { startCheckout, isLoading } = useEssaCheckout();
+  const { startCheckout, isLoading: checkoutLoading } = useEssaCheckout();
+  const { data: credits = [] } = useEssaCredits();
+  const bookWithCredit = useBookWithCredit();
+  const totalCredits = credits.reduce((s, c) => s + c.remaining, 0);
+  const canUseCredit = totalCredits > 0;
 
   if (!lesson || !slot) {
     return (
@@ -363,13 +405,24 @@ const ConfirmPanel = ({
     );
   }
 
-  const handleBook = () =>
+  const handleBookWithCredit = async () => {
+    try {
+      await bookWithCredit.mutateAsync({
+        lessonId: lesson.id,
+        lessonName: lesson.shortName,
+        durationMinutes: lesson.durationMinutes,
+        slot,
+      });
+      onBooked();
+    } catch {
+      // toast handled in hook
+    }
+  };
+
+  const handlePay = () =>
     startCheckout({
       priceId: lesson.stripePriceId,
-      metadata: {
-        lesson_id: lesson.id,
-        requested_start: slot.toISOString(),
-      },
+      metadata: { lesson_id: lesson.id, requested_start: slot.toISOString() },
     });
 
   return (
@@ -400,12 +453,37 @@ const ConfirmPanel = ({
           <span className="text-primary font-display text-lg">{formatPrice(lesson.priceCents)}</span>
         </div>
       </div>
-      <div className="mt-4 flex gap-2">
+
+      {canUseCredit && (
+        <Button
+          onClick={handleBookWithCredit}
+          disabled={bookWithCredit.isPending}
+          className="w-full mt-4"
+        >
+          {bookWithCredit.isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Booking...
+            </>
+          ) : (
+            <>
+              <Ticket className="w-4 h-4 mr-2" />
+              Book with credit ({totalCredits} left)
+            </>
+          )}
+        </Button>
+      )}
+
+      <div className="mt-3 flex gap-2">
         <Button variant="outline" onClick={onClear} className="flex-1">
           Clear
         </Button>
-        <Button onClick={handleBook} disabled={isLoading} className="flex-1">
-          {isLoading ? (
+        <Button
+          onClick={handlePay}
+          disabled={checkoutLoading}
+          variant={canUseCredit ? "outline" : "default"}
+          className="flex-1"
+        >
+          {checkoutLoading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Loading...
             </>
@@ -416,11 +494,92 @@ const ConfirmPanel = ({
           )}
         </Button>
       </div>
+
       <p className="text-[10px] text-muted-foreground mt-3 leading-relaxed">
         Free cancellation 24+ hours in advance. Within 24h: 50% charge. Same-day or no-show:
         full charge + $25 fee. Weather cancellations are fully refunded.
       </p>
     </Card>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  My ESSA bookings                                                           */
+/* -------------------------------------------------------------------------- */
+
+const MyBookings = () => {
+  const { data: bookings = [], isLoading } = useMyEssaBookings();
+
+  const upcoming = bookings.filter((b) => new Date(b.starts_at) >= new Date());
+  const past = bookings
+    .filter((b) => new Date(b.starts_at) < new Date())
+    .slice(-5)
+    .reverse();
+
+  if (isLoading) {
+    return (
+      <div className="text-sm text-muted-foreground text-center py-10">
+        <Loader2 className="w-4 h-4 inline animate-spin mr-2" /> Loading your bookings...
+      </div>
+    );
+  }
+
+  if (bookings.length === 0) {
+    return (
+      <Card className="p-8 text-center border-dashed bg-card/40">
+        <CalendarIcon className="w-6 h-6 mx-auto mb-2 text-primary/60" />
+        <div className="text-sm text-muted-foreground">
+          No ESSA bookings yet. Book a session above to get started.
+        </div>
+      </Card>
+    );
+  }
+
+  const Row = ({ b }: { b: (typeof bookings)[number] }) => {
+    const start = new Date(b.starts_at);
+    const isUpcoming = start >= new Date();
+    return (
+      <div className="flex items-center justify-between gap-3 border-b border-border/50 last:border-0 py-3">
+        <div className="min-w-0">
+          <div className="text-sm text-foreground font-medium truncate">{b.title}</div>
+          <div className="text-[11px] text-muted-foreground">
+            {start.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}{" "}
+            · {formatTime(start)}
+          </div>
+        </div>
+        <Badge
+          variant="outline"
+          className={
+            isUpcoming
+              ? "border-primary/40 text-primary text-[10px]"
+              : "border-border text-muted-foreground text-[10px]"
+          }
+        >
+          {isUpcoming ? "Upcoming" : "Past"}
+        </Badge>
+      </div>
+    );
+  };
+
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      <Card className="p-5 bg-card border-border">
+        <h3 className="font-display text-sm tracking-wide uppercase mb-2">Upcoming</h3>
+        {upcoming.length === 0 ? (
+          <p className="text-xs text-muted-foreground py-2">Nothing on the books.</p>
+        ) : (
+          upcoming.map((b) => <Row key={b.id} b={b} />)
+        )}
+      </Card>
+      <Card className="p-5 bg-card border-border">
+        <h3 className="font-display text-sm tracking-wide uppercase mb-2">Recent</h3>
+        {past.length === 0 ? (
+          <p className="text-xs text-muted-foreground py-2">No completed sessions yet.</p>
+        ) : (
+          past.map((b) => <Row key={b.id} b={b} />)
+        )}
+      </Card>
+    </div>
   );
 };
 
@@ -547,6 +706,11 @@ const FacilityScheduling = () => {
     };
   }, []);
 
+  const clearSelection = () => {
+    setSelectedLesson(null);
+    setSelectedSlot(null);
+  };
+
   return (
     <>
       <Navbar />
@@ -554,17 +718,18 @@ const FacilityScheduling = () => {
         <Header />
 
         <div className="container mx-auto px-4 py-8 md:py-12">
+          <CreditsBanner />
+
           <Tabs defaultValue="single">
             <TabsList className="bg-card border border-border">
               <TabsTrigger value="single">Single Lesson</TabsTrigger>
               <TabsTrigger value="packages">Packages</TabsTrigger>
+              <TabsTrigger value="bookings">My Bookings</TabsTrigger>
               <TabsTrigger value="more">Groups · Clinics · Teams</TabsTrigger>
             </TabsList>
 
-            {/* ---------------- Single lesson booking flow ---------------- */}
             <TabsContent value="single" className="mt-6">
               <div className="grid lg:grid-cols-3 gap-6">
-                {/* Lesson types */}
                 <div className="lg:col-span-1 space-y-3">
                   <h2 className="font-display text-sm tracking-wide uppercase text-foreground/80 mb-2">
                     1 · Choose Lesson
@@ -582,7 +747,6 @@ const FacilityScheduling = () => {
                   ))}
                 </div>
 
-                {/* Calendar */}
                 <div className="lg:col-span-1 space-y-3">
                   <h2 className="font-display text-sm tracking-wide uppercase text-foreground/80 mb-2">
                     2 · Pick Time
@@ -594,7 +758,6 @@ const FacilityScheduling = () => {
                   />
                 </div>
 
-                {/* Confirm */}
                 <div className="lg:col-span-1 space-y-3">
                   <h2 className="font-display text-sm tracking-wide uppercase text-foreground/80 mb-2">
                     3 · Confirm
@@ -602,16 +765,13 @@ const FacilityScheduling = () => {
                   <ConfirmPanel
                     lesson={selectedLesson}
                     slot={selectedSlot}
-                    onClear={() => {
-                      setSelectedLesson(null);
-                      setSelectedSlot(null);
-                    }}
+                    onClear={clearSelection}
+                    onBooked={clearSelection}
                   />
                 </div>
               </div>
             </TabsContent>
 
-            {/* ---------------- Packages ---------------- */}
             <TabsContent value="packages" className="mt-6">
               <div className="mb-5">
                 <h2 className="font-display text-2xl text-foreground tracking-wide">
@@ -629,7 +789,10 @@ const FacilityScheduling = () => {
               </div>
             </TabsContent>
 
-            {/* ---------------- More ---------------- */}
+            <TabsContent value="bookings" className="mt-6">
+              <MyBookings />
+            </TabsContent>
+
             <TabsContent value="more" className="mt-6">
               <InquiryGrid />
             </TabsContent>
