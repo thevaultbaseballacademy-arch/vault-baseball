@@ -1,9 +1,9 @@
+@import "@fontsource/bebas-neue";
+@import "@fontsource/inter";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import "@fontsource/bebas-neue";
-@import "@fontsource/inter";
 
 @layer base {
   :root {

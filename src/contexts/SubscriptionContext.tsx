@@ -30,30 +30,42 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>(null);
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasTeamAccess, setHasTeamAccess] = useState(false);
 
-  // Use refs to avoid stale closures in interval
   const sessionRef = useRef<Session | null>(null);
   const userRef = useRef<User | null>(null);
 
   usePushNotifications(user?.id);
 
+  const resetSubscriptionState = useCallback(() => {
+    setIsSubscribed(false);
+    setSubscriptionTier(null);
+    setSubscriptionEnd(null);
+    setHasTeamAccess(false);
+  }, []);
+
   const checkTeamAccess = useCallback(async (email: string | undefined) => {
-    if (!email) { setHasTeamAccess(false); return; }
+    if (!email) {
+      setHasTeamAccess(false);
+      return;
+    }
+
     try {
       const { data } = await supabase
         .from("team_whitelist")
         .select("full_access")
         .eq("email", email.toLowerCase())
         .maybeSingle();
+
       setHasTeamAccess(data?.full_access ?? false);
-    } catch { setHasTeamAccess(false); }
+    } catch {
+      setHasTeamAccess(false);
+    }
   }, []);
 
   const checkSubscription = useCallback(async (accessToken: string, userEmail?: string) => {
     try {
-      // Run team check and subscription check in parallel
       const [, subResult] = await Promise.all([
         checkTeamAccess(userEmail),
         supabase.functions.invoke("check-subscription", {
@@ -69,11 +81,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       setSubscriptionEnd(data?.subscription_end ?? null);
     } catch (error) {
       console.error("Error checking subscription:", error);
-      setIsSubscribed(false);
-      setSubscriptionTier(null);
-      setSubscriptionEnd(null);
+      resetSubscriptionState();
     }
-  }, [checkTeamAccess]);
+  }, [checkTeamAccess, resetSubscriptionState]);
 
   const refreshSubscription = useCallback(async () => {
     if (sessionRef.current?.access_token) {
@@ -82,69 +92,55 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   }, [checkSubscription]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-        sessionRef.current = newSession;
-        userRef.current = newSession?.user ?? null;
+    let active = true;
 
-        if (event === "TOKEN_REFRESHED" && !newSession) {
-          setIsSubscribed(false);
-          setSubscriptionTier(null);
-          setSubscriptionEnd(null);
-          setHasTeamAccess(false);
-          setIsLoading(false);
-          return;
-        }
+    const syncSessionState = async (nextSession: Session | null) => {
+      if (!active) return;
 
-        if (event === "SIGNED_OUT") {
-          setIsSubscribed(false);
-          setSubscriptionTier(null);
-          setSubscriptionEnd(null);
-          setHasTeamAccess(false);
-          setIsLoading(false);
-          return;
-        }
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      sessionRef.current = nextSession;
+      userRef.current = nextSession?.user ?? null;
 
-        if (newSession?.access_token) {
-          setTimeout(() => {
-            checkSubscription(newSession.access_token, newSession.user?.email);
-          }, 0);
-        } else {
-          setIsSubscribed(false);
-          setSubscriptionTier(null);
-          setSubscriptionEnd(null);
-          setHasTeamAccess(false);
-        }
+      if (!nextSession?.access_token) {
+        resetSubscriptionState();
+        if (active) setIsLoading(false);
+        return;
+      }
+
+      await checkSubscription(nextSession.access_token, nextSession.user?.email);
+
+      if (active) {
         setIsLoading(false);
       }
-    );
+    };
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      sessionRef.current = s;
-      userRef.current = s?.user ?? null;
+    const initializeAuth = async () => {
+      setIsLoading(true);
+      const { data: { session: restoredSession } } = await supabase.auth.getSession();
+      await syncSessionState(restoredSession);
+    };
 
-      if (s?.access_token) {
-        checkSubscription(s.access_token, s.user?.email);
-      }
-      setIsLoading(false);
+    void initializeAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === "INITIAL_SESSION") return;
+      setIsLoading(true);
+      void syncSessionState(nextSession);
     });
 
-    // Use refs for interval to avoid stale closure
     const interval = setInterval(() => {
       if (sessionRef.current?.access_token) {
-        checkSubscription(sessionRef.current.access_token, userRef.current?.email);
+        void checkSubscription(sessionRef.current.access_token, userRef.current?.email);
       }
     }, 300000);
 
     return () => {
+      active = false;
       subscription.unsubscribe();
       clearInterval(interval);
     };
-  }, [checkSubscription]);
+  }, [checkSubscription, resetSubscriptionState]);
 
   return (
     <SubscriptionContext.Provider

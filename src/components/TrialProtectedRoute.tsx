@@ -1,8 +1,7 @@
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 interface TrialProtectedRouteProps {
   children: React.ReactNode;
@@ -13,19 +12,11 @@ const TrialProtectedRoute = ({
   children, 
   allowTrialAccess = false 
 }: TrialProtectedRouteProps) => {
+  const { user } = useSubscription();
   const { isTrialUser, isTrialExpired, isFullMember, loading } = useTrialStatus();
   const location = useLocation();
-  const [user, setUser] = useState<any>(null);
-  const [authLoading, setAuthLoading] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-      setAuthLoading(false);
-    });
-  }, []);
-
-  if (loading || authLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -33,27 +24,22 @@ const TrialProtectedRoute = ({
     );
   }
 
-  // Not logged in - redirect to auth
   if (!user) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Full member - always allow access
   if (isFullMember) {
     return <>{children}</>;
   }
 
-  // Trial user with active trial — grant full access to all core features
   if (isTrialUser && !isTrialExpired) {
     return <>{children}</>;
   }
 
-  // Trial expired - redirect to expired page
-  if (isTrialUser && isTrialExpired) {
+  if (isTrialUser && isTrialExpired && !allowTrialAccess) {
     return <Navigate to="/trial-expired" replace />;
   }
 
-  // Default: allow access (new users who haven't started trial)
   return <>{children}</>;
 };
 
