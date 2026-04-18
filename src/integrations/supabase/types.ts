@@ -2864,6 +2864,7 @@ export type Database = {
       facility_reservations: {
         Row: {
           attendee_count: number | null
+          coach_user_id: string | null
           color: string | null
           created_at: string
           created_by: string | null
@@ -2881,6 +2882,7 @@ export type Database = {
         }
         Insert: {
           attendee_count?: number | null
+          coach_user_id?: string | null
           color?: string | null
           created_at?: string
           created_by?: string | null
@@ -2898,6 +2900,7 @@ export type Database = {
         }
         Update: {
           attendee_count?: number | null
+          coach_user_id?: string | null
           color?: string | null
           created_at?: string
           created_by?: string | null
@@ -6952,6 +6955,17 @@ export type Database = {
         }[]
       }
       get_coach_badge_level: { Args: { _user_id: string }; Returns: Json }
+      get_coach_essa_availability: {
+        Args: {
+          p_coach_user_id: string
+          p_date: string
+          p_duration_minutes?: number
+        }
+        Returns: {
+          slot_end: string
+          slot_start: string
+        }[]
+      }
       get_coach_user_id_by_name: {
         Args: { _coach_name: string }
         Returns: string
