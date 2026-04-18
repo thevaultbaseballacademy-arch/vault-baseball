@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Check, Loader2, Power, Zap, Shield, Award } from "lucide-react";
+import { Check, Loader2, Power, Zap, Shield, Award, Apple } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { isIOS, IOS_SUBSCRIPTION_NOTICE } from "@/lib/appleIAP";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -25,7 +26,7 @@ const plans = [
     id: 1,
     name: "Athlete",
     description: "Core system access for individual athletes",
-    price: 29,
+    price: 29.99,
     period: "/month",
     icon: Zap,
     features: [
@@ -43,7 +44,7 @@ const plans = [
     id: 2,
     name: "Performance",
     description: "Full suite for serious competitors",
-    price: 59,
+    price: 59.99,
     period: "/month",
     icon: Shield,
     features: [
@@ -66,7 +67,7 @@ const plans = [
     id: 3,
     name: "Elite",
     description: "Complete framework for next-level athletes",
-    price: 149,
+    price: 149.99,
     period: "/month",
     icon: Award,
     features: [
