@@ -53,14 +53,20 @@ export const useAdminEssaBookings = (filters: EssaBookingFilters = {}) => {
       if (error) throw error;
       const rows = (data ?? []) as any[];
 
-      // Hydrate athlete display name + email
-      const userIds = Array.from(new Set(rows.map((r) => r.created_by).filter(Boolean)));
+      // Hydrate athlete + coach display names
+      const userIds = Array.from(
+        new Set(
+          rows
+            .flatMap((r) => [r.created_by, r.coach_user_id])
+            .filter(Boolean) as string[],
+        ),
+      );
       let profileMap: Record<string, { name: string | null; email: string | null }> = {};
       if (userIds.length > 0) {
         const { data: profs } = await supabase
           .from("profiles")
           .select("user_id,display_name,email")
-          .in("user_id", userIds as string[]);
+          .in("user_id", userIds);
         profileMap = Object.fromEntries(
           (profs ?? []).map((p: any) => [p.user_id, { name: p.display_name, email: p.email }]),
         );
@@ -70,6 +76,7 @@ export const useAdminEssaBookings = (filters: EssaBookingFilters = {}) => {
         ...r,
         athlete_name: r.created_by ? profileMap[r.created_by]?.name ?? null : null,
         athlete_email: r.created_by ? profileMap[r.created_by]?.email ?? null : null,
+        coach_name: r.coach_user_id ? profileMap[r.coach_user_id]?.name ?? null : null,
       })) as AdminEssaBooking[];
 
       if (filters.search?.trim()) {
