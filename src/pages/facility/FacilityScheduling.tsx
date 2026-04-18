@@ -731,6 +731,8 @@ const InquiryGrid = () => (
 const FacilityScheduling = () => {
   const [selectedLesson, setSelectedLesson] = useState<PrivateLesson | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
+  const [coachUserId, setCoachUserId] = useState<string | null>(null);
+  const [coachName, setCoachName] = useState<string | null>(null);
 
   useEffect(() => {
     const prev = document.title;
