@@ -11,9 +11,11 @@ export type AdminEssaBooking = {
   status: string;
   space_id: string;
   created_by: string | null;
+  coach_user_id: string | null;
   attendee_count: number | null;
   athlete_name?: string | null;
   athlete_email?: string | null;
+  coach_name?: string | null;
 };
 
 export type EssaBookingFilters = {
@@ -29,7 +31,7 @@ export const useAdminEssaBookings = (filters: EssaBookingFilters = {}) => {
     queryFn: async (): Promise<AdminEssaBooking[]> => {
       let q = supabase
         .from("facility_reservations" as any)
-        .select("id,title,notes,starts_at,ends_at,status,space_id,created_by,attendee_count")
+        .select("id,title,notes,starts_at,ends_at,status,space_id,created_by,coach_user_id,attendee_count")
         .like("notes", "ESSA:%")
         .order("starts_at", { ascending: false })
         .limit(500);
@@ -51,14 +53,20 @@ export const useAdminEssaBookings = (filters: EssaBookingFilters = {}) => {
       if (error) throw error;
       const rows = (data ?? []) as any[];
 
-      // Hydrate athlete display name + email
-      const userIds = Array.from(new Set(rows.map((r) => r.created_by).filter(Boolean)));
+      // Hydrate athlete + coach display names
+      const userIds = Array.from(
+        new Set(
+          rows
+            .flatMap((r) => [r.created_by, r.coach_user_id])
+            .filter(Boolean) as string[],
+        ),
+      );
       let profileMap: Record<string, { name: string | null; email: string | null }> = {};
       if (userIds.length > 0) {
         const { data: profs } = await supabase
           .from("profiles")
           .select("user_id,display_name,email")
-          .in("user_id", userIds as string[]);
+          .in("user_id", userIds);
         profileMap = Object.fromEntries(
           (profs ?? []).map((p: any) => [p.user_id, { name: p.display_name, email: p.email }]),
         );
@@ -68,6 +76,7 @@ export const useAdminEssaBookings = (filters: EssaBookingFilters = {}) => {
         ...r,
         athlete_name: r.created_by ? profileMap[r.created_by]?.name ?? null : null,
         athlete_email: r.created_by ? profileMap[r.created_by]?.email ?? null : null,
+        coach_name: r.coach_user_id ? profileMap[r.coach_user_id]?.name ?? null : null,
       })) as AdminEssaBooking[];
 
       if (filters.search?.trim()) {

@@ -78,6 +78,8 @@ export const useBookWithCredit = () => {
       lessonName: string;
       durationMinutes: number;
       slot: Date;
+      coachUserId?: string | null;
+      coachName?: string | null;
     }) => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Please sign in to book.");
@@ -114,13 +116,16 @@ export const useBookWithCredit = () => {
         .from("facility_reservations" as any)
         .insert({
           space_id: space.id,
-          title: `ESSA · ${args.lessonName}`,
+          title: args.coachName
+            ? `ESSA · ${args.lessonName} · ${args.coachName}`
+            : `ESSA · ${args.lessonName}`,
           notes: `ESSA:${args.lessonId}`,
           starts_at: args.slot.toISOString(),
           ends_at: ends.toISOString(),
           attendee_count: 1,
           status: "confirmed",
           created_by: u.user.id,
+          coach_user_id: args.coachUserId ?? null,
           color: space.color,
         })
         .select("id")

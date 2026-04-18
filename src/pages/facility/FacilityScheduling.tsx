@@ -32,6 +32,8 @@ import {
 import { useEssaCheckout } from "@/hooks/useEssaCheckout";
 import { useFacilityReservations, useFacilitySpaces } from "@/hooks/useFacilitySchedule";
 import { useEssaCredits, useMyEssaBookings, useBookWithCredit } from "@/hooks/useEssaCredits";
+import { useCoachEssaSlots } from "@/hooks/useEssaCoaches";
+import EssaCoachPicker from "@/components/facility/EssaCoachPicker";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -256,10 +258,12 @@ const SlotPicker = ({
   selectedLesson,
   onSlotPick,
   selectedSlot,
+  coachUserId,
 }: {
   selectedLesson: PrivateLesson | null;
   selectedSlot: Date | null;
   onSlotPick: (d: Date) => void;
+  coachUserId: string | null;
 }) => {
   const [date, setDate] = useState(() => {
     const d = new Date();
@@ -278,8 +282,18 @@ const SlotPicker = ({
     dayStart.toISOString(),
     dayEnd.toISOString(),
   );
+  const { data: coachSlots = [], isLoading: loadingCoachSlots } = useCoachEssaSlots(
+    coachUserId,
+    date,
+    selectedLesson?.durationMinutes ?? SLOT_MINUTES,
+  );
 
   const activeSpaceCount = spaces.filter((s) => s.is_active).length || 1;
+
+  const coachSlotSet = useMemo(() => {
+    if (!coachUserId) return null;
+    return new Set(coachSlots.map((s) => new Date(s.slot_start).getTime()));
+  }, [coachUserId, coachSlots]);
 
   const isSlotBooked = (slotStart: Date) => {
     const slotEnd = new Date(slotStart.getTime() + SLOT_MINUTES * 60_000);
@@ -291,6 +305,9 @@ const SlotPicker = ({
     );
     return conflicting.length >= activeSpaceCount;
   };
+
+  const isOutsideCoachAvail = (slot: Date) =>
+    coachSlotSet !== null && !coachSlotSet.has(slot.getTime());
 
   const isPast = (slot: Date) => slot.getTime() < Date.now();
 
@@ -343,7 +360,8 @@ const SlotPicker = ({
         {slots.map((slot) => {
           const booked = isSlotBooked(slot);
           const past = isPast(slot);
-          const disabled = booked || past;
+          const outsideCoach = isOutsideCoachAvail(slot);
+          const disabled = booked || past || outsideCoach;
           const selected = selectedSlot && selectedSlot.getTime() === slot.getTime();
           return (
             <button
@@ -364,6 +382,15 @@ const SlotPicker = ({
         })}
       </div>
 
+      {coachUserId && loadingCoachSlots && (
+        <p className="text-[11px] text-muted-foreground mt-2">Loading coach availability...</p>
+      )}
+      {coachUserId && !loadingCoachSlots && coachSlots.length === 0 && (
+        <p className="text-[11px] text-destructive mt-2">
+          This coach has no remaining slots on this day. Pick another day or coach.
+        </p>
+      )}
+
       {!selectedLesson && (
         <p className="text-[11px] text-muted-foreground mt-3 flex items-center gap-1.5">
           <ShieldAlert className="w-3 h-3" /> Select a lesson type above to enable booking.
@@ -380,11 +407,15 @@ const SlotPicker = ({
 const ConfirmPanel = ({
   lesson,
   slot,
+  coachUserId,
+  coachName,
   onClear,
   onBooked,
 }: {
   lesson: PrivateLesson | null;
   slot: Date | null;
+  coachUserId: string | null;
+  coachName: string | null;
   onClear: () => void;
   onBooked: () => void;
 }) => {
@@ -412,6 +443,8 @@ const ConfirmPanel = ({
         lessonName: lesson.shortName,
         durationMinutes: lesson.durationMinutes,
         slot,
+        coachUserId,
+        coachName,
       });
       onBooked();
     } catch {
@@ -422,7 +455,11 @@ const ConfirmPanel = ({
   const handlePay = () =>
     startCheckout({
       priceId: lesson.stripePriceId,
-      metadata: { lesson_id: lesson.id, requested_start: slot.toISOString() },
+      metadata: {
+        lesson_id: lesson.id,
+        requested_start: slot.toISOString(),
+        coach_user_id: coachUserId ?? "",
+      },
     });
 
   return (
@@ -447,6 +484,10 @@ const ConfirmPanel = ({
           <span className="text-foreground">
             {formatTime(slot)} · {lesson.durationMinutes} min
           </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Coach</span>
+          <span className="text-foreground">{coachName ?? "Any available"}</span>
         </div>
         <div className="flex justify-between border-t border-border pt-2 mt-2">
           <span className="text-muted-foreground">Total</span>
@@ -690,6 +731,8 @@ const InquiryGrid = () => (
 const FacilityScheduling = () => {
   const [selectedLesson, setSelectedLesson] = useState<PrivateLesson | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
+  const [coachUserId, setCoachUserId] = useState<string | null>(null);
+  const [coachName, setCoachName] = useState<string | null>(null);
 
   useEffect(() => {
     const prev = document.title;
@@ -749,11 +792,20 @@ const FacilityScheduling = () => {
 
                 <div className="lg:col-span-1 space-y-3">
                   <h2 className="font-display text-sm tracking-wide uppercase text-foreground/80 mb-2">
-                    2 · Pick Time
+                    2 · Pick Coach & Time
                   </h2>
+                  <EssaCoachPicker
+                    value={coachUserId}
+                    onChange={(id, name) => {
+                      setCoachUserId(id);
+                      setCoachName(name);
+                      setSelectedSlot(null);
+                    }}
+                  />
                   <SlotPicker
                     selectedLesson={selectedLesson}
                     selectedSlot={selectedSlot}
+                    coachUserId={coachUserId}
                     onSlotPick={(d) => selectedLesson && setSelectedSlot(d)}
                   />
                 </div>
@@ -765,6 +817,8 @@ const FacilityScheduling = () => {
                   <ConfirmPanel
                     lesson={selectedLesson}
                     slot={selectedSlot}
+                    coachUserId={coachUserId}
+                    coachName={coachName}
                     onClear={clearSelection}
                     onBooked={clearSelection}
                   />

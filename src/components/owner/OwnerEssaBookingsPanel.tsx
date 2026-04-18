@@ -351,6 +351,11 @@ const OwnerEssaBookingsPanel = () => {
                         {b.athlete_email}
                       </span>
                     )}
+                    {b.coach_name && (
+                      <span className="inline-flex items-center gap-1 text-primary">
+                        Coach: {b.coach_name}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0">
