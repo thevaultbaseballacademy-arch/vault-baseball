@@ -78,6 +78,8 @@ export const useBookWithCredit = () => {
       lessonName: string;
       durationMinutes: number;
       slot: Date;
+      coachUserId?: string | null;
+      coachName?: string | null;
     }) => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Please sign in to book.");
