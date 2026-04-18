@@ -133,18 +133,43 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
     scroll-behavior: smooth;
+    /* iOS 100vh fix — use dynamic viewport height where supported */
+    height: 100%;
   }
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    /* Smooth momentum scrolling on iOS, no rubber-band past edges */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    /* Safe-area insets for notch / dynamic island / home indicator */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    /* Prevent iOS auto-zoom on input focus */
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-wider uppercase;
+    line-height: 1.2;
+  }
+
+  /* Prevent iOS zoom on form inputs */
+  input, select, textarea {
+    font-size: 16px;
+  }
+
+  /* Remove default iOS link underline tap highlight */
+  a {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -225,4 +250,23 @@
 
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Disable webkit tap highlight (used in Button base class) */
+  .tap-highlight-transparent {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Safe-area helpers for native shells */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+  /* Full viewport height that respects mobile browser chrome */
+  .min-h-dvh { min-height: 100dvh; }
+  .h-dvh { height: 100dvh; }
+
+  /* Smooth momentum scroll container */
+  .scroll-momentum {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
 }
