@@ -50,7 +50,7 @@ const Auth = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) checkMFAStatus(session);
     });
-  }, [navigate, location]);
+  }, []);
 
   const checkMFAStatus = async (session: any) => {
     try {
