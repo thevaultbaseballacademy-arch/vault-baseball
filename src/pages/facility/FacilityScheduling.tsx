@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -32,7 +31,7 @@ import {
 import { useEssaCheckout } from "@/hooks/useEssaCheckout";
 import { useFacilityReservations, useFacilitySpaces } from "@/hooks/useFacilitySchedule";
 import Navbar from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import Footer from "@/components/Footer";
 
 /* -------------------------------------------------------------------------- */
 /*  Calendar helpers                                                           */
