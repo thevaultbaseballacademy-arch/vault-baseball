@@ -42,6 +42,7 @@ const CoachLessons = lazy(() => import("./pages/coach/CoachLessons"));
 const CoachAssignments = lazy(() => import("./pages/coach/CoachAssignments"));
 const CoachCreate = lazy(() => import("./pages/coach/CoachCreate"));
 const CoachSchedule = lazy(() => import("./pages/coach/CoachSchedule"));
+const CoachEssaDay = lazy(() => import("./pages/coach/CoachEssaDay"));
 const CoachProfilePage = lazy(() => import("./pages/coach/CoachProfile"));
 const CoachDownloads = lazy(() => import("./pages/coach/CoachDownloads"));
 const Admin = lazy(() => import("./pages/Admin"));
