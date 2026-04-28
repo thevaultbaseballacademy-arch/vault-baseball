@@ -68,3 +68,6 @@ verify_jwt = false
 
 [functions.tryout-reminders]
 verify_jwt = false
+
+[functions.tryout-ics]
+verify_jwt = false

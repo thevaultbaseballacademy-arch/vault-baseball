@@ -14,6 +14,8 @@ interface Props {
   eventDate?: string
   eventTime?: string
   cancelUrl?: string
+  calendarUrl?: string
+  confirmationNumber?: string
 }
 
 const TryoutConfirmation = ({
@@ -23,6 +25,8 @@ const TryoutConfirmation = ({
   eventDate = 'TBD',
   eventTime = '6:00 PM – 8:30 PM',
   cancelUrl = '#',
+  calendarUrl,
+  confirmationNumber,
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
