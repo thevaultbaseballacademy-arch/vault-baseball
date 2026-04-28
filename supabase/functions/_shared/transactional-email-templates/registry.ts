@@ -12,9 +12,11 @@ export interface TemplateEntry {
 import { template as tryoutConfirmation } from './tryout-confirmation.tsx'
 import { template as tryoutReminder } from './tryout-reminder.tsx'
 import { template as tryoutCancellation } from './tryout-cancellation.tsx'
+import { template as tryoutStaffNotification } from './tryout-staff-notification.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'tryout-confirmation': tryoutConfirmation,
   'tryout-reminder': tryoutReminder,
   'tryout-cancellation': tryoutCancellation,
+  'tryout-staff-notification': tryoutStaffNotification,
 }
