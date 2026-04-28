@@ -14,6 +14,8 @@ interface Props {
   eventDate?: string
   eventTime?: string
   cancelUrl?: string
+  calendarUrl?: string
+  confirmationNumber?: string
 }
 
 const TryoutConfirmation = ({
@@ -23,6 +25,8 @@ const TryoutConfirmation = ({
   eventDate = 'TBD',
   eventTime = '6:00 PM – 8:30 PM',
   cancelUrl = '#',
+  calendarUrl,
+  confirmationNumber,
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -47,9 +51,18 @@ const TryoutConfirmation = ({
         <Text style={text}>
           <strong>What to bring:</strong> glove, cleats/turfs, water, and your A-game.
         </Text>
-        <Section style={{ textAlign: 'center', margin: '32px 0' }}>
-          <Button style={button} href={cancelUrl}>Can't make it? Cancel here</Button>
+        {calendarUrl && (
+          <Section style={{ textAlign: 'center', margin: '24px 0 8px' }}>
+            <Button style={button} href={calendarUrl}>📅 Add to calendar</Button>
+          </Section>
+        )}
+        <Section style={{ textAlign: 'center', margin: '16px 0 24px' }}>
+          <Button style={buttonGhost} href={cancelUrl}>Can't make it? Cancel here</Button>
         </Section>
+        {confirmationNumber && (
+          <Text style={confNum}>Confirmation #: {confirmationNumber}</Text>
+        )}
+        <Text style={footer}>Questions? Reply to this email or contact staff@methods22.com</Text>
         <Text style={footer}>— The {SITE_NAME} Staff</Text>
       </Container>
     </Body>
@@ -79,4 +92,6 @@ const cardLabel = { fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', 
 const cardValue = { fontSize: '15px', color: '#0a0a0a', margin: '0 0 12px' }
 const hr = { borderTop: '1px solid #e5e5e5', margin: '12px 0' }
 const button = { backgroundColor: '#c9a227', color: '#000', padding: '12px 24px', borderRadius: '6px', fontWeight: 'bold', textDecoration: 'none', fontSize: '14px' }
-const footer = { fontSize: '13px', color: '#888', margin: '24px 0 0' }
+const buttonGhost = { backgroundColor: 'transparent', color: '#666', padding: '8px 16px', border: '1px solid #ddd', borderRadius: '6px', textDecoration: 'none', fontSize: '13px' }
+const confNum = { fontSize: '12px', color: '#888', textAlign: 'center' as const, margin: '0 0 8px' }
+const footer = { fontSize: '13px', color: '#888', margin: '8px 0 0', textAlign: 'center' as const }

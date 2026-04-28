@@ -165,7 +165,9 @@ serve(async (req) => {
         hour: "numeric", minute: "2-digit", timeZone: "America/New_York",
       }) + " – 8:30 PM";
       const cancelUrl = `https://vault-baseball.lovable.app/tryouts/cancel/${inserted.cancel_token}`;
+      const calendarUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/tryout-ics?event_id=${event.id}`;
       const eventName = (event as any).name ?? "Spring 2026 Tryout";
+      const confirmationNumber = inserted.id.slice(0, 8).toUpperCase();
 
       // Parent confirmation
       await supabase.functions.invoke("send-transactional-email", {
@@ -180,6 +182,8 @@ serve(async (req) => {
             eventDate,
             eventTime,
             cancelUrl,
+            calendarUrl,
+            confirmationNumber,
           },
         },
       });
