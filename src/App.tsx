@@ -67,6 +67,7 @@ const AdminTryouts = lazy(() => import("./pages/admin/AdminTryouts"));
 const AdminTryoutDetail = lazy(() => import("./pages/admin/AdminTryoutDetail"));
 const Tryouts = lazy(() => import("./pages/Tryouts"));
 const TryoutRegister = lazy(() => import("./pages/TryoutRegister"));
+const CancelTryout = lazy(() => import("./pages/CancelTryout"));
 const Community = lazy(() => import("./pages/Community"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Courses = lazy(() => import("./pages/Courses"));
@@ -241,6 +242,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/tryouts" element={<Tryouts />} />
             <Route path="/tryouts/:id/register" element={<TryoutRegister />} />
+            <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<Account />} />

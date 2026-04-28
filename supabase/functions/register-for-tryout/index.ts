@@ -145,7 +145,7 @@ serve(async (req) => {
         waiver_ip: ip,
         status: assignedStatus,
       })
-      .select("id, status")
+      .select("id, status, cancel_token")
       .single();
 
     if (insErr) {
@@ -153,6 +153,36 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Could not save registration" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Send confirmation email (best-effort — never block registration)
+    try {
+      const eventDate = new Date(event.starts_at).toLocaleString("en-US", {
+        weekday: "long", month: "long", day: "numeric",
+        timeZone: "America/New_York",
+      });
+      const eventTime = new Date(event.starts_at).toLocaleString("en-US", {
+        hour: "numeric", minute: "2-digit", timeZone: "America/New_York",
+      }) + " – 8:30 PM";
+      const cancelUrl = `https://vault-baseball.lovable.app/tryouts/cancel/${inserted.cancel_token}`;
+
+      await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "tryout-confirmation",
+          recipientEmail: data.parent_email.toLowerCase(),
+          idempotencyKey: `tryout-confirm-${inserted.id}`,
+          templateData: {
+            playerName: data.player_first_name,
+            parentName: data.parent_name,
+            eventName: (event as any).name ?? "Spring 2026 Tryout",
+            eventDate,
+            eventTime,
+            cancelUrl,
+          },
+        },
+      });
+    } catch (emailErr) {
+      console.warn("Confirmation email failed", emailErr);
     }
 
     return new Response(
