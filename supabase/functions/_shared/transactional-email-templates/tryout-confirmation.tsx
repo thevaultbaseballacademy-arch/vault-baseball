@@ -51,9 +51,18 @@ const TryoutConfirmation = ({
         <Text style={text}>
           <strong>What to bring:</strong> glove, cleats/turfs, water, and your A-game.
         </Text>
-        <Section style={{ textAlign: 'center', margin: '32px 0' }}>
-          <Button style={button} href={cancelUrl}>Can't make it? Cancel here</Button>
+        {calendarUrl && (
+          <Section style={{ textAlign: 'center', margin: '24px 0 8px' }}>
+            <Button style={button} href={calendarUrl}>📅 Add to calendar</Button>
+          </Section>
+        )}
+        <Section style={{ textAlign: 'center', margin: '16px 0 24px' }}>
+          <Button style={buttonGhost} href={cancelUrl}>Can't make it? Cancel here</Button>
         </Section>
+        {confirmationNumber && (
+          <Text style={confNum}>Confirmation #: {confirmationNumber}</Text>
+        )}
+        <Text style={footer}>Questions? Reply to this email or contact staff@methods22.com</Text>
         <Text style={footer}>— The {SITE_NAME} Staff</Text>
       </Container>
     </Body>
