@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useRoleAuth } from "@/hooks/useRoleAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Users, Target, Calendar, BookOpen, PenTool, Clock, UserCircle, ChevronLeft, Menu, X, Download } from "lucide-react";
+import { Loader2, Users, Target, Calendar, BookOpen, PenTool, Clock, UserCircle, ChevronLeft, Menu, X, Download, ClipboardList } from "lucide-react";
 import { Navigate } from "react-router-dom";
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 const NAV_ITEMS = [
   { to: "/coach", label: "My Athletes", icon: Users, end: true },
+  { to: "/coach/evaluations", label: "Evaluations", icon: ClipboardList },
   { to: "/coach/kpis", label: "KPI Tracker", icon: Target },
   { to: "/coach/lessons", label: "Lessons", icon: Calendar },
   { to: "/coach/assignments", label: "Assignments", icon: BookOpen },

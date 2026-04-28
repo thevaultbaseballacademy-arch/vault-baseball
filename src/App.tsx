@@ -45,6 +45,8 @@ const CoachSchedule = lazy(() => import("./pages/coach/CoachSchedule"));
 const CoachEssaDay = lazy(() => import("./pages/coach/CoachEssaDay"));
 const CoachProfilePage = lazy(() => import("./pages/coach/CoachProfile"));
 const CoachDownloads = lazy(() => import("./pages/coach/CoachDownloads"));
+const CoachEvaluations = lazy(() => import("./pages/coach/CoachEvaluations"));
+const CoachEvaluateAthlete = lazy(() => import("./pages/coach/CoachEvaluateAthlete"));
 const Admin = lazy(() => import("./pages/Admin"));
 const OwnerDashboardLayout = lazy(() => import("./components/admin/OwnerDashboardLayout"));
 const OwnerOverview = lazy(() => import("./pages/admin/OwnerOverview"));
@@ -264,6 +266,8 @@ const App = () => (
               <Route path="create" element={<CoachCreate />} />
               <Route path="schedule" element={<CoachSchedule />} />
               <Route path="essa-day" element={<CoachEssaDay />} />
+              <Route path="evaluations" element={<CoachEvaluations />} />
+              <Route path="evaluations/:athleteId" element={<CoachEvaluateAthlete />} />
               <Route path="profile" element={<CoachProfilePage />} />
               <Route path="downloads" element={<CoachDownloads />} />
             </Route>

@@ -2231,6 +2231,51 @@ export type Database = {
         }
         Relationships: []
       }
+      development_reports: {
+        Row: {
+          age_group: string
+          athlete_user_id: string
+          coach_notes: string | null
+          created_at: string
+          generated_at: string
+          generated_by: string
+          goals: string | null
+          id: string
+          overall_score: number | null
+          payload: Json
+          program_label: string
+          template_key: string
+        }
+        Insert: {
+          age_group: string
+          athlete_user_id: string
+          coach_notes?: string | null
+          created_at?: string
+          generated_at?: string
+          generated_by: string
+          goals?: string | null
+          id?: string
+          overall_score?: number | null
+          payload?: Json
+          program_label: string
+          template_key: string
+        }
+        Update: {
+          age_group?: string
+          athlete_user_id?: string
+          coach_notes?: string | null
+          created_at?: string
+          generated_at?: string
+          generated_by?: string
+          goals?: string | null
+          id?: string
+          overall_score?: number | null
+          payload?: Json
+          program_label?: string
+          template_key?: string
+        }
+        Relationships: []
+      }
       device_integrations: {
         Row: {
           access_token: string | null
@@ -4404,6 +4449,57 @@ export type Database = {
           setting_value?: Json
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      player_evaluations: {
+        Row: {
+          age_group: string
+          athlete_user_id: string
+          category_notes: Json
+          created_at: string
+          evaluated_at: string
+          evaluator_user_id: string
+          id: string
+          overall_score: number | null
+          program_id: string | null
+          scores: Json
+          session_label: string | null
+          session_note: string | null
+          template_key: string
+          updated_at: string
+        }
+        Insert: {
+          age_group: string
+          athlete_user_id: string
+          category_notes?: Json
+          created_at?: string
+          evaluated_at?: string
+          evaluator_user_id: string
+          id?: string
+          overall_score?: number | null
+          program_id?: string | null
+          scores?: Json
+          session_label?: string | null
+          session_note?: string | null
+          template_key: string
+          updated_at?: string
+        }
+        Update: {
+          age_group?: string
+          athlete_user_id?: string
+          category_notes?: Json
+          created_at?: string
+          evaluated_at?: string
+          evaluator_user_id?: string
+          id?: string
+          overall_score?: number | null
+          program_id?: string | null
+          scores?: Json
+          session_label?: string | null
+          session_note?: string | null
+          template_key?: string
+          updated_at?: string
         }
         Relationships: []
       }
