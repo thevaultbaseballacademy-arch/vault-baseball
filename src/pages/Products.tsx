@@ -257,9 +257,20 @@ const Products = () => {
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
-      
+
+      {/* Inline Spring 2026 Tryouts CTA */}
+      <div className="bg-primary/10 border-b border-primary/20 py-3 mt-16">
+        <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-center text-sm">
+          <span className="font-semibold">⚾ Spring 2026 Tryouts are open</span>
+          <span className="text-muted-foreground hidden sm:inline">·</span>
+          <Link to="/tryouts" className="text-primary font-semibold underline-offset-4 hover:underline">
+            Reserve a spot →
+          </Link>
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="pt-32 pb-8 bg-gradient-to-b from-muted/50 to-background">
+      <section className="pt-8 pb-8 bg-gradient-to-b from-muted/50 to-background">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
