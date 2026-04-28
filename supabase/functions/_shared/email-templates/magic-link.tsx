@@ -10,8 +10,10 @@ import {
   Heading,
   Html,
   Preview,
+  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
+import * as s from './_styles.ts'
 
 interface MagicLinkEmailProps {
   siteName: string
@@ -24,47 +26,30 @@ export const MagicLinkEmail = ({
 }: MagicLinkEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your login link for {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Your login link</Heading>
-        <Text style={text}>
-          Click the button below to log in to {siteName}. This link will expire
-          shortly.
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Log In
-        </Button>
-        <Text style={footer}>
-          If you didn't request this link, you can safely ignore this email.
-        </Text>
+    <Preview>Your secure login link for {siteName}</Preview>
+    <Body style={s.main}>
+      <Container style={s.container}>
+        <Section style={s.header}>
+          <Text style={s.brand}>VAULT</Text>
+          <Text style={s.tagline}>Methods 22 · Player Development</Text>
+        </Section>
+        <Section style={s.body}>
+          <Heading style={s.h1}>Sign in to {siteName}</Heading>
+          <Text style={s.text}>
+            Click below to securely sign in. This link will expire shortly.
+          </Text>
+          <Button style={s.button} href={confirmationUrl}>
+            Sign In
+          </Button>
+          <div style={s.divider} />
+          <Text style={{ ...s.text, fontSize: '13px', margin: 0 }}>
+            Didn't request this? You can safely ignore this email.
+          </Text>
+        </Section>
+        <Text style={s.footer}>© {new Date().getFullYear()} Methods 22 · {siteName}</Text>
       </Container>
     </Body>
   </Html>
 )
 
 export default MagicLinkEmail
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }

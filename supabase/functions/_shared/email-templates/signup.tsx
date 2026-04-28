@@ -11,8 +11,10 @@ import {
   Html,
   Link,
   Preview,
+  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
+import * as s from './_styles.ts'
 
 interface SignupEmailProps {
   siteName: string
@@ -29,29 +31,32 @@ export const SignupEmail = ({
 }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Confirm your email for {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm your email</Heading>
-        <Text style={text}>
-          Thanks for signing up for{' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
-          !
-        </Text>
-        <Text style={text}>
-          Please confirm your email address (
-          <Link href={`mailto:${recipient}`} style={link}>
-            {recipient}
-          </Link>
-          ) by clicking the button below:
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Verify Email
-        </Button>
-        <Text style={footer}>
-          If you didn't create an account, you can safely ignore this email.
+    <Preview>Confirm your email to activate your VAULT account</Preview>
+    <Body style={s.main}>
+      <Container style={s.container}>
+        <Section style={s.header}>
+          <Text style={s.brand}>VAULT</Text>
+          <Text style={s.tagline}>Methods 22 · Player Development</Text>
+        </Section>
+        <Section style={s.body}>
+          <Heading style={s.h1}>Confirm your email</Heading>
+          <Text style={s.text}>
+            Welcome to <strong>{siteName}</strong>. Confirm{' '}
+            <Link href={`mailto:${recipient}`} style={s.link}>{recipient}</Link>{' '}
+            to activate your account and access your training.
+          </Text>
+          <Button style={s.button} href={confirmationUrl}>
+            Confirm Email
+          </Button>
+          <div style={s.divider} />
+          <Text style={{ ...s.text, fontSize: '13px', margin: 0 }}>
+            Didn't sign up? You can safely ignore this email.
+          </Text>
+        </Section>
+        <Text style={s.footer}>
+          © {new Date().getFullYear()} Methods 22 · {siteName}
+          <br />
+          <Link href={siteUrl} style={{ ...s.link, color: '#999' }}>{siteUrl}</Link>
         </Text>
       </Container>
     </Body>
@@ -59,28 +64,3 @@ export const SignupEmail = ({
 )
 
 export default SignupEmail
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
