@@ -85,6 +85,29 @@ const TryoutRegister = () => {
     localStorage.setItem(STORAGE_KEY(id), JSON.stringify(values));
   }, [id, values]);
 
+  // SEO / OG tags — dynamic per event
+  useEffect(() => {
+    if (!event) return;
+    const title = `Register: ${event.name} | Vault Tryouts`;
+    const desc = `Reserve your spot for ${event.name} on ${new Date(event.starts_at).toLocaleDateString()} at ${event.location_name}. Ages ${event.age_group}.`;
+    document.title = title;
+    const setMeta = (selector: string, attr: string, name: string, content: string) => {
+      let el = document.querySelector(selector) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+    setMeta('meta[name="description"]', "name", "description", desc);
+    setMeta('meta[property="og:title"]', "property", "og:title", title);
+    setMeta('meta[property="og:description"]', "property", "og:description", desc);
+    setMeta('meta[property="og:type"]', "property", "og:type", "event");
+    setMeta('meta[property="og:image"]', "property", "og:image", "https://vault-baseball.lovable.app/favicon.webp");
+    setMeta('meta[name="twitter:card"]', "name", "twitter:card", "summary_large_image");
+  }, [event]);
+
   const set = <K extends keyof FormValues>(k: K, v: FormValues[K]) =>
     setValues((prev) => ({ ...prev, [k]: v }));
 

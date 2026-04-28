@@ -138,6 +138,7 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Programs", href: "/courses" },
+    { name: "Tryouts", href: "/tryouts" },
     { name: "Book Session", href: "/book-session" },
     { name: "Submit Video", href: "/evaluate" },
     { 

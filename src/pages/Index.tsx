@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DevelopmentPathway from "@/components/home/DevelopmentPathway";
+import UpcomingTryoutCTA from "@/components/home/UpcomingTryoutCTA";
 import AthleteResults from "@/components/home/AthleteResults";
 import ContentAuthority from "@/components/home/ContentAuthority";
 import UpcomingLessons from "@/components/dashboard/UpcomingLessons";
@@ -468,6 +469,9 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ═══════════ UPCOMING TRYOUT (within 30 days) ═══════════ */}
+      <UpcomingTryoutCTA />
 
       {/* ═══════════ DEVELOPMENT PATHWAY ═══════════ */}
       <DevelopmentPathway />

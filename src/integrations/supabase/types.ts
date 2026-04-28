@@ -6276,6 +6276,36 @@ export type Database = {
         }
         Relationships: []
       }
+      tryout_interest: {
+        Row: {
+          age_group: string | null
+          created_at: string
+          email: string
+          id: string
+          notes: string | null
+          notified_at: string | null
+          parent_name: string | null
+        }
+        Insert: {
+          age_group?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          notes?: string | null
+          notified_at?: string | null
+          parent_name?: string | null
+        }
+        Update: {
+          age_group?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          notes?: string | null
+          notified_at?: string | null
+          parent_name?: string | null
+        }
+        Relationships: []
+      }
       tryout_registrations: {
         Row: {
           created_at: string

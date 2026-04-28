@@ -41,6 +41,11 @@ const Footer = () => {
                     Leaderboard
                   </Link>
                 </li>
+                <li>
+                  <Link to="/tryouts" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Tryouts & Showcases
+                  </Link>
+                </li>
               </ul>
             </div>
 
