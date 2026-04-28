@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { useParentPortal } from "@/hooks/useParentPortal";
+import ParentReportsCard from "@/components/parent/ParentReportsCard";
 
 const ParentAthletes = () => {
   const { activeLinks, pendingLinks, loading, linkAthlete, fetchAthleteData, athleteData } = useParentPortal();
@@ -169,6 +170,11 @@ const ParentAthletes = () => {
                         <p className="text-sm text-foreground font-medium">{devScore.weekly_focus}</p>
                       </div>
                     )}
+
+                    <ParentReportsCard
+                      athleteId={link.athlete_user_id}
+                      athleteName={profile?.display_name || "Athlete"}
+                    />
                   </div>
                 </Link>
               </motion.div>
