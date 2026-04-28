@@ -148,6 +148,20 @@ const AdminTryoutDetail = () => {
         </Button>
       </div>
 
+      {(() => {
+        const filled = stats.confirmed + stats.pending;
+        const pct = event.capacity > 0 ? filled / event.capacity : 0;
+        if (pct < 0.8 || event.status === "closed") return null;
+        return (
+          <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
+            <strong className="text-amber-200">{Math.round(pct * 100)}% full</strong>{" "}
+            <span className="text-amber-100/80">
+              ({filled}/{event.capacity}). Consider opening the next pair of dates so the waitlist doesn't bottleneck.
+            </span>
+          </div>
+        );
+      })()}
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Confirmed" value={stats.confirmed} />
         <Stat label="Pending" value={stats.pending} />
