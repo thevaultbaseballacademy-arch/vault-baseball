@@ -60,7 +60,7 @@ serve(async (req) => {
     // Load event
     const { data: event, error: evtErr } = await supabase
       .from("tryout_events")
-      .select("id, status, starts_at, age_group, capacity, waitlist_capacity")
+      .select("id, name, status, starts_at, age_group, capacity, waitlist_capacity")
       .eq("id", data.event_id)
       .maybeSingle();
 
