@@ -236,6 +236,7 @@ const App = () => (
           <BiometricGate />
           <ScrollToTop />
 
+          <ErrorBoundary>
           <Suspense fallback={<PageLoader />}>
           <PageTransition>
           <Routes>
