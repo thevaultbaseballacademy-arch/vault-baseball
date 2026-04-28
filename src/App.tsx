@@ -63,6 +63,10 @@ const OwnerAudit = lazy(() => import("./pages/admin/OwnerAudit"));
 const OwnerExports = lazy(() => import("./pages/admin/OwnerExports"));
 const OwnerFacility = lazy(() => import("./pages/admin/OwnerFacility"));
 const OwnerEssaBookings = lazy(() => import("./pages/admin/OwnerEssaBookings"));
+const AdminTryouts = lazy(() => import("./pages/admin/AdminTryouts"));
+const AdminTryoutDetail = lazy(() => import("./pages/admin/AdminTryoutDetail"));
+const Tryouts = lazy(() => import("./pages/Tryouts"));
+const TryoutRegister = lazy(() => import("./pages/TryoutRegister"));
 const Community = lazy(() => import("./pages/Community"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Courses = lazy(() => import("./pages/Courses"));
@@ -317,6 +321,12 @@ const App = () => (
               } />
               <Route path="essa-bookings" element={
                 <RoleGuard requires="view_facility_schedule"><OwnerEssaBookings /></RoleGuard>
+              } />
+              <Route path="tryouts" element={
+                <RoleGuard requires="view_facility_schedule"><AdminTryouts /></RoleGuard>
+              } />
+              <Route path="tryouts/:id" element={
+                <RoleGuard requires="view_facility_schedule"><AdminTryoutDetail /></RoleGuard>
               } />
               {/* Legacy sub-routes */}
               <Route path="certification-analytics" element={
