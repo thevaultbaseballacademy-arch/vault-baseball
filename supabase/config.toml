@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.essa-stripe-webhook]
 verify_jwt = false
+
+[functions.register-for-tryout]
+verify_jwt = false
