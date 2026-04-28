@@ -155,7 +155,7 @@ serve(async (req) => {
       });
     }
 
-    // Send confirmation email (best-effort — never block registration)
+    // Send confirmation email to parent + notification to staff (best-effort — never block registration)
     try {
       const eventDate = new Date(event.starts_at).toLocaleString("en-US", {
         weekday: "long", month: "long", day: "numeric",
@@ -165,7 +165,9 @@ serve(async (req) => {
         hour: "numeric", minute: "2-digit", timeZone: "America/New_York",
       }) + " – 8:30 PM";
       const cancelUrl = `https://vault-baseball.lovable.app/tryouts/cancel/${inserted.cancel_token}`;
+      const eventName = (event as any).name ?? "Spring 2026 Tryout";
 
+      // Parent confirmation
       await supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "tryout-confirmation",
@@ -174,15 +176,44 @@ serve(async (req) => {
           templateData: {
             playerName: data.player_first_name,
             parentName: data.parent_name,
-            eventName: (event as any).name ?? "Spring 2026 Tryout",
+            eventName,
             eventDate,
             eventTime,
             cancelUrl,
           },
         },
       });
+
+      // Staff notification → staff@methods22.com
+      await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "tryout-staff-notification",
+          recipientEmail: "staff@methods22.com",
+          idempotencyKey: `tryout-staff-${inserted.id}`,
+          templateData: {
+            playerName: `${data.player_first_name} ${data.player_last_name}`,
+            playerAge: age,
+            playerDob: data.player_dob,
+            throwingHand: data.player_throwing_hand,
+            position: data.player_position,
+            currentTeam: data.player_current_team,
+            parentName: data.parent_name,
+            parentEmail: data.parent_email.toLowerCase(),
+            parentPhone: data.parent_phone,
+            emergencyContactName: data.emergency_contact_name,
+            emergencyContactPhone: data.emergency_contact_phone,
+            emergencyRelationship: data.emergency_relationship,
+            medicalNotes: data.medical_notes,
+            eventName,
+            eventDate,
+            eventTime,
+            registrationStatus: assignedStatus,
+            waitlistPosition,
+          },
+        },
+      });
     } catch (emailErr) {
-      console.warn("Confirmation email failed", emailErr);
+      console.warn("Email dispatch failed", emailErr);
     }
 
     return new Response(
