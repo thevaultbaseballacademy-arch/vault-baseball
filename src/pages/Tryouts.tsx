@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, MapPin, Calendar, Users } from "lucide-react";
 import { usePublicTryouts } from "@/hooks/useTryouts";
@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+const TryoutsInterest = lazy(() => import("./TryoutsInterest"));
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString(undefined, {
@@ -13,9 +17,31 @@ const formatDate = (iso: string) =>
     hour: "numeric", minute: "2-digit",
   });
 
+const setMeta = (selector: string, attr: string, name: string, content: string) => {
+  let el = document.querySelector(selector) as HTMLMetaElement | null;
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+};
+
 const Tryouts = () => {
   const { data: events, isLoading } = usePublicTryouts();
   const [filter, setFilter] = useState<string>("all");
+
+  useEffect(() => {
+    document.title = "Tryouts & Showcases | The Vault Baseball Academy";
+    setMeta('meta[name="description"]', "name", "description",
+      "Register for upcoming Vault Baseball tryouts, showcases, and pitching lab evaluations. Filter by age group.");
+    setMeta('meta[property="og:title"]', "property", "og:title", "Vault Baseball Tryouts & Showcases");
+    setMeta('meta[property="og:description"]', "property", "og:description",
+      "Reserve your spot for an upcoming pitching lab, tryout, or showcase. Limited capacity.");
+    setMeta('meta[property="og:type"]', "property", "og:type", "website");
+    setMeta('meta[property="og:image"]', "property", "og:image", "https://vault-baseball.lovable.app/favicon.webp");
+    setMeta('meta[name="twitter:card"]', "name", "twitter:card", "summary_large_image");
+  }, []);
 
   const filtered = useMemo(() => {
     if (!events) return [];
@@ -23,14 +49,24 @@ const Tryouts = () => {
     return events.filter((e) => e.age_group === filter);
   }, [events, filter]);
 
+  // Off-season: no published events → show interest capture instead
+  if (!isLoading && (!events || events.length === 0)) {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <TryoutsInterest />
+      </Suspense>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="max-w-3xl mx-auto px-4 py-6">
+      <Navbar />
+      <header className="border-b border-border bg-card pt-24 md:pt-28">
+        <div className="max-w-3xl mx-auto px-4 py-8">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">22M Baseball</p>
-          <h1 className="text-3xl md:text-4xl font-display tracking-wide mt-1">Tryouts</h1>
+          <h1 className="text-3xl md:text-4xl font-display tracking-wide mt-1">Tryouts & Showcases</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Reserve your spot for an upcoming pitching lab or showcase.
+            Reserve your spot for an upcoming pitching lab, tryout, or showcase event.
           </p>
         </div>
       </header>
@@ -56,14 +92,6 @@ const Tryouts = () => {
           <div className="flex justify-center py-16">
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           </div>
-        )}
-
-        {!isLoading && filtered.length === 0 && (
-          <Card>
-            <CardContent className="py-12 text-center text-muted-foreground text-sm">
-              No upcoming tryouts. Check back soon.
-            </CardContent>
-          </Card>
         )}
 
         <div className="space-y-3">
@@ -105,6 +133,7 @@ const Tryouts = () => {
           ))}
         </div>
       </main>
+      <Footer />
     </div>
   );
 };
