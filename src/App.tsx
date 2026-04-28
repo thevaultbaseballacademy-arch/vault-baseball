@@ -567,6 +567,7 @@ const App = () => (
           </Routes>
           </PageTransition>
           </Suspense>
+          </ErrorBoundary>
           <Suspense fallback={null}>
             <EddieAIChat />
           </Suspense>
