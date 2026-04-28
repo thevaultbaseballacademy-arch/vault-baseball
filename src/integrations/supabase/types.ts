@@ -6213,6 +6213,164 @@ export type Database = {
         }
         Relationships: []
       }
+      tryout_events: {
+        Row: {
+          address: string | null
+          age_group: string
+          capacity: number
+          coach_ids: string[] | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          id: string
+          location_name: string
+          name: string
+          price_cents: number
+          starts_at: string
+          status: string
+          updated_at: string
+          waitlist_capacity: number
+          waiver_text: string
+          what_to_bring: string | null
+        }
+        Insert: {
+          address?: string | null
+          age_group: string
+          capacity?: number
+          coach_ids?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          location_name: string
+          name: string
+          price_cents?: number
+          starts_at: string
+          status?: string
+          updated_at?: string
+          waitlist_capacity?: number
+          waiver_text?: string
+          what_to_bring?: string | null
+        }
+        Update: {
+          address?: string | null
+          age_group?: string
+          capacity?: number
+          coach_ids?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          location_name?: string
+          name?: string
+          price_cents?: number
+          starts_at?: string
+          status?: string
+          updated_at?: string
+          waitlist_capacity?: number
+          waiver_text?: string
+          what_to_bring?: string | null
+        }
+        Relationships: []
+      }
+      tryout_registrations: {
+        Row: {
+          created_at: string
+          emergency_contact_name: string
+          emergency_contact_phone: string
+          emergency_relationship: string
+          event_id: string
+          id: string
+          medical_notes: string | null
+          paid_at: string | null
+          parent_email: string
+          parent_name: string
+          parent_phone: string
+          photo_release_consent: boolean
+          player_current_team: string | null
+          player_dob: string
+          player_experience: string | null
+          player_first_name: string
+          player_last_name: string
+          player_position: string | null
+          player_throwing_hand: string | null
+          registered_at: string
+          status: string
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          waiver_ip: string | null
+          waiver_signature_name: string
+          waiver_signed_at: string
+        }
+        Insert: {
+          created_at?: string
+          emergency_contact_name: string
+          emergency_contact_phone: string
+          emergency_relationship: string
+          event_id: string
+          id?: string
+          medical_notes?: string | null
+          paid_at?: string | null
+          parent_email: string
+          parent_name: string
+          parent_phone: string
+          photo_release_consent?: boolean
+          player_current_team?: string | null
+          player_dob: string
+          player_experience?: string | null
+          player_first_name: string
+          player_last_name: string
+          player_position?: string | null
+          player_throwing_hand?: string | null
+          registered_at?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          waiver_ip?: string | null
+          waiver_signature_name: string
+          waiver_signed_at?: string
+        }
+        Update: {
+          created_at?: string
+          emergency_contact_name?: string
+          emergency_contact_phone?: string
+          emergency_relationship?: string
+          event_id?: string
+          id?: string
+          medical_notes?: string | null
+          paid_at?: string | null
+          parent_email?: string
+          parent_name?: string
+          parent_phone?: string
+          photo_release_consent?: boolean
+          player_current_team?: string | null
+          player_dob?: string
+          player_experience?: string | null
+          player_first_name?: string
+          player_last_name?: string
+          player_position?: string | null
+          player_throwing_hand?: string | null
+          registered_at?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          waiver_ip?: string | null
+          waiver_signature_name?: string
+          waiver_signed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tryout_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "tryout_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       upsell_offers: {
         Row: {
           converted_at: string | null

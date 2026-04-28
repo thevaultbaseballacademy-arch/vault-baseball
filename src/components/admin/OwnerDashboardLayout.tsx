@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useRoleAuth } from "@/hooks/useRoleAuth";
-import { Loader2, DollarSign, Users, FileCheck, FolderOpen, Brain, Settings, BarChart3, ScrollText, ChevronLeft, HeartPulse, Wrench, Building2, CalendarCheck } from "lucide-react";
+import { Loader2, DollarSign, Users, FileCheck, FolderOpen, Brain, Settings, BarChart3, ScrollText, ChevronLeft, HeartPulse, Wrench, Building2, CalendarCheck, ClipboardList } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
 const NAV_ITEMS = [
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/facility", label: "Facility Scheduling", icon: Building2 },
   { to: "/admin/essa-bookings", label: "ESSA Bookings", icon: CalendarCheck },
+  { to: "/admin/tryouts", label: "Tryouts", icon: ClipboardList },
   { to: "/admin/content/queue", label: "Approval Queue", icon: FileCheck },
   { to: "/admin/content", label: "Content", icon: FolderOpen },
   { to: "/admin/intelligence", label: "Intelligence", icon: Brain },
