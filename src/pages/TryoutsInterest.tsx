@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CalendarClock, Mail, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

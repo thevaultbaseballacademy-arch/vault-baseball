@@ -10,7 +10,7 @@ const UpcomingTryoutCTA = () => {
 
   if (!tryout) return null;
 
-  const eventDate = new Date(tryout.event_date);
+  const eventDate = new Date(tryout.starts_at);
   const dateLabel = eventDate.toLocaleDateString(undefined, {
     month: "long",
     day: "numeric",
@@ -43,9 +43,9 @@ const UpcomingTryoutCTA = () => {
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                   <span>📅 {dateLabel}</span>
                   {tryout.age_group && <span>👥 Ages {tryout.age_group}</span>}
-                  {tryout.location && (
+                  {tryout.location_name && (
                     <span className="inline-flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5" /> {tryout.location}
+                      <MapPin className="w-3.5 h-3.5" /> {tryout.location_name}
                     </span>
                   )}
                 </div>

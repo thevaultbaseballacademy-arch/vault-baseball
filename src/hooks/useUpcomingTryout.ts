@@ -4,9 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 export interface UpcomingTryout {
   id: string;
   name: string;
-  event_date: string;
+  starts_at: string;
   age_group: string | null;
-  location: string | null;
+  location_name: string | null;
 }
 
 /**
@@ -25,32 +25,30 @@ export const useUpcomingTryout = (withinDays: number | null = null) => {
         const nowIso = new Date().toISOString();
         let query = supabase
           .from("tryout_events")
-          .select("id, name, event_date, age_group, location, status")
+          .select("id, name, starts_at, age_group, location_name")
           .eq("status", "published")
-          .gte("event_date", nowIso)
-          .order("event_date", { ascending: true })
+          .gte("starts_at", nowIso)
+          .order("starts_at", { ascending: true })
           .limit(1);
 
         if (withinDays !== null) {
           const cutoff = new Date();
           cutoff.setDate(cutoff.getDate() + withinDays);
-          query = query.lte("event_date", cutoff.toISOString());
+          query = query.lte("starts_at", cutoff.toISOString());
         }
 
         const { data } = await query;
-        if (!active) return;
 
-        // Also check if ANY published future event exists (for nav visibility)
         const { data: anyData } = await supabase
           .from("tryout_events")
           .select("id")
           .eq("status", "published")
-          .gte("event_date", nowIso)
+          .gte("starts_at", nowIso)
           .limit(1);
 
         if (!active) return;
         setHasAny((anyData?.length ?? 0) > 0);
-        setTryout((data?.[0] as UpcomingTryout) ?? null);
+        setTryout(data && data.length > 0 ? (data[0] as UpcomingTryout) : null);
       } catch {
         if (active) {
           setTryout(null);
