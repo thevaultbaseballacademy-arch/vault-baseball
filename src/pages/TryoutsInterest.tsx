@@ -47,23 +47,27 @@ const TryoutsInterest = () => {
     setSubmitted(true);
   };
 
+  useEffect(() => {
+    document.title = "Tryouts — Coming Soon | The Vault Baseball Academy";
+    const setMeta = (selector: string, attr: string, name: string, content: string) => {
+      let el = document.querySelector(selector) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+    setMeta('meta[name="description"]', "name", "description",
+      "Get notified when our next baseball & softball tryouts open for registration. Join the waitlist.");
+    setMeta('meta[property="og:title"]', "property", "og:title", "Vault Tryouts — Get Notified");
+    setMeta('meta[property="og:description"]', "property", "og:description",
+      "Be first in line when our next tryout drops. Join the waitlist for spring & fall events.");
+    setMeta('meta[property="og:type"]', "property", "og:type", "website");
+  }, []);
+
   return (
     <>
-      <Helmet>
-        <title>Tryouts — Coming Soon | The Vault Baseball Academy</title>
-        <meta
-          name="description"
-          content="Get notified when our next baseball & softball tryouts open for registration. Join the waitlist."
-        />
-        <meta property="og:title" content="Vault Tryouts — Get Notified" />
-        <meta
-          property="og:description"
-          content="Be first in line when our next tryout drops. Join the waitlist for spring & fall events."
-        />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://vault-baseball.lovable.app/tryouts" />
-      </Helmet>
-
       <main className="min-h-screen bg-background">
         <Navbar />
 
