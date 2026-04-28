@@ -92,4 +92,6 @@ const cardLabel = { fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', 
 const cardValue = { fontSize: '15px', color: '#0a0a0a', margin: '0 0 12px' }
 const hr = { borderTop: '1px solid #e5e5e5', margin: '12px 0' }
 const button = { backgroundColor: '#c9a227', color: '#000', padding: '12px 24px', borderRadius: '6px', fontWeight: 'bold', textDecoration: 'none', fontSize: '14px' }
-const footer = { fontSize: '13px', color: '#888', margin: '24px 0 0' }
+const buttonGhost = { backgroundColor: 'transparent', color: '#666', padding: '8px 16px', border: '1px solid #ddd', borderRadius: '6px', textDecoration: 'none', fontSize: '13px' }
+const confNum = { fontSize: '12px', color: '#888', textAlign: 'center' as const, margin: '0 0 8px' }
+const footer = { fontSize: '13px', color: '#888', margin: '8px 0 0', textAlign: 'center' as const }
