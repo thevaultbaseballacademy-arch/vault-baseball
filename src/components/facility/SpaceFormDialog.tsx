@@ -112,6 +112,23 @@ export const SpaceFormDialog = ({
         ) : (
           <>
             <div className="space-y-3">
+              {isTypeless && !form.type_id && !typelessDismissed && (
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs space-y-2">
+                  <p className="text-foreground">
+                    This space doesn't have a type assigned. Want to pick one?
+                    It helps with filtering, reports, and quick booking templates.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="default" onClick={() => setStep("picker")}>
+                      Pick a Type
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setTypelessDismissed(true)}>
+                      Not now
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <Label>Name</Label>
                 <Input value={form.name ?? ""} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Cage 1" />
