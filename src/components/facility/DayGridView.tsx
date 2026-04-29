@@ -2,9 +2,11 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFacilitySpaces, useFacilityReservations, useFacilitySettings, FacilityReservation } from "@/hooks/useFacilitySchedule";
+import { useFacilityReservationsRealtime } from "@/hooks/useFacilityReservationsRealtime";
 import { ReservationDialog } from "./ReservationDialog";
 
 export const DayGridView = () => {
+  useFacilityReservationsRealtime();
   const { data: spaces = [] } = useFacilitySpaces();
   const { data: settings } = useFacilitySettings();
   const slot = settings?.slot_size_minutes ?? 30;

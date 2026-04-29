@@ -3,9 +3,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFacilitySpaces, useFacilityReservations, FacilityReservation } from "@/hooks/useFacilitySchedule";
+import { useFacilityReservationsRealtime } from "@/hooks/useFacilityReservationsRealtime";
 import { ReservationDialog } from "./ReservationDialog";
 
 export const WeekView = () => {
+  useFacilityReservationsRealtime();
   const { data: spaces = [] } = useFacilitySpaces();
   const activeSpaces = spaces.filter((s) => s.is_active);
   const [spaceId, setSpaceId] = useState<string | undefined>();
