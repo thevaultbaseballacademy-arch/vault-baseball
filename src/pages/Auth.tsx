@@ -100,12 +100,12 @@ const Auth = () => {
 
     // Check user_roles table for role — bounded so a stalled query can't hang login
     const result = await withTimeout(
-      supabase.from("user_roles").select("role").eq("user_id", userId),
+      Promise.resolve(supabase.from("user_roles").select("role").eq("user_id", userId)),
       5000,
       "user_roles lookup"
     );
 
-    const userRoles = result?.data?.map((r: any) => r.role) || [];
+    const userRoles = (result as any)?.data?.map((r: any) => r.role) || [];
 
     if (userRoles.includes("admin")) {
       navigate("/admin", { replace: true });
