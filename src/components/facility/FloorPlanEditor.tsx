@@ -60,10 +60,12 @@ const findFirstOpenCell = (
 interface DraggableSpaceProps {
   space: FacilitySpace;
   invalid: boolean;
+  selected: boolean;
   onEdit: () => void;
+  onSelect: () => void;
 }
 
-const DraggableSpace = ({ space, invalid, onEdit }: DraggableSpaceProps) => {
+const DraggableSpace = ({ space, invalid, selected, onEdit, onSelect }: DraggableSpaceProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: space.id,
   });
@@ -76,7 +78,7 @@ const DraggableSpace = ({ space, invalid, onEdit }: DraggableSpaceProps) => {
     background: space.color,
     opacity: space.is_active ? (isDragging ? 0.85 : 1) : 0.4,
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-    zIndex: isDragging ? 30 : 1,
+    zIndex: isDragging ? 30 : selected ? 5 : 1,
     touchAction: "none",
     boxShadow: isDragging
       ? "0 12px 28px hsl(0 0% 0% / 0.5)"
@@ -87,11 +89,13 @@ const DraggableSpace = ({ space, invalid, onEdit }: DraggableSpaceProps) => {
     <div
       ref={setNodeRef}
       style={style}
+      onClick={onSelect}
       className={cn(
         "absolute rounded-md p-2 text-left text-xs font-medium text-white select-none cursor-grab active:cursor-grabbing transition-shadow",
         "ring-2 ring-transparent",
         invalid && "ring-destructive animate-pulse",
         !invalid && isDragging && "ring-foreground/60",
+        !invalid && !isDragging && selected && "ring-primary",
       )}
       {...listeners}
       {...attributes}
@@ -106,14 +110,13 @@ const DraggableSpace = ({ space, invalid, onEdit }: DraggableSpaceProps) => {
         </div>
         <button
           type="button"
-          onPointerDown={(e) => {
-            e.stopPropagation();
-          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
             onEdit();
           }}
-          className="shrink-0 p-1 rounded hover:bg-black/20 active:bg-black/30 -m-1"
+          className="shrink-0 p-1 rounded hover:bg-black/20 active:bg-black/30 -m-1 min-w-[28px] min-h-[28px] flex items-center justify-center"
           aria-label={`Edit ${space.name}`}
         >
           <Edit3 className="w-3.5 h-3.5" />
