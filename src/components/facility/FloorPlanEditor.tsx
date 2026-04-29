@@ -428,6 +428,8 @@ export const FloorPlanEditor = () => {
                 key={s.id}
                 space={s}
                 invalid={collision && s.id === activeId}
+                selected={selectedId === s.id}
+                onSelect={() => setSelectedId(s.id)}
                 onEdit={() => openEdit(s)}
               />
             ))}
