@@ -8,6 +8,7 @@ import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { SportProvider } from "@/contexts/SportContext";
 import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
 import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
+import SessionVisibilityRefresh from "@/components/auth/SessionVisibilityRefresh";
 import BiometricGate from "@/components/auth/BiometricGate";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import RoleGuard from "@/components/RoleGuard";
@@ -233,6 +234,7 @@ const App = () => (
           {/* Site-wide Founder's Pricing Urgency Banner */}
           <FoundersPricingBanner />
           <SessionExpiryHandler />
+          <SessionVisibilityRefresh />
           <BiometricGate />
           <ScrollToTop />
 

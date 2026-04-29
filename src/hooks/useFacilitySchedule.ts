@@ -146,6 +146,34 @@ export const useDeleteSpace = () => {
   });
 };
 
+export const useUpdateSpacePosition = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (
+      patch: { id: string; grid_x?: number; grid_y?: number; grid_w?: number; grid_h?: number },
+    ) => {
+      const { id, ...fields } = patch;
+      const { error } = await supabase.from("facility_spaces" as any).update(fields).eq("id", id);
+      if (error) throw error;
+    },
+    onMutate: async (patch) => {
+      await qc.cancelQueries({ queryKey: ["facility-spaces"] });
+      const prev = qc.getQueryData<FacilitySpace[]>(["facility-spaces"]);
+      qc.setQueryData<FacilitySpace[]>(["facility-spaces"], (old) =>
+        (old || []).map((s) => (s.id === patch.id ? { ...s, ...patch } : s)),
+      );
+      return { prev };
+    },
+    onError: (e: any, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["facility-spaces"], ctx.prev);
+      toast.error(e.message);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["facility-spaces"] });
+    },
+  });
+};
+
 export const useUpdateHours = () => {
   const qc = useQueryClient();
   return useMutation({
