@@ -197,6 +197,11 @@ export const FloorPlanEditor = () => {
   const [savedLabel, setSavedLabel] = useState<string>("");
   const [pendingWrites, setPendingWrites] = useState(0);
 
+  // Resize state — separate gesture from dnd-kit drag.
+  const [resizeId, setResizeId] = useState<string | null>(null);
+  const [resizePreview, setResizePreview] = useState<Rect | null>(null);
+  const [resizeCollision, setResizeCollision] = useState(false);
+
   const undoStack = useRef<HistoryEntry[]>([]);
   const redoStack = useRef<HistoryEntry[]>([]);
   const [, forceRender] = useState(0);
