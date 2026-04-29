@@ -650,7 +650,7 @@ export const MultiResourceBookingWizard = ({
         status: "confirmed",
       });
 
-      if (result.success) {
+      if (result.success === true) {
         toast.success("Booking confirmed");
         onBooked?.(result.reservation_id);
         onOpenChange(false);
