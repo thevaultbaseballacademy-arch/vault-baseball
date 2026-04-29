@@ -3,11 +3,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFacilitySpaces, useFacilityReservations, FacilityReservation } from "@/hooks/useFacilitySchedule";
-import { useFacilityReservationsRealtime } from "@/hooks/useFacilityReservationsRealtime";
+import { RealtimeStatusBadge } from "./RealtimeStatusBadge";
 import { ReservationDialog } from "./ReservationDialog";
 
 export const WeekView = () => {
-  useFacilityReservationsRealtime();
+
   const { data: spaces = [] } = useFacilitySpaces();
   const activeSpaces = spaces.filter((s) => s.is_active);
   const [spaceId, setSpaceId] = useState<string | undefined>();
@@ -54,12 +54,16 @@ export const WeekView = () => {
           <h2 className="text-lg font-display text-foreground min-w-[180px] text-center">{weekLabel}</h2>
           <Button size="icon" variant="outline" onClick={() => shiftWeek(1)}><ChevronRight className="w-4 h-4" /></Button>
         </div>
-        <Select value={selected} onValueChange={setSpaceId}>
-          <SelectTrigger className="w-[200px]"><SelectValue placeholder="Select space" /></SelectTrigger>
-          <SelectContent>
-            {activeSpaces.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <RealtimeStatusBadge />
+          <Select value={selected} onValueChange={setSpaceId}>
+            <SelectTrigger className="w-[200px]"><SelectValue placeholder="Select space" /></SelectTrigger>
+            <SelectContent>
+              {activeSpaces.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+
       </div>
 
       <div className="grid grid-cols-7 gap-2">
