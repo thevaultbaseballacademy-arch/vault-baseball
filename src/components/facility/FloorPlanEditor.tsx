@@ -458,8 +458,9 @@ export const FloorPlanEditor = () => {
     window.addEventListener("pointercancel", onUp);
   };
 
-
+  const openEdit = (s: Partial<FacilitySpace> | null) => {
     if (!s) {
+
       // Try 2x2, fall back to 1x1, reject if canvas truly full
       const cell = findFirstOpenCell(spaces, 2, 2);
       if (!cell) {
