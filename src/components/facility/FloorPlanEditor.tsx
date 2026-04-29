@@ -128,21 +128,22 @@ type HistoryEntry = { id: string; from: Rect; to: Rect };
 export const FloorPlanEditor = () => {
   const { data: spaces = [] } = useFacilitySpaces();
   const updatePos = useUpdateSpacePosition();
+  const deleteSpace = useDeleteSpace();
 
   const [editing, setEditing] = useState<Partial<FacilitySpace> | null>(null);
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [previewCell, setPreviewCell] = useState<{ x: number; y: number } | null>(null);
   const [collision, setCollision] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [savedLabel, setSavedLabel] = useState<string>("");
+  const [pendingWrites, setPendingWrites] = useState(0);
 
   const undoStack = useRef<HistoryEntry[]>([]);
   const redoStack = useRef<HistoryEntry[]>([]);
   const [, forceRender] = useState(0);
 
-  // Sensors tuned for both touch and mouse with a small activation distance to
-  // avoid hijacking taps on the edit button.
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 8 } }),
@@ -158,7 +159,7 @@ export const FloorPlanEditor = () => {
     [spaces, activeId],
   );
 
-  // "Saved Xs ago" label
+  // "Saved Xs ago" — only ticks server-confirmed saves
   useEffect(() => {
     if (!savedAt) return;
     const update = () => {
@@ -169,6 +170,23 @@ export const FloorPlanEditor = () => {
     const t = setInterval(update, 1000);
     return () => clearInterval(t);
   }, [savedAt]);
+
+  // Wrap a position write so we (a) track in-flight count for undo gating and
+  // (b) only set savedAt on real server confirmation, not on optimistic update.
+  const persistMove = (
+    patch: { id: string; grid_x: number; grid_y: number },
+  ): Promise<void> => {
+    setPendingWrites((n) => n + 1);
+    return new Promise((resolve) => {
+      updatePos.mutate(patch, {
+        onSuccess: () => setSavedAt(Date.now()),
+        onSettled: () => {
+          setPendingWrites((n) => Math.max(0, n - 1));
+          resolve();
+        },
+      });
+    });
+  };
 
   const computeTargetCell = (e: DragMoveEvent | DragEndEvent) => {
     if (!activeSpace) return null;
@@ -181,6 +199,7 @@ export const FloorPlanEditor = () => {
 
   const handleDragStart = (event: { active: { id: string | number } }) => {
     setActiveId(String(event.active.id));
+    setSelectedId(String(event.active.id));
     setCollision(false);
     setPreviewCell(null);
   };
@@ -230,64 +249,90 @@ export const FloorPlanEditor = () => {
     redoStack.current = [];
     forceRender((n) => n + 1);
 
-    updatePos.mutate(
-      { id: activeSpace.id, grid_x: cell.x, grid_y: cell.y },
-      { onSuccess: () => setSavedAt(Date.now()) },
-    );
+    persistMove({ id: activeSpace.id, grid_x: cell.x, grid_y: cell.y });
   };
 
-  const undo = () => {
+  // Undo/redo gate on in-flight writes: prevents the classic
+  // "drag → drag → undo → late write clobbers undo" race.
+  const undo = async () => {
+    if (pendingWrites > 0) return;
     const entry = undoStack.current[undoStack.current.length - 1];
     if (!entry) return;
     undoStack.current = undoStack.current.slice(0, -1);
     redoStack.current = [...redoStack.current, entry];
     forceRender((n) => n + 1);
-    updatePos.mutate(
-      { id: entry.id, grid_x: entry.from.x, grid_y: entry.from.y },
-      { onSuccess: () => setSavedAt(Date.now()) },
-    );
+    await persistMove({ id: entry.id, grid_x: entry.from.x, grid_y: entry.from.y });
   };
 
-  const redo = () => {
+  const redo = async () => {
+    if (pendingWrites > 0) return;
     const entry = redoStack.current[redoStack.current.length - 1];
     if (!entry) return;
     redoStack.current = redoStack.current.slice(0, -1);
     undoStack.current = [...undoStack.current, entry];
     forceRender((n) => n + 1);
-    updatePos.mutate(
-      { id: entry.id, grid_x: entry.to.x, grid_y: entry.to.y },
-      { onSuccess: () => setSavedAt(Date.now()) },
-    );
+    await persistMove({ id: entry.id, grid_x: entry.to.x, grid_y: entry.to.y });
   };
-
-  // Cmd/Ctrl+Z / Shift+Cmd+Z keyboard shortcuts (desktop)
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
-        e.preventDefault();
-        if (e.shiftKey) redo();
-        else undo();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   const openEdit = (s: Partial<FacilitySpace> | null) => {
     if (!s) {
-      // Auto-position new space in first open 2x2 cell
+      // Try 2x2, fall back to 1x1, reject if canvas truly full
       const cell = findFirstOpenCell(spaces, 2, 2);
-      setEditing({ grid_x: cell.x, grid_y: cell.y, grid_w: 2, grid_h: 2 });
+      if (!cell) {
+        toast.error("Floor plan is full — resize or remove a space to add another.");
+        return;
+      }
+      setEditing({ grid_x: cell.x, grid_y: cell.y, grid_w: cell.w, grid_h: cell.h });
     } else {
       setEditing(s);
     }
     setOpen(true);
   };
 
+  const handleDelete = (id: string) => {
+    if (!confirm("Delete this space? This cannot be undone.")) return;
+    deleteSpace.mutate(id);
+    setSelectedId(null);
+  };
+
+  // Keyboard shortcuts: ⌘Z undo, ⇧⌘Z redo, A/N add, Del/Backspace delete
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const inField =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable);
+      if (inField || open) return;
+
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+        return;
+      }
+      if (!e.metaKey && !e.ctrlKey && (e.key === "a" || e.key === "A" || e.key === "n" || e.key === "N")) {
+        e.preventDefault();
+        openEdit(null);
+        return;
+      }
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
+        e.preventDefault();
+        handleDelete(selectedId);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, open, pendingWrites, spaces]);
+
   const previewRect: Rect | null =
     activeSpace && previewCell
       ? { x: previewCell.x, y: previewCell.y, w: activeSpace.grid_w, h: activeSpace.grid_h }
       : null;
+
+  const isSaving = pendingWrites > 0;
 
   return (
     <div className="space-y-4">
