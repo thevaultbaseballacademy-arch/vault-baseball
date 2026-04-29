@@ -27,15 +27,20 @@ export const SpaceFormDialog = ({
   const { data: spaceTypes = [] } = useSpaceTypes();
 
   const isNew = !space?.id;
+  const isTypeless = !!space?.id && !space?.type_id;
   // Phase 2: new spaces start at the type picker. Existing spaces skip straight
   // to the form (don't disturb anyone's pre-Phase 2 setup).
   const [step, setStep] = useState<"picker" | "form">(isNew ? "picker" : "form");
   const [form, setForm] = useState<Partial<FacilitySpace>>({});
+  // Per-session dismiss for the typeless soft prompt — re-appears on next edit.
+  const [typelessDismissed, setTypelessDismissed] = useState(false);
 
   useEffect(() => {
     setStep(space?.id ? "form" : "picker");
     setForm(space ?? { name: "", space_type: "Cage", capacity: 1, color: COLORS[0], grid_w: 2, grid_h: 2, is_active: true });
+    setTypelessDismissed(false);
   }, [space, open]);
+
 
   const pickType = (t: SpaceType) => {
     setForm((f) => ({
@@ -107,6 +112,23 @@ export const SpaceFormDialog = ({
         ) : (
           <>
             <div className="space-y-3">
+              {isTypeless && !form.type_id && !typelessDismissed && (
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs space-y-2">
+                  <p className="text-foreground">
+                    This space doesn't have a type assigned. Want to pick one?
+                    It helps with filtering, reports, and quick booking templates.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="default" onClick={() => setStep("picker")}>
+                      Pick a Type
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setTypelessDismissed(true)}>
+                      Not now
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <Label>Name</Label>
                 <Input value={form.name ?? ""} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Cage 1" />

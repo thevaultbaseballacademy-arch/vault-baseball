@@ -2,11 +2,11 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFacilitySpaces, useFacilityReservations, useFacilitySettings, FacilityReservation } from "@/hooks/useFacilitySchedule";
-import { useFacilityReservationsRealtime } from "@/hooks/useFacilityReservationsRealtime";
+import { RealtimeStatusBadge } from "./RealtimeStatusBadge";
 import { ReservationDialog } from "./ReservationDialog";
 
 export const DayGridView = () => {
-  useFacilityReservationsRealtime();
+
   const { data: spaces = [] } = useFacilitySpaces();
   const { data: settings } = useFacilitySettings();
   const slot = settings?.slot_size_minutes ?? 30;
@@ -70,9 +70,13 @@ export const DayGridView = () => {
           <Button size="icon" variant="outline" onClick={() => shift(1)}><ChevronRight className="w-4 h-4" /></Button>
           <Button size="sm" variant="ghost" onClick={() => { const d = new Date(); d.setHours(0,0,0,0); setDate(d); }}>Today</Button>
         </div>
-        <Button size="sm" onClick={() => { setEditing(null); setDefaultSpace(activeSpaces[0]?.id); setDefaultStart(new Date()); setOpen(true); }}>
-          <Plus className="w-4 h-4 mr-1" /> New Booking
-        </Button>
+        <div className="flex items-center gap-2">
+          <RealtimeStatusBadge />
+          <Button size="sm" onClick={() => { setEditing(null); setDefaultSpace(activeSpaces[0]?.id); setDefaultStart(new Date()); setOpen(true); }}>
+            <Plus className="w-4 h-4 mr-1" /> New Booking
+          </Button>
+        </div>
+
       </div>
 
       <div className="border border-border rounded-xl bg-card overflow-auto">

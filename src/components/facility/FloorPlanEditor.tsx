@@ -61,29 +61,51 @@ interface DraggableSpaceProps {
   space: FacilitySpace;
   invalid: boolean;
   selected: boolean;
+  resizing: boolean;
+  resizePreview: Rect | null;
   onEdit: () => void;
   onSelect: () => void;
+  onResizeStart: (corner: ResizeCorner, e: React.PointerEvent) => void;
 }
 
-const DraggableSpace = ({ space, invalid, selected, onEdit, onSelect }: DraggableSpaceProps) => {
+type ResizeCorner = "nw" | "ne" | "sw" | "se";
+
+const DraggableSpace = ({
+  space,
+  invalid,
+  selected,
+  resizing,
+  resizePreview,
+  onEdit,
+  onSelect,
+  onResizeStart,
+}: DraggableSpaceProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: space.id,
+    disabled: resizing,
   });
 
+  // While actively resizing, show the live preview rect (snap-to-grid happens
+  // visually as the pointer crosses cell boundaries).
+  const rect = resizePreview ?? { x: space.grid_x, y: space.grid_y, w: space.grid_w, h: space.grid_h };
+
   const style: React.CSSProperties = {
-    left: space.grid_x * CELL,
-    top: space.grid_y * CELL,
-    width: space.grid_w * CELL - 4,
-    height: space.grid_h * CELL - 4,
+    left: rect.x * CELL,
+    top: rect.y * CELL,
+    width: rect.w * CELL - 4,
+    height: rect.h * CELL - 4,
     background: space.color,
     opacity: space.is_active ? (isDragging ? 0.85 : 1) : 0.4,
-    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-    zIndex: isDragging ? 30 : selected ? 5 : 1,
+    transform: transform && !resizing ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    zIndex: isDragging || resizing ? 30 : selected ? 5 : 1,
     touchAction: "none",
-    boxShadow: isDragging
+    boxShadow: isDragging || resizing
       ? "0 12px 28px hsl(0 0% 0% / 0.5)"
       : "0 2px 8px hsl(0 0% 0% / 0.25)",
   };
+
+  const handleClasses =
+    "absolute w-7 h-7 rounded-full bg-foreground border-2 border-background shadow-md z-40 flex items-center justify-center";
 
   return (
     <div
@@ -91,22 +113,25 @@ const DraggableSpace = ({ space, invalid, selected, onEdit, onSelect }: Draggabl
       style={style}
       onClick={onSelect}
       className={cn(
-        "absolute rounded-md p-2 text-left text-xs font-medium text-white select-none cursor-grab active:cursor-grabbing transition-shadow",
+        "absolute rounded-md p-2 text-left text-xs font-medium text-white select-none transition-shadow",
         "ring-2 ring-transparent",
+        !resizing && "cursor-grab active:cursor-grabbing",
         invalid && "ring-destructive animate-pulse",
-        !invalid && isDragging && "ring-foreground/60",
-        !invalid && !isDragging && selected && "ring-primary",
+        !invalid && (isDragging || resizing) && "ring-foreground/60",
+        !invalid && !isDragging && !resizing && selected && "ring-primary",
       )}
-      {...listeners}
-      {...attributes}
+      {...(resizing ? {} : listeners)}
+      {...(resizing ? {} : attributes)}
     >
-      <div className="flex items-start justify-between gap-1 h-full">
+      <div className="flex items-start justify-between gap-1 h-full pointer-events-none">
         <div className="min-w-0 flex-1">
           <div className="font-bold leading-tight break-words" title={space.name}>
             {space.name}
           </div>
           <div className="text-[10px] opacity-90 capitalize">{space.space_type}</div>
-          <div className="text-[10px] opacity-90 mt-0.5">Capacity {space.capacity}</div>
+          <div className="text-[10px] opacity-90 mt-0.5">
+            {resizing ? `${rect.w}×${rect.h}` : `Capacity ${space.capacity}`}
+          </div>
         </div>
         <button
           type="button"
@@ -116,12 +141,41 @@ const DraggableSpace = ({ space, invalid, selected, onEdit, onSelect }: Draggabl
             e.stopPropagation();
             onEdit();
           }}
-          className="shrink-0 p-1 rounded hover:bg-black/20 active:bg-black/30 -m-1 min-w-[28px] min-h-[28px] flex items-center justify-center"
+          className="shrink-0 p-1 rounded hover:bg-black/20 active:bg-black/30 -m-1 min-w-[28px] min-h-[28px] flex items-center justify-center pointer-events-auto"
           aria-label={`Edit ${space.name}`}
         >
           <Edit3 className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      {selected && !isDragging && (
+        <>
+          <div
+            className={cn(handleClasses, "cursor-nwse-resize")}
+            style={{ top: -14, left: -14 }}
+            onPointerDown={(e) => onResizeStart("nw", e)}
+            aria-label={`Resize ${space.name} from top-left`}
+          />
+          <div
+            className={cn(handleClasses, "cursor-nesw-resize")}
+            style={{ top: -14, right: -14 }}
+            onPointerDown={(e) => onResizeStart("ne", e)}
+            aria-label={`Resize ${space.name} from top-right`}
+          />
+          <div
+            className={cn(handleClasses, "cursor-nesw-resize")}
+            style={{ bottom: -14, left: -14 }}
+            onPointerDown={(e) => onResizeStart("sw", e)}
+            aria-label={`Resize ${space.name} from bottom-left`}
+          />
+          <div
+            className={cn(handleClasses, "cursor-nwse-resize")}
+            style={{ bottom: -14, right: -14 }}
+            onPointerDown={(e) => onResizeStart("se", e)}
+            aria-label={`Resize ${space.name} from bottom-right`}
+          />
+        </>
+      )}
     </div>
   );
 };
@@ -142,6 +196,11 @@ export const FloorPlanEditor = () => {
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [savedLabel, setSavedLabel] = useState<string>("");
   const [pendingWrites, setPendingWrites] = useState(0);
+
+  // Resize state — separate gesture from dnd-kit drag.
+  const [resizeId, setResizeId] = useState<string | null>(null);
+  const [resizePreview, setResizePreview] = useState<Rect | null>(null);
+  const [resizeCollision, setResizeCollision] = useState(false);
 
   const undoStack = useRef<HistoryEntry[]>([]);
   const redoStack = useRef<HistoryEntry[]>([]);
@@ -174,10 +233,10 @@ export const FloorPlanEditor = () => {
     return () => clearInterval(t);
   }, [savedAt]);
 
-  // Wrap a position write so we (a) track in-flight count for undo gating and
-  // (b) only set savedAt on real server confirmation, not on optimistic update.
-  const persistMove = (
-    patch: { id: string; grid_x: number; grid_y: number },
+  // Wrap a position/size write so we (a) track in-flight count for undo gating
+  // and (b) only set savedAt on real server confirmation, not on optimistic update.
+  const persistRect = (
+    patch: { id: string; grid_x: number; grid_y: number; grid_w?: number; grid_h?: number },
   ): Promise<void> => {
     setPendingWrites((n) => n + 1);
     return new Promise((resolve) => {
@@ -252,11 +311,12 @@ export const FloorPlanEditor = () => {
     redoStack.current = [];
     forceRender((n) => n + 1);
 
-    persistMove({ id: activeSpace.id, grid_x: cell.x, grid_y: cell.y });
+    persistRect({ id: activeSpace.id, grid_x: cell.x, grid_y: cell.y });
   };
 
   // Undo/redo gate on in-flight writes: prevents the classic
-  // "drag → drag → undo → late write clobbers undo" race.
+  // "drag → drag → undo → late write clobbers undo" race. Each entry is one
+  // atomic action — drag-move OR resize — so a single ⌘Z reverts the whole gesture.
   const undo = async () => {
     if (pendingWrites > 0) return;
     const entry = undoStack.current[undoStack.current.length - 1];
@@ -264,7 +324,13 @@ export const FloorPlanEditor = () => {
     undoStack.current = undoStack.current.slice(0, -1);
     redoStack.current = [...redoStack.current, entry];
     forceRender((n) => n + 1);
-    await persistMove({ id: entry.id, grid_x: entry.from.x, grid_y: entry.from.y });
+    await persistRect({
+      id: entry.id,
+      grid_x: entry.from.x,
+      grid_y: entry.from.y,
+      grid_w: entry.from.w,
+      grid_h: entry.from.h,
+    });
   };
 
   const redo = async () => {
@@ -274,11 +340,127 @@ export const FloorPlanEditor = () => {
     redoStack.current = redoStack.current.slice(0, -1);
     undoStack.current = [...undoStack.current, entry];
     forceRender((n) => n + 1);
-    await persistMove({ id: entry.id, grid_x: entry.to.x, grid_y: entry.to.y });
+    await persistRect({
+      id: entry.id,
+      grid_x: entry.to.x,
+      grid_y: entry.to.y,
+      grid_w: entry.to.w,
+      grid_h: entry.to.h,
+    });
+  };
+
+  // Resize gesture: native pointer events, isolated from dnd-kit drag.
+  // One gesture = one undoable history entry. Saves only on release.
+  const handleResizeStart = (id: string, corner: ResizeCorner, e: React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (pendingWrites > 0) return;
+    const space = spaces.find((s) => s.id === id);
+    if (!space) return;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const initial: Rect = { x: space.grid_x, y: space.grid_y, w: space.grid_w, h: space.grid_h };
+    const others = spaces.filter((s) => s.id !== id);
+
+    setResizeId(id);
+    setSelectedId(id);
+    setResizePreview(initial);
+    setResizeCollision(false);
+
+    const computeRect = (cx: number, cy: number): Rect => {
+      const dx = Math.round((cx - startX) / CELL);
+      const dy = Math.round((cy - startY) / CELL);
+      let { x, y, w, h } = initial;
+      // Adjust which edges move based on the corner being dragged.
+      if (corner === "nw" || corner === "sw") {
+        const nx = Math.max(0, Math.min(initial.x + initial.w - 1, initial.x + dx));
+        w = initial.w + (initial.x - nx);
+        x = nx;
+      } else {
+        w = Math.max(1, initial.w + dx);
+      }
+      if (corner === "nw" || corner === "ne") {
+        const ny = Math.max(0, Math.min(initial.y + initial.h - 1, initial.y + dy));
+        h = initial.h + (initial.y - ny);
+        y = ny;
+      } else {
+        h = Math.max(1, initial.h + dy);
+      }
+      // Clamp to canvas bounds.
+      w = Math.max(1, Math.min(w, GRID_COLS - x));
+      h = Math.max(1, Math.min(h, GRID_ROWS - y));
+      return { x, y, w, h };
+    };
+
+    const onMove = (ev: PointerEvent) => {
+      const rect = computeRect(ev.clientX, ev.clientY);
+      setResizePreview(rect);
+      const collides = others.some((s) =>
+        rectsOverlap(rect, { x: s.grid_x, y: s.grid_y, w: s.grid_w, h: s.grid_h }),
+      );
+      setResizeCollision(collides || !isInBounds(rect));
+    };
+
+    const onUp = (ev: PointerEvent) => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+
+      const rect = computeRect(ev.clientX, ev.clientY);
+      setResizeId(null);
+      setResizePreview(null);
+
+      const collides = others.some((s) =>
+        rectsOverlap(rect, { x: s.grid_x, y: s.grid_y, w: s.grid_w, h: s.grid_h }),
+      );
+
+      if (collides || !isInBounds(rect)) {
+        setResizeCollision(true);
+        setTimeout(() => setResizeCollision(false), 350);
+        return;
+      }
+
+      // No-op if nothing changed
+      if (rect.x === initial.x && rect.y === initial.y && rect.w === initial.w && rect.h === initial.h) {
+        setResizeCollision(false);
+        return;
+      }
+
+      // Capacity warning if shrinking under existing reservation needs
+      // (advisory only — admin's call). Active reservations live elsewhere;
+      // we surface a soft toast when capacity drops sharply.
+      if (rect.w * rect.h < initial.w * initial.h && space.capacity > rect.w * rect.h) {
+        toast.warning(`${space.name} is now smaller than its capacity (${space.capacity}). Review if needed.`);
+      }
+
+      const entry: HistoryEntry = {
+        id: space.id,
+        from: initial,
+        to: rect,
+      };
+      undoStack.current = [...undoStack.current.slice(-9), entry];
+      redoStack.current = [];
+      forceRender((n) => n + 1);
+      setResizeCollision(false);
+
+      persistRect({
+        id: space.id,
+        grid_x: rect.x,
+        grid_y: rect.y,
+        grid_w: rect.w,
+        grid_h: rect.h,
+      });
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
   };
 
   const openEdit = (s: Partial<FacilitySpace> | null) => {
     if (!s) {
+
       // Try 2x2, fall back to 1x1, reject if canvas truly full
       const cell = findFirstOpenCell(spaces, 2, 2);
       if (!cell) {
@@ -427,10 +609,13 @@ export const FloorPlanEditor = () => {
               <DraggableSpace
                 key={s.id}
                 space={s}
-                invalid={collision && s.id === activeId}
+                invalid={(collision && s.id === activeId) || (resizeCollision && s.id === resizeId)}
                 selected={selectedId === s.id}
+                resizing={resizeId === s.id}
+                resizePreview={resizeId === s.id ? resizePreview : null}
                 onSelect={() => setSelectedId(s.id)}
                 onEdit={() => openEdit(s)}
+                onResizeStart={(corner, e) => handleResizeStart(s.id, corner, e)}
               />
             ))}
 

@@ -30,6 +30,13 @@ export const setGlobalReconnecting = (v: boolean) => {
   reconnectingListeners.forEach((cb) => cb(v));
 };
 
+/**
+ * Synchronous read of the global reconnecting flag. Used by above-guard
+ * components like SessionExpiryHandler that need to suppress hard redirects
+ * while a session refresh is in flight (avoids the iOS BFCache → /auth race).
+ */
+export const isGloballyReconnecting = () => globalReconnecting;
+
 export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
