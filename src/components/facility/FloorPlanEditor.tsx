@@ -31,21 +31,28 @@ const rectsOverlap = (a: Rect, b: Rect) =>
 const isInBounds = (r: Rect) =>
   r.x >= 0 && r.y >= 0 && r.x + r.w <= GRID_COLS && r.y + r.h <= GRID_ROWS;
 
+/**
+ * Try to find an open region of size w×h. Falls back to 1×1 if the requested
+ * size doesn't fit anywhere. Returns null only when the entire canvas is full.
+ */
 const findFirstOpenCell = (
   spaces: FacilitySpace[],
   w: number,
   h: number,
-): { x: number; y: number } => {
-  for (let y = 0; y <= GRID_ROWS - h; y++) {
-    for (let x = 0; x <= GRID_COLS - w; x++) {
-      const candidate = { x, y, w, h };
-      const collides = spaces.some((s) =>
-        rectsOverlap(candidate, { x: s.grid_x, y: s.grid_y, w: s.grid_w, h: s.grid_h }),
-      );
-      if (!collides) return { x, y };
+): { x: number; y: number; w: number; h: number } | null => {
+  const tryFit = (tw: number, th: number) => {
+    for (let y = 0; y <= GRID_ROWS - th; y++) {
+      for (let x = 0; x <= GRID_COLS - tw; x++) {
+        const candidate = { x, y, w: tw, h: th };
+        const collides = spaces.some((s) =>
+          rectsOverlap(candidate, { x: s.grid_x, y: s.grid_y, w: s.grid_w, h: s.grid_h }),
+        );
+        if (!collides) return { x, y, w: tw, h: th };
+      }
     }
-  }
-  return { x: 0, y: 0 };
+    return null;
+  };
+  return tryFit(w, h) ?? tryFit(1, 1);
 };
 
 interface DraggableSpaceProps {
