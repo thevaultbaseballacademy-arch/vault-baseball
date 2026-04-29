@@ -3122,6 +3122,7 @@ export type Database = {
           name: string
           notes: string | null
           space_type: string
+          type_id: string | null
           updated_at: string
           zone: string | null
         }
@@ -3140,6 +3141,7 @@ export type Database = {
           name: string
           notes?: string | null
           space_type?: string
+          type_id?: string | null
           updated_at?: string
           zone?: string | null
         }
@@ -3158,10 +3160,19 @@ export type Database = {
           name?: string
           notes?: string | null
           space_type?: string
+          type_id?: string | null
           updated_at?: string
           zone?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "facility_spaces_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "space_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       group_session_enrollments: {
         Row: {
@@ -5869,6 +5880,54 @@ export type Database = {
           slap_type?: string
           success_rate?: number | null
           timing_score?: number | null
+        }
+        Relationships: []
+      }
+      space_types: {
+        Row: {
+          allows_pitching_machine: boolean
+          coach_required: string
+          color: string
+          created_at: string
+          default_capacity: number
+          default_duration_minutes: number
+          display_order: number
+          icon: string
+          id: string
+          is_custom: boolean
+          key: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          allows_pitching_machine?: boolean
+          coach_required?: string
+          color: string
+          created_at?: string
+          default_capacity?: number
+          default_duration_minutes?: number
+          display_order?: number
+          icon: string
+          id?: string
+          is_custom?: boolean
+          key: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          allows_pitching_machine?: boolean
+          coach_required?: string
+          color?: string
+          created_at?: string
+          default_capacity?: number
+          default_duration_minutes?: number
+          display_order?: number
+          icon?: string
+          id?: string
+          is_custom?: boolean
+          key?: string
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
