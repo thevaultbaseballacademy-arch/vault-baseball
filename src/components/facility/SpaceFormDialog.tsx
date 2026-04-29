@@ -27,15 +27,20 @@ export const SpaceFormDialog = ({
   const { data: spaceTypes = [] } = useSpaceTypes();
 
   const isNew = !space?.id;
+  const isTypeless = !!space?.id && !space?.type_id;
   // Phase 2: new spaces start at the type picker. Existing spaces skip straight
   // to the form (don't disturb anyone's pre-Phase 2 setup).
   const [step, setStep] = useState<"picker" | "form">(isNew ? "picker" : "form");
   const [form, setForm] = useState<Partial<FacilitySpace>>({});
+  // Per-session dismiss for the typeless soft prompt — re-appears on next edit.
+  const [typelessDismissed, setTypelessDismissed] = useState(false);
 
   useEffect(() => {
     setStep(space?.id ? "form" : "picker");
     setForm(space ?? { name: "", space_type: "Cage", capacity: 1, color: COLORS[0], grid_w: 2, grid_h: 2, is_active: true });
+    setTypelessDismissed(false);
   }, [space, open]);
+
 
   const pickType = (t: SpaceType) => {
     setForm((f) => ({
