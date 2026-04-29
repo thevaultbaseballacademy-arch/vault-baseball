@@ -2996,10 +2996,13 @@ export type Database = {
       facility_reservations: {
         Row: {
           attendee_count: number | null
+          cancellation_reason: string | null
+          coach_availability_id: string | null
           coach_user_id: string | null
           color: string | null
           created_at: string
           created_by: string | null
+          credit_id: string | null
           ends_at: string
           id: string
           notes: string | null
@@ -3014,10 +3017,13 @@ export type Database = {
         }
         Insert: {
           attendee_count?: number | null
+          cancellation_reason?: string | null
+          coach_availability_id?: string | null
           coach_user_id?: string | null
           color?: string | null
           created_at?: string
           created_by?: string | null
+          credit_id?: string | null
           ends_at: string
           id?: string
           notes?: string | null
@@ -3032,10 +3038,13 @@ export type Database = {
         }
         Update: {
           attendee_count?: number | null
+          cancellation_reason?: string | null
+          coach_availability_id?: string | null
           coach_user_id?: string | null
           color?: string | null
           created_at?: string
           created_by?: string | null
+          credit_id?: string | null
           ends_at?: string
           id?: string
           notes?: string | null
