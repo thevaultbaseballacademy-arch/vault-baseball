@@ -349,7 +349,116 @@ export const FloorPlanEditor = () => {
     });
   };
 
-  const openEdit = (s: Partial<FacilitySpace> | null) => {
+  // Resize gesture: native pointer events, isolated from dnd-kit drag.
+  // One gesture = one undoable history entry. Saves only on release.
+  const handleResizeStart = (id: string, corner: ResizeCorner, e: React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (pendingWrites > 0) return;
+    const space = spaces.find((s) => s.id === id);
+    if (!space) return;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const initial: Rect = { x: space.grid_x, y: space.grid_y, w: space.grid_w, h: space.grid_h };
+    const others = spaces.filter((s) => s.id !== id);
+
+    setResizeId(id);
+    setSelectedId(id);
+    setResizePreview(initial);
+    setResizeCollision(false);
+
+    const computeRect = (cx: number, cy: number): Rect => {
+      const dx = Math.round((cx - startX) / CELL);
+      const dy = Math.round((cy - startY) / CELL);
+      let { x, y, w, h } = initial;
+      // Adjust which edges move based on the corner being dragged.
+      if (corner === "nw" || corner === "sw") {
+        const nx = Math.max(0, Math.min(initial.x + initial.w - 1, initial.x + dx));
+        w = initial.w + (initial.x - nx);
+        x = nx;
+      } else {
+        w = Math.max(1, initial.w + dx);
+      }
+      if (corner === "nw" || corner === "ne") {
+        const ny = Math.max(0, Math.min(initial.y + initial.h - 1, initial.y + dy));
+        h = initial.h + (initial.y - ny);
+        y = ny;
+      } else {
+        h = Math.max(1, initial.h + dy);
+      }
+      // Clamp to canvas bounds.
+      w = Math.max(1, Math.min(w, GRID_COLS - x));
+      h = Math.max(1, Math.min(h, GRID_ROWS - y));
+      return { x, y, w, h };
+    };
+
+    const onMove = (ev: PointerEvent) => {
+      const rect = computeRect(ev.clientX, ev.clientY);
+      setResizePreview(rect);
+      const collides = others.some((s) =>
+        rectsOverlap(rect, { x: s.grid_x, y: s.grid_y, w: s.grid_w, h: s.grid_h }),
+      );
+      setResizeCollision(collides || !isInBounds(rect));
+    };
+
+    const onUp = (ev: PointerEvent) => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+
+      const rect = computeRect(ev.clientX, ev.clientY);
+      setResizeId(null);
+      setResizePreview(null);
+
+      const collides = others.some((s) =>
+        rectsOverlap(rect, { x: s.grid_x, y: s.grid_y, w: s.grid_w, h: s.grid_h }),
+      );
+
+      if (collides || !isInBounds(rect)) {
+        setResizeCollision(true);
+        setTimeout(() => setResizeCollision(false), 350);
+        return;
+      }
+
+      // No-op if nothing changed
+      if (rect.x === initial.x && rect.y === initial.y && rect.w === initial.w && rect.h === initial.h) {
+        setResizeCollision(false);
+        return;
+      }
+
+      // Capacity warning if shrinking under existing reservation needs
+      // (advisory only — admin's call). Active reservations live elsewhere;
+      // we surface a soft toast when capacity drops sharply.
+      if (rect.w * rect.h < initial.w * initial.h && space.capacity > rect.w * rect.h) {
+        toast.warning(`${space.name} is now smaller than its capacity (${space.capacity}). Review if needed.`);
+      }
+
+      const entry: HistoryEntry = {
+        id: space.id,
+        from: initial,
+        to: rect,
+      };
+      undoStack.current = [...undoStack.current.slice(-9), entry];
+      redoStack.current = [];
+      forceRender((n) => n + 1);
+      setResizeCollision(false);
+
+      persistRect({
+        id: space.id,
+        grid_x: rect.x,
+        grid_y: rect.y,
+        grid_w: rect.w,
+        grid_h: rect.h,
+      });
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+  };
+
+
     if (!s) {
       // Try 2x2, fall back to 1x1, reject if canvas truly full
       const cell = findFirstOpenCell(spaces, 2, 2);
