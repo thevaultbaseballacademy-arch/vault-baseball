@@ -344,18 +344,24 @@ export const FloorPlanEditor = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {savedLabel && (
+          {isSaving ? (
+            <span className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+              Saving…
+            </span>
+          ) : savedLabel ? (
             <span className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground">
               <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
               {savedLabel}
             </span>
-          )}
+          ) : null}
           <Button
             size="icon"
             variant="outline"
             onClick={undo}
-            disabled={undoStack.current.length === 0}
-            aria-label="Undo"
+            disabled={undoStack.current.length === 0 || isSaving}
+            aria-label="Undo (⌘Z)"
+            title="Undo (⌘Z)"
           >
             <Undo2 className="w-4 h-4" />
           </Button>
@@ -363,8 +369,9 @@ export const FloorPlanEditor = () => {
             size="icon"
             variant="outline"
             onClick={redo}
-            disabled={redoStack.current.length === 0}
-            aria-label="Redo"
+            disabled={redoStack.current.length === 0 || isSaving}
+            aria-label="Redo (⇧⌘Z)"
+            title="Redo (⇧⌘Z)"
           >
             <Redo2 className="w-4 h-4" />
           </Button>
