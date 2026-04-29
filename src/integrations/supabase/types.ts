@@ -5342,6 +5342,47 @@ export type Database = {
           },
         ]
       }
+      reservation_resources: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          reservation_id: string
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["reservation_resource_type"]
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          reservation_id: string
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["reservation_resource_type"]
+          starts_at: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          reservation_id?: string
+          resource_id?: string
+          resource_type?: Database["public"]["Enums"]["reservation_resource_type"]
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservation_resources_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "facility_reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sc_programs: {
         Row: {
           age_group: string | null
@@ -7356,6 +7397,19 @@ export type Database = {
             Args: { question_id: string; selected_answer: number }
             Returns: boolean
           }
+      create_reservation_atomic: {
+        Args: {
+          p_coach_user_id: string
+          p_email?: string
+          p_ends_at: string
+          p_notes?: string
+          p_space_id: string
+          p_starts_at: string
+          p_status?: string
+          p_title: string
+        }
+        Returns: Json
+      }
       decrypt_credential: { Args: { ciphertext: string }; Returns: string }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -7603,6 +7657,17 @@ export type Database = {
         Returns: number
       }
       obfuscate_ip: { Args: { ip_address: string }; Returns: string }
+      preview_recurring_conflicts: {
+        Args: {
+          p_coach_user_id: string
+          p_ends_at: string
+          p_recurrence_rule?: string
+          p_series_end_date?: string
+          p_space_id: string
+          p_starts_at: string
+        }
+        Returns: Json
+      }
       purge_old_audit_logs:
         | { Args: never; Returns: number }
         | { Args: { retention_days?: number }; Returns: number }
@@ -7682,6 +7747,7 @@ export type Database = {
         | "blast_motion"
         | "trackman"
         | "pocket_radar"
+      reservation_resource_type: "space" | "coach" | "equipment"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -7856,6 +7922,7 @@ export const Constants = {
         "trackman",
         "pocket_radar",
       ],
+      reservation_resource_type: ["space", "coach", "equipment"],
     },
   },
 } as const
