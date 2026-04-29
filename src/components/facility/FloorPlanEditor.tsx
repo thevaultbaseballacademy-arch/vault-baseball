@@ -61,29 +61,51 @@ interface DraggableSpaceProps {
   space: FacilitySpace;
   invalid: boolean;
   selected: boolean;
+  resizing: boolean;
+  resizePreview: Rect | null;
   onEdit: () => void;
   onSelect: () => void;
+  onResizeStart: (corner: ResizeCorner, e: React.PointerEvent) => void;
 }
 
-const DraggableSpace = ({ space, invalid, selected, onEdit, onSelect }: DraggableSpaceProps) => {
+type ResizeCorner = "nw" | "ne" | "sw" | "se";
+
+const DraggableSpace = ({
+  space,
+  invalid,
+  selected,
+  resizing,
+  resizePreview,
+  onEdit,
+  onSelect,
+  onResizeStart,
+}: DraggableSpaceProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: space.id,
+    disabled: resizing,
   });
 
+  // While actively resizing, show the live preview rect (snap-to-grid happens
+  // visually as the pointer crosses cell boundaries).
+  const rect = resizePreview ?? { x: space.grid_x, y: space.grid_y, w: space.grid_w, h: space.grid_h };
+
   const style: React.CSSProperties = {
-    left: space.grid_x * CELL,
-    top: space.grid_y * CELL,
-    width: space.grid_w * CELL - 4,
-    height: space.grid_h * CELL - 4,
+    left: rect.x * CELL,
+    top: rect.y * CELL,
+    width: rect.w * CELL - 4,
+    height: rect.h * CELL - 4,
     background: space.color,
     opacity: space.is_active ? (isDragging ? 0.85 : 1) : 0.4,
-    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-    zIndex: isDragging ? 30 : selected ? 5 : 1,
+    transform: transform && !resizing ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    zIndex: isDragging || resizing ? 30 : selected ? 5 : 1,
     touchAction: "none",
-    boxShadow: isDragging
+    boxShadow: isDragging || resizing
       ? "0 12px 28px hsl(0 0% 0% / 0.5)"
       : "0 2px 8px hsl(0 0% 0% / 0.25)",
   };
+
+  const handleClasses =
+    "absolute w-7 h-7 rounded-full bg-foreground border-2 border-background shadow-md z-40 flex items-center justify-center";
 
   return (
     <div
@@ -91,22 +113,25 @@ const DraggableSpace = ({ space, invalid, selected, onEdit, onSelect }: Draggabl
       style={style}
       onClick={onSelect}
       className={cn(
-        "absolute rounded-md p-2 text-left text-xs font-medium text-white select-none cursor-grab active:cursor-grabbing transition-shadow",
+        "absolute rounded-md p-2 text-left text-xs font-medium text-white select-none transition-shadow",
         "ring-2 ring-transparent",
+        !resizing && "cursor-grab active:cursor-grabbing",
         invalid && "ring-destructive animate-pulse",
-        !invalid && isDragging && "ring-foreground/60",
-        !invalid && !isDragging && selected && "ring-primary",
+        !invalid && (isDragging || resizing) && "ring-foreground/60",
+        !invalid && !isDragging && !resizing && selected && "ring-primary",
       )}
-      {...listeners}
-      {...attributes}
+      {...(resizing ? {} : listeners)}
+      {...(resizing ? {} : attributes)}
     >
-      <div className="flex items-start justify-between gap-1 h-full">
+      <div className="flex items-start justify-between gap-1 h-full pointer-events-none">
         <div className="min-w-0 flex-1">
           <div className="font-bold leading-tight break-words" title={space.name}>
             {space.name}
           </div>
           <div className="text-[10px] opacity-90 capitalize">{space.space_type}</div>
-          <div className="text-[10px] opacity-90 mt-0.5">Capacity {space.capacity}</div>
+          <div className="text-[10px] opacity-90 mt-0.5">
+            {resizing ? `${rect.w}×${rect.h}` : `Capacity ${space.capacity}`}
+          </div>
         </div>
         <button
           type="button"
@@ -116,12 +141,41 @@ const DraggableSpace = ({ space, invalid, selected, onEdit, onSelect }: Draggabl
             e.stopPropagation();
             onEdit();
           }}
-          className="shrink-0 p-1 rounded hover:bg-black/20 active:bg-black/30 -m-1 min-w-[28px] min-h-[28px] flex items-center justify-center"
+          className="shrink-0 p-1 rounded hover:bg-black/20 active:bg-black/30 -m-1 min-w-[28px] min-h-[28px] flex items-center justify-center pointer-events-auto"
           aria-label={`Edit ${space.name}`}
         >
           <Edit3 className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      {selected && !isDragging && (
+        <>
+          <div
+            className={cn(handleClasses, "cursor-nwse-resize")}
+            style={{ top: -14, left: -14 }}
+            onPointerDown={(e) => onResizeStart("nw", e)}
+            aria-label={`Resize ${space.name} from top-left`}
+          />
+          <div
+            className={cn(handleClasses, "cursor-nesw-resize")}
+            style={{ top: -14, right: -14 }}
+            onPointerDown={(e) => onResizeStart("ne", e)}
+            aria-label={`Resize ${space.name} from top-right`}
+          />
+          <div
+            className={cn(handleClasses, "cursor-nesw-resize")}
+            style={{ bottom: -14, left: -14 }}
+            onPointerDown={(e) => onResizeStart("sw", e)}
+            aria-label={`Resize ${space.name} from bottom-left`}
+          />
+          <div
+            className={cn(handleClasses, "cursor-nwse-resize")}
+            style={{ bottom: -14, right: -14 }}
+            onPointerDown={(e) => onResizeStart("se", e)}
+            aria-label={`Resize ${space.name} from bottom-right`}
+          />
+        </>
+      )}
     </div>
   );
 };
