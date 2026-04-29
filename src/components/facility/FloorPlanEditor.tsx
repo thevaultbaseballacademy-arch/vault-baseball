@@ -228,10 +228,10 @@ export const FloorPlanEditor = () => {
     return () => clearInterval(t);
   }, [savedAt]);
 
-  // Wrap a position write so we (a) track in-flight count for undo gating and
-  // (b) only set savedAt on real server confirmation, not on optimistic update.
-  const persistMove = (
-    patch: { id: string; grid_x: number; grid_y: number },
+  // Wrap a position/size write so we (a) track in-flight count for undo gating
+  // and (b) only set savedAt on real server confirmation, not on optimistic update.
+  const persistRect = (
+    patch: { id: string; grid_x: number; grid_y: number; grid_w?: number; grid_h?: number },
   ): Promise<void> => {
     setPendingWrites((n) => n + 1);
     return new Promise((resolve) => {
@@ -306,11 +306,12 @@ export const FloorPlanEditor = () => {
     redoStack.current = [];
     forceRender((n) => n + 1);
 
-    persistMove({ id: activeSpace.id, grid_x: cell.x, grid_y: cell.y });
+    persistRect({ id: activeSpace.id, grid_x: cell.x, grid_y: cell.y });
   };
 
   // Undo/redo gate on in-flight writes: prevents the classic
-  // "drag → drag → undo → late write clobbers undo" race.
+  // "drag → drag → undo → late write clobbers undo" race. Each entry is one
+  // atomic action — drag-move OR resize — so a single ⌘Z reverts the whole gesture.
   const undo = async () => {
     if (pendingWrites > 0) return;
     const entry = undoStack.current[undoStack.current.length - 1];
@@ -318,7 +319,13 @@ export const FloorPlanEditor = () => {
     undoStack.current = undoStack.current.slice(0, -1);
     redoStack.current = [...redoStack.current, entry];
     forceRender((n) => n + 1);
-    await persistMove({ id: entry.id, grid_x: entry.from.x, grid_y: entry.from.y });
+    await persistRect({
+      id: entry.id,
+      grid_x: entry.from.x,
+      grid_y: entry.from.y,
+      grid_w: entry.from.w,
+      grid_h: entry.from.h,
+    });
   };
 
   const redo = async () => {
@@ -328,7 +335,13 @@ export const FloorPlanEditor = () => {
     redoStack.current = redoStack.current.slice(0, -1);
     undoStack.current = [...undoStack.current, entry];
     forceRender((n) => n + 1);
-    await persistMove({ id: entry.id, grid_x: entry.to.x, grid_y: entry.to.y });
+    await persistRect({
+      id: entry.id,
+      grid_x: entry.to.x,
+      grid_y: entry.to.y,
+      grid_w: entry.to.w,
+      grid_h: entry.to.h,
+    });
   };
 
   const openEdit = (s: Partial<FacilitySpace> | null) => {
