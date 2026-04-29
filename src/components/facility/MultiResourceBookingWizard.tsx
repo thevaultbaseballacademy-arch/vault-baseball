@@ -656,7 +656,8 @@ export const MultiResourceBookingWizard = ({
         onOpenChange(false);
       } else {
         // Conflict — keep state, surface specific resources
-        setConflicts(result.conflicts);
+        const failure = result as Extract<typeof result, { success: false }>;
+        setConflicts(failure.conflicts);
         // Drop the no-longer-valid slot so the user must repick
         setState((s) => ({ ...s, slot: null }));
       }
