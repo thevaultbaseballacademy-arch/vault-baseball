@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { setGlobalReconnecting } from "@/hooks/useAuth";
 
 /**
  * Mobile/iOS Safari fix: when the tab returns to the foreground (screenshot,
@@ -31,6 +32,7 @@ const SessionVisibilityRefresh = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session || force) {
           setReconnecting(true);
+          setGlobalReconnecting(true);
           await supabase.auth.refreshSession();
         }
       } catch {
@@ -38,6 +40,7 @@ const SessionVisibilityRefresh = () => {
       } finally {
         inFlight = false;
         setReconnecting(false);
+        setGlobalReconnecting(false);
       }
     };
 
