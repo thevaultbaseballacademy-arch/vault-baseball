@@ -144,17 +144,23 @@ const Auth = () => {
       if (isLogin) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        
-        const { data: factors } = await supabase.auth.mfa.listFactors();
-        const verifiedFactors = factors?.totp?.filter(f => f.status === "verified") || [];
-        
+
+        // MFA factor lookup is bounded — if it stalls we proceed without MFA prompt rather than hang.
+        const factorsRes: any = await withTimeout(
+          Promise.resolve(supabase.auth.mfa.listFactors()),
+          5000,
+          "mfa.listFactors"
+        );
+        const verifiedFactors = factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
+
         if (verifiedFactors.length > 0 && data.user) {
           setMfaRequired(true);
           setMfaFactorId(verifiedFactors[0].id);
           setMfaUserId(data.user.id);
           toast({ title: "2FA Required", description: "Please enter your authentication code." });
         } else {
-          await recordSession();
+          // Fire-and-forget: don't block navigation on session telemetry write
+          recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
           toast({ title: "Welcome back!", description: "You're signed in." });
           if (data.user) {
             await routeByRole(data.user.id);
