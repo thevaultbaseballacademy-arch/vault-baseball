@@ -444,7 +444,7 @@ export const FloorPlanEditor = () => {
 
         <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
           <p className="text-[10px] text-muted-foreground">
-            Tip: drag to move · pencil to edit · ⌘Z to undo
+            Drag to move · tap pencil to edit · ⌘Z undo · A add · ⌫ delete selected
           </p>
           {savedLabel && (
             <span className="sm:hidden inline-flex items-center gap-1 text-[10px] text-muted-foreground">
