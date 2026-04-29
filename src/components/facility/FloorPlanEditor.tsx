@@ -9,11 +9,13 @@ import {
   type DragEndEvent,
   type DragMoveEvent,
 } from "@dnd-kit/core";
-import { Plus, Edit3, Undo2, Redo2, CheckCircle2 } from "lucide-react";
+import { Plus, Edit3, Undo2, Redo2, CheckCircle2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   useFacilitySpaces,
   useUpdateSpacePosition,
+  useDeleteSpace,
   type FacilitySpace,
 } from "@/hooks/useFacilitySchedule";
 import { SpaceFormDialog } from "./SpaceFormDialog";
