@@ -75,6 +75,21 @@ const Auth = () => {
     }
   };
 
+  /** Race a promise against a timeout. Returns null on timeout/error so callers never hang. */
+  const withTimeout = <T,>(p: Promise<T>, ms: number, label: string): Promise<T | null> =>
+    Promise.race([
+      p.catch((e) => {
+        console.warn(`[auth] ${label} failed:`, e);
+        return null as any;
+      }),
+      new Promise<null>((resolve) =>
+        setTimeout(() => {
+          console.warn(`[auth] ${label} timed out after ${ms}ms`);
+          resolve(null);
+        }, ms)
+      ),
+    ]);
+
   /** Route user to the correct dashboard based on their role */
   const routeByRole = async (userId: string) => {
     const from = (location.state as any)?.from?.pathname;
@@ -83,19 +98,21 @@ const Auth = () => {
       return;
     }
 
-    // Check user_roles table for role
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
+    // Check user_roles table for role — bounded so a stalled query can't hang login
+    const result = await withTimeout(
+      Promise.resolve(supabase.from("user_roles").select("role").eq("user_id", userId)),
+      5000,
+      "user_roles lookup"
+    );
 
-    const userRoles = roles?.map(r => r.role) || [];
-    
+    const userRoles = (result as any)?.data?.map((r: any) => r.role) || [];
+
     if (userRoles.includes("admin")) {
       navigate("/admin", { replace: true });
     } else if (userRoles.includes("coach")) {
       navigate("/coach-dashboard", { replace: true });
     } else {
+      // Safe default — Dashboard further routes based on profile/role if needed
       navigate("/dashboard", { replace: true });
     }
   };
@@ -127,17 +144,23 @@ const Auth = () => {
       if (isLogin) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        
-        const { data: factors } = await supabase.auth.mfa.listFactors();
-        const verifiedFactors = factors?.totp?.filter(f => f.status === "verified") || [];
-        
+
+        // MFA factor lookup is bounded — if it stalls we proceed without MFA prompt rather than hang.
+        const factorsRes: any = await withTimeout(
+          Promise.resolve(supabase.auth.mfa.listFactors()),
+          5000,
+          "mfa.listFactors"
+        );
+        const verifiedFactors = factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
+
         if (verifiedFactors.length > 0 && data.user) {
           setMfaRequired(true);
           setMfaFactorId(verifiedFactors[0].id);
           setMfaUserId(data.user.id);
           toast({ title: "2FA Required", description: "Please enter your authentication code." });
         } else {
-          await recordSession();
+          // Fire-and-forget: don't block navigation on session telemetry write
+          recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
           toast({ title: "Welcome back!", description: "You're signed in." });
           if (data.user) {
             await routeByRole(data.user.id);
