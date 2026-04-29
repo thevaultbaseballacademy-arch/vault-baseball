@@ -609,10 +609,13 @@ export const FloorPlanEditor = () => {
               <DraggableSpace
                 key={s.id}
                 space={s}
-                invalid={collision && s.id === activeId}
+                invalid={(collision && s.id === activeId) || (resizeCollision && s.id === resizeId)}
                 selected={selectedId === s.id}
+                resizing={resizeId === s.id}
+                resizePreview={resizeId === s.id ? resizePreview : null}
                 onSelect={() => setSelectedId(s.id)}
                 onEdit={() => openEdit(s)}
+                onResizeStart={(corner, e) => handleResizeStart(s.id, corner, e)}
               />
             ))}
 
