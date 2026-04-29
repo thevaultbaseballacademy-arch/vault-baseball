@@ -16,6 +16,7 @@ export type FacilitySpace = {
   notes: string | null;
   is_active: boolean;
   display_order: number;
+  type_id: string | null;
 };
 
 export type FacilityHours = {
