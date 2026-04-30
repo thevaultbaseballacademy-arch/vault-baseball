@@ -72,32 +72,16 @@ const Auth = () => {
   };
 
   useEffect(() => {
+    // If a session already exists when landing on /auth, route immediately.
+    // Do NOT call mfa.getAuthenticatorAssuranceLevel() here — it hits GoTrue's
+    // /user endpoint which has been observed taking 9+ seconds and locks the UI.
+    // MFA is enforced post-login inside handleSubmit instead.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) checkMFAStatus(session);
+      if (session?.user) {
+        routeByRole(session.user.id);
+      }
     });
   }, []);
-
-  const checkMFAStatus = async (session: any) => {
-    try {
-      const { data: { currentLevel } } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (currentLevel === "aal2") {
-        await routeByRole(session.user.id);
-      } else {
-        const { data: factors } = await supabase.auth.mfa.listFactors();
-        const verifiedFactors = factors?.totp?.filter(f => f.status === "verified") || [];
-        if (verifiedFactors.length > 0) {
-          setMfaRequired(true);
-          setMfaFactorId(verifiedFactors[0].id);
-          setMfaUserId(session.user.id);
-        } else {
-          await routeByRole(session.user.id);
-        }
-      }
-    } catch (error) {
-      const from = (location.state as any)?.from?.pathname || "/";
-      navigate(from, { replace: true });
-    }
-  };
 
   /** Race a promise against a timeout. Returns null on timeout/error so callers never hang. */
   const withTimeout = <T,>(p: Promise<T>, ms: number, label: string): Promise<T | null> =>
