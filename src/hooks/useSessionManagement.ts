@@ -17,7 +17,7 @@ interface UserSession {
 }
 
 // Parse user agent to extract browser and OS
-const parseUserAgent = (ua: string): { browser: string; os: string } => {
+export const parseUserAgent = (ua: string): { browser: string; os: string } => {
   let browser = "Unknown Browser";
   let os = "Unknown OS";
 
