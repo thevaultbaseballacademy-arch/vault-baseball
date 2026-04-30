@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { differenceInDays, differenceInHours } from 'date-fns';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { withTimeout } from '@/lib/queryTimeout';
 
 interface TrialStatus {
   isTrialUser: boolean;
@@ -20,6 +21,7 @@ export const useTrialStatus = (): TrialStatus => {
 
   const { data: trialData, isLoading: trialLoading } = useQuery({
     queryKey: ['trial-status', user?.id],
+    retry: false,
     queryFn: async () => {
       if (!user) return null;
 
@@ -29,25 +31,41 @@ export const useTrialStatus = (): TrialStatus => {
       }
 
       // Check for Founder's Access or vault_trial purchases
-      const { data: purchases } = await supabase
-        .from('user_purchases')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('status', 'completed')
-        .in('product_key', ['founders_access', 'vault_trial'])
-        .limit(1);
+      const { data: purchases } = await withTimeout(
+        () =>
+          Promise.resolve(
+            supabase
+              .from('user_purchases')
+              .select('id')
+              .eq('user_id', user.id)
+              .eq('status', 'completed')
+              .in('product_key', ['founders_access', 'vault_trial'])
+              .limit(1),
+          ),
+        4000,
+        'user_purchases lookup',
+        { data: [] as any[] } as any,
+      );
 
       if (purchases && purchases.length > 0) {
         return { fullMember: true } as const;
       }
 
       // Check for trial
-      const { data: trial } = await supabase
-        .from('user_trials')
-        .select('started_at, expires_at')
-        .eq('user_id', user.id)
-        .eq('trial_type', 'velocity_baseline')
-        .maybeSingle();
+      const { data: trial } = await withTimeout(
+        () =>
+          Promise.resolve(
+            supabase
+              .from('user_trials')
+              .select('started_at, expires_at')
+              .eq('user_id', user.id)
+              .eq('trial_type', 'velocity_baseline')
+              .maybeSingle(),
+          ),
+        4000,
+        'user_trials lookup',
+        { data: null } as any,
+      );
 
       if (trial) {
         return { trial } as const;
