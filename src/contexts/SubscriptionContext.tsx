@@ -36,6 +36,13 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const sessionRef = useRef<Session | null>(null);
   const userRef = useRef<User | null>(null);
 
+  const applySessionState = useCallback((nextSession: Session | null) => {
+    setSession(nextSession);
+    setUser(nextSession?.user ?? null);
+    sessionRef.current = nextSession;
+    userRef.current = nextSession?.user ?? null;
+  }, []);
+
   usePushNotifications(user?.id);
 
   const resetSubscriptionState = useCallback(() => {
@@ -97,10 +104,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     const syncSessionState = async (nextSession: Session | null) => {
       if (!active) return;
 
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
-      sessionRef.current = nextSession;
-      userRef.current = nextSession?.user ?? null;
+      applySessionState(nextSession);
 
       if (!nextSession?.access_token) {
         resetSubscriptionState();
@@ -108,11 +112,11 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      await checkSubscription(nextSession.access_token, nextSession.user?.email);
-
       if (active) {
         setIsLoading(false);
       }
+
+      void checkSubscription(nextSession.access_token, nextSession.user?.email);
     };
 
     const initializeAuth = async () => {
@@ -125,7 +129,15 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (event === "INITIAL_SESSION") return;
-      setIsLoading(true);
+      applySessionState(nextSession);
+
+      if (!nextSession?.access_token) {
+        resetSubscriptionState();
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(false);
       void syncSessionState(nextSession);
     });
 
@@ -140,7 +152,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       subscription.unsubscribe();
       clearInterval(interval);
     };
-  }, [checkSubscription, resetSubscriptionState]);
+  }, [applySessionState, checkSubscription, resetSubscriptionState]);
 
   return (
     <SubscriptionContext.Provider

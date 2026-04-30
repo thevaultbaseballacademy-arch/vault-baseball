@@ -12,7 +12,7 @@ import MFAVerify from "@/components/auth/MFAVerify";
 import LegalAgreements from "@/components/auth/LegalAgreements";
 import RoleSelector from "@/components/auth/RoleSelector";
 import SportSelector from "@/components/auth/SportSelector";
-import { useSessionManagement } from "@/hooks/useSessionManagement";
+import { parseUserAgent } from "@/hooks/useSessionManagement";
 import { SportType } from "@/lib/sportTypes";
 import { lovable } from "@/integrations/lovable";
 import vaultLogo from "@/assets/vault-logo-new.webp";
@@ -45,7 +45,31 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const { recordSession } = useSessionManagement();
+  const recordSession = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const userAgent = navigator.userAgent;
+      const { browser, os } = parseUserAgent(userAgent);
+      const sessionToken = session.access_token.substring(0, 32);
+
+      await supabase.from("user_sessions").upsert(
+        {
+          user_id: session.user.id,
+          session_token: sessionToken,
+          user_agent: userAgent,
+          browser,
+          os,
+          device_info: `${browser} on ${os}`,
+          last_active_at: new Date().toISOString(),
+        },
+        { onConflict: "session_token" },
+      );
+    } catch (error) {
+      console.error("Error recording session:", error);
+    }
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

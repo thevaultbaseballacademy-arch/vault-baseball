@@ -19,21 +19,21 @@ const AuthCallback = () => {
         }
 
         if (session?.user) {
-          // Check role to route correctly
-          const { data: roles } = await supabase
+          navigate("/dashboard", { replace: true });
+
+          supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", session.user.id);
+            .eq("user_id", session.user.id)
+            .then(({ data: roles }) => {
+              const userRoles = roles?.map(r => r.role) || [];
 
-          const userRoles = roles?.map(r => r.role) || [];
-
-          if (userRoles.includes("admin")) {
-            navigate("/admin", { replace: true });
-          } else if (userRoles.includes("coach")) {
-            navigate("/coach-dashboard", { replace: true });
-          } else {
-            navigate("/dashboard", { replace: true });
-          }
+              if (userRoles.includes("admin")) {
+                navigate("/admin", { replace: true });
+              } else if (userRoles.includes("coach")) {
+                navigate("/coach-dashboard", { replace: true });
+              }
+            });
         } else {
           navigate("/auth", { replace: true });
         }

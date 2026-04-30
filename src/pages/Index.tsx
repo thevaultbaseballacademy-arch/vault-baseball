@@ -38,16 +38,26 @@ const Index = () => {
       return;
     }
 
-    const { data: roleRow } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", uid)
-      .eq("role", "coach")
-      .maybeSingle();
+    setDashboardPath("/dashboard");
+    setDashboardLabel("My Dashboard");
 
-    const isCoach = !!roleRow;
-    setDashboardPath(isCoach ? "/coach-dashboard" : "/dashboard");
-    setDashboardLabel(isCoach ? "Coach Dashboard" : "My Dashboard");
+    void (async () => {
+      try {
+        const { data: roleRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", uid)
+          .eq("role", "coach")
+          .maybeSingle();
+
+        const isCoach = !!roleRow;
+        setDashboardPath(isCoach ? "/coach-dashboard" : "/dashboard");
+        setDashboardLabel(isCoach ? "Coach Dashboard" : "My Dashboard");
+      } catch {
+        setDashboardPath("/dashboard");
+        setDashboardLabel("My Dashboard");
+      }
+    })();
   };
 
   useEffect(() => {

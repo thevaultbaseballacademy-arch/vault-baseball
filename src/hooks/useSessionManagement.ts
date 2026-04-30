@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +17,7 @@ interface UserSession {
 }
 
 // Parse user agent to extract browser and OS
-const parseUserAgent = (ua: string): { browser: string; os: string } => {
+export const parseUserAgent = (ua: string): { browser: string; os: string } => {
   let browser = "Unknown Browser";
   let os = "Unknown OS";
 
@@ -207,10 +207,6 @@ export const useSessionManagement = () => {
       console.error("Error cleaning up session:", error);
     }
   }, []);
-
-  useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
 
   return {
     sessions,
