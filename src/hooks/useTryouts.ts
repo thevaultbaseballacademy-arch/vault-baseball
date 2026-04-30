@@ -4,23 +4,22 @@ import { toast } from "sonner";
 
 const PUBLIC_QUERY_TIMEOUT_MS = 6000;
 
-const runWithTimeout = async <T,>(
-  label: string,
-  queryFactory: (signal: AbortSignal) => Promise<T>,
-  timeoutMs = PUBLIC_QUERY_TIMEOUT_MS,
-) => {
-  const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(`${label} timed out`), timeoutMs);
+const runWithTimeout = async <T,>(label: string, promise: Promise<T>, timeoutMs = PUBLIC_QUERY_TIMEOUT_MS) => {
+  let timeoutId: number | undefined;
 
   try {
-    return await queryFactory(controller.signal);
-  } catch (error: any) {
-    if (error?.name === "AbortError") {
-      throw new Error(`${label} is taking too long. Please try again.`);
-    }
-    throw error;
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timeoutId = window.setTimeout(() => {
+          reject(new Error(`${label} is taking too long. Please try again.`));
+        }, timeoutMs);
+      }),
+    ]);
   } finally {
-    window.clearTimeout(timeoutId);
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
   }
 };
 
@@ -76,14 +75,14 @@ export const usePublicTryouts = () =>
   useQuery({
     queryKey: ["tryouts", "public"],
     queryFn: async () => {
-      const { data, error } = await runWithTimeout("Loading tryouts", (signal) =>
+      const { data, error } = await runWithTimeout(
+        "Loading tryouts",
         supabase
           .from("tryout_events")
           .select("id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, waiver_text, status, coach_ids, created_at, updated_at")
           .eq("status", "published")
           .gt("starts_at", new Date().toISOString())
           .order("starts_at", { ascending: true })
-          .abortSignal(signal)
       );
       if (error) throw error;
       return (data ?? []) as TryoutEvent[];
@@ -96,7 +95,8 @@ export const usePublicTryout = (id?: string) =>
     queryKey: ["tryouts", "public", id],
     enabled: !!id,
     queryFn: async () => {
-      const { data, error } = await runWithTimeout("Loading registration form", (signal) =>
+      const { data, error } = await runWithTimeout(
+        "Loading registration form",
         supabase
           .from("tryout_events")
           .select("id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, waiver_text, status, coach_ids, created_at, updated_at")
@@ -104,7 +104,6 @@ export const usePublicTryout = (id?: string) =>
           .eq("status", "published")
           .gt("starts_at", new Date().toISOString())
           .maybeSingle()
-          .abortSignal(signal)
       );
       if (error) throw error;
       return data as TryoutEvent | null;
@@ -118,21 +117,21 @@ export const useTryoutCounts = (id?: string) =>
     enabled: !!id,
     queryFn: async () => {
       const [{ count: filled }, { count: waitlisted }] = await Promise.all([
-        runWithTimeout("Loading tryout counts", (signal) =>
+        runWithTimeout(
+          "Loading tryout counts",
           supabase
             .from("tryout_registrations")
             .select("id", { count: "exact", head: true })
             .eq("event_id", id!)
             .in("status", ["confirmed", "pending"])
-            .abortSignal(signal)
         ),
-        runWithTimeout("Loading waitlist counts", (signal) =>
+        runWithTimeout(
+          "Loading waitlist counts",
           supabase
             .from("tryout_registrations")
             .select("id", { count: "exact", head: true })
             .eq("event_id", id!)
             .eq("status", "waitlisted")
-            .abortSignal(signal)
         ),
       ]);
       return { filled: filled ?? 0, waitlisted: waitlisted ?? 0 };
