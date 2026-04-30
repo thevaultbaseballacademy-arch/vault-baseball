@@ -74,6 +74,7 @@ export interface TryoutRegistration {
 export const usePublicTryouts = () =>
   useQuery({
     queryKey: ["tryouts", "public"],
+    retry: false,
     queryFn: async () => {
       const { data, error } = await runWithTimeout("Loading tryouts", async () =>
         await supabase
@@ -93,6 +94,7 @@ export const usePublicTryout = (id?: string) =>
   useQuery({
     queryKey: ["tryouts", "public", id],
     enabled: !!id,
+    retry: false,
     queryFn: async () => {
       const { data, error } = await runWithTimeout("Loading registration form", async () =>
         await supabase
@@ -113,6 +115,7 @@ export const useTryoutCounts = (id?: string) =>
   useQuery({
     queryKey: ["tryouts", "counts", id],
     enabled: !!id,
+    retry: false,
     queryFn: async () => {
       const [{ count: filled }, { count: waitlisted }] = await Promise.all([
         runWithTimeout("Loading tryout counts", async () =>
