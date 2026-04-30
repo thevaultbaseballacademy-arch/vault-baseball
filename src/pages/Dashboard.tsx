@@ -143,13 +143,7 @@ const Dashboard = () => {
     totalMinutes: checkins.reduce((sum, c) => sum + (c.training_duration_minutes || 0), 0),
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  // (Removed duplicate spinner — initial loading handled above.)
 
   return (
     <div className="min-h-screen bg-background">

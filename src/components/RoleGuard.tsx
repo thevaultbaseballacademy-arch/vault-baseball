@@ -2,7 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Permission, VaultRole } from "@/lib/permissions";
 import { useRoleAuth } from "@/hooks/useRoleAuth";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface RoleGuardProps {
@@ -18,11 +18,19 @@ interface RoleGuardProps {
 /**
  * Route guard that enforces permission-based access.
  * Logs 403 denials to access_denied_logs for owner audit visibility.
+ * Hard 4s ceiling on the spinner so a slow role lookup never traps users.
  */
 const RoleGuard = ({ children, requires, requiresRole, fallback }: RoleGuardProps) => {
   const { user, can, roles, isLoading } = useRoleAuth();
   const location = useLocation();
   const logged = useRef(false);
+
+  const [forceDecide, setForceDecide] = useState(false);
+  useEffect(() => {
+    if (!isLoading) return;
+    const t = window.setTimeout(() => setForceDecide(true), 4000);
+    return () => window.clearTimeout(t);
+  }, [isLoading]);
 
   const isAuthorized = (() => {
     if (!user) return false;
@@ -48,7 +56,7 @@ const RoleGuard = ({ children, requires, requiresRole, fallback }: RoleGuardProp
       });
   }, [isLoading, user, isAuthorized, location.pathname, requires, requiresRole]);
 
-  if (isLoading) {
+  if (isLoading && !forceDecide) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
