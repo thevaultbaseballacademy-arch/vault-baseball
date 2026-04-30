@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, Send, X, Minimize2, Trash2, ArrowRight } from "lucide-react";
 import { useEddieChat } from "@/hooks/useEddieChat";
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
 // ── Product CTA detection & rendering ──
@@ -106,6 +106,7 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
   const { messages, isLoading, error, sendMessage, clearChat, injectMessage, sport } = useEddieChat();
   const [chatInput, setChatInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
 
   const isSoftball = sport === "softball";
 
@@ -145,8 +146,12 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
     setShowQuickPrompts(false);
   };
 
-  // Hide on /contact
-  if (typeof window !== "undefined" && window.location.pathname === "/contact") return null;
+  const shouldHideFloatingWidget =
+    location.pathname === "/contact" ||
+    location.pathname === "/auth" ||
+    location.pathname.startsWith("/tryouts");
+
+  if (shouldHideFloatingWidget) return null;
 
   const quickStarters = isSoftball ? SOFTBALL_QUICK_STARTERS : BASEBALL_QUICK_STARTERS;
   const quickPrompts = isSoftball ? SOFTBALL_QUICK_PROMPTS : BASEBALL_QUICK_PROMPTS;
@@ -157,7 +162,7 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
       {!isOpen && (
         <button
           onClick={handleOpen}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-5 py-3 bg-foreground text-background shadow-lg hover:bg-foreground/90 transition-all hover:scale-[1.03] active:scale-95 font-display text-base tracking-wider"
+          className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-50 flex items-center gap-2.5 px-5 py-3 bg-foreground text-background shadow-lg hover:bg-foreground/90 transition-all hover:scale-[1.03] active:scale-95 font-display text-base tracking-wider"
           aria-label="Ask Eddie AI"
         >
           <MessageCircle className="h-5 w-5" />
@@ -169,7 +174,7 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
       {isOpen && (
         <div
           className={cn(
-            "fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bg-card border border-border shadow-2xl transition-all duration-200 overflow-hidden flex flex-col",
+            "fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-50 bg-card border border-border shadow-2xl transition-all duration-200 overflow-hidden flex flex-col",
             isMinimized
               ? "w-72 h-14"
               : "w-[calc(100vw-32px)] sm:w-[400px] h-[calc(100svh-100px)] sm:h-[580px] max-h-[85vh]"

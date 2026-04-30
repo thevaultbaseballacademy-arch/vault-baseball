@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Loader2, ArrowLeft, CheckCircle2, MapPin, Calendar } from "lucide-react";
 import { z } from "zod";
@@ -44,7 +44,7 @@ const STORAGE_KEY = (id: string) => `tryout-form:${id}`;
 
 const POSITIONS = ["Pitcher", "Catcher", "Infield", "Outfield", "Utility"];
 
-const TryoutRegister = () => {
+const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: event, isLoading, isError, error, refetch, isFetching } = usePublicTryout(id);
@@ -395,7 +395,7 @@ const TryoutRegister = () => {
       </main>
     </div>
   );
-};
+});
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section className="space-y-4">
