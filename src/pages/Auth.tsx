@@ -98,10 +98,11 @@ const Auth = () => {
       return;
     }
 
-    // Check user_roles table for role — bounded so a stalled query can't hang login
+    // Tight 1.5s budget — if the role lookup stalls we ship the user to /dashboard
+    // immediately rather than hanging the login UI. Dashboard handles role nuance itself.
     const result = await withTimeout(
       Promise.resolve(supabase.from("user_roles").select("role").eq("user_id", userId)),
-      5000,
+      1500,
       "user_roles lookup"
     );
 
@@ -145,26 +146,29 @@ const Auth = () => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
-        // MFA factor lookup is bounded — if it stalls we proceed without MFA prompt rather than hang.
-        const factorsRes: any = await withTimeout(
-          Promise.resolve(supabase.auth.mfa.listFactors()),
-          5000,
-          "mfa.listFactors"
-        );
-        const verifiedFactors = factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
+        // Fire-and-forget telemetry — never block navigation
+        recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
+        toast({ title: "Welcome back!", description: "You're signed in." });
 
-        if (verifiedFactors.length > 0 && data.user) {
-          setMfaRequired(true);
-          setMfaFactorId(verifiedFactors[0].id);
-          setMfaUserId(data.user.id);
-          toast({ title: "2FA Required", description: "Please enter your authentication code." });
-        } else {
-          // Fire-and-forget: don't block navigation on session telemetry write
-          recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
-          toast({ title: "Welcome back!", description: "You're signed in." });
-          if (data.user) {
-            await routeByRole(data.user.id);
-          }
+        // Navigate immediately; MFA check runs in background and only intervenes if needed.
+        if (data.user) {
+          const userId = data.user.id;
+          // Kick off MFA check in parallel — if a verified factor exists, prompt for it.
+          // Tight 1.5s budget so a stalled GoTrue call cannot delay anything visible.
+          withTimeout(
+            Promise.resolve(supabase.auth.mfa.listFactors()),
+            1500,
+            "mfa.listFactors"
+          ).then((factorsRes: any) => {
+            const verifiedFactors =
+              factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
+            if (verifiedFactors.length > 0) {
+              setMfaRequired(true);
+              setMfaFactorId(verifiedFactors[0].id);
+              setMfaUserId(userId);
+            }
+          });
+          await routeByRole(userId);
         }
       } else {
         const { data: signUpData, error } = await supabase.auth.signUp({
