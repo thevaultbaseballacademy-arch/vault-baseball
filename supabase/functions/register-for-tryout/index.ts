@@ -2,6 +2,10 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { z } from "npm:zod@3.23.8";
 
+declare const EdgeRuntime: {
+  waitUntil: (promise: Promise<unknown>) => void;
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -35,6 +39,87 @@ function ageOn(dob: string, on: Date): number {
   const m = on.getMonth() - d.getMonth();
   if (m < 0 || (m === 0 && on.getDate() < d.getDate())) age--;
   return age;
+}
+
+async function sendRegistrationEmails({
+  supabase,
+  event,
+  inserted,
+  data,
+  age,
+  assignedStatus,
+  waitlistPosition,
+}: {
+  supabase: ReturnType<typeof createClient>;
+  event: { id: string; name: string; starts_at: string };
+  inserted: { id: string; cancel_token: string };
+  data: z.infer<typeof RegistrationSchema>;
+  age: number;
+  assignedStatus: "pending" | "waitlisted";
+  waitlistPosition: number | null;
+}) {
+  try {
+    const eventDate = new Date(event.starts_at).toLocaleString("en-US", {
+      weekday: "long", month: "long", day: "numeric",
+      timeZone: "America/New_York",
+    });
+    const eventTime = new Date(event.starts_at).toLocaleString("en-US", {
+      hour: "numeric", minute: "2-digit", timeZone: "America/New_York",
+    }) + " – 8:30 PM";
+    const cancelUrl = `https://vault-baseball.lovable.app/tryouts/cancel/${inserted.cancel_token}`;
+    const calendarUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/tryout-ics?event_id=${event.id}`;
+    const eventName = event.name ?? "Spring 2026 Tryout";
+    const confirmationNumber = inserted.id.slice(0, 8).toUpperCase();
+
+    await Promise.allSettled([
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "tryout-confirmation",
+          recipientEmail: data.parent_email.toLowerCase(),
+          idempotencyKey: `tryout-confirm-${inserted.id}`,
+          templateData: {
+            playerName: data.player_first_name,
+            parentName: data.parent_name,
+            eventName,
+            eventDate,
+            eventTime,
+            cancelUrl,
+            calendarUrl,
+            confirmationNumber,
+          },
+        },
+      }),
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "tryout-staff-notification",
+          recipientEmail: "staff@methods22.com",
+          idempotencyKey: `tryout-staff-${inserted.id}`,
+          templateData: {
+            playerName: `${data.player_first_name} ${data.player_last_name}`,
+            playerAge: age,
+            playerDob: data.player_dob,
+            throwingHand: data.player_throwing_hand,
+            position: data.player_position,
+            currentTeam: data.player_current_team,
+            parentName: data.parent_name,
+            parentEmail: data.parent_email.toLowerCase(),
+            parentPhone: data.parent_phone,
+            emergencyContactName: data.emergency_contact_name,
+            emergencyContactPhone: data.emergency_contact_phone,
+            emergencyRelationship: data.emergency_relationship,
+            medicalNotes: data.medical_notes,
+            eventName,
+            eventDate,
+            eventTime,
+            registrationStatus: assignedStatus,
+            waitlistPosition,
+          },
+        },
+      }),
+    ]);
+  } catch (emailErr) {
+    console.warn("Email dispatch failed", emailErr);
+  }
 }
 
 serve(async (req) => {
@@ -155,70 +240,21 @@ serve(async (req) => {
       });
     }
 
-    // Send confirmation email to parent + notification to staff (best-effort — never block registration)
-    try {
-      const eventDate = new Date(event.starts_at).toLocaleString("en-US", {
-        weekday: "long", month: "long", day: "numeric",
-        timeZone: "America/New_York",
-      });
-      const eventTime = new Date(event.starts_at).toLocaleString("en-US", {
-        hour: "numeric", minute: "2-digit", timeZone: "America/New_York",
-      }) + " – 8:30 PM";
-      const cancelUrl = `https://vault-baseball.lovable.app/tryouts/cancel/${inserted.cancel_token}`;
-      const calendarUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/tryout-ics?event_id=${event.id}`;
-      const eventName = (event as any).name ?? "Spring 2026 Tryout";
-      const confirmationNumber = inserted.id.slice(0, 8).toUpperCase();
-
-      // Parent confirmation
-      await supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "tryout-confirmation",
-          recipientEmail: data.parent_email.toLowerCase(),
-          idempotencyKey: `tryout-confirm-${inserted.id}`,
-          templateData: {
-            playerName: data.player_first_name,
-            parentName: data.parent_name,
-            eventName,
-            eventDate,
-            eventTime,
-            cancelUrl,
-            calendarUrl,
-            confirmationNumber,
-          },
+    EdgeRuntime.waitUntil(
+      sendRegistrationEmails({
+        supabase,
+        event: {
+          id: event.id,
+          name: event.name,
+          starts_at: event.starts_at,
         },
-      });
-
-      // Staff notification → staff@methods22.com
-      await supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "tryout-staff-notification",
-          recipientEmail: "staff@methods22.com",
-          idempotencyKey: `tryout-staff-${inserted.id}`,
-          templateData: {
-            playerName: `${data.player_first_name} ${data.player_last_name}`,
-            playerAge: age,
-            playerDob: data.player_dob,
-            throwingHand: data.player_throwing_hand,
-            position: data.player_position,
-            currentTeam: data.player_current_team,
-            parentName: data.parent_name,
-            parentEmail: data.parent_email.toLowerCase(),
-            parentPhone: data.parent_phone,
-            emergencyContactName: data.emergency_contact_name,
-            emergencyContactPhone: data.emergency_contact_phone,
-            emergencyRelationship: data.emergency_relationship,
-            medicalNotes: data.medical_notes,
-            eventName,
-            eventDate,
-            eventTime,
-            registrationStatus: assignedStatus,
-            waitlistPosition,
-          },
-        },
-      });
-    } catch (emailErr) {
-      console.warn("Email dispatch failed", emailErr);
-    }
+        inserted,
+        data,
+        age,
+        assignedStatus,
+        waitlistPosition,
+      }),
+    );
 
     return new Response(
       JSON.stringify({

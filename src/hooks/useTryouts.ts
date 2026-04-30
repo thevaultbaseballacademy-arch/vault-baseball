@@ -249,9 +249,14 @@ export const useUpdateRegistrationStatus = () => {
 };
 
 export const submitTryoutRegistration = async (payload: Record<string, unknown>) => {
-  const { data, error } = await supabase.functions.invoke("register-for-tryout", {
-    body: payload,
-  });
+  const { data, error } = await runWithTimeout(
+    "Submitting registration",
+    () =>
+      supabase.functions.invoke("register-for-tryout", {
+        body: payload,
+      }),
+    12000,
+  );
   if (error) throw new Error(error.message || "Registration failed");
   if (data?.error) throw new Error(data.error);
   return data as { success: true; registration_id: string; status: string; waitlist_position: number | null };

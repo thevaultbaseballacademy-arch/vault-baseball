@@ -71,6 +71,7 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<{ status: string; waitlist_position: number | null } | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Restore + persist progress
   useEffect(() => {
@@ -141,6 +142,7 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
       return;
     }
     setErrors({});
+    setSubmitError(null);
     setSubmitting(true);
     try {
       const result = await submitTryoutRegistration({
@@ -151,7 +153,9 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
       setSuccess({ status: result.status, waitlist_position: result.waitlist_position });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
-      toast.error(err?.message || "Could not submit registration");
+      const message = err?.message || "Could not submit registration";
+      setSubmitError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -384,6 +388,11 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
               <span className="text-sm text-muted-foreground">Total</span>
               <span className="text-2xl font-semibold">${(event.price_cents / 100).toFixed(2)}</span>
             </div>
+            {submitError && (
+              <p className="text-sm text-destructive" role="alert">
+                {submitError}
+              </p>
+            )}
             <p className="text-xs text-muted-foreground">
               Payment will be collected after submission. You'll receive an email with details.
             </p>
