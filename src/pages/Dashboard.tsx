@@ -21,6 +21,7 @@ import DevelopmentIntelligence from "@/components/intelligence/DevelopmentIntell
 import ActivationChecklist from "@/components/dashboard/ActivationChecklist";
 import UpsellCards from "@/components/dashboard/UpsellCards";
 import { useOnboardingActivation } from "@/hooks/useOnboardingActivation";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import {
   LineChart,
   Line,
@@ -49,8 +50,8 @@ interface CheckinData {
 }
 
 const Dashboard = () => {
+  const { user: authedUser, isLoading: authLoading } = useSubscription();
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
   const [checkins, setCheckins] = useState<CheckinData[]>([]);
   const [timeRange, setTimeRange] = useState<7 | 14 | 30>(14);
   const navigate = useNavigate();
@@ -59,30 +60,15 @@ const Dashboard = () => {
   useOnboardingActivation(user?.id);
 
   useEffect(() => {
-    const safetyTimeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
-      setUser(session.user);
-      setLoading(false);
-    });
+    if (authLoading) return;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
-        navigate("/auth");
-      }
-      setUser(session?.user ?? null);
-    });
+    if (!authedUser) {
+      navigate("/auth");
+      return;
+    }
 
-    clearTimeout(safetyTimeout);
-
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    setUser(authedUser);
+  }, [authLoading, authedUser, navigate]);
 
   useEffect(() => {
     if (user) {
@@ -107,6 +93,20 @@ const Dashboard = () => {
       console.error('Error fetching checkins:', error);
     }
   };
+
+  const loading = authLoading && !user;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
