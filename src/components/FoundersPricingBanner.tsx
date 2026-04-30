@@ -12,6 +12,9 @@ export const FoundersPricingBanner = ({ endDate }: FoundersPricingBannerProps) =
   const [isVisible, setIsVisible] = useState(true);
   const [timeLeft, setTimeLeft] = useState("");
   const navigate = useNavigate();
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+
+  const shouldHideBanner = pathname === "/auth" || pathname.startsWith("/tryouts");
 
   // Calculate next Wednesday EOD if no endDate provided
   const getNextWednesday = () => {
@@ -70,6 +73,8 @@ export const FoundersPricingBanner = ({ endDate }: FoundersPricingBannerProps) =
   const handleUpgrade = () => {
     navigate('/products/founders-access');
   };
+
+  if (shouldHideBanner) return null;
 
   return (
     <AnimatePresence>
