@@ -3,36 +3,58 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { VaultRole, Permission, hasPermission, getPrimaryRole, getDashboardRoute } from "@/lib/permissions";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { withTimeout } from "@/lib/queryTimeout";
 
 /**
  * Unified hook for role-based auth. Uses React Query for caching.
+ * Each Supabase call is wrapped in a 4s timeout with a safe fallback so a
+ * stalled REST call cannot trap the user on a global spinner.
  */
 export const useRoleAuth = () => {
   const { user, isLoading: authLoading } = useSubscription();
 
   const { data, isLoading: rolesLoading } = useQuery({
     queryKey: ["user-roles", user?.id],
+    retry: false,
     queryFn: async () => {
       if (!user) return { roles: [] as VaultRole[] };
 
       const [rolesResult, whitelistResult, coachResult] = await Promise.all([
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id),
+        withTimeout(
+          () => Promise.resolve(supabase.from("user_roles").select("role").eq("user_id", user.id)),
+          4000,
+          "user_roles lookup",
+          { data: [] as { role: string }[] } as any,
+        ),
         user.email
-          ? supabase
-              .from("team_whitelist")
-              .select("admin_access, full_access")
-              .eq("email", user.email.toLowerCase())
-              .maybeSingle()
-          : Promise.resolve({ data: null }),
-        supabase
-          .from("coaches")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("status", "Active")
-          .maybeSingle(),
+          ? withTimeout(
+              () =>
+                Promise.resolve(
+                  supabase
+                    .from("team_whitelist")
+                    .select("admin_access, full_access")
+                    .eq("email", user.email!.toLowerCase())
+                    .maybeSingle(),
+                ),
+              4000,
+              "team_whitelist lookup",
+              { data: null } as any,
+            )
+          : Promise.resolve({ data: null } as any),
+        withTimeout(
+          () =>
+            Promise.resolve(
+              supabase
+                .from("coaches")
+                .select("id")
+                .eq("user_id", user.id)
+                .eq("status", "Active")
+                .maybeSingle(),
+            ),
+          4000,
+          "coaches lookup",
+          { data: null } as any,
+        ),
       ]);
 
       const roles: VaultRole[] = (rolesResult.data || [])
