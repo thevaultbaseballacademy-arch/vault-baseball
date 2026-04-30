@@ -98,10 +98,11 @@ const Auth = () => {
       return;
     }
 
-    // Check user_roles table for role — bounded so a stalled query can't hang login
+    // Tight 1.5s budget — if the role lookup stalls we ship the user to /dashboard
+    // immediately rather than hanging the login UI. Dashboard handles role nuance itself.
     const result = await withTimeout(
       Promise.resolve(supabase.from("user_roles").select("role").eq("user_id", userId)),
-      5000,
+      1500,
       "user_roles lookup"
     );
 
