@@ -47,7 +47,7 @@ const POSITIONS = ["Pitcher", "Catcher", "Infield", "Outfield", "Utility"];
 const TryoutRegister = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: event, isLoading } = usePublicTryout(id);
+  const { data: event, isLoading, isError, error, refetch, isFetching } = usePublicTryout(id);
 
   const [values, setValues] = useState<FormValues>({
     player_first_name: "",
@@ -161,6 +161,28 @@ const TryoutRegister = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="py-10 text-center space-y-4">
+            <h1 className="text-2xl font-display tracking-wide">Registration is loading slowly</h1>
+            <p className="text-sm text-muted-foreground">
+              {(error as Error | null)?.message || "Please try again."}
+            </p>
+            <div className="flex flex-col gap-3">
+              <Button onClick={() => refetch()} disabled={isFetching}>
+                {isFetching ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                Retry
+              </Button>
+              <Button asChild variant="outline"><Link to="/tryouts">Back to Tryouts</Link></Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

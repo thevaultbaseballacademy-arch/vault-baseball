@@ -2,6 +2,27 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const PUBLIC_QUERY_TIMEOUT_MS = 6000;
+
+const runWithTimeout = async <T,>(label: string, task: () => Promise<T>, timeoutMs = PUBLIC_QUERY_TIMEOUT_MS) => {
+  let timeoutId: number | undefined;
+
+  try {
+    return await Promise.race([
+      task(),
+      new Promise<T>((_, reject) => {
+        timeoutId = window.setTimeout(() => {
+          reject(new Error(`${label} is taking too long. Please try again.`));
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+  }
+};
+
 export type TryoutAgeGroup = "9-12" | "13-17";
 export type TryoutStatus = "draft" | "published" | "closed";
 
@@ -53,13 +74,16 @@ export interface TryoutRegistration {
 export const usePublicTryouts = () =>
   useQuery({
     queryKey: ["tryouts", "public"],
+    retry: false,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("tryout_events")
-        .select("*")
-        .eq("status", "published")
-        .gt("starts_at", new Date().toISOString())
-        .order("starts_at", { ascending: true });
+      const { data, error } = await runWithTimeout("Loading tryouts", async () =>
+        await supabase
+          .from("tryout_events")
+          .select("id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, waiver_text, status, coach_ids, created_at, updated_at")
+          .eq("status", "published")
+          .gt("starts_at", new Date().toISOString())
+          .order("starts_at", { ascending: true })
+      );
       if (error) throw error;
       return (data ?? []) as TryoutEvent[];
     },
@@ -70,14 +94,17 @@ export const usePublicTryout = (id?: string) =>
   useQuery({
     queryKey: ["tryouts", "public", id],
     enabled: !!id,
+    retry: false,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("tryout_events")
-        .select("*")
-        .eq("id", id!)
-        .eq("status", "published")
-        .gt("starts_at", new Date().toISOString())
-        .maybeSingle();
+      const { data, error } = await runWithTimeout("Loading registration form", async () =>
+        await supabase
+          .from("tryout_events")
+          .select("id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, waiver_text, status, coach_ids, created_at, updated_at")
+          .eq("id", id!)
+          .eq("status", "published")
+          .gt("starts_at", new Date().toISOString())
+          .maybeSingle()
+      );
       if (error) throw error;
       return data as TryoutEvent | null;
     },
@@ -88,17 +115,24 @@ export const useTryoutCounts = (id?: string) =>
   useQuery({
     queryKey: ["tryouts", "counts", id],
     enabled: !!id,
+    retry: false,
     queryFn: async () => {
-      const { count: filled } = await supabase
-        .from("tryout_registrations")
-        .select("id", { count: "exact", head: true })
-        .eq("event_id", id!)
-        .in("status", ["confirmed", "pending"]);
-      const { count: waitlisted } = await supabase
-        .from("tryout_registrations")
-        .select("id", { count: "exact", head: true })
-        .eq("event_id", id!)
-        .eq("status", "waitlisted");
+      const [{ count: filled }, { count: waitlisted }] = await Promise.all([
+        runWithTimeout("Loading tryout counts", async () =>
+          await supabase
+            .from("tryout_registrations")
+            .select("id", { count: "exact", head: true })
+            .eq("event_id", id!)
+            .in("status", ["confirmed", "pending"])
+        ),
+        runWithTimeout("Loading waitlist counts", async () =>
+          await supabase
+            .from("tryout_registrations")
+            .select("id", { count: "exact", head: true })
+            .eq("event_id", id!)
+            .eq("status", "waitlisted")
+        ),
+      ]);
       return { filled: filled ?? 0, waitlisted: waitlisted ?? 0 };
     },
   });

@@ -28,7 +28,7 @@ const setMeta = (selector: string, attr: string, name: string, content: string) 
 };
 
 const Tryouts = () => {
-  const { data: events, isLoading } = usePublicTryouts();
+  const { data: events, isLoading, isError, error, refetch, isFetching } = usePublicTryouts();
   const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
@@ -48,6 +48,29 @@ const Tryouts = () => {
     if (filter === "all") return events;
     return events.filter((e) => e.age_group === filter);
   }, [events, filter]);
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="max-w-3xl mx-auto px-4 pt-28 pb-12">
+          <Card>
+            <CardContent className="p-8 text-center space-y-4">
+              <h1 className="text-2xl font-display tracking-wide">Tryouts are loading slowly</h1>
+              <p className="text-sm text-muted-foreground">
+                {(error as Error | null)?.message || "Please try again."}
+              </p>
+              <Button onClick={() => refetch()} disabled={isFetching}>
+                {isFetching ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                Retry
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   // Off-season: no published events → show interest capture instead
   if (!isLoading && (!events || events.length === 0)) {
