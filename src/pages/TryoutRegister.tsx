@@ -266,7 +266,7 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
               <p className="text-sm text-muted-foreground">
                 {success.status === "waitlisted"
                   ? `You're #${success.waitlist_position} on the waitlist for ${event.name}. We'll email you if a spot opens.`
-                  : `Your registration for ${event.name} is in. Payment and confirmation details will be sent to your email shortly.`}
+                  : `Your spot for ${event.name} is reserved. A confirmation email is on the way with all the event details.`}
               </p>
               <div className="border border-border p-4 text-left text-sm space-y-1.5">
                 <div className="font-medium">{event.name}</div>
