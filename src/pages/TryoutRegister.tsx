@@ -406,6 +406,8 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
   );
 });
 
+TryoutRegister.displayName = "TryoutRegister";
+
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section className="space-y-4">
     <h2 className="text-xs uppercase tracking-widest text-muted-foreground border-b border-border pb-2">{title}</h2>
