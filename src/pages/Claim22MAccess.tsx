@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Loader2, CheckCircle, XCircle, Trophy, Zap, Video, BarChart3, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { isGloballyReconnecting } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
