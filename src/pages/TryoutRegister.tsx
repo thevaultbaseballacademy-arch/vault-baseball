@@ -302,7 +302,7 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
           </Button>
           <div className="min-w-0">
             <div className="text-sm font-medium truncate">{event.name}</div>
-            <div className="text-[11px] text-muted-foreground">Ages {event.age_group} · ${(event.price_cents / 100).toFixed(0)}</div>
+            <div className="text-[11px] text-muted-foreground">Ages {event.age_group} · Free</div>
           </div>
         </div>
       </header>
