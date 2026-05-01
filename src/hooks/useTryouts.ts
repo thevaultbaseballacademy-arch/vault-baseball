@@ -148,7 +148,9 @@ export const usePublicTryout = (id?: string) =>
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
     refetchOnReconnect: true,
+    staleTime: 1000 * 60 * 5,
     initialData: () => (id ? readCache<TryoutEvent | null>(PUBLIC_TRYOUT_CACHE_KEY(id)) : undefined),
+    placeholderData: (previousData) => previousData,
     queryFn: async () => {
       try {
         const { data, error } = await withTimeout(() =>

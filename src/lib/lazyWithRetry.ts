@@ -15,10 +15,39 @@ export function lazyWithRetry<T extends ComponentType<any>>(
   factory: () => Promise<{ default: T }>,
 ): React.LazyExoticComponent<T> {
   return lazy(async () => {
+    const readReloadFlag = () => {
+      try {
+        return window.sessionStorage.getItem(RELOAD_FLAG);
+      } catch {
+        return window.name.includes(RELOAD_FLAG) ? "1" : null;
+      }
+    };
+
+    const writeReloadFlag = () => {
+      try {
+        window.sessionStorage.setItem(RELOAD_FLAG, "1");
+      } catch {
+        if (!window.name.includes(RELOAD_FLAG)) {
+          window.name = `${window.name}${window.name ? "|" : ""}${RELOAD_FLAG}`;
+        }
+      }
+    };
+
+    const clearReloadFlag = () => {
+      try {
+        window.sessionStorage.removeItem(RELOAD_FLAG);
+      } catch {
+        window.name = window.name
+          .split("|")
+          .filter((part) => part && part !== RELOAD_FLAG)
+          .join("|");
+      }
+    };
+
     try {
       const mod = await factory();
       // Successful load — clear any prior reload flag
-      try { window.sessionStorage.removeItem(RELOAD_FLAG); } catch { /* ignore */ }
+      clearReloadFlag();
       return mod;
     } catch (err: any) {
       const message = String(err?.message || "");
@@ -34,21 +63,19 @@ export function lazyWithRetry<T extends ComponentType<any>>(
       try {
         await new Promise((r) => setTimeout(r, 400));
         const mod = await factory();
-        try { window.sessionStorage.removeItem(RELOAD_FLAG); } catch { /* ignore */ }
+        clearReloadFlag();
         return mod;
       } catch (retryErr) {
         // Hard reload once to pick up new asset hashes after a redeploy.
         // Guard with sessionStorage so we never enter a reload loop.
-        try {
-          const alreadyReloaded = window.sessionStorage.getItem(RELOAD_FLAG);
-          if (!alreadyReloaded) {
-            window.sessionStorage.setItem(RELOAD_FLAG, "1");
-            window.location.reload();
-            // Return a never-resolving promise so React doesn't render an error
-            // before the reload kicks in.
-            return new Promise<never>(() => {});
-          }
-        } catch { /* ignore storage errors */ }
+        const alreadyReloaded = readReloadFlag();
+        if (!alreadyReloaded) {
+          writeReloadFlag();
+          window.location.reload();
+          // Return a never-resolving promise so React doesn't render an error
+          // before the reload kicks in.
+          return new Promise<never>(() => {});
+        }
         throw retryErr;
       }
     }
