@@ -112,18 +112,12 @@ const Admin = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
+      if (!session?.user) { return; }
       setUser(session.user);
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
+      if (!session?.user) { return; }
       setUser(session.user);
       checkAdminRole(session.user.id);
     });

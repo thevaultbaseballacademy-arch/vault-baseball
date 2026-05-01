@@ -52,7 +52,7 @@ const RemoteTrainingHub = () => {
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { navigate("/auth"); return; }
+      if (!session?.user) { return; }
       setUser(session.user);
 
       // Fetch assigned coach

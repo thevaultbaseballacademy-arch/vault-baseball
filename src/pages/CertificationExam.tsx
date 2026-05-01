@@ -51,10 +51,7 @@ const CertificationExam = () => {
       setLoading(false);
     }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
+      if (!session?.user) { return; }
       setUser(session.user);
       setLoading(false);
     });

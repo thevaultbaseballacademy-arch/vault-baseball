@@ -22,7 +22,7 @@ export const useSoftballProfile = (): SoftballProfileContext => {
   useEffect(() => {
     const load = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { navigate("/auth"); return; }
+      if (!session?.user) { return; }
       setUser(session.user);
 
       const { data } = await supabase.from("profiles").select("*").eq("user_id", session.user.id).single();

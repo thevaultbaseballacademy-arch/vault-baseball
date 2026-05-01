@@ -39,17 +39,12 @@ const CoachManagement = () => {
       setLoading(false);
     }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
+      if (!session?.user) { return; }
       setUser(session.user);
       checkAuthorization(session.user.id);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) navigate("/auth");
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {});
 
     clearTimeout(safetyTimeout);
 

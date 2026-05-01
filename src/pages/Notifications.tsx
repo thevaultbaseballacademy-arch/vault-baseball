@@ -56,10 +56,7 @@ const Notifications = () => {
       setLoading(false);
     }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
+      if (!session?.user) { return; }
       setUserId(session.user.id);
     });
   }, [navigate]);
