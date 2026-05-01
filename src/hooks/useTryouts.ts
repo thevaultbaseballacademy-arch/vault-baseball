@@ -168,7 +168,7 @@ export const useTryoutCounts = (id?: string) =>
     retry: 1,
     refetchOnReconnect: true,
     queryFn: async () => {
-      const [{ count: filled }, { count: waitlisted }] = await Promise.all([
+      const [filledResponse, waitlistedResponse] = await Promise.all([
         supabase
           .from("tryout_registrations")
           .select("id", { count: "exact", head: true })
@@ -181,10 +181,13 @@ export const useTryoutCounts = (id?: string) =>
           .eq("status", "waitlisted"),
       ]);
 
-      if (filled.error) throw filled.error;
-      if (waitlisted.error) throw waitlisted.error;
+      if (filledResponse.error) throw filledResponse.error;
+      if (waitlistedResponse.error) throw waitlistedResponse.error;
 
-      return { filled: filled ?? 0, waitlisted: waitlisted ?? 0 };
+      return {
+        filled: filledResponse.count ?? 0,
+        waitlisted: waitlistedResponse.count ?? 0,
+      };
     },
   });
 
