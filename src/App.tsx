@@ -250,9 +250,9 @@ const App = () => (
             <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/checkin" element={<Checkin />} />
+            <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
+            <Route path="/schedule" element={<AuthGuard><Schedule /></AuthGuard>} />
+            <Route path="/checkin" element={<AuthGuard><Checkin /></AuthGuard>} />
             
             {/* Protected app routes with trial check */}
             <Route path="/dashboard" element={
