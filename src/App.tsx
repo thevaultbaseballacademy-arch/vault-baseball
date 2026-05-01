@@ -480,16 +480,16 @@ const App = () => (
                 <SoftballDevelopment />
               </TrialProtectedRoute>
             } />
-            <Route path="/softball/lessons/booking" element={<SoftballLessonBooking />} />
-            <Route path="/softball/lessons/coaches" element={<SoftballCoaches />} />
-            <Route path="/softball/lessons/notes" element={<SoftballLessonNotes />} />
-            <Route path="/softball/courses" element={<SoftballCourses />} />
-            <Route path="/softball/profile" element={<SoftballProfile />} />
-            <Route path="/softball/pitching" element={<SoftballPitching />} />
-            <Route path="/softball/hitting" element={<SoftballHitting />} />
-            <Route path="/softball/fielding" element={<SoftballFielding />} />
-            <Route path="/softball/analytics" element={<SoftballAnalytics />} />
-            <Route path="/softball/position-tracks" element={<SoftballPositionTracks />} />
+            <Route path="/softball/lessons/booking" element={<AuthGuard><SoftballLessonBooking /></AuthGuard>} />
+            <Route path="/softball/lessons/coaches" element={<AuthGuard><SoftballCoaches /></AuthGuard>} />
+            <Route path="/softball/lessons/notes" element={<AuthGuard><SoftballLessonNotes /></AuthGuard>} />
+            <Route path="/softball/courses" element={<AuthGuard><SoftballCourses /></AuthGuard>} />
+            <Route path="/softball/profile" element={<AuthGuard><SoftballProfile /></AuthGuard>} />
+            <Route path="/softball/pitching" element={<AuthGuard><SoftballPitching /></AuthGuard>} />
+            <Route path="/softball/hitting" element={<AuthGuard><SoftballHitting /></AuthGuard>} />
+            <Route path="/softball/fielding" element={<AuthGuard><SoftballFielding /></AuthGuard>} />
+            <Route path="/softball/analytics" element={<AuthGuard><SoftballAnalytics /></AuthGuard>} />
+            <Route path="/softball/position-tracks" element={<AuthGuard><SoftballPositionTracks /></AuthGuard>} />
             
             {/* Recruiting Readiness Engine */}
             <Route path="/recruiting" element={
