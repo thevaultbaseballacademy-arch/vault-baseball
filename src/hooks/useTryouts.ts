@@ -2,31 +2,44 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const PUBLIC_QUERY_TIMEOUT_MS = 6000;
+const TRYOUT_SUMMARY_SELECT = "id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, status, created_at, updated_at";
+const TRYOUT_DETAIL_SELECT = `${TRYOUT_SUMMARY_SELECT}, waiver_text, coach_ids`;
+const PUBLIC_TRYOUTS_CACHE_KEY = "public-tryouts:v2";
+const PUBLIC_TRYOUT_CACHE_KEY = (id: string) => `public-tryout:${id}:v2`;
 
-const runWithTimeout = async <T,>(label: string, task: () => Promise<T>, timeoutMs = PUBLIC_QUERY_TIMEOUT_MS) => {
-  let timeoutId: number | undefined;
+const isBrowser = typeof window !== "undefined";
+
+const readCache = <T,>(key: string) => {
+  if (!isBrowser) return undefined;
 
   try {
-    return await Promise.race([
-      task(),
-      new Promise<T>((_, reject) => {
-        timeoutId = window.setTimeout(() => {
-          reject(new Error(`${label} is taking too long. Please try again.`));
-        }, timeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timeoutId) {
-      window.clearTimeout(timeoutId);
-    }
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : undefined;
+  } catch {
+    return undefined;
   }
 };
+
+const writeCache = <T,>(key: string, value: T) => {
+  if (!isBrowser) return;
+
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Ignore storage quota / private mode failures.
+  }
+};
+
+const isUpcomingPublishedTryout = ({ starts_at, status }: { starts_at: string; status: string }) =>
+  status === "published" && new Date(starts_at).getTime() > Date.now();
+
+const sortByStartDate = <T extends { starts_at: string }>(events: T[]) =>
+  [...events].sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
 
 export type TryoutAgeGroup = "9-12" | "13-17";
 export type TryoutStatus = "draft" | "published" | "closed";
 
-export interface TryoutEvent {
+export interface TryoutEventSummary {
   id: string;
   name: string;
   age_group: TryoutAgeGroup;
@@ -39,11 +52,14 @@ export interface TryoutEvent {
   waitlist_capacity: number;
   description: string | null;
   what_to_bring: string | null;
-  waiver_text: string;
   status: TryoutStatus;
-  coach_ids: string[] | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface TryoutEvent extends TryoutEventSummary {
+  waiver_text: string;
+  coach_ids: string[] | null;
 }
 
 export interface TryoutRegistration {
@@ -74,18 +90,36 @@ export interface TryoutRegistration {
 export const usePublicTryouts = () =>
   useQuery({
     queryKey: ["tryouts", "public"],
-    retry: false,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
+    refetchOnReconnect: true,
+    initialData: () => {
+      const cached = readCache<TryoutEventSummary[]>(PUBLIC_TRYOUTS_CACHE_KEY);
+      return cached ? sortByStartDate(cached.filter(isUpcomingPublishedTryout)) : undefined;
+    },
     queryFn: async () => {
-      const { data, error } = await runWithTimeout("Loading tryouts", async () =>
-        await supabase
+      try {
+        const { data, error } = await supabase
           .from("tryout_events")
-          .select("id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, waiver_text, status, coach_ids, created_at, updated_at")
+          .select(TRYOUT_SUMMARY_SELECT)
           .eq("status", "published")
           .gt("starts_at", new Date().toISOString())
           .order("starts_at", { ascending: true })
-      );
-      if (error) throw error;
-      return (data ?? []) as TryoutEvent[];
+          .returns<TryoutEventSummary[]>();
+
+        if (error) throw error;
+
+        const events = sortByStartDate((data ?? []).filter(isUpcomingPublishedTryout));
+        writeCache(PUBLIC_TRYOUTS_CACHE_KEY, events);
+        return events;
+      } catch (error) {
+        const cached = readCache<TryoutEventSummary[]>(PUBLIC_TRYOUTS_CACHE_KEY);
+        if (cached?.length) {
+          return sortByStartDate(cached.filter(isUpcomingPublishedTryout));
+        }
+
+        throw error;
+      }
     },
   });
 
@@ -94,19 +128,35 @@ export const usePublicTryout = (id?: string) =>
   useQuery({
     queryKey: ["tryouts", "public", id],
     enabled: !!id,
-    retry: false,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
+    refetchOnReconnect: true,
+    initialData: () => (id ? readCache<TryoutEvent | null>(PUBLIC_TRYOUT_CACHE_KEY(id)) : undefined),
     queryFn: async () => {
-      const { data, error } = await runWithTimeout("Loading registration form", async () =>
-        await supabase
+      try {
+        const { data, error } = await supabase
           .from("tryout_events")
-          .select("id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, waiver_text, status, coach_ids, created_at, updated_at")
+          .select(TRYOUT_DETAIL_SELECT)
           .eq("id", id!)
           .eq("status", "published")
           .gt("starts_at", new Date().toISOString())
           .maybeSingle()
-      );
-      if (error) throw error;
-      return data as TryoutEvent | null;
+          .returns<TryoutEvent | null>();
+
+        if (error) throw error;
+        if (data) {
+          writeCache(PUBLIC_TRYOUT_CACHE_KEY(id!), data);
+        }
+
+        return data as TryoutEvent | null;
+      } catch (error) {
+        const cached = id ? readCache<TryoutEvent | null>(PUBLIC_TRYOUT_CACHE_KEY(id)) : undefined;
+        if (cached && isUpcomingPublishedTryout(cached)) {
+          return cached;
+        }
+
+        throw error;
+      }
     },
   });
 
@@ -115,25 +165,29 @@ export const useTryoutCounts = (id?: string) =>
   useQuery({
     queryKey: ["tryouts", "counts", id],
     enabled: !!id,
-    retry: false,
+    retry: 1,
+    refetchOnReconnect: true,
     queryFn: async () => {
-      const [{ count: filled }, { count: waitlisted }] = await Promise.all([
-        runWithTimeout("Loading tryout counts", async () =>
-          await supabase
-            .from("tryout_registrations")
-            .select("id", { count: "exact", head: true })
-            .eq("event_id", id!)
-            .in("status", ["confirmed", "pending"])
-        ),
-        runWithTimeout("Loading waitlist counts", async () =>
-          await supabase
-            .from("tryout_registrations")
-            .select("id", { count: "exact", head: true })
-            .eq("event_id", id!)
-            .eq("status", "waitlisted")
-        ),
+      const [filledResponse, waitlistedResponse] = await Promise.all([
+        supabase
+          .from("tryout_registrations")
+          .select("id", { count: "exact", head: true })
+          .eq("event_id", id!)
+          .in("status", ["confirmed", "pending"]),
+        supabase
+          .from("tryout_registrations")
+          .select("id", { count: "exact", head: true })
+          .eq("event_id", id!)
+          .eq("status", "waitlisted"),
       ]);
-      return { filled: filled ?? 0, waitlisted: waitlisted ?? 0 };
+
+      if (filledResponse.error) throw filledResponse.error;
+      if (waitlistedResponse.error) throw waitlistedResponse.error;
+
+      return {
+        filled: filledResponse.count ?? 0,
+        waitlisted: waitlistedResponse.count ?? 0,
+      };
     },
   });
 
@@ -249,15 +303,22 @@ export const useUpdateRegistrationStatus = () => {
 };
 
 export const submitTryoutRegistration = async (payload: Record<string, unknown>) => {
-  const { data, error } = await runWithTimeout(
-    "Submitting registration",
-    () =>
-      supabase.functions.invoke("register-for-tryout", {
-        body: payload,
-      }),
-    12000,
-  );
-  if (error) throw new Error(error.message || "Registration failed");
-  if (data?.error) throw new Error(data.error);
-  return data as { success: true; registration_id: string; status: string; waitlist_position: number | null };
+  try {
+    const { data, error } = await supabase.functions.invoke("register-for-tryout", {
+      body: payload,
+    });
+
+    if (error) throw new Error(error.message || "Registration failed");
+    if (data?.error) throw new Error(data.error);
+
+    return data as {
+      success: true;
+      registration_id: string;
+      status: string;
+      waitlist_position: number | null;
+      duplicate?: boolean;
+    };
+  } catch (error: any) {
+    throw new Error(error?.message || "Registration failed");
+  }
 };
