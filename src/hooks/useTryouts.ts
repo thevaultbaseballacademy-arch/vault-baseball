@@ -37,7 +37,7 @@ const isUpcomingPublishedTryout = ({ starts_at, status }: { starts_at: string; s
 const sortByStartDate = <T extends { starts_at: string }>(events: T[]) =>
   [...events].sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
 
-const withTimeout = async <T,>(work: Promise<T>, message: string) => {
+const withTimeout = async <T,>(work: () => PromiseLike<T>, message: string): Promise<T> => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   const timeout = new Promise<never>((_, reject) => {
@@ -45,7 +45,7 @@ const withTimeout = async <T,>(work: Promise<T>, message: string) => {
   });
 
   try {
-    return await Promise.race([work, timeout]);
+    return await Promise.race([Promise.resolve(work()), timeout]);
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
@@ -114,7 +114,7 @@ export const usePublicTryouts = () =>
     },
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(
+        const { data, error } = await withTimeout(() =>
           supabase
             .from("tryout_events")
             .select(TRYOUT_SUMMARY_SELECT)
@@ -122,8 +122,7 @@ export const usePublicTryouts = () =>
             .gt("starts_at", new Date().toISOString())
             .order("starts_at", { ascending: true })
             .returns<TryoutEventSummary[]>(),
-          "Tryouts are taking too long to load. Please retry.",
-        );
+          "Tryouts are taking too long to load. Please retry.");
 
         if (error) throw error;
 
@@ -152,7 +151,7 @@ export const usePublicTryout = (id?: string) =>
     initialData: () => (id ? readCache<TryoutEvent | null>(PUBLIC_TRYOUT_CACHE_KEY(id)) : undefined),
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(
+        const { data, error } = await withTimeout(() =>
           supabase
             .from("tryout_events")
             .select(TRYOUT_DETAIL_SELECT)
@@ -161,8 +160,7 @@ export const usePublicTryout = (id?: string) =>
             .gt("starts_at", new Date().toISOString())
             .maybeSingle()
             .returns<TryoutEvent | null>(),
-          "Registration is taking too long to load. Please retry.",
-        );
+          "Registration is taking too long to load. Please retry.");
 
         if (error) throw error;
         if (data) {
@@ -325,12 +323,11 @@ export const useUpdateRegistrationStatus = () => {
 
 export const submitTryoutRegistration = async (payload: Record<string, unknown>) => {
   try {
-    const { data, error } = await withTimeout(
+    const { data, error } = await withTimeout(() =>
       supabase.functions.invoke("register-for-tryout", {
         body: payload,
       }),
-      "Registration timed out. Please try again.",
-    );
+      "Registration timed out. Please try again.");
 
     if (error) throw new Error(error.message || "Registration failed");
     if (data?.error) throw new Error(data.error);
