@@ -8,8 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 
 const formatDate = (iso: string) =>
@@ -112,14 +110,22 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
   // Restore + persist progress
   useEffect(() => {
     if (!id) return;
-    const saved = localStorage.getItem(STORAGE_KEY(id));
-    if (saved) {
-      try { setValues((v) => ({ ...v, ...JSON.parse(saved) })); } catch { /* ignore */ }
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY(id));
+      if (saved) {
+        setValues((v) => ({ ...v, ...JSON.parse(saved) }));
+      }
+    } catch {
+      // Ignore storage failures on restrictive mobile browsers.
     }
   }, [id]);
   useEffect(() => {
     if (!id) return;
-    localStorage.setItem(STORAGE_KEY(id), JSON.stringify(values));
+    try {
+      window.localStorage.setItem(STORAGE_KEY(id), JSON.stringify(values));
+    } catch {
+      // Ignore storage failures on restrictive mobile browsers.
+    }
   }, [id, values]);
 
   // SEO / OG tags — dynamic per event
@@ -198,7 +204,11 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
         ...parsed.data,
         player_dob: normalizedPlayerDob,
       });
-      localStorage.removeItem(STORAGE_KEY(event.id));
+      try {
+        window.localStorage.removeItem(STORAGE_KEY(event.id));
+      } catch {
+        // Ignore storage failures on restrictive mobile browsers.
+      }
       setSuccess({ status: result.status, waitlist_position: result.waitlist_position });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
@@ -346,18 +356,21 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
               )}
             </Field>
             <Field label="Throwing hand *" error={errors.player_throwing_hand}>
-              <RadioGroup
-                value={values.player_throwing_hand}
-                onValueChange={(v) => set("player_throwing_hand", v as "Right" | "Left")}
-                className="flex gap-6"
-              >
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <RadioGroupItem value="Right" /> Right
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <RadioGroupItem value="Left" /> Left
-                </label>
-              </RadioGroup>
+              <div className="flex flex-wrap gap-3">
+                {(["Right", "Left"] as const).map((hand) => (
+                  <label key={hand} className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input
+                      type="radio"
+                      name="player_throwing_hand"
+                      value={hand}
+                      checked={values.player_throwing_hand === hand}
+                      onChange={() => set("player_throwing_hand", hand)}
+                      className="h-4 w-4 accent-[hsl(var(--primary))]"
+                    />
+                    <span>{hand}</span>
+                  </label>
+                ))}
+              </div>
             </Field>
             <Field label="Primary position">
               <select
@@ -423,10 +436,11 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
               {event.waiver_text}
             </div>
             <label className="flex items-start gap-3 cursor-pointer">
-              <Checkbox
+              <input
+                type="checkbox"
                 checked={values.waiver_accepted}
-                onCheckedChange={(v) => set("waiver_accepted", !!v)}
-                className="mt-0.5"
+                onChange={(e) => set("waiver_accepted", e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-[hsl(var(--primary))]"
               />
               <span className="text-sm">I have read and agree to the waiver</span>
             </label>
@@ -435,10 +449,11 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
               <Input value={values.waiver_signature_name} onChange={(e) => set("waiver_signature_name", e.target.value)} />
             </Field>
             <label className="flex items-start gap-3 cursor-pointer">
-              <Checkbox
+              <input
+                type="checkbox"
                 checked={values.photo_release_consent}
-                onCheckedChange={(v) => set("photo_release_consent", !!v)}
-                className="mt-0.5"
+                onChange={(e) => set("photo_release_consent", e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-[hsl(var(--primary))]"
               />
               <span className="text-sm">
                 I consent to photos / video being used for promotional purposes (optional)
