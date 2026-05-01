@@ -92,7 +92,7 @@ const RemoteTrainingHub = () => {
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!session?.user) navigate("/auth");
+      if (!session?.user) { /* AuthGuard handles redirect */ }
       setUser(session?.user ?? null);
     });
     return () => subscription.unsubscribe();
