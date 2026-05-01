@@ -52,7 +52,7 @@ const RemoteTrainingHub = () => {
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { navigate("/auth"); return; }
+      if (!session?.user) { return; }
       setUser(session.user);
 
       // Fetch assigned coach
@@ -92,7 +92,7 @@ const RemoteTrainingHub = () => {
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!session?.user) navigate("/auth");
+      if (!session?.user) { /* AuthGuard handles redirect */ }
       setUser(session?.user ?? null);
     });
     return () => subscription.unsubscribe();

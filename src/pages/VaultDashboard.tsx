@@ -41,18 +41,13 @@ const VaultDashboard = () => {
       setLoading(false);
     }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
+      if (!session?.user) { return; }
       setUser(session.user);
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
-        navigate("/auth");
-      }
+      if (!session?.user) { /* AuthGuard handles redirect */ }
       setUser(session?.user ?? null);
     });
 

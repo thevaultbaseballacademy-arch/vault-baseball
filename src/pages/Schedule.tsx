@@ -39,33 +39,21 @@ const Schedule = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const safetyTimeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
+    // AuthGuard ensures we only mount when authenticated. Just hydrate the
+    // session and kick off the data fetches.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
+      if (!session?.user) return;
       setUser(session.user);
       checkSubscription();
       fetchSessions();
-      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
-      setUser(session.user);
+      if (session?.user) setUser(session.user);
     });
 
-    clearTimeout(safetyTimeout);
-
-
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, []);
 
   const checkSubscription = async () => {
     try {

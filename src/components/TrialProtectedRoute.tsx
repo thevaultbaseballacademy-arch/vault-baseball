@@ -3,6 +3,7 @@ import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { isGloballyReconnecting } from "@/hooks/useAuth";
 
 interface TrialProtectedRouteProps {
   children: React.ReactNode;
@@ -40,6 +41,14 @@ const TrialProtectedRoute = ({
   }
 
   if (!user) {
+    // Don't bounce while a session refresh is in flight (iOS BFCache, tab restore).
+    if (isGloballyReconnecting()) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      );
+    }
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 

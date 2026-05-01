@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { isGloballyReconnecting } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachApplicationForm from "@/components/coach-register/CoachApplicationForm";
@@ -47,6 +48,8 @@ const CoachRegister = () => {
     }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
+        // Don't bounce mid session-refresh (iOS BFCache, tab restore).
+        if (isGloballyReconnecting()) return;
         navigate("/auth", {
           state: { from: { pathname: `/coach-register${inviteToken ? `?invite=${inviteToken}` : ""}` } },
         });

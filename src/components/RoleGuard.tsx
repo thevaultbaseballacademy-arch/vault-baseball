@@ -4,6 +4,7 @@ import { Permission, VaultRole } from "@/lib/permissions";
 import { useRoleAuth } from "@/hooks/useRoleAuth";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { isGloballyReconnecting } from "@/hooks/useAuth";
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -65,6 +66,13 @@ const RoleGuard = ({ children, requires, requiresRole, fallback }: RoleGuardProp
   }
 
   if (!user) {
+    if (isGloballyReconnecting()) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      );
+    }
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 

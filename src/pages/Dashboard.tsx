@@ -62,10 +62,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!authedUser) {
-      navigate("/auth");
-      return;
-    }
+    if (!authedUser) { return; }
 
     setUser(authedUser);
   }, [authLoading, authedUser, navigate]);

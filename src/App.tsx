@@ -10,6 +10,7 @@ import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
 import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import SessionVisibilityRefresh from "@/components/auth/SessionVisibilityRefresh";
 import BiometricGate from "@/components/auth/BiometricGate";
+import AuthGuard from "@/components/auth/AuthGuard";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import RoleGuard from "@/components/RoleGuard";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -249,9 +250,9 @@ const App = () => (
             <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/checkin" element={<Checkin />} />
+            <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
+            <Route path="/schedule" element={<AuthGuard><Schedule /></AuthGuard>} />
+            <Route path="/checkin" element={<AuthGuard><Checkin /></AuthGuard>} />
             
             {/* Protected app routes with trial check */}
             <Route path="/dashboard" element={
@@ -377,7 +378,7 @@ const App = () => (
                 <MyPrograms />
               </TrialProtectedRoute>
             } />
-            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/notifications" element={<AuthGuard><Notifications /></AuthGuard>} />
             <Route path="/pathway/youth" element={<YouthPathway />} />
             <Route path="/pathway/academy" element={<AcademyPathway />} />
             <Route path="/longevity" element={
@@ -390,12 +391,12 @@ const App = () => (
                 <WeeklyCalendar />
               </TrialProtectedRoute>
             } />
-            <Route path="/certifications" element={<Certifications />} />
-            <Route path="/certifications/exam/:certType" element={<CertificationExam />} />
-            <Route path="/certifications/video-exam/:certType" element={<VideoExam />} />
+            <Route path="/certifications" element={<AuthGuard><Certifications /></AuthGuard>} />
+            <Route path="/certifications/exam/:certType" element={<AuthGuard><CertificationExam /></AuthGuard>} />
+            <Route path="/certifications/video-exam/:certType" element={<AuthGuard><VideoExam /></AuthGuard>} />
             <Route path="/certifications/leaderboard" element={<CertificationLeaderboard />} />
             <Route path="/verify" element={<VerifyCertification />} />
-            <Route path="/privacy-settings" element={<PrivacySettings />} />
+            <Route path="/privacy-settings" element={<AuthGuard><PrivacySettings /></AuthGuard>} />
             {/* Payment Pages */}
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
@@ -454,24 +455,24 @@ const App = () => (
             <Route path="/baseline-audit" element={<BaselineAudit />} />
             <Route path="/performance-blueprint" element={<PerformanceBlueprint />} />
             <Route path="/performance-analytics" element={<TrialProtectedRoute><PerformanceAnalytics /></TrialProtectedRoute>} />
-            <Route path="/coach-register" element={<CoachRegister />} />
-            <Route path="/coach-onboarding" element={<CoachOnboarding />} />
-            <Route path="/lesson-packages" element={<LessonPackages />} />
-            <Route path="/remote-lessons" element={<RemoteLessons />} />
-            <Route path="/group-sessions" element={<GroupSessions />} />
+            <Route path="/coach-register" element={<AuthGuard><CoachRegister /></AuthGuard>} />
+            <Route path="/coach-onboarding" element={<AuthGuard><CoachOnboarding /></AuthGuard>} />
+            <Route path="/lesson-packages" element={<AuthGuard><LessonPackages /></AuthGuard>} />
+            <Route path="/remote-lessons" element={<AuthGuard><RemoteLessons /></AuthGuard>} />
+            <Route path="/group-sessions" element={<AuthGuard><GroupSessions /></AuthGuard>} />
             <Route path="/free-velocity-guide" element={<FreeVelocityGuide />} />
-            <Route path="/athlete-onboarding" element={<AthleteOnboarding />} />
+            <Route path="/athlete-onboarding" element={<AuthGuard><AthleteOnboarding /></AuthGuard>} />
             <Route path="/evaluate" element={<FreeEvaluation />} />
-            <Route path="/training-hub" element={<RemoteTrainingHub />} />
+            <Route path="/training-hub" element={<AuthGuard><RemoteTrainingHub /></AuthGuard>} />
             <Route path="/weekly-program" element={
               <TrialProtectedRoute allowTrialAccess><WeeklyProgramGenerator /></TrialProtectedRoute>
             } />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
             <Route path="/progress-report/:token" element={<ProgressReport />} />
-            <Route path="/book-session" element={<BookSession />} />
-            <Route path="/facility/scheduling" element={<FacilityScheduling />} />
-            <Route path="/claim-22m" element={<Claim22MAccess />} />
+            <Route path="/book-session" element={<AuthGuard><BookSession /></AuthGuard>} />
+            <Route path="/facility/scheduling" element={<AuthGuard><FacilityScheduling /></AuthGuard>} />
+            <Route path="/claim-22m" element={<AuthGuard><Claim22MAccess /></AuthGuard>} />
             
             {/* Softball Development */}
             <Route path="/softball" element={
@@ -479,16 +480,16 @@ const App = () => (
                 <SoftballDevelopment />
               </TrialProtectedRoute>
             } />
-            <Route path="/softball/lessons/booking" element={<SoftballLessonBooking />} />
-            <Route path="/softball/lessons/coaches" element={<SoftballCoaches />} />
-            <Route path="/softball/lessons/notes" element={<SoftballLessonNotes />} />
-            <Route path="/softball/courses" element={<SoftballCourses />} />
-            <Route path="/softball/profile" element={<SoftballProfile />} />
-            <Route path="/softball/pitching" element={<SoftballPitching />} />
-            <Route path="/softball/hitting" element={<SoftballHitting />} />
-            <Route path="/softball/fielding" element={<SoftballFielding />} />
-            <Route path="/softball/analytics" element={<SoftballAnalytics />} />
-            <Route path="/softball/position-tracks" element={<SoftballPositionTracks />} />
+            <Route path="/softball/lessons/booking" element={<AuthGuard><SoftballLessonBooking /></AuthGuard>} />
+            <Route path="/softball/lessons/coaches" element={<AuthGuard><SoftballCoaches /></AuthGuard>} />
+            <Route path="/softball/lessons/notes" element={<AuthGuard><SoftballLessonNotes /></AuthGuard>} />
+            <Route path="/softball/courses" element={<AuthGuard><SoftballCourses /></AuthGuard>} />
+            <Route path="/softball/profile" element={<AuthGuard><SoftballProfile /></AuthGuard>} />
+            <Route path="/softball/pitching" element={<AuthGuard><SoftballPitching /></AuthGuard>} />
+            <Route path="/softball/hitting" element={<AuthGuard><SoftballHitting /></AuthGuard>} />
+            <Route path="/softball/fielding" element={<AuthGuard><SoftballFielding /></AuthGuard>} />
+            <Route path="/softball/analytics" element={<AuthGuard><SoftballAnalytics /></AuthGuard>} />
+            <Route path="/softball/position-tracks" element={<AuthGuard><SoftballPositionTracks /></AuthGuard>} />
             
             {/* Recruiting Readiness Engine */}
             <Route path="/recruiting" element={
