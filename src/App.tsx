@@ -470,9 +470,9 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/coach/:coachId" element={<CoachMarketplaceProfile />} />
             <Route path="/progress-report/:token" element={<ProgressReport />} />
-            <Route path="/book-session" element={<BookSession />} />
-            <Route path="/facility/scheduling" element={<FacilityScheduling />} />
-            <Route path="/claim-22m" element={<Claim22MAccess />} />
+            <Route path="/book-session" element={<AuthGuard><BookSession /></AuthGuard>} />
+            <Route path="/facility/scheduling" element={<AuthGuard><FacilityScheduling /></AuthGuard>} />
+            <Route path="/claim-22m" element={<AuthGuard><Claim22MAccess /></AuthGuard>} />
             
             {/* Softball Development */}
             <Route path="/softball" element={
