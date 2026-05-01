@@ -71,10 +71,7 @@ const LongevityDashboard = () => {
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
+      if (!session) { return; }
       setUser(session.user);
       fetchCheckins(session.user.id);
     };

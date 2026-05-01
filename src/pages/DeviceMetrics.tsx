@@ -26,9 +26,7 @@ const DeviceMetrics = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
+      if (!session) { /* AuthGuard handles redirect */ } else {
         setUserId(session.user.id);
       }
     });
