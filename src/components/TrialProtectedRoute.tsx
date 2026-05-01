@@ -3,6 +3,7 @@ import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { isGloballyReconnecting } from "@/hooks/useAuth";
 
 interface TrialProtectedRouteProps {
   children: React.ReactNode;
