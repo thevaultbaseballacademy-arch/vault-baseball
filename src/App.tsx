@@ -391,12 +391,12 @@ const App = () => (
                 <WeeklyCalendar />
               </TrialProtectedRoute>
             } />
-            <Route path="/certifications" element={<Certifications />} />
-            <Route path="/certifications/exam/:certType" element={<CertificationExam />} />
-            <Route path="/certifications/video-exam/:certType" element={<VideoExam />} />
+            <Route path="/certifications" element={<AuthGuard><Certifications /></AuthGuard>} />
+            <Route path="/certifications/exam/:certType" element={<AuthGuard><CertificationExam /></AuthGuard>} />
+            <Route path="/certifications/video-exam/:certType" element={<AuthGuard><VideoExam /></AuthGuard>} />
             <Route path="/certifications/leaderboard" element={<CertificationLeaderboard />} />
             <Route path="/verify" element={<VerifyCertification />} />
-            <Route path="/privacy-settings" element={<PrivacySettings />} />
+            <Route path="/privacy-settings" element={<AuthGuard><PrivacySettings /></AuthGuard>} />
             {/* Payment Pages */}
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
