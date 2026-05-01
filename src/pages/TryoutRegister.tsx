@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Loader2, ArrowLeft, CheckCircle2, MapPin, Calendar } from "lucide-react";
 import { z } from "zod";
@@ -18,10 +18,45 @@ const formatDate = (iso: string) =>
     hour: "numeric", minute: "2-digit",
   });
 
+const isValidCalendarDate = (year: number, month: number, day: number) => {
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+};
+
+const normalizeDateInput = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    const year = Number(isoMatch[1]);
+    const month = Number(isoMatch[2]);
+    const day = Number(isoMatch[3]);
+    return isValidCalendarDate(year, month, day) ? `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}` : null;
+  }
+
+  const usMatch = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (usMatch) {
+    const month = Number(usMatch[1]);
+    const day = Number(usMatch[2]);
+    const year = Number(usMatch[3]);
+    if (!isValidCalendarDate(year, month, day)) return null;
+    return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  return null;
+};
+
 const FormSchema = z.object({
   player_first_name: z.string().trim().min(1, "Required"),
   player_last_name: z.string().trim().min(1, "Required"),
-  player_dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Required"),
+  player_dob: z.string().trim().min(1, "Required").refine((value) => normalizeDateInput(value) !== null, {
+    message: "Use MM/DD/YYYY",
+  }),
   player_throwing_hand: z.enum(["Right", "Left"], { required_error: "Required" }),
   player_position: z.string().optional(),
   player_current_team: z.string().optional(),
@@ -48,6 +83,7 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: event, isLoading, isError, error, refetch, isFetching } = usePublicTryout(id);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const [values, setValues] = useState<FormValues>({
     player_first_name: "",
@@ -112,9 +148,11 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
   const set = <K extends keyof FormValues>(k: K, v: FormValues[K]) =>
     setValues((prev) => ({ ...prev, [k]: v }));
 
+  const normalizedDob = normalizeDateInput(values.player_dob);
+
   const ageOnEvent = (() => {
-    if (!event || !values.player_dob) return null;
-    const dob = new Date(values.player_dob);
+    if (!event || !normalizedDob) return null;
+    const dob = new Date(`${normalizedDob}T12:00:00`);
     const ev = new Date(event.starts_at);
     let a = ev.getFullYear() - dob.getFullYear();
     const m = ev.getMonth() - dob.getMonth();
@@ -138,9 +176,19 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
         if (v?.[0]) errs[k] = v[0];
       }
       setErrors(errs);
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       toast.error("Please fix the errors and try again");
       return;
     }
+
+    const normalizedPlayerDob = normalizeDateInput(parsed.data.player_dob);
+    if (!normalizedPlayerDob) {
+      setErrors({ player_dob: "Use MM/DD/YYYY" });
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      toast.error("Please enter a valid date of birth");
+      return;
+    }
+
     setErrors({});
     setSubmitError(null);
     setSubmitting(true);
@@ -148,6 +196,7 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
       const result = await submitTryoutRegistration({
         event_id: event.id,
         ...parsed.data,
+        player_dob: normalizedPlayerDob,
       });
       localStorage.removeItem(STORAGE_KEY(event.id));
       setSuccess({ status: result.status, waitlist_position: result.waitlist_position });
@@ -264,7 +313,13 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
           <div className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5" /> {event.location_name}</div>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-8">
+        <form ref={formRef} onSubmit={onSubmit} className="space-y-8" noValidate>
+          {Object.keys(errors).length > 0 && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+              Please review the highlighted fields before submitting.
+            </div>
+          )}
+
           <Section title="Player info">
             <Row>
               <Field label="First name *" error={errors.player_first_name}>
@@ -275,7 +330,15 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
               </Field>
             </Row>
             <Field label="Date of birth *" error={errors.player_dob}>
-              <Input type="date" value={values.player_dob} onChange={(e) => set("player_dob", e.target.value)} />
+              <Input
+                type="text"
+                inputMode="numeric"
+                autoComplete="bday"
+                placeholder="MM/DD/YYYY"
+                value={values.player_dob}
+                onChange={(e) => set("player_dob", e.target.value)}
+              />
+              <p className="text-[11px] text-muted-foreground">Enter as MM/DD/YYYY</p>
               {ageMismatch && (
                 <p className="text-xs text-destructive mt-1">
                   This event is for ages {event.age_group}. Player appears to be {ageOnEvent}.
