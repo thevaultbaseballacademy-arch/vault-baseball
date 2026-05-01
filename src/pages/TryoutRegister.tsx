@@ -266,7 +266,7 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
               <p className="text-sm text-muted-foreground">
                 {success.status === "waitlisted"
                   ? `You're #${success.waitlist_position} on the waitlist for ${event.name}. We'll email you if a spot opens.`
-                  : `Your registration for ${event.name} is in. Payment and confirmation details will be sent to your email shortly.`}
+                  : `Your spot for ${event.name} is reserved. A confirmation email is on the way with all the event details.`}
               </p>
               <div className="border border-border p-4 text-left text-sm space-y-1.5">
                 <div className="font-medium">{event.name}</div>
@@ -302,7 +302,7 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
           </Button>
           <div className="min-w-0">
             <div className="text-sm font-medium truncate">{event.name}</div>
-            <div className="text-[11px] text-muted-foreground">Ages {event.age_group} · ${(event.price_cents / 100).toFixed(0)}</div>
+            <div className="text-[11px] text-muted-foreground">Ages {event.age_group} · Free</div>
           </div>
         </div>
       </header>
@@ -448,8 +448,8 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
 
           <div className="border-t border-border pt-6 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Total</span>
-              <span className="text-2xl font-semibold">${(event.price_cents / 100).toFixed(2)}</span>
+              <span className="text-sm text-muted-foreground">Cost</span>
+              <span className="text-2xl font-semibold">Free</span>
             </div>
             {submitError && (
               <p className="text-sm text-destructive" role="alert">
@@ -457,10 +457,10 @@ const TryoutRegister = forwardRef<HTMLDivElement>((_, __) => {
               </p>
             )}
             <p className="text-xs text-muted-foreground">
-              Payment will be collected after submission. You'll receive an email with details.
+              Tryouts are free. You'll receive a confirmation email with event details.
             </p>
             <Button type="submit" className="w-full" disabled={submitting || ageMismatch}>
-              {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting…</> : "Submit registration"}
+              {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting…</> : "Reserve my spot"}
             </Button>
           </div>
         </form>
