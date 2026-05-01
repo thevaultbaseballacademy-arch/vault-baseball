@@ -455,15 +455,15 @@ const App = () => (
             <Route path="/baseline-audit" element={<BaselineAudit />} />
             <Route path="/performance-blueprint" element={<PerformanceBlueprint />} />
             <Route path="/performance-analytics" element={<TrialProtectedRoute><PerformanceAnalytics /></TrialProtectedRoute>} />
-            <Route path="/coach-register" element={<CoachRegister />} />
-            <Route path="/coach-onboarding" element={<CoachOnboarding />} />
-            <Route path="/lesson-packages" element={<LessonPackages />} />
-            <Route path="/remote-lessons" element={<RemoteLessons />} />
-            <Route path="/group-sessions" element={<GroupSessions />} />
+            <Route path="/coach-register" element={<AuthGuard><CoachRegister /></AuthGuard>} />
+            <Route path="/coach-onboarding" element={<AuthGuard><CoachOnboarding /></AuthGuard>} />
+            <Route path="/lesson-packages" element={<AuthGuard><LessonPackages /></AuthGuard>} />
+            <Route path="/remote-lessons" element={<AuthGuard><RemoteLessons /></AuthGuard>} />
+            <Route path="/group-sessions" element={<AuthGuard><GroupSessions /></AuthGuard>} />
             <Route path="/free-velocity-guide" element={<FreeVelocityGuide />} />
-            <Route path="/athlete-onboarding" element={<AthleteOnboarding />} />
+            <Route path="/athlete-onboarding" element={<AuthGuard><AthleteOnboarding /></AuthGuard>} />
             <Route path="/evaluate" element={<FreeEvaluation />} />
-            <Route path="/training-hub" element={<RemoteTrainingHub />} />
+            <Route path="/training-hub" element={<AuthGuard><RemoteTrainingHub /></AuthGuard>} />
             <Route path="/weekly-program" element={
               <TrialProtectedRoute allowTrialAccess><WeeklyProgramGenerator /></TrialProtectedRoute>
             } />
