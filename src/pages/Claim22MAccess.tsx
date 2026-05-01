@@ -36,6 +36,7 @@ const Claim22MAccess = () => {
     }, 5000);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
+        if (isGloballyReconnecting()) return;
         navigate("/auth", {
           state: { from: { pathname: `/claim-22m${inviteToken ? `?invite=${inviteToken}` : ""}` } },
         });
