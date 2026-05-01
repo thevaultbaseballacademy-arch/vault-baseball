@@ -378,7 +378,7 @@ const App = () => (
                 <MyPrograms />
               </TrialProtectedRoute>
             } />
-            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/notifications" element={<AuthGuard><Notifications /></AuthGuard>} />
             <Route path="/pathway/youth" element={<YouthPathway />} />
             <Route path="/pathway/academy" element={<AcademyPathway />} />
             <Route path="/longevity" element={
