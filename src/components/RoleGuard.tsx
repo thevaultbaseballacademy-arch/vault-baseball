@@ -4,6 +4,7 @@ import { Permission, VaultRole } from "@/lib/permissions";
 import { useRoleAuth } from "@/hooks/useRoleAuth";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { isGloballyReconnecting } from "@/hooks/useAuth";
 
 interface RoleGuardProps {
   children: React.ReactNode;
