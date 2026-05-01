@@ -10,6 +10,7 @@ import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
 import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import SessionVisibilityRefresh from "@/components/auth/SessionVisibilityRefresh";
 import BiometricGate from "@/components/auth/BiometricGate";
+import AuthGuard from "@/components/auth/AuthGuard";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import RoleGuard from "@/components/RoleGuard";
 import ScrollToTop from "@/components/ScrollToTop";
