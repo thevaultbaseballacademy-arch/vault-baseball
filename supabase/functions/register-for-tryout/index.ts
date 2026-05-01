@@ -71,49 +71,67 @@ async function sendRegistrationEmails({
     const eventName = event.name ?? "Spring 2026 Tryout";
     const confirmationNumber = inserted.id.slice(0, 8).toUpperCase();
 
-    await Promise.allSettled([
-      supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "tryout-confirmation",
-          recipientEmail: data.parent_email.toLowerCase(),
-          idempotencyKey: `tryout-confirm-${inserted.id}`,
-          templateData: {
-            playerName: data.player_first_name,
-            parentName: data.parent_name,
-            eventName,
-            eventDate,
-            eventTime,
-            cancelUrl,
-            calendarUrl,
-            confirmationNumber,
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const endpoint = `${supabaseUrl}/functions/v1/send-transactional-email`;
+
+    const sendEmail = async (label: string, payload: Record<string, unknown>) => {
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${serviceKey}`,
+            "apikey": serviceKey,
           },
+          body: JSON.stringify(payload),
+        });
+        const text = await res.text();
+        console.log(`[email:${label}] status=${res.status} body=${text.slice(0, 500)}`);
+      } catch (err) {
+        console.error(`[email:${label}] fetch failed`, err);
+      }
+    };
+
+    await Promise.allSettled([
+      sendEmail("parent-confirmation", {
+        templateName: "tryout-confirmation",
+        recipientEmail: data.parent_email.toLowerCase(),
+        idempotencyKey: `tryout-confirm-${inserted.id}`,
+        templateData: {
+          playerName: data.player_first_name,
+          parentName: data.parent_name,
+          eventName,
+          eventDate,
+          eventTime,
+          cancelUrl,
+          calendarUrl,
+          confirmationNumber,
         },
       }),
-      supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "tryout-staff-notification",
-          recipientEmail: "staff@methods22.com",
-          idempotencyKey: `tryout-staff-${inserted.id}`,
-          templateData: {
-            playerName: `${data.player_first_name} ${data.player_last_name}`,
-            playerAge: age,
-            playerDob: data.player_dob,
-            throwingHand: data.player_throwing_hand,
-            position: data.player_position,
-            currentTeam: data.player_current_team,
-            parentName: data.parent_name,
-            parentEmail: data.parent_email.toLowerCase(),
-            parentPhone: data.parent_phone,
-            emergencyContactName: data.emergency_contact_name,
-            emergencyContactPhone: data.emergency_contact_phone,
-            emergencyRelationship: data.emergency_relationship,
-            medicalNotes: data.medical_notes,
-            eventName,
-            eventDate,
-            eventTime,
-            registrationStatus: assignedStatus,
-            waitlistPosition,
-          },
+      sendEmail("staff-notification", {
+        templateName: "tryout-staff-notification",
+        recipientEmail: "staff@methods22.com",
+        idempotencyKey: `tryout-staff-${inserted.id}`,
+        templateData: {
+          playerName: `${data.player_first_name} ${data.player_last_name}`,
+          playerAge: age,
+          playerDob: data.player_dob,
+          throwingHand: data.player_throwing_hand,
+          position: data.player_position,
+          currentTeam: data.player_current_team,
+          parentName: data.parent_name,
+          parentEmail: data.parent_email.toLowerCase(),
+          parentPhone: data.parent_phone,
+          emergencyContactName: data.emergency_contact_name,
+          emergencyContactPhone: data.emergency_contact_phone,
+          emergencyRelationship: data.emergency_relationship,
+          medicalNotes: data.medical_notes,
+          eventName,
+          eventDate,
+          eventTime,
+          registrationStatus: assignedStatus,
+          waitlistPosition,
         },
       }),
     ]);
