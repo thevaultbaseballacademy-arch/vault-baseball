@@ -4,13 +4,17 @@ import { toast } from "sonner";
 
 const TRYOUT_SUMMARY_SELECT = "id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, status, created_at, updated_at";
 const TRYOUT_DETAIL_SELECT = `${TRYOUT_SUMMARY_SELECT}, waiver_text, coach_ids`;
-const PUBLIC_TRYOUTS_CACHE_KEY = "public-tryouts:v2";
-const PUBLIC_TRYOUT_CACHE_KEY = (id: string) => `public-tryout:${id}:v2`;
-const TRYOUT_REQUEST_TIMEOUT_MS = 8000;
+const PUBLIC_TRYOUTS_CACHE_KEY = "public-tryouts:v3";
+const PUBLIC_TRYOUT_CACHE_KEY = (id: string) => `public-tryout:${id}:v3`;
+const PUBLIC_TRYOUT_REQUEST_TIMEOUT_MS = 4000;
+const TRYOUT_SUBMIT_TIMEOUT_MS = 12000;
 
 const isBrowser = typeof window !== "undefined";
+const memoryCache = new Map<string, unknown>();
 
 const readCache = <T,>(key: string) => {
+  const memoryValue = memoryCache.get(key);
+  if (memoryValue !== undefined) return memoryValue as T;
   if (!isBrowser) return undefined;
 
   try {
@@ -22,6 +26,7 @@ const readCache = <T,>(key: string) => {
 };
 
 const writeCache = <T,>(key: string, value: T) => {
+  memoryCache.set(key, value);
   if (!isBrowser) return;
 
   try {
@@ -37,11 +42,15 @@ const isUpcomingPublishedTryout = ({ starts_at, status }: { starts_at: string; s
 const sortByStartDate = <T extends { starts_at: string }>(events: T[]) =>
   [...events].sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
 
-const withTimeout = async <T,>(work: () => PromiseLike<T>, message: string): Promise<T> => {
+const withTimeout = async <T,>(
+  work: () => PromiseLike<T>,
+  message: string,
+  timeoutMs: number = PUBLIC_TRYOUT_REQUEST_TIMEOUT_MS,
+): Promise<T> => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   const timeout = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error(message)), TRYOUT_REQUEST_TIMEOUT_MS);
+    timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
   });
 
   try {
@@ -49,6 +58,49 @@ const withTimeout = async <T,>(work: () => PromiseLike<T>, message: string): Pro
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
+};
+
+const PUBLIC_REST_HEADERS = {
+  apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+} as const;
+
+const fetchPublicTryoutsFallback = async () => {
+  const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/tryout_events`);
+  url.searchParams.set("select", TRYOUT_SUMMARY_SELECT);
+  url.searchParams.set("status", "eq.published");
+  url.searchParams.set("starts_at", `gt.${new Date().toISOString()}`);
+  url.searchParams.set("order", "starts_at.asc");
+
+  const response = await fetch(url.toString(), { headers: PUBLIC_REST_HEADERS });
+  if (!response.ok) {
+    throw new Error(`Tryouts request failed (${response.status})`);
+  }
+
+  return (await response.json()) as TryoutEventSummary[];
+};
+
+const fetchPublicTryoutFallback = async (id: string) => {
+  const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/tryout_events`);
+  url.searchParams.set("select", TRYOUT_DETAIL_SELECT);
+  url.searchParams.set("id", `eq.${id}`);
+  url.searchParams.set("status", "eq.published");
+  url.searchParams.set("starts_at", `gt.${new Date().toISOString()}`);
+  url.searchParams.set("limit", "1");
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      ...PUBLIC_REST_HEADERS,
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Registration request failed (${response.status})`);
+  }
+
+  const data = (await response.json()) as TryoutEvent[];
+  return data[0] ?? null;
 };
 
 export type TryoutAgeGroup = "9-12" | "13-17";
@@ -105,24 +157,39 @@ export interface TryoutRegistration {
 export const usePublicTryouts = () =>
   useQuery({
     queryKey: ["tryouts", "public"],
-    retry: 2,
+    retry: false,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
-    refetchOnReconnect: true,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
     initialData: () => {
       const cached = readCache<TryoutEventSummary[]>(PUBLIC_TRYOUTS_CACHE_KEY);
       return cached ? sortByStartDate(cached.filter(isUpcomingPublishedTryout)) : undefined;
     },
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(() =>
-          supabase
-            .from("tryout_events")
-            .select(TRYOUT_SUMMARY_SELECT)
-            .eq("status", "published")
-            .gt("starts_at", new Date().toISOString())
-            .order("starts_at", { ascending: true })
-            .returns<TryoutEventSummary[]>(),
-          "Tryouts are taking too long to load. Please retry.");
+        let data: TryoutEventSummary[] | null = null;
+        let error: Error | null = null;
+
+        try {
+          const response = await withTimeout(() =>
+            supabase
+              .from("tryout_events")
+              .select(TRYOUT_SUMMARY_SELECT)
+              .eq("status", "published")
+              .gt("starts_at", new Date().toISOString())
+              .order("starts_at", { ascending: true })
+              .returns<TryoutEventSummary[]>(),
+            "Tryouts are taking too long to load. Please retry.");
+          data = response.data ?? null;
+          error = response.error ? new Error(response.error.message) : null;
+        } catch (sdkError) {
+          const fallbackData = await withTimeout(
+            () => fetchPublicTryoutsFallback(),
+            "Tryouts are taking too long to load. Please retry.",
+          );
+          data = fallbackData;
+          error = null;
+        }
 
         if (error) throw error;
 
@@ -145,24 +212,38 @@ export const usePublicTryout = (id?: string) =>
   useQuery({
     queryKey: ["tryouts", "public", id],
     enabled: !!id,
-    retry: 2,
+    retry: false,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
-    refetchOnReconnect: true,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
     staleTime: 1000 * 60 * 5,
     initialData: () => (id ? readCache<TryoutEvent | null>(PUBLIC_TRYOUT_CACHE_KEY(id)) : undefined),
     placeholderData: (previousData) => previousData,
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(() =>
-          supabase
-            .from("tryout_events")
-            .select(TRYOUT_DETAIL_SELECT)
-            .eq("id", id!)
-            .eq("status", "published")
-            .gt("starts_at", new Date().toISOString())
-            .maybeSingle()
-            .returns<TryoutEvent | null>(),
-          "Registration is taking too long to load. Please retry.");
+        let data: TryoutEvent | null = null;
+        let error: Error | null = null;
+
+        try {
+          const response = await withTimeout(() =>
+            supabase
+              .from("tryout_events")
+              .select(TRYOUT_DETAIL_SELECT)
+              .eq("id", id!)
+              .eq("status", "published")
+              .gt("starts_at", new Date().toISOString())
+              .maybeSingle()
+              .returns<TryoutEvent | null>(),
+            "Registration is taking too long to load. Please retry.");
+          data = response.data ?? null;
+          error = response.error ? new Error(response.error.message) : null;
+        } catch (sdkError) {
+          data = await withTimeout(
+            () => fetchPublicTryoutFallback(id!),
+            "Registration is taking too long to load. Please retry.",
+          );
+          error = null;
+        }
 
         if (error) throw error;
         if (data) {
@@ -329,7 +410,8 @@ export const submitTryoutRegistration = async (payload: Record<string, unknown>)
       supabase.functions.invoke("register-for-tryout", {
         body: payload,
       }),
-      "Registration timed out. Please try again.");
+      "Registration timed out. Please try again.",
+      TRYOUT_SUBMIT_TIMEOUT_MS);
 
     if (error) throw new Error(error.message || "Registration failed");
     if (data?.error) throw new Error(data.error);
