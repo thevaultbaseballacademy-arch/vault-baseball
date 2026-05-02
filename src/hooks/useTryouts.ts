@@ -203,31 +203,13 @@ export const usePublicTryout = (id?: string) =>
     placeholderData: (previousData) => previousData,
     queryFn: async () => {
       try {
-        let data: TryoutEvent | null = null;
-        let error: Error | null = null;
+        // Direct REST — bypass supabase-js to avoid hangs in restrictive in-app browsers.
+        const data = await withTimeout(
+          () => fetchPublicTryoutFallback(id!),
+          "Registration is taking too long to load. Please retry.",
+          8000,
+        );
 
-        try {
-          const response = await withTimeout(() =>
-            supabase
-              .from("tryout_events")
-              .select(TRYOUT_DETAIL_SELECT)
-              .eq("id", id!)
-              .eq("status", "published")
-              .gt("starts_at", new Date().toISOString())
-              .maybeSingle()
-              .returns<TryoutEvent | null>(),
-            "Registration is taking too long to load. Please retry.");
-          data = response.data ?? null;
-          error = response.error ? new Error(response.error.message) : null;
-        } catch (sdkError) {
-          data = await withTimeout(
-            () => fetchPublicTryoutFallback(id!),
-            "Registration is taking too long to load. Please retry.",
-          );
-          error = null;
-        }
-
-        if (error) throw error;
         if (data) {
           writeCache(PUBLIC_TRYOUT_CACHE_KEY(id!), data);
         }
