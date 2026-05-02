@@ -167,31 +167,13 @@ export const usePublicTryouts = () =>
     },
     queryFn: async () => {
       try {
-        let data: TryoutEventSummary[] | null = null;
-        let error: Error | null = null;
-
-        try {
-          const response = await withTimeout(() =>
-            supabase
-              .from("tryout_events")
-              .select(TRYOUT_SUMMARY_SELECT)
-              .eq("status", "published")
-              .gt("starts_at", new Date().toISOString())
-              .order("starts_at", { ascending: true })
-              .returns<TryoutEventSummary[]>(),
-            "Tryouts are taking too long to load. Please retry.");
-          data = response.data ?? null;
-          error = response.error ? new Error(response.error.message) : null;
-        } catch (sdkError) {
-          const fallbackData = await withTimeout(
-            () => fetchPublicTryoutsFallback(),
-            "Tryouts are taking too long to load. Please retry.",
-          );
-          data = fallbackData;
-          error = null;
-        }
-
-        if (error) throw error;
+        // Use direct REST (bypass supabase-js) — avoids SDK/auth init hangs
+        // in restrictive in-app browsers (Instagram, TikTok, etc).
+        const data = await withTimeout(
+          () => fetchPublicTryoutsFallback(),
+          "Tryouts are taking too long to load. Please retry.",
+          8000,
+        );
 
         const events = sortByStartDate((data ?? []).filter(isUpcomingPublishedTryout));
         writeCache(PUBLIC_TRYOUTS_CACHE_KEY, events);
