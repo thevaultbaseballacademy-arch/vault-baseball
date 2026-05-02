@@ -19,9 +19,12 @@ import PageTransition from "@/components/PageTransition";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 
-// Only eagerly load the landing page and auth
+// Eagerly load the public landing + tryout funnel to avoid stale chunk issues on mobile Safari
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Tryouts from "./pages/Tryouts";
+import TryoutRegister from "./pages/TryoutRegister";
+import CancelTryout from "./pages/CancelTryout";
 
 // Global loading fallback
 const PageLoader = () => (
@@ -69,9 +72,6 @@ const OwnerFacility = lazy(() => import("./pages/admin/OwnerFacility"));
 const OwnerEssaBookings = lazy(() => import("./pages/admin/OwnerEssaBookings"));
 const AdminTryouts = lazy(() => import("./pages/admin/AdminTryouts"));
 const AdminTryoutDetail = lazy(() => import("./pages/admin/AdminTryoutDetail"));
-const Tryouts = lazy(() => import("./pages/Tryouts"));
-const TryoutRegister = lazy(() => import("./pages/TryoutRegister"));
-const CancelTryout = lazy(() => import("./pages/CancelTryout"));
 const Community = lazy(() => import("./pages/Community"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Courses = lazy(() => import("./pages/Courses"));
