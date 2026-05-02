@@ -4,13 +4,17 @@ import { toast } from "sonner";
 
 const TRYOUT_SUMMARY_SELECT = "id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, status, created_at, updated_at";
 const TRYOUT_DETAIL_SELECT = `${TRYOUT_SUMMARY_SELECT}, waiver_text, coach_ids`;
-const PUBLIC_TRYOUTS_CACHE_KEY = "public-tryouts:v2";
-const PUBLIC_TRYOUT_CACHE_KEY = (id: string) => `public-tryout:${id}:v2`;
-const TRYOUT_REQUEST_TIMEOUT_MS = 8000;
+const PUBLIC_TRYOUTS_CACHE_KEY = "public-tryouts:v3";
+const PUBLIC_TRYOUT_CACHE_KEY = (id: string) => `public-tryout:${id}:v3`;
+const PUBLIC_TRYOUT_REQUEST_TIMEOUT_MS = 4000;
+const TRYOUT_SUBMIT_TIMEOUT_MS = 12000;
 
 const isBrowser = typeof window !== "undefined";
+const memoryCache = new Map<string, unknown>();
 
 const readCache = <T,>(key: string) => {
+  const memoryValue = memoryCache.get(key);
+  if (memoryValue !== undefined) return memoryValue as T;
   if (!isBrowser) return undefined;
 
   try {
@@ -22,6 +26,7 @@ const readCache = <T,>(key: string) => {
 };
 
 const writeCache = <T,>(key: string, value: T) => {
+  memoryCache.set(key, value);
   if (!isBrowser) return;
 
   try {
@@ -37,11 +42,15 @@ const isUpcomingPublishedTryout = ({ starts_at, status }: { starts_at: string; s
 const sortByStartDate = <T extends { starts_at: string }>(events: T[]) =>
   [...events].sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
 
-const withTimeout = async <T,>(work: () => PromiseLike<T>, message: string): Promise<T> => {
+const withTimeout = async <T,>(
+  work: () => PromiseLike<T>,
+  message: string,
+  timeoutMs: number = PUBLIC_TRYOUT_REQUEST_TIMEOUT_MS,
+): Promise<T> => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   const timeout = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error(message)), TRYOUT_REQUEST_TIMEOUT_MS);
+    timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
   });
 
   try {
