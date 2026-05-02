@@ -60,6 +60,49 @@ const withTimeout = async <T,>(
   }
 };
 
+const PUBLIC_REST_HEADERS = {
+  apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+} as const;
+
+const fetchPublicTryoutsFallback = async () => {
+  const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/tryout_events`);
+  url.searchParams.set("select", TRYOUT_SUMMARY_SELECT);
+  url.searchParams.set("status", "eq.published");
+  url.searchParams.set("starts_at", `gt.${new Date().toISOString()}`);
+  url.searchParams.set("order", "starts_at.asc");
+
+  const response = await fetch(url.toString(), { headers: PUBLIC_REST_HEADERS });
+  if (!response.ok) {
+    throw new Error(`Tryouts request failed (${response.status})`);
+  }
+
+  return (await response.json()) as TryoutEventSummary[];
+};
+
+const fetchPublicTryoutFallback = async (id: string) => {
+  const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/tryout_events`);
+  url.searchParams.set("select", TRYOUT_DETAIL_SELECT);
+  url.searchParams.set("id", `eq.${id}`);
+  url.searchParams.set("status", "eq.published");
+  url.searchParams.set("starts_at", `gt.${new Date().toISOString()}`);
+  url.searchParams.set("limit", "1");
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      ...PUBLIC_REST_HEADERS,
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Registration request failed (${response.status})`);
+  }
+
+  const data = (await response.json()) as TryoutEvent[];
+  return data[0] ?? null;
+};
+
 export type TryoutAgeGroup = "9-12" | "13-17";
 export type TryoutStatus = "draft" | "published" | "closed";
 
@@ -124,15 +167,29 @@ export const usePublicTryouts = () =>
     },
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(() =>
-          supabase
-            .from("tryout_events")
-            .select(TRYOUT_SUMMARY_SELECT)
-            .eq("status", "published")
-            .gt("starts_at", new Date().toISOString())
-            .order("starts_at", { ascending: true })
-            .returns<TryoutEventSummary[]>(),
-          "Tryouts are taking too long to load. Please retry.");
+        let data: TryoutEventSummary[] | null = null;
+        let error: Error | null = null;
+
+        try {
+          const response = await withTimeout(() =>
+            supabase
+              .from("tryout_events")
+              .select(TRYOUT_SUMMARY_SELECT)
+              .eq("status", "published")
+              .gt("starts_at", new Date().toISOString())
+              .order("starts_at", { ascending: true })
+              .returns<TryoutEventSummary[]>(),
+            "Tryouts are taking too long to load. Please retry.");
+          data = response.data ?? null;
+          error = response.error ? new Error(response.error.message) : null;
+        } catch (sdkError) {
+          const fallbackData = await withTimeout(
+            () => fetchPublicTryoutsFallback(),
+            "Tryouts are taking too long to load. Please retry.",
+          );
+          data = fallbackData;
+          error = null;
+        }
 
         if (error) throw error;
 
@@ -164,16 +221,29 @@ export const usePublicTryout = (id?: string) =>
     placeholderData: (previousData) => previousData,
     queryFn: async () => {
       try {
-        const { data, error } = await withTimeout(() =>
-          supabase
-            .from("tryout_events")
-            .select(TRYOUT_DETAIL_SELECT)
-            .eq("id", id!)
-            .eq("status", "published")
-            .gt("starts_at", new Date().toISOString())
-            .maybeSingle()
-            .returns<TryoutEvent | null>(),
-          "Registration is taking too long to load. Please retry.");
+        let data: TryoutEvent | null = null;
+        let error: Error | null = null;
+
+        try {
+          const response = await withTimeout(() =>
+            supabase
+              .from("tryout_events")
+              .select(TRYOUT_DETAIL_SELECT)
+              .eq("id", id!)
+              .eq("status", "published")
+              .gt("starts_at", new Date().toISOString())
+              .maybeSingle()
+              .returns<TryoutEvent | null>(),
+            "Registration is taking too long to load. Please retry.");
+          data = response.data ?? null;
+          error = response.error ? new Error(response.error.message) : null;
+        } catch (sdkError) {
+          data = await withTimeout(
+            () => fetchPublicTryoutFallback(id!),
+            "Registration is taking too long to load. Please retry.",
+          );
+          error = null;
+        }
 
         if (error) throw error;
         if (data) {
