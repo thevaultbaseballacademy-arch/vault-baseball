@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, MapPin, Calendar, Users } from "lucide-react";
 import { usePublicTryouts } from "@/hooks/useTryouts";
@@ -8,8 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
-const TryoutsInterest = lazy(() => import("./TryoutsInterest"));
+import TryoutsInterest from "./TryoutsInterest";
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString(undefined, {
@@ -74,11 +73,7 @@ const Tryouts = () => {
 
   // Off-season: no published events → show interest capture instead
   if (!isLoading && (!events || events.length === 0)) {
-    return (
-      <Suspense fallback={<div className="min-h-screen bg-background" />}>
-        <TryoutsInterest />
-      </Suspense>
-    );
+    return <TryoutsInterest />;
   }
 
   return (

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo } from "react";
+import { usePublicTryouts } from "@/hooks/useTryouts";
 
 export interface UpcomingTryout {
   id: string;
@@ -14,54 +14,19 @@ export interface UpcomingTryout {
  * Used to drive conditional nav visibility + homepage CTA card.
  */
 export const useUpcomingTryout = (withinDays: number | null = null) => {
-  const [tryout, setTryout] = useState<UpcomingTryout | null>(null);
-  const [hasAny, setHasAny] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { data: events, isLoading } = usePublicTryouts();
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const nowIso = new Date().toISOString();
-        let query = supabase
-          .from("tryout_events")
-          .select("id, name, starts_at, age_group, location_name")
-          .eq("status", "published")
-          .gte("starts_at", nowIso)
-          .order("starts_at", { ascending: true })
-          .limit(1);
+  const filteredEvents = useMemo(() => {
+    if (!events?.length) return [];
+    if (withinDays === null) return events;
 
-        if (withinDays !== null) {
-          const cutoff = new Date();
-          cutoff.setDate(cutoff.getDate() + withinDays);
-          query = query.lte("starts_at", cutoff.toISOString());
-        }
+    const cutoff = Date.now() + withinDays * 24 * 60 * 60 * 1000;
+    return events.filter((event) => new Date(event.starts_at).getTime() <= cutoff);
+  }, [events, withinDays]);
 
-        const { data } = await query;
-
-        const { data: anyData } = await supabase
-          .from("tryout_events")
-          .select("id")
-          .eq("status", "published")
-          .gte("starts_at", nowIso)
-          .limit(1);
-
-        if (!active) return;
-        setHasAny((anyData?.length ?? 0) > 0);
-        setTryout(data && data.length > 0 ? (data[0] as UpcomingTryout) : null);
-      } catch {
-        if (active) {
-          setTryout(null);
-          setHasAny(false);
-        }
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [withinDays]);
+  const tryout = (filteredEvents[0] as UpcomingTryout | undefined) ?? null;
+  const hasAny = (events?.length ?? 0) > 0;
+  const loading = isLoading;
 
   return { tryout, hasAny, loading };
 };
