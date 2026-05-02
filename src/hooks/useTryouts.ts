@@ -114,9 +114,10 @@ export interface TryoutRegistration {
 export const usePublicTryouts = () =>
   useQuery({
     queryKey: ["tryouts", "public"],
-    retry: 2,
+    retry: false,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
-    refetchOnReconnect: true,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
     initialData: () => {
       const cached = readCache<TryoutEventSummary[]>(PUBLIC_TRYOUTS_CACHE_KEY);
       return cached ? sortByStartDate(cached.filter(isUpcomingPublishedTryout)) : undefined;
@@ -154,9 +155,10 @@ export const usePublicTryout = (id?: string) =>
   useQuery({
     queryKey: ["tryouts", "public", id],
     enabled: !!id,
-    retry: 2,
+    retry: false,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
-    refetchOnReconnect: true,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
     staleTime: 1000 * 60 * 5,
     initialData: () => (id ? readCache<TryoutEvent | null>(PUBLIC_TRYOUT_CACHE_KEY(id)) : undefined),
     placeholderData: (previousData) => previousData,
@@ -338,7 +340,8 @@ export const submitTryoutRegistration = async (payload: Record<string, unknown>)
       supabase.functions.invoke("register-for-tryout", {
         body: payload,
       }),
-      "Registration timed out. Please try again.");
+      "Registration timed out. Please try again.",
+      TRYOUT_SUBMIT_TIMEOUT_MS);
 
     if (error) throw new Error(error.message || "Registration failed");
     if (data?.error) throw new Error(data.error);
