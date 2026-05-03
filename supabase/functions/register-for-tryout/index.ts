@@ -71,19 +71,26 @@ async function sendRegistrationEmails({
     const eventName = event.name ?? "Spring 2026 Tryout";
     const confirmationNumber = inserted.id.slice(0, 8).toUpperCase();
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
     const sendEmail = async (label: string, payload: Record<string, unknown>) => {
       try {
-        const { data: resData, error } = await supabase.functions.invoke(
-          "send-transactional-email",
-          { body: payload },
-        );
-        if (error) {
-          console.error(`[email:${label}] invoke error`, error);
-        } else {
-          console.log(`[email:${label}] sent`, resData);
-        }
+        // Use anon key (JWT) for the gateway — the project's service-role key
+        // is in the new sb_secret_* non-JWT format, which the gateway rejects
+        // when verify_jwt = true on the target function.
+        const res = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+          },
+          body: JSON.stringify(payload),
+        });
+        const text = await res.text();
+        console.log(`[email:${label}] status=${res.status} body=${text.slice(0, 500)}`);
       } catch (err) {
-        console.error(`[email:${label}] invoke threw`, err);
+        console.error(`[email:${label}] fetch failed`, err);
       }
     };
 
