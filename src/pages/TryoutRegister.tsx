@@ -342,7 +342,6 @@ const TryoutRegister = () => {
             <Field label="Date of birth *" error={errors.player_dob}>
               <Input
                 type="text"
-                inputMode="numeric"
                 autoComplete="bday"
                 placeholder="MM/DD/YYYY"
                 value={values.player_dob}
