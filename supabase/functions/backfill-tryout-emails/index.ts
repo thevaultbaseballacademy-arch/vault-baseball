@@ -50,17 +50,11 @@ Deno.serve(async (req) => {
 
     const send = async (label: string, payload: Record<string, unknown>) => {
       try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${serviceKey}`,
-            apikey: serviceKey,
-          },
-          body: JSON.stringify(payload),
-        });
-        const text = await res.text();
-        results.push({ id: r.id, label, status: res.status, body: text.slice(0, 300) });
+        const { data: resData, error } = await supabase.functions.invoke(
+          "send-transactional-email",
+          { body: payload },
+        );
+        results.push({ id: r.id, label, ok: !error, data: resData, error: error?.message });
       } catch (e: any) {
         results.push({ id: r.id, label, error: e?.message });
       }
