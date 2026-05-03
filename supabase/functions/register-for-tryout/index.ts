@@ -258,21 +258,22 @@ serve(async (req) => {
       });
     }
 
-    EdgeRuntime.waitUntil(
-      sendRegistrationEmails({
-        supabase,
-        event: {
-          id: event.id,
-          name: event.name,
-          starts_at: event.starts_at,
-        },
-        inserted,
-        data,
-        age,
-        assignedStatus,
-        waitlistPosition,
-      }),
-    );
+    // Await emails before responding so failures surface in logs and the
+    // queue actually receives them (background tasks via waitUntil were being
+    // dropped by the edge runtime, causing silent staff-notification failures).
+    await sendRegistrationEmails({
+      supabase,
+      event: {
+        id: event.id,
+        name: event.name,
+        starts_at: event.starts_at,
+      },
+      inserted,
+      data,
+      age,
+      assignedStatus,
+      waitlistPosition,
+    });
 
     return new Response(
       JSON.stringify({
