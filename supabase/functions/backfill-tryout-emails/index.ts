@@ -48,13 +48,20 @@ Deno.serve(async (req) => {
     const cancelUrl = `https://vault-baseball.lovable.app/tryouts/cancel/${r.cancel_token}`;
     const calendarUrl = `${supabaseUrl}/functions/v1/tryout-ics?event_id=${r.event_id}`;
 
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
     const send = async (label: string, payload: Record<string, unknown>) => {
       try {
-        const { data: resData, error } = await supabase.functions.invoke(
-          "send-transactional-email",
-          { body: payload },
-        );
-        results.push({ id: r.id, label, ok: !error, data: resData, error: error?.message });
+        const res = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+          },
+          body: JSON.stringify(payload),
+        });
+        const text = await res.text();
+        results.push({ id: r.id, label, status: res.status, body: text.slice(0, 400) });
       } catch (e: any) {
         results.push({ id: r.id, label, error: e?.message });
       }
