@@ -369,15 +369,34 @@ export const useUpdateRegistrationStatus = () => {
 };
 
 export const submitTryoutRegistration = async (payload: Record<string, unknown>) => {
-  try {
-    const { data, error } = await withTimeout(() =>
-      supabase.functions.invoke("register-for-tryout", {
-        body: payload,
-      }),
-      "Registration timed out. Please try again.",
-      TRYOUT_SUBMIT_TIMEOUT_MS);
+  // Direct fetch to the edge function — bypasses supabase-js invoke which can
+  // hang indefinitely in restrictive in-app browsers (Instagram, TikTok, iOS Safari).
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/register-for-tryout`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TRYOUT_SUBMIT_TIMEOUT_MS);
 
-    if (error) throw new Error(error.message || "Registration failed");
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    let data: any = null;
+    try {
+      data = await response.json();
+    } catch {
+      // ignore parse failure
+    }
+
+    if (!response.ok) {
+      throw new Error(data?.error || `Registration failed (${response.status})`);
+    }
     if (data?.error) throw new Error(data.error);
 
     return data as {
@@ -388,6 +407,11 @@ export const submitTryoutRegistration = async (payload: Record<string, unknown>)
       duplicate?: boolean;
     };
   } catch (error: any) {
+    if (error?.name === "AbortError") {
+      throw new Error("Registration timed out. Please try again.");
+    }
     throw new Error(error?.message || "Registration failed");
+  } finally {
+    clearTimeout(timeoutId);
   }
 };
