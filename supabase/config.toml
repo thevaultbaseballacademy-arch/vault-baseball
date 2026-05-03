@@ -46,7 +46,7 @@ project_id = "hhvdxkxaiauzikavtpuj"
   [functions.send-manual-reminder]
     verify_jwt = false
   [functions.send-transactional-email]
-    verify_jwt = true
+    verify_jwt = false
   [functions.tryout-ics]
     verify_jwt = false
   [functions.tryout-reminders]
