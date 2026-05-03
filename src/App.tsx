@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { SportProvider } from "@/contexts/SportContext";
 import { FoundersPricingBanner } from "@/components/FoundersPricingBanner";
@@ -214,6 +214,11 @@ const CoursesRedirect = () => {
   return <Navigate to={`/course/${courseId}`} replace />;
 };
 
+const LegacyTryoutRegisterRedirect = () => {
+  const { id } = useParams();
+  return id ? <Navigate to={`/tryouts/${id}/register`} replace /> : <Navigate to="/tryouts" replace />;
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -247,6 +252,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/tryouts" element={<Tryouts />} />
+            <Route path="/tryouts/register/:id" element={<LegacyTryoutRegisterRedirect />} />
             <Route path="/tryouts/:id/register" element={<TryoutRegister />} />
             <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
