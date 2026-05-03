@@ -71,25 +71,19 @@ async function sendRegistrationEmails({
     const eventName = event.name ?? "Spring 2026 Tryout";
     const confirmationNumber = inserted.id.slice(0, 8).toUpperCase();
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const endpoint = `${supabaseUrl}/functions/v1/send-transactional-email`;
-
     const sendEmail = async (label: string, payload: Record<string, unknown>) => {
       try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${serviceKey}`,
-            "apikey": serviceKey,
-          },
-          body: JSON.stringify(payload),
-        });
-        const text = await res.text();
-        console.log(`[email:${label}] status=${res.status} body=${text.slice(0, 500)}`);
+        const { data: resData, error } = await supabase.functions.invoke(
+          "send-transactional-email",
+          { body: payload },
+        );
+        if (error) {
+          console.error(`[email:${label}] invoke error`, error);
+        } else {
+          console.log(`[email:${label}] sent`, resData);
+        }
       } catch (err) {
-        console.error(`[email:${label}] fetch failed`, err);
+        console.error(`[email:${label}] invoke threw`, err);
       }
     };
 
