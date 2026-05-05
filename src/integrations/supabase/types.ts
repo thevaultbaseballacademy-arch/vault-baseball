@@ -785,6 +785,304 @@ export type Database = {
         }
         Relationships: []
       }
+      camp_cohorts: {
+        Row: {
+          age_label: string
+          age_max: number
+          age_min: number
+          camp_id: string
+          created_at: string
+          daily_end_time: string
+          daily_start_time: string
+          display_order: number
+          id: string
+          updated_at: string
+          venue_address: string
+          venue_city: string
+          venue_name: string
+          venue_state: string
+          venue_zip: string
+        }
+        Insert: {
+          age_label: string
+          age_max: number
+          age_min: number
+          camp_id: string
+          created_at?: string
+          daily_end_time: string
+          daily_start_time: string
+          display_order?: number
+          id?: string
+          updated_at?: string
+          venue_address: string
+          venue_city: string
+          venue_name: string
+          venue_state: string
+          venue_zip: string
+        }
+        Update: {
+          age_label?: string
+          age_max?: number
+          age_min?: number
+          camp_id?: string
+          created_at?: string
+          daily_end_time?: string
+          daily_start_time?: string
+          display_order?: number
+          id?: string
+          updated_at?: string
+          venue_address?: string
+          venue_city?: string
+          venue_name?: string
+          venue_state?: string
+          venue_zip?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camp_cohorts_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "camps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camp_registration_sessions: {
+        Row: {
+          id: string
+          registration_id: string
+          reserved_at: string
+          session_id: string
+          status: string
+        }
+        Insert: {
+          id?: string
+          registration_id: string
+          reserved_at?: string
+          session_id: string
+          status?: string
+        }
+        Update: {
+          id?: string
+          registration_id?: string
+          reserved_at?: string
+          session_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camp_registration_sessions_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "camp_registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "camp_registration_sessions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "camp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camp_registrations: {
+        Row: {
+          amount_paid_cents: number
+          camp_id: string
+          cancel_token: string
+          cancelled_at: string | null
+          cohort_id: string
+          confirmed_at: string | null
+          emergency_contact_name: string
+          emergency_contact_phone: string
+          emergency_contact_relationship: string
+          id: string
+          medical_notes: string | null
+          paid_at: string | null
+          parent_email: string
+          parent_name: string
+          parent_phone: string
+          photo_release_consent: boolean
+          player_age_at_registration: number
+          player_dob: string
+          player_first_name: string
+          player_last_name: string
+          registered_at: string
+          registration_type: string
+          status: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          waiver_ip: string | null
+          waiver_signature_name: string
+          waiver_signed_at: string
+        }
+        Insert: {
+          amount_paid_cents: number
+          camp_id: string
+          cancel_token?: string
+          cancelled_at?: string | null
+          cohort_id: string
+          confirmed_at?: string | null
+          emergency_contact_name: string
+          emergency_contact_phone: string
+          emergency_contact_relationship: string
+          id?: string
+          medical_notes?: string | null
+          paid_at?: string | null
+          parent_email: string
+          parent_name: string
+          parent_phone: string
+          photo_release_consent?: boolean
+          player_age_at_registration: number
+          player_dob: string
+          player_first_name: string
+          player_last_name: string
+          registered_at?: string
+          registration_type: string
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          waiver_ip?: string | null
+          waiver_signature_name: string
+          waiver_signed_at: string
+        }
+        Update: {
+          amount_paid_cents?: number
+          camp_id?: string
+          cancel_token?: string
+          cancelled_at?: string | null
+          cohort_id?: string
+          confirmed_at?: string | null
+          emergency_contact_name?: string
+          emergency_contact_phone?: string
+          emergency_contact_relationship?: string
+          id?: string
+          medical_notes?: string | null
+          paid_at?: string | null
+          parent_email?: string
+          parent_name?: string
+          parent_phone?: string
+          photo_release_consent?: boolean
+          player_age_at_registration?: number
+          player_dob?: string
+          player_first_name?: string
+          player_last_name?: string
+          registered_at?: string
+          registration_type?: string
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          waiver_ip?: string | null
+          waiver_signature_name?: string
+          waiver_signed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camp_registrations_camp_id_fkey"
+            columns: ["camp_id"]
+            isOneToOne: false
+            referencedRelation: "camps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "camp_registrations_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "camp_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camp_sessions: {
+        Row: {
+          capacity: number
+          cohort_id: string
+          created_at: string
+          ends_on: string
+          id: string
+          session_number: number
+          starts_on: string
+          status: string
+          updated_at: string
+          waitlist_capacity: number
+        }
+        Insert: {
+          capacity?: number
+          cohort_id: string
+          created_at?: string
+          ends_on: string
+          id?: string
+          session_number: number
+          starts_on: string
+          status?: string
+          updated_at?: string
+          waitlist_capacity?: number
+        }
+        Update: {
+          capacity?: number
+          cohort_id?: string
+          created_at?: string
+          ends_on?: string
+          id?: string
+          session_number?: number
+          starts_on?: string
+          status?: string
+          updated_at?: string
+          waitlist_capacity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camp_sessions_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "camp_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camps: {
+        Row: {
+          created_at: string
+          description: string | null
+          full_pass_price_cents: number
+          full_pass_savings_cents: number | null
+          id: string
+          name: string
+          registration_closes_at: string | null
+          registration_opens_at: string | null
+          status: string
+          updated_at: string
+          weekly_price_cents: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          full_pass_price_cents: number
+          full_pass_savings_cents?: number | null
+          id?: string
+          name: string
+          registration_closes_at?: string | null
+          registration_opens_at?: string | null
+          status?: string
+          updated_at?: string
+          weekly_price_cents: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          full_pass_price_cents?: number
+          full_pass_savings_cents?: number | null
+          id?: string
+          name?: string
+          registration_closes_at?: string | null
+          registration_opens_at?: string | null
+          status?: string
+          updated_at?: string
+          weekly_price_cents?: number
+        }
+        Relationships: []
+      }
       certification_attempts: {
         Row: {
           answers: Json
@@ -4406,6 +4704,42 @@ export type Database = {
         }
         Relationships: []
       }
+      page_views: {
+        Row: {
+          funnel_event: string | null
+          id: string
+          page_category: string
+          page_path: string
+          referrer: string | null
+          related_entity_id: string | null
+          session_id: string
+          user_agent_summary: string | null
+          viewed_at: string
+        }
+        Insert: {
+          funnel_event?: string | null
+          id?: string
+          page_category: string
+          page_path: string
+          referrer?: string | null
+          related_entity_id?: string | null
+          session_id: string
+          user_agent_summary?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          funnel_event?: string | null
+          id?: string
+          page_category?: string
+          page_path?: string
+          referrer?: string | null
+          related_entity_id?: string | null
+          session_id?: string
+          user_agent_summary?: string | null
+          viewed_at?: string
+        }
+        Relationships: []
+      }
       parent_athlete_links: {
         Row: {
           athlete_user_id: string
@@ -7397,6 +7731,34 @@ export type Database = {
             Args: { question_id: string; selected_answer: number }
             Returns: boolean
           }
+      create_camp_registration_atomic: {
+        Args: {
+          p_amount_paid_cents: number
+          p_camp_id: string
+          p_cohort_id: string
+          p_emergency_contact_name: string
+          p_emergency_contact_phone: string
+          p_emergency_contact_relationship: string
+          p_medical_notes: string
+          p_parent_email: string
+          p_parent_name: string
+          p_parent_phone: string
+          p_photo_release_consent: boolean
+          p_player_age_at_registration: number
+          p_player_dob: string
+          p_player_first_name: string
+          p_player_last_name: string
+          p_registration_type: string
+          p_session_ids: string[]
+          p_waiver_ip: string
+          p_waiver_signature_name: string
+        }
+        Returns: {
+          conflict_code: string
+          conflict_session_id: string
+          registration_id: string
+        }[]
+      }
       create_reservation_atomic: {
         Args: {
           p_coach_user_id: string
