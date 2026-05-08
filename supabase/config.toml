@@ -9,6 +9,14 @@ project_id = "hhvdxkxaiauzikavtpuj"
     verify_jwt = false
   [functions.cancel-tryout-registration]
     verify_jwt = false
+  [functions.cancel-camp-registration]
+    verify_jwt = false
+  [functions.camp-ics]
+    verify_jwt = false
+  [functions.camp-stripe-webhook]
+    verify_jwt = false
+  [functions.register-for-camp]
+    verify_jwt = false
   [functions.check-subscription]
     verify_jwt = false
   [functions.create-checkout]
