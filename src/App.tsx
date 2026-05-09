@@ -25,6 +25,7 @@ import Auth from "./pages/Auth";
 import Tryouts from "./pages/Tryouts";
 import TryoutRegister from "./pages/TryoutRegister";
 import CancelTryout from "./pages/CancelTryout";
+const Camps = lazy(() => import("./pages/Camps"));
 
 // Global loading fallback
 const PageLoader = () => (
