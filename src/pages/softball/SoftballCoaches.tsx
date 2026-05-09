@@ -50,11 +50,12 @@ const SoftballCoaches = () => {
           });
 
           const userIds = softballCoaches.map(c => c.user_id!);
-          const { data: profiles } = userIds.length
-            ? await supabase.from("profiles").select("user_id, avatar_url").in("user_id", userIds)
-            : { data: [] as any[] };
-
-          const profileMap = new Map(profiles?.map(p => [p.user_id, p.avatar_url]) || []);
+          let profiles: Array<{ user_id: string; avatar_url: string | null }> = [];
+          if (userIds.length) {
+            const { data } = await supabase.from("profiles").select("user_id, avatar_url").in("user_id", userIds);
+            profiles = (data || []) as any;
+          }
+          const profileMap = new Map(profiles.map(p => [p.user_id, p.avatar_url]));
           if (cancelled) return;
           setCoaches(softballCoaches.map(c => ({
             ...c,
