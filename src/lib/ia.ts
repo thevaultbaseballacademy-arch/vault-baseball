@@ -62,7 +62,7 @@ export const IA_BUCKETS: IABucket[] = [
       { name: "Showcase Prep", href: "/products/showcase-prep" },
       { name: "Tryouts", href: "/tryouts", description: "Free open tryouts." },
       { name: "Summer Camps", href: "/camps", description: "22M Elite development camps." },
-      { name: "Wall of Wins", href: "/wins", description: "Athletes who got there." },
+      { name: "Wall of Wins", href: "/wall-of-wins", description: "Athletes who got there." },
     ],
   },
   {

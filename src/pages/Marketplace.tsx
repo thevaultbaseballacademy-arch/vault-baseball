@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { useMarketplaceCoaches, type MarketplaceCoach } from "@/hooks/useMarketplace";
 import { Skeleton } from "@/components/ui/skeleton";
 import CoachBadges from "@/components/marketplace/CoachBadges";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const SPECIALTIES = ["Pitching", "Hitting", "Fielding", "Catching", "Strength", "Youth Development", "College Prep"];
 
@@ -227,15 +228,16 @@ const Marketplace = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-20">
-              <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-display text-foreground mb-2">No Coaches Found</h3>
-              <p className="text-muted-foreground mb-6">
-                {searchTerm || selectedSpecialty
-                  ? "Try adjusting your search or filters."
-                  : "The marketplace is launching soon. Check back for certified coaches."}
-              </p>
-            </div>
+            <EmptyState
+              icon={<Users className="w-7 h-7 text-muted-foreground" />}
+              title="No coaches match"
+              description={searchTerm || selectedSpecialty
+                ? "Try clearing filters or searching a different specialty."
+                : "The Coach Network is launching. Check back soon — or get certified and join."}
+              actionLabel={searchTerm || selectedSpecialty ? "Clear filters" : "Become a Coach"}
+              actionHref={searchTerm || selectedSpecialty ? undefined : "/coach-register"}
+              onAction={searchTerm || selectedSpecialty ? () => { setSearchTerm(""); setSelectedSpecialty(""); } : undefined}
+            />
           )}
 
           {/* Platform Disclaimer */}
