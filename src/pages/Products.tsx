@@ -17,6 +17,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductFilters, { Category, PriceRange } from "@/components/products/ProductFilters";
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
 
 interface Product {
