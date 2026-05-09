@@ -23,7 +23,7 @@ interface LessonPackage {
 
 const LessonPackages = () => {
   const [packages, setPackages] = useState<LessonPackage[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const { remainingLessons } = useLessonCredits();
   const navigate = useNavigate();
@@ -34,13 +34,21 @@ const LessonPackages = () => {
   }, []);
 
   const fetchPackages = async () => {
-    const { data, error } = await (supabase.from('lesson_packages' as any) as any)
-      .select('*')
-      .eq('is_active', true)
-      .order('lesson_count');
-
-    if (!error) setPackages(data || []);
-    setLoading(false);
+    setLoading(true);
+    // Hard timeout so a stalled query can't lock the page forever
+    const safety = window.setTimeout(() => setLoading(false), 6000);
+    try {
+      const { data, error } = await (supabase.from('lesson_packages' as any) as any)
+        .select('*')
+        .eq('is_active', true)
+        .order('lesson_count');
+      if (!error) setPackages(data || []);
+    } catch (err) {
+      console.error('[LessonPackages] fetch failed', err);
+    } finally {
+      window.clearTimeout(safety);
+      setLoading(false);
+    }
   };
 
   const handlePurchase = async (pkg: LessonPackage) => {
