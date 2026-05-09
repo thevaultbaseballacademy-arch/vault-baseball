@@ -13,7 +13,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   const buckets = [
-    { to: "/free-evaluation", label: "Assess", icon: Compass, desc: "Free evaluation & baselines" },
+    { to: "/evaluate", label: "Assess", icon: Compass, desc: "Free evaluation & baselines" },
     { to: "/products", label: "Train", icon: Dumbbell, desc: "Programs, bundles, coaching" },
     { to: "/recruiting", label: "Get Seen", icon: Eye, desc: "Audits, tryouts, showcases" },
     { to: "/certifications", label: "Scale", icon: Building2, desc: "Coach & org tools" },
