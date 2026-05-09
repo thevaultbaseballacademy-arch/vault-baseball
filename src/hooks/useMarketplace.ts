@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -73,11 +74,12 @@ export interface CoachReview {
 const PLATFORM_FEE_PERCENT = 30;
 
 export const useMarketplaceCoaches = (filters?: { specialty?: string; search?: string }) => {
-  return useQuery({
-    queryKey: ["marketplace-coaches", filters],
+  const query = useQuery({
+    // Single cached fetch — filtering happens client-side via useMemo below.
+    queryKey: ["marketplace-coaches"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      // Query marketplace profiles joined with coaches — only approved coaches
-      let query = supabase
+      const { data, error } = await supabase
         .from("coach_marketplace_profiles")
         .select(`
           *,
@@ -92,12 +94,11 @@ export const useMarketplaceCoaches = (filters?: { specialty?: string; search?: s
             marketplace_status
           )
         `)
-        .eq("is_marketplace_active", true);
-
-      const { data, error } = await query.order("avg_rating", { ascending: false });
+        .eq("is_marketplace_active", true)
+        .order("avg_rating", { ascending: false });
       if (error) throw error;
 
-      let results = (data || [])
+      return (data || [])
         .map((item: any) => ({
           ...item,
           coach_name: item.coaches?.name,
@@ -109,39 +110,36 @@ export const useMarketplaceCoaches = (filters?: { specialty?: string; search?: s
           is_marketplace_approved: item.coaches?.is_marketplace_approved,
           marketplace_status: item.coaches?.marketplace_status,
         }))
-        // CRITICAL PROTECTION: Only show coaches who meet ALL requirements:
-        // 1. Admin has approved marketplace access
-        // 2. Status is "approved"
-        // 3. Coach is certified (Vault Certified, Vault Staff, OR Eddie Certified)
         .filter((c: any) => {
           const isApproved = c.is_marketplace_approved === true;
           const hasApprovedStatus = c.marketplace_status === "approved";
-          const isCertified = c.is_certified === true || c.is_bypass_certified === true || c.is_staff === true;
+          const isCertified =
+            c.is_certified === true || c.is_bypass_certified === true || c.is_staff === true;
           return isApproved && hasApprovedStatus && isCertified;
-        });
-
-      // Client-side filtering
-      if (filters?.specialty) {
-        results = results.filter((c: any) =>
-          c.specialties?.some((s: string) =>
-            s.toLowerCase().includes(filters.specialty!.toLowerCase())
-          )
-        );
-      }
-      if (filters?.search) {
-        const term = filters.search.toLowerCase();
-        results = results.filter(
-          (c: any) =>
-            c.coach_name?.toLowerCase().includes(term) ||
-            c.tagline?.toLowerCase().includes(term) ||
-            c.location?.toLowerCase().includes(term) ||
-            c.specialties?.some((s: string) => s.toLowerCase().includes(term))
-        );
-      }
-
-      return results as MarketplaceCoach[];
+        }) as MarketplaceCoach[];
     },
   });
+
+  const filtered = useMemo(() => {
+    let results = query.data || [];
+    if (filters?.specialty) {
+      const sp = filters.specialty.toLowerCase();
+      results = results.filter((c) => c.specialties?.some((s) => s.toLowerCase().includes(sp)));
+    }
+    if (filters?.search) {
+      const term = filters.search.toLowerCase();
+      results = results.filter(
+        (c) =>
+          c.coach_name?.toLowerCase().includes(term) ||
+          c.tagline?.toLowerCase().includes(term) ||
+          c.location?.toLowerCase().includes(term) ||
+          c.specialties?.some((s) => s.toLowerCase().includes(term))
+      );
+    }
+    return results;
+  }, [query.data, filters?.specialty, filters?.search]);
+
+  return { ...query, data: filtered };
 };
 
 export const useCoachProfile = (coachId: string) => {
