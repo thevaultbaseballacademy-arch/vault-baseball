@@ -173,7 +173,7 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
       {!isOpen && (
         <button
           onClick={handleOpen}
-          className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-50 flex items-center gap-2.5 px-5 py-3 bg-foreground text-background shadow-lg hover:bg-foreground/90 transition-all hover:scale-[1.03] active:scale-95 font-display text-base tracking-wider"
+          className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-40 flex items-center gap-2.5 px-5 py-3 bg-foreground text-background shadow-lg hover:bg-foreground/90 transition-all hover:scale-[1.03] active:scale-95 font-display text-base tracking-wider"
           aria-label="Ask Eddie AI"
         >
           <MessageCircle className="h-5 w-5" />
@@ -185,7 +185,7 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
       {isOpen && (
         <div
           className={cn(
-            "fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-50 bg-card border border-border shadow-2xl transition-all duration-200 overflow-hidden flex flex-col",
+            "fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-40 bg-card border border-border shadow-2xl transition-all duration-200 overflow-hidden flex flex-col",
             isMinimized
               ? "w-72 h-14"
               : "w-[calc(100vw-32px)] sm:w-[400px] h-[calc(100svh-100px)] sm:h-[580px] max-h-[85vh]"
