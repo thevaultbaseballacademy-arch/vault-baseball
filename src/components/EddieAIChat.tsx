@@ -104,12 +104,22 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
   const [showQuickPrompts, setShowQuickPrompts] = useState(false);
-  const { messages, isLoading, error, sendMessage, clearChat, injectMessage, sport } = useEddieChat();
+  const { messages, isLoading, error, sendMessage, clearChat, injectMessage, updatePageContext, sport } = useEddieChat();
   const [chatInput, setChatInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
   const isSoftball = sport === "softball";
+  const bucket = bucketForPath(location.pathname);
+
+  // Push page context to Eddie whenever the route changes
+  useEffect(() => {
+    updatePageContext({
+      bucket,
+      page: pageContextLabel(location.pathname),
+      pathname: location.pathname,
+    });
+  }, [location.pathname, bucket, updatePageContext]);
 
   // Auto-scroll
   useEffect(() => {
