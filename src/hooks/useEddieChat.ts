@@ -4,12 +4,18 @@ import { useSport } from "@/contexts/SportContext";
 const EDDIE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/eddie-ai`;
 
 export type Message = { role: "user" | "assistant"; content: string };
+export type EddiePageContext = {
+  bucket: "assess" | "train" | "get_seen" | "scale" | null;
+  page: string;     // human label: "Recruitment Audit product page"
+  pathname: string; // raw route
+};
 
 export const useEddieChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [prospectGrades, setProspectGrades] = useState<Record<string, number> | null>(null);
+  const [pageContext, setPageContext] = useState<EddiePageContext | null>(null);
   const { sport } = useSport();
 
   const streamChat = async ({
