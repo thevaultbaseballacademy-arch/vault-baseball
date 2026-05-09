@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2, TrendingUp, Calendar, Dumbbell, Heart } from "lucide-react";
+import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
