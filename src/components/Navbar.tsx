@@ -135,38 +135,60 @@ const Navbar = () => {
     }, 150);
   };
 
+  // 4-bucket VAULT OS information architecture
+  // (single source: src/lib/ia.ts)
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Programs", href: "/courses" },
-    { name: "Tryouts", href: "/tryouts" },
-    { name: "Book Session", href: "/book-session" },
-    { name: "Submit Video", href: "/evaluate" },
-    { 
-      name: "Products", 
+    {
+      name: "Assess",
+      href: "/evaluate",
+      dropdown: [
+        { name: "Free Evaluation", href: "/evaluate" },
+        { name: "Prospect Grader", href: "/recruiting/prospect-grader" },
+        { name: "Velocity Baseline", href: "/velocity-baseline" },
+        { name: "Velo-Check Analysis", href: "/products/velo-check" },
+      ],
+    },
+    {
+      name: "Train",
       href: "/products",
       dropdown: [
-        { name: "All Products", href: "/products" },
+        { name: "All Programs", href: "/products" },
         { name: "12-Week Velocity System", href: "/products/velocity-system" },
         { name: "Velocity Accelerator", href: "/products/velocity-accelerator" },
-        { name: "Velo-Check Analysis", href: "/products/velo-check" },
-        { name: "Recruitment Audit", href: "/products/recruitment" },
         { name: "Longevity System", href: "/products/longevity" },
         { name: "Transfer System", href: "/products/transfer" },
-        { name: "Team Licenses", href: "/products/teams" },
-        { name: "Coach Certification", href: "/products/certified-coach" },
+        { name: "Remote Training", href: "/products/remote-training" },
         { name: "Bundles", href: "/products/bundles" },
-      ]
-    },
-    { 
-      name: "Coaching", 
-      href: "/marketplace",
-      dropdown: [
-        { name: "Coach Marketplace", href: "/marketplace" },
-        { name: "Find a Coach", href: "/find-coach" },
+        { name: "Book a Lesson", href: "/book-session" },
         { name: "Lesson Packages", href: "/lesson-packages" },
         { name: "Group Sessions", href: "/group-sessions" },
+      ],
+    },
+    {
+      name: "Get Seen",
+      href: "/recruiting",
+      dropdown: [
+        { name: "Recruiting Hub", href: "/recruiting" },
+        { name: "Recruitment Audit", href: "/products/recruitment" },
+        { name: "Showcase Prep", href: "/products/showcase-prep" },
+        { name: "Tryouts", href: "/tryouts" },
+        { name: "Summer Camps", href: "/camps" },
+        { name: "Wall of Wins", href: "/wins" },
+      ],
+    },
+    {
+      name: "Scale",
+      href: "/marketplace",
+      dropdown: [
+        { name: "Coach Network (Marketplace)", href: "/marketplace" },
+        { name: "Find a Coach", href: "/find-coach" },
         { name: "Become a Coach", href: "/coach-register" },
-      ]
+        { name: "Coach Certification", href: "/products/certified-coach" },
+        { name: "Team Licenses", href: "/products/teams" },
+        { name: "Org Licensing", href: "/products/org-licensing" },
+        { name: "Org Starter Pack", href: "/products/org-starter-pack" },
+      ],
     },
   ];
 
