@@ -7,6 +7,7 @@ import { useEddieChat } from "@/hooks/useEddieChat";
 import { cn } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import { bucketForPath, pageContextLabel } from "@/lib/ia";
 
 // ── Product CTA detection & rendering ──
 const PRODUCT_PATTERNS: { pattern: RegExp; href: string; label: string }[] = [
