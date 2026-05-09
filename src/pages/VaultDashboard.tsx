@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
 import Footer from "@/components/Footer";
 import TrialStatusBanner from "@/components/trial/TrialStatusBanner";
 import {
