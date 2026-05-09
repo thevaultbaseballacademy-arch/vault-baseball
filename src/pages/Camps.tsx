@@ -86,9 +86,13 @@ const Camps = () => {
           .eq("camp_id", c.id)
           .order("display_order");
         if (cancelled) return;
-        setCohorts((ch || []) as Cohort[]);
+        const cohortList = (ch || []) as Cohort[];
+        setCohorts(cohortList);
 
-        const cohortIds = (ch || []).map((x: any) => x.id);
+        const cohortIds = cohortList.map((x) => x.id);
+        if (cohortIds.length === 0) return;
+
+        // Sessions then capacity (capacity needs session ids)
         const { data: sess } = await (supabase.from("camp_sessions" as any) as any)
           .select("*")
           .in("cohort_id", cohortIds)
@@ -97,7 +101,7 @@ const Camps = () => {
         const sessList = (sess || []) as CampSession[];
         setSessions(sessList);
 
-        // Capacity (no PII)
+        if (sessList.length === 0) return;
         const { data: caps } = await supabase.rpc("get_camp_session_capacity" as any, {
           p_session_ids: sessList.map((s) => s.id),
         });
