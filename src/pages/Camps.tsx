@@ -71,8 +71,7 @@ const Camps = () => {
     const safety = window.setTimeout(() => { if (!cancelled) setLoading(false); }, 6000);
     (async () => {
       try {
-        const { data: camps } = await supabase
-          .from("camps" as any)
+        const { data: camps } = await (supabase.from("camps" as any) as any)
           .select("id, name, description, weekly_price_cents, full_pass_price_cents, full_pass_savings_cents, registration_opens_at, registration_closes_at")
           .eq("status", "published")
           .order("created_at", { ascending: false })
@@ -82,8 +81,7 @@ const Camps = () => {
         if (cancelled) return;
         setCamp(c);
 
-        const { data: ch } = await supabase
-          .from("camp_cohorts" as any)
+        const { data: ch } = await (supabase.from("camp_cohorts" as any) as any)
           .select("*")
           .eq("camp_id", c.id)
           .order("display_order");
@@ -91,8 +89,7 @@ const Camps = () => {
         setCohorts((ch || []) as Cohort[]);
 
         const cohortIds = (ch || []).map((x: any) => x.id);
-        const { data: sess } = await supabase
-          .from("camp_sessions" as any)
+        const { data: sess } = await (supabase.from("camp_sessions" as any) as any)
           .select("*")
           .in("cohort_id", cohortIds)
           .order("session_number");
