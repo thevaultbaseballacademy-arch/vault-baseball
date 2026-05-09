@@ -26,6 +26,8 @@ import Tryouts from "./pages/Tryouts";
 import TryoutRegister from "./pages/TryoutRegister";
 import CancelTryout from "./pages/CancelTryout";
 const Camps = lazy(() => import("./pages/Camps"));
+const CampRegister = lazy(() => import("./pages/CampRegister"));
+const CampSuccess = lazy(() => import("./pages/CampSuccess"));
 
 // Global loading fallback
 const PageLoader = () => (
@@ -257,6 +259,8 @@ const App = () => (
             <Route path="/tryouts/:id/register" element={<TryoutRegister />} />
             <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
             <Route path="/camps" element={<Camps />} />
+            <Route path="/camps/:cohortId/register" element={<CampRegister />} />
+            <Route path="/camps/success" element={<CampSuccess />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
