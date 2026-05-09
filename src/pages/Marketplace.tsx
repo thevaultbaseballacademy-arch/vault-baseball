@@ -54,14 +54,13 @@ const Marketplace = () => {
             className="max-w-4xl mx-auto text-center"
           >
             <Badge variant="outline" className="mb-4 border-background/30 text-background/70 text-xs tracking-widest">
-              VAULT CERTIFIED NETWORK
+              VAULT COACH NETWORK
             </Badge>
             <h1 className="text-5xl md:text-7xl font-display mb-4">
-              COACH MARKETPLACE
+              ONE STANDARD. EVERY COACH.
             </h1>
             <p className="text-lg text-background/60 max-w-2xl mx-auto mb-8">
-              Connect with elite, Vault-certified coaches for remote training sessions.
-              Every coach follows the Vault development system and philosophy.
+              Book certified coaches who train inside the VAULT system — same protocols, same metrics, same outcomes. No guesswork, no mismatched philosophies.
             </p>
 
             {/* Search Bar */}
@@ -258,9 +257,9 @@ const Marketplace = () => {
             className="mt-8 bg-foreground text-background rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6"
           >
             <div>
-              <h3 className="text-2xl font-display mb-2">ARE YOU A COACH?</h3>
+              <h3 className="text-2xl font-display mb-2">COACH ON THE NETWORK.</h3>
               <p className="text-background/60 max-w-md">
-                Get Vault certified and join the marketplace. Earn income coaching athletes remotely through the Vault platform.
+                Get VAULT certified, list on the network, and earn 70% on every remote session — running standardized protocols, not freelance guesses.
               </p>
             </div>
             <div className="flex gap-3">

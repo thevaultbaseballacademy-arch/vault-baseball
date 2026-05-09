@@ -126,14 +126,13 @@ const Camps = () => {
             className="text-center mb-12"
           >
             <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-3 block">
-              22M ELITE
+              22M ELITE · IN-PERSON
             </span>
             <h1 className="text-3xl md:text-5xl font-display text-foreground mb-3">
-              SUMMER DEVELOPMENT CAMPS
+              FOUR WEEKS. MEASURED GAINS.
             </h1>
             <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
-              Four weeks of focused player development — June 29 through July 24, 2026.
-              Pick a single week or save with the Full Pass.
+              The VAULT system, run live. June 29 – July 24, 2026. Daily baselines, pillar-based blocks, exit report. Single week or Full Pass.
             </p>
           </motion.div>
 
