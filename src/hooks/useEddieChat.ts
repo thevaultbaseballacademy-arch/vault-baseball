@@ -37,6 +37,7 @@ export const useEddieChat = () => {
         messages,
         sport,
         prospectGrades,
+        pageContext,
       }),
     });
 
