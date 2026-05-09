@@ -379,11 +379,12 @@ const Navbar = () => {
 
                 {/* Mobile Auth/User Section */}
                 <div className="flex flex-col gap-1.5 pt-3 mt-2 border-t border-border px-2">
-                  <Button 
-                    className="justify-center bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold" 
-                    onClick={() => handleNavigate("/products/founders-access")}
+                  <Button
+                    variant="vault"
+                    className="justify-center font-display tracking-wide"
+                    onClick={() => handleNavigate("/evaluate")}
                   >
-                    🔥 $499 Lifetime - Limited Window
+                    GET YOUR FREE EVALUATION
                   </Button>
                   {user ? (
                     <>
