@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { useMarketplaceCoaches, type MarketplaceCoach } from "@/hooks/useMarketplace";
 import { Skeleton } from "@/components/ui/skeleton";
 import CoachBadges from "@/components/marketplace/CoachBadges";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const SPECIALTIES = ["Pitching", "Hitting", "Fielding", "Catching", "Strength", "Youth Development", "College Prep"];
 

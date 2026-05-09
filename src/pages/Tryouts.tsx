@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TryoutsInterest from "./TryoutsInterest";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString(undefined, {
