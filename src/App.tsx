@@ -259,6 +259,8 @@ const App = () => (
             <Route path="/tryouts/:id/register" element={<TryoutRegister />} />
             <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
             <Route path="/camps" element={<Camps />} />
+            <Route path="/camps/:cohortId/register" element={<CampRegister />} />
+            <Route path="/camps/success" element={<CampSuccess />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
