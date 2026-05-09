@@ -257,12 +257,13 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-2">
-            <Button 
-              size="sm" 
-              onClick={() => handleNavigate("/products/founders-access")}
-              className="mr-1 bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold text-xs"
+            <Button
+              size="sm"
+              variant="vault"
+              onClick={() => handleNavigate("/evaluate")}
+              className="mr-1 font-display tracking-wide"
             >
-              🔥 $499 Lifetime
+              FREE EVALUATION
             </Button>
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
