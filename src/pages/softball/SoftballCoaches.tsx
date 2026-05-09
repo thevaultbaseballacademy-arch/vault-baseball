@@ -29,42 +29,49 @@ const SoftballCoaches = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+    const safety = window.setTimeout(() => { if (!cancelled) setLoading(false); }, 8000);
     const fetchSoftballCoaches = async () => {
       setLoading(true);
-      const { data: coachRecords } = await supabase
-        .from("coaches")
-        .select("id, user_id, name, email, bio, specialties, years_experience, location, is_certified, role")
-        .eq("status", "Active")
-        .not("user_id", "is", null);
+      try {
+        const { data: coachRecords } = await supabase
+          .from("coaches")
+          .select("id, user_id, name, email, bio, specialties, years_experience, location, is_certified, role")
+          .eq("status", "Active")
+          .not("user_id", "is", null);
 
-      if (coachRecords) {
-        const softballCoaches = coachRecords.filter(c => {
-          const specs = (c.specialties || []).map((s: string) => s.toLowerCase());
-          return specs.some((s: string) =>
-            s.includes("softball") || s.includes("fastpitch") ||
-            s.includes("windmill") || s.includes("slap")
-          );
-        });
+        if (coachRecords && !cancelled) {
+          const softballCoaches = coachRecords.filter(c => {
+            const specs = (c.specialties || []).map((s: string) => s.toLowerCase());
+            return specs.some((s: string) =>
+              s.includes("softball") || s.includes("fastpitch") ||
+              s.includes("windmill") || s.includes("slap")
+            );
+          });
 
-        // Fetch avatar URLs from profiles
-        const userIds = softballCoaches.map(c => c.user_id!);
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("user_id, avatar_url")
-          .in("user_id", userIds);
+          const userIds = softballCoaches.map(c => c.user_id!);
+          const { data: profiles } = userIds.length
+            ? await supabase.from("profiles").select("user_id, avatar_url").in("user_id", userIds)
+            : { data: [] as any[] };
 
-        const profileMap = new Map(profiles?.map(p => [p.user_id, p.avatar_url]) || []);
-
-        setCoaches(softballCoaches.map(c => ({
-          ...c,
-          specialties: c.specialties || [],
-          avatar_url: profileMap.get(c.user_id!) || null,
-        })) as SoftballCoach[]);
+          const profileMap = new Map(profiles?.map(p => [p.user_id, p.avatar_url]) || []);
+          if (cancelled) return;
+          setCoaches(softballCoaches.map(c => ({
+            ...c,
+            specialties: c.specialties || [],
+            avatar_url: profileMap.get(c.user_id!) || null,
+          })) as SoftballCoach[]);
+        }
+      } catch (e) {
+        console.error("[SoftballCoaches] load failed", e);
+      } finally {
+        if (!cancelled) setLoading(false);
+        window.clearTimeout(safety);
       }
-      setLoading(false);
     };
 
     fetchSoftballCoaches();
+    return () => { cancelled = true; window.clearTimeout(safety); };
   }, []);
 
   return (

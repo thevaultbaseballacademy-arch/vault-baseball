@@ -73,25 +73,30 @@ const SoftballLessonNotes = () => {
 
   const loadLessons = async (userId: string) => {
     setLoading(true);
-    // Fetch softball lessons where user is athlete or coach
-    const { data } = await supabase
-      .from("remote_lessons")
-      .select("*")
-      .eq("sport_type", "softball")
-      .or(`athlete_user_id.eq.${userId},coach_user_id.eq.${userId}`)
-      .eq("status", "completed")
-      .order("scheduled_at", { ascending: false })
-      .limit(20);
+    const safety = window.setTimeout(() => setLoading(false), 8000);
+    try {
+      const { data } = await supabase
+        .from("remote_lessons")
+        .select("*")
+        .eq("sport_type", "softball")
+        .or(`athlete_user_id.eq.${userId},coach_user_id.eq.${userId}`)
+        .eq("status", "completed")
+        .order("scheduled_at", { ascending: false })
+        .limit(20);
 
-    const typedData = (data || []) as unknown as LessonWithDetails[];
-    setLessons(typedData);
+      const typedData = (data || []) as unknown as LessonWithDetails[];
+      setLessons(typedData);
 
-    // Auto-select if lessonId in URL
-    if (lessonId && typedData.length > 0) {
-      const found = typedData.find(l => l.id === lessonId);
-      if (found) await selectLesson(found, userId);
+      if (lessonId && typedData.length > 0) {
+        const found = typedData.find(l => l.id === lessonId);
+        if (found) await selectLesson(found, userId);
+      }
+    } catch (e) {
+      console.error("[SoftballLessonNotes] load failed", e);
+    } finally {
+      window.clearTimeout(safety);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const selectLesson = async (lesson: LessonWithDetails, userId?: string) => {
