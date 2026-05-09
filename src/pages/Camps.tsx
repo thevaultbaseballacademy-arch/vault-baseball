@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type Camp = {
   id: string;
@@ -145,11 +146,13 @@ const Camps = () => {
               <Loader2 className="w-7 h-7 animate-spin text-primary" />
             </div>
           ) : !camp ? (
-            <Card className="border-border">
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">Camp registration opens soon. Check back shortly.</p>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={<CalendarDays className="w-7 h-7 text-muted-foreground" />}
+              title="Camp registration opens soon"
+              description="The next 22M Elite cohort hasn't been announced yet. Get the free evaluation in the meantime — your data carries into camp."
+              actionLabel="Get a Free Evaluation"
+              actionHref="/evaluate"
+            />
           ) : (
             <>
               {/* Pricing strip */}

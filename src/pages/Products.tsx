@@ -17,6 +17,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductFilters, { Category, PriceRange } from "@/components/products/ProductFilters";
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
 
 interface Product {
@@ -304,16 +305,15 @@ const Products = () => {
 
       {/* No Results State */}
       {hasNoResults && (
-        <section className="py-24">
-          <div className="container mx-auto px-4 text-center">
-            <div className="w-16 h-16 rounded-full bg-muted/50 mx-auto flex items-center justify-center mb-6">
-              <SearchX className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-display text-foreground mb-2">No products found</h3>
-            <p className="text-muted-foreground mb-6">Try adjusting your search or filters to find what you're looking for.</p>
-            <Button variant="outline" onClick={() => { setSearchQuery(""); setCategory("all"); setPriceRange("all"); }}>
-              Clear Filters
-            </Button>
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <EmptyState
+              icon={<SearchX className="w-7 h-7 text-muted-foreground" />}
+              title="No products match"
+              description="Try adjusting your search or filters."
+              actionLabel="Clear filters"
+              onAction={() => { setSearchQuery(""); setCategory("all"); setPriceRange("all"); }}
+            />
           </div>
         </section>
       )}
