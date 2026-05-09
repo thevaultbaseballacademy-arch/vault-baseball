@@ -53,7 +53,7 @@ const BookSession = () => {
   const POSITIONS = sport === 'softball' ? SOFTBALL_POSITIONS : BASEBALL_POSITIONS;
   const [step, setStep] = useState<Step>("coach");
   const [coaches, setCoaches] = useState<CoachOption[]>([]);
-  const [loadingCoaches, setLoadingCoaches] = useState(false);
+  const [loadingCoaches, setLoadingCoaches] = useState(true);
 
   // Selections
   const [selectedCoach, setSelectedCoach] = useState<CoachOption | null>(null);
@@ -77,7 +77,7 @@ const BookSession = () => {
 
   useEffect(() => {
     fetchCoaches();
-    // Auto-fill logged-in user info
+    // Auto-fill logged-in user info — wrapped so a stalled auth call can't block render
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setEmail(session.user.email || "");
@@ -90,7 +90,7 @@ const BookSession = () => {
             if (data?.display_name) setAthleteName(data.display_name);
           });
       }
-    });
+    }).catch((err) => console.error("[BookSession] session fetch failed", err));
   }, []);
 
   useEffect(() => {
@@ -109,21 +109,28 @@ const BookSession = () => {
   }, [selectedCoach, selectedDate]);
 
   const fetchCoaches = async () => {
-    const sportLabel = sport === 'softball' ? 'Softball' : 'Baseball';
-    const { data } = await supabase
-      .from("coaches")
-      .select("user_id, name, specialties")
-      .eq("status", "Active")
-      .not("user_id", "is", null);
+    setLoadingCoaches(true);
+    const safety = window.setTimeout(() => setLoadingCoaches(false), 6000);
+    try {
+      const sportLabel = sport === 'softball' ? 'Softball' : 'Baseball';
+      const { data } = await supabase
+        .from("coaches")
+        .select("user_id, name, specialties")
+        .eq("status", "Active")
+        .not("user_id", "is", null);
 
-    // Filter coaches whose specialties include the current sport (or show all if no specialties set)
-    const filtered = data?.filter(c => {
-      if (!c.specialties || c.specialties.length === 0) return true;
-      return c.specialties.some((s: string) => s.toLowerCase().includes(sportLabel.toLowerCase()));
-    }) || [];
+      const filtered = data?.filter(c => {
+        if (!c.specialties || c.specialties.length === 0) return true;
+        return c.specialties.some((s: string) => s.toLowerCase().includes(sportLabel.toLowerCase()));
+      }) || [];
 
-    setCoaches(filtered.map(c => ({ user_id: c.user_id!, name: c.name })));
-    setLoadingCoaches(false);
+      setCoaches(filtered.map(c => ({ user_id: c.user_id!, name: c.name })));
+    } catch (err) {
+      console.error("[BookSession] fetch coaches failed", err);
+    } finally {
+      window.clearTimeout(safety);
+      setLoadingCoaches(false);
+    }
   };
 
   const fetchBookedSlots = async () => {
