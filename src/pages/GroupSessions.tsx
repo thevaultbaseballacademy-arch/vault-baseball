@@ -36,7 +36,7 @@ const GroupSessions = () => {
   const [user, setUser] = useState<any>(null);
   const [isCoach, setIsCoach] = useState(false);
   const [sessions, setSessions] = useState<GroupSession[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [enrolling, setEnrolling] = useState<string | null>(null);
   const [newSession, setNewSession] = useState({ title: '', description: '', date: '', time: '', duration: '90', maxParticipants: '10', focusArea: 'general', skillLevel: 'all', videoLink: '' });
@@ -46,38 +46,49 @@ const GroupSessions = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const safetyTimeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) { return; }
-      setUser(session.user);
-      checkCoachRole(session.user.id);
-      fetchSessions(session.user.id);
-      setLoading(false);
-    });
+    let cancelled = false;
+    const safety = window.setTimeout(() => { if (!cancelled) setLoading(false); }, 6000);
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (!session?.user) { setLoading(false); return; }
+        setUser(session.user);
+        await Promise.all([
+          checkCoachRole(session.user.id),
+          fetchSessions(session.user.id),
+        ]);
+      } catch (err) {
+        console.error('[GroupSessions] init failed', err);
+      } finally {
+        window.clearTimeout(safety);
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; window.clearTimeout(safety); };
   }, []);
 
   const checkCoachRole = async (userId: string) => {
-    const { data } = await supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'coach').maybeSingle();
-    setIsCoach(!!data);
+    try {
+      const { data } = await supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'coach').maybeSingle();
+      setIsCoach(!!data);
+    } catch (e) { console.error('[GroupSessions] role check failed', e); }
   };
 
   const fetchSessions = async (userId: string) => {
-    const { data: sessionsData } = await (supabase.from('group_sessions' as any) as any).select('*').order('scheduled_at');
-    
-    const { data: enrollments } = await (supabase.from('group_session_enrollments' as any) as any).select('session_id, athlete_user_id');
-    
-    const enriched = (sessionsData || []).map((s: any) => {
-      const sessionEnrollments = (enrollments || []).filter((e: any) => e.session_id === s.id);
-      return {
-        ...s,
-        enrolled_count: sessionEnrollments.length,
-        is_enrolled: sessionEnrollments.some((e: any) => e.athlete_user_id === userId),
-      };
-    });
-    
-    setSessions(enriched);
+    try {
+      const { data: sessionsData } = await (supabase.from('group_sessions' as any) as any).select('*').order('scheduled_at');
+      const { data: enrollments } = await (supabase.from('group_session_enrollments' as any) as any).select('session_id, athlete_user_id');
+      const enriched = (sessionsData || []).map((s: any) => {
+        const sessionEnrollments = (enrollments || []).filter((e: any) => e.session_id === s.id);
+        return {
+          ...s,
+          enrolled_count: sessionEnrollments.length,
+          is_enrolled: sessionEnrollments.some((e: any) => e.athlete_user_id === userId),
+        };
+      });
+      setSessions(enriched);
+    } catch (e) { console.error('[GroupSessions] fetch failed', e); }
   };
 
   const handleCreate = async () => {

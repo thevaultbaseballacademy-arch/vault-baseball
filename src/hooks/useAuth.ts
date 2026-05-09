@@ -52,9 +52,24 @@ export const useAuth = () => {
       },
     );
 
+    // Hard timeout: if Supabase auth hangs (e.g. bad_jwt / network stall),
+    // flip to unauthenticated after 4s rather than spinning forever behind AuthGuard.
+    let timedOut = false;
+    const hydrationTimeout = window.setTimeout(() => {
+      timedOut = true;
+      console.warn("[useAuth] getSession() timed out after 4s — treating as unauthenticated");
+      setHydrated(true);
+    }, 4000);
+
     supabase.auth.getSession().then(({ data: { session: s } }) => {
+      if (timedOut) return; // late resolution; onAuthStateChange will catch real session
+      window.clearTimeout(hydrationTimeout);
       setSession(s);
       setUser(s?.user ?? null);
+      setHydrated(true);
+    }).catch((err) => {
+      console.error("[useAuth] getSession() failed", err);
+      window.clearTimeout(hydrationTimeout);
       setHydrated(true);
     });
 

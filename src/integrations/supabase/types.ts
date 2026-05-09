@@ -7836,6 +7836,15 @@ export type Database = {
         }[]
       }
       get_athlete_trial_status: { Args: { p_user_id: string }; Returns: Json }
+      get_camp_session_capacity: {
+        Args: { p_session_ids: string[] }
+        Returns: {
+          capacity: number
+          confirmed_count: number
+          pending_count: number
+          session_id: string
+        }[]
+      }
       get_certificate_leaderboard: {
         Args: { result_limit?: number; time_filter?: string }
         Returns: {
