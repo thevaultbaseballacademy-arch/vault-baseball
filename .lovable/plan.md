@@ -1,63 +1,88 @@
-This is a multi-turn plan. One Lovable turn cannot honestly ship all five AI modules + three bug fixes + Camps Day 3 well. I'm splitting it so each turn ships something complete and testable, and camps still launch on schedule.
+# VAULT Stabilization & Production-Hardening Plan
 
-## Turn A (this turn) — Stop the bleeding + Camps Day 3
+Mode: fix-only. No new features, no redesigns, no removed products. I will land changes in small batches and recheck each major flow before moving on.
 
-**1. Diagnose & fix the three "spins forever" pages**
+---
 
-Root cause analysis from the code:
+## What the audit found
 
-- `BookSession.tsx` — `loadingCoaches` is initialized `false` and never set `true`, BUT auth logs show `bad_jwt / missing sub claim` 403s. When the auth fetch hangs/fails, the coach query never resolves and the empty grid + the in-page subcomponents that gate on `getSession()` look like a spinner.
-- `GroupSessions.tsx` — same pattern: `getSession()` then if no session, `return` without populating data; the page is hardcoded to render a full-page `Loader2` when `loading === true`. The 5-second safety timeout exists but anything that throws inside the `.then` chain (e.g. RLS error on `group_sessions`) leaves UI half-rendered.
-- `LessonPackages.tsx` — `setLoading(false)` is only called inside `fetchPackages` after the await. If the query throws (RLS / table missing for unauthed users), `loading` stays `true` and never recovers because there's no `.catch` / `finally`.
+**Shape of the app**
+- 187 routes in `App.tsx`, all lazy-loaded with `lazyWithRetry` + `Suspense` fallback. Good.
+- Global `ErrorBoundary`, `QueryClient` with `staleTime: 5min`, `refetchOnWindowFocus: false`. Good.
+- 181 `console.error` sites, 140 untyped `catch` blocks — most are fine, but several swallow errors and leave the UI spinning.
+- 20+ files >700 lines (Courses 1.3k, FoundersAccess 1.1k, AthleteKPIForm 1.5k, FacilityScheduling 861, BaselineAudit 763, Index 768, CoachDashboard 733). These are the prime suspects for slow first paint and noisy re-renders.
 
-Fixes (frontend-only, no schema changes):
-- Wrap every initial-load fetch in `try/finally` and always clear loading.
-- Replace `if (loading) return <FullPageSpinner/>` with skeleton + content fallback so a stalled query never blocks the entire screen.
-- Add a 6s hard timeout on each initial query using existing `withTimeout` from `src/lib/queryTimeout.ts`.
-- For `BookSession` and `GroupSessions`, surface a clear "Sign in to continue" empty state when there's no session instead of leaving the page blank.
+**Recent regressions still at risk**
+- BookSession / GroupSessions / LessonPackages full-page spinners were patched last week — need an end-to-end recheck on mobile.
+- Camps Day 3 (`/camps/:cohortId/register`, `/camps/success`) is brand new and hasn't been smoke-tested against Stripe webhook timing.
+- IA restructure (4-bucket nav, Coach Network merge) and Eddie context routing — recent enough to harbor mobile/overflow bugs.
 
-**2. Camps Day 3 — public registration UI**
+**Highest-risk classes of bugs (by category, not exhaustive list)**
 
-Build the three public pages on top of the Day 2 backend that's already deployed:
-- `/camps` — landing page listing the two cohorts (Ages 7-10 @ Ross Field, Ages 11-15 @ Gravelly Brook), 4 weeks of sessions, pricing, capacity remaining (live).
-- `/camps/register/:cohortId` — multi-step form (player info → session selection → review → Stripe Checkout), invokes `register-for-camp`.
-- `/camps/success` and `/camps/cancel` — confirmation + cancellation flow that calls `cancel-camp-registration`.
+1. **Hanging pages** — `useEffect` data loads without a `finally { setLoading(false) }`, or a thrown error inside an async path that the catch swallows silently. Symptom: full-page spinner forever. Same root cause as the BookSession/Group/Packages issue.
+2. **Auth-gated route flicker** — pages that read `user` before `useAuth()` resolves, then redirect or render a blank state.
+3. **Mobile overflow** — long product titles, tables, and the Marketplace coach grid on 360–414px viewports.
+4. **Duplicate fetches** — components that fetch in `useEffect` instead of `useQuery`, causing re-fetch on every mount/route change.
+5. **Eddie AI** — context payload + page metadata size, and the chat panel z-index/stacking against modals.
+6. **Stripe checkout edges** — success page polling without a hard timeout fallback message; cancel paths that drop the user on a blank state.
+7. **Form validation inconsistency** — some forms use Zod, others ad-hoc booleans; error text styling drifts.
+8. **Empty/error states** — many list pages render `null` when the query returns `[]` or errors, leaving a blank screen.
 
-All UI uses existing design tokens (gold primary on dark steel). Mobile-first since user is on a 402px viewport.
+---
 
-**3. Memory update**
-Add a memory entry locking down camp pricing, venues, and the Day 0–3 scope so future turns don't drift.
+## Prioritized fix plan (5 batches)
 
-## Turn B (next turn) — AI Coach Notes + AI Risk Monitor
+I'll do **Batch 1 → recheck → Batch 2 → recheck**, etc. After each batch I'll report what was touched and what I verified in the preview before moving on.
 
-These two have the most existing infrastructure to build on:
-- **AI Coach Notes** — extend `generate-lesson-analysis` (already exists, uses Lovable AI) to produce the "what changed / what to do next" summary format and surface it on the coach + parent dashboards.
-- **AI Risk Monitor** — new edge function `ai-risk-monitor` that runs on a schedule (cron) over `athlete_kpis`, `workload_logs`, `coach_lesson_feedback` and writes flags to a new `athlete_risk_flags` table. UI: red/amber chip on the dashboard + a flags panel.
+### Batch 1 — Critical: spinners, blank states, broken flows (P0)
+- Sweep every page-level `useEffect` data loader for missing `finally { setLoading(false) }` and unhandled rejections. Add a shared `useSafeAsync` pattern where it keeps recurring.
+- Audit BookSession, GroupSessions, LessonPackages, Camps, CampRegister, CampSuccess, FreeEvaluation, RemoteTrainingHub, Marketplace, Tryouts end-to-end. Fix any remaining hang or blank state.
+- Add a hard 30s timeout + visible "took too long, retry" CTA on the CampSuccess polling loop and any other polling success page.
+- Standardize empty states: every list/grid page renders a `<EmptyState>` component when the query returns `[]` and an `<ErrorState>` with retry when it errors. Build the two components if they don't exist; reuse if they do.
+- Audit Stripe cancel/success redirects so neither path lands on a blank screen.
 
-## Turn C — AI Onboarding Assessor + AI Development Engine
+### Batch 2 — Navigation, auth gating, dead ends (P0/P1)
+- Verify every link in the 4-bucket nav resolves to a real route (no 404s after the IA restructure).
+- Audit `<AuthGuard>` usage — confirm no page does `navigate('/auth')` directly (memory rule).
+- Fix auth-flicker: pages that render content before `useAuth().loading === false` get a skeleton instead of a redirect or blank.
+- Add a project-wide 404 review: confirm `NotFound.tsx` is wired and links back to home + bucket entries.
 
-- **Onboarding Assessor** — wire a new `ai-onboarding-assessor` edge function called at the end of `AthleteOnboarding.tsx`, consuming age/position/goals/metrics + optional video URL, returning a starting plan stored in `athlete_starting_plans`. This wraps the existing rule-based `analyzeAthlete` engine in `src/lib/intelligence/engine.ts` with an LLM layer that turns it into a narrative.
-- **Development Engine** — weekly cron edge function `ai-weekly-block-generator` that reads each athlete's recent KPIs/check-ins/feedback, calls Lovable AI, and writes a structured weekly block to `athlete_weekly_blocks`. Surface in `WeeklyCalendar.tsx`.
+### Batch 3 — Mobile responsiveness pass (P1)
+- Test the top 15 pages at 360, 390, 414, 768. Fix overflow, clipped CTAs, broken grids, sticky-header overlap.
+- Marketplace coach cards, Products grid, Certifications cards, RemoteTrainingHub stat cards, CoachDashboard tables — known suspects.
+- Eddie chat panel: verify it doesn't trap focus or sit above modals/sheets on mobile.
 
-## Turn D — AI Parent Mode + polish
+### Batch 4 — Performance pass (P2)
+- Convert remaining `useEffect`+`fetch` pairs to `useQuery` so React Query handles dedupe + caching.
+- Memoize heavy lists (Products, Marketplace, Courses) with `useMemo` for filter results and `React.memo` for cards.
+- Split the largest pages (Courses 1.3k, FoundersAccess 1.1k, AthleteKPIForm 1.5k) into smaller components only where it reduces re-renders — no behavior change.
+- Convert oversized PNGs to WebP where safe; keep `vault-logo.png` as-is unless transparency is needed elsewhere.
 
-- **AI Parent Mode** — toggle in the parent portal that translates the most recent coach notes + KPI deltas into plain-English updates via Lovable AI; cached per (athlete, week).
-- Final polish: dashboard "where now / what next / why it matters" answer cards added to athlete + parent dashboards (the user explicitly called this out).
+### Batch 5 — Cross-flow verification (P0 gate before "done")
+End-to-end smoke test in the preview, mobile + desktop:
+1. **Athlete**: land → Free Evaluation → recommendation → Products → checkout open.
+2. **Parent**: land → any major page → confirm "what is this / who for / next action" is answered.
+3. **Coach**: Certifications → exam flow entry → Marketplace listing path.
+4. **Org buyer**: Products → licensing/coach-authority bundle → checkout open.
+5. **Event user**: Camps → register flow → success polling.
+6. **Eddie**: open on Assess, Train, Get Seen, Scale pages — confirm prompts switch and no console errors.
 
-## Why this split
+---
 
-- All five AI modules require new tables + RLS + edge functions + cron schedules + UI on multiple dashboards. Done in one turn, none of it would be tested. Done across four turns, each shipment is verifiable end-to-end.
-- Camps launch is on a hard deadline (next Mon-Tues). Day 3 has to ship this turn.
-- The spinning bugs are blocking real users right now and have to ship this turn.
+## Constraints I will respect
 
-## Technical notes
+- No legacy WebRTC, Course Access, or Baseball booking changes.
+- No homepage hero copy edits (per prior rule).
+- Sport parity: any fix to Baseball gets mirrored on Softball.
+- Mobile checkout stays on `openCheckout` utility.
+- No cookie banners.
+- Risky changes get called out in the batch summary before I ship them.
 
-- All AI calls go through the Lovable AI Gateway (`LOVABLE_API_KEY`, model `google/gemini-2.5-flash` for cost, `gemini-2.5-pro` for the Risk Monitor where reasoning matters).
-- New tables (`athlete_risk_flags`, `athlete_starting_plans`, `athlete_weekly_blocks`, `parent_mode_summaries`) all RLS-scoped to `auth.uid()` via existing patterns.
-- Cron jobs use the existing `pg_cron + CRON_SECRET` pattern already wired.
-- No changes to legacy WebRTC, Course Access, or Baseball booking systems (per memory).
-- Tryouts pricing memory (always free) preserved — camps are paid, separate product.
+## Clarifying questions before Batch 1
 
-## Confirm before I execute Turn A
+1. **Scope of "production-ready"** — should I prioritize the 5 athlete/parent/coach/org/event flows above everything else and defer admin/owner internal tools to a later pass? (Recommended: yes.)
+2. **Performance budget** — do you want me to convert eager `useEffect` fetches to `useQuery` aggressively (touches ~30 files) or only on pages that demonstrably re-fetch? (Recommended: only on demonstrable offenders to minimize regression risk.)
+3. **Empty/error state design** — OK to introduce two shared components `<EmptyState>` and `<ErrorState>` styled to the existing dark/gold system, used everywhere lists render? (Recommended: yes.)
+4. **Test budget per batch** — should I use the browser tool to smoke-test each batch (slower but catches real regressions) or only after Batch 5? (Recommended: spot-check P0 batches, full sweep at Batch 5.)
 
-If you want me to compress turns (e.g. ship Risk Monitor in Turn A too), say so and I'll re-plan. Otherwise approve and I'll execute Turn A end-to-end: spin fixes + Camps Day 3 + memory update.
+Approve the plan (or answer the 4 questions) and I'll start with Batch 1.
