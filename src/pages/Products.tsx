@@ -279,13 +279,13 @@ const Products = () => {
           >
             <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
               <Sparkles className="w-3 h-3 mr-1" />
-              Complete Product Catalog
+              The Operating System Catalog
             </Badge>
             <h1 className="text-4xl md:text-6xl font-display text-foreground mb-6">
-              VAULT™ Products & Programs
+              EVERY MODULE OF THE VAULT OS.
             </h1>
             <p className="text-xl text-muted-foreground">
-              From quick video analysis to comprehensive velocity systems — find the right tool for your development stage.
+              Programs, audits, certifications, and licenses — engineered to plug into one development system. Pick the module that matches your stage.
             </p>
           </motion.div>
         </div>
@@ -332,10 +332,10 @@ const Products = () => {
                 <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
                   <Zap className="w-5 h-5 text-red-500" />
                 </div>
-                <h2 className="text-3xl font-display text-foreground">Flagship Programs</h2>
+                <h2 className="text-3xl font-display text-foreground">Flagship Systems</h2>
               </div>
               <p className="text-muted-foreground max-w-2xl">
-                Our core velocity development systems — structured, proven, and designed for serious athletes.
+                The five pillars that run the OS — velocity, command, athleticism, longevity, and transfer. Built for athletes who want measurable gains, not generic workouts.
               </p>
             </motion.div>
 
@@ -403,7 +403,7 @@ const Products = () => {
                 <h2 className="text-3xl font-display text-foreground">Entry Points</h2>
               </div>
               <p className="text-muted-foreground max-w-2xl">
-                Low-friction ways to experience Vault quality before committing to a full program.
+                Run a single audit before going all-in. Same scoring engine, same recommendations — just a smaller scope.
               </p>
             </motion.div>
 
@@ -468,11 +468,11 @@ const Products = () => {
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
                   <Star className="w-5 h-5 text-cyan-500" />
                 </div>
-                <h2 className="text-3xl font-display text-foreground">Featured Products</h2>
+                <h2 className="text-3xl font-display text-foreground">High-Impact Modules</h2>
                 <Badge className="bg-red-500 text-white border-0">New</Badge>
               </div>
               <p className="text-muted-foreground max-w-2xl">
-                Fresh offerings designed for maximum impact — live coaching, certifications, and targeted programs.
+                Short-cycle programs and live coaching blocks that move a metric in 4–6 weeks.
               </p>
             </motion.div>
 
@@ -526,10 +526,10 @@ const Products = () => {
                 <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
                   <Package className="w-5 h-5 text-green-500" />
                 </div>
-                <h2 className="text-3xl font-display text-foreground">Value Bundles</h2>
+                <h2 className="text-3xl font-display text-foreground">Stacked Bundles</h2>
               </div>
               <p className="text-muted-foreground max-w-2xl">
-                Combine products for maximum impact and savings.
+                Pre-built module stacks for the three most common goals: more velocity, more offers, more authority.
               </p>
             </motion.div>
 
@@ -582,10 +582,10 @@ const Products = () => {
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                   <Award className="w-5 h-5 text-emerald-500" />
                 </div>
-                <h2 className="text-3xl font-display text-foreground">For Coaches</h2>
+                <h2 className="text-3xl font-display text-foreground">For Coaches & Orgs</h2>
               </div>
               <p className="text-muted-foreground max-w-2xl">
-                Grow your coaching business with VAULT™ certification and credentialing.
+                License the curriculum, certify your staff, and run every athlete through the same scoring system you teach.
               </p>
             </motion.div>
 

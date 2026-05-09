@@ -81,10 +81,10 @@ const Tryouts = () => {
       <Navbar />
       <header className="border-b border-border bg-card pt-24 md:pt-28">
         <div className="max-w-3xl mx-auto px-4 py-8">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">22M Baseball</p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">22M Baseball · Get Seen</p>
           <h1 className="text-3xl md:text-4xl font-display tracking-wide mt-1">Tryouts & Showcases</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Reserve your spot for an upcoming pitching lab, tryout, or showcase event.
+            Verified metrics, scout-ready reports, real eyes. Reserve a lab, tryout, or showcase slot below.
           </p>
         </div>
       </header>

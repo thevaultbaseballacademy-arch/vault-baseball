@@ -366,13 +366,13 @@ const Certifications = () => {
             <div className="text-center space-y-4">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
                 <Shield className="w-5 h-5" />
-                <span className="font-medium">VAULT™ Coach Certification Program</span>
+                <span className="font-medium">VAULT™ Coach Certification</span>
               </div>
               <h1 className="text-4xl md:text-5xl font-display text-foreground">
-                COACH CERTIFICATIONS
+                CERTIFY THE METHOD. OWN THE AUTHORITY.
               </h1>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Standardization • Accountability • Authority
+                Pass the exam, earn the badge, list on the network. One standard the whole industry can be measured against.
               </p>
               <Button 
                 variant="outline" 

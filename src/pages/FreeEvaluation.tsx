@@ -120,7 +120,7 @@ const FreeEvaluation = () => {
               animate={{ opacity: 1 }}
               className="text-[11px] font-display tracking-[0.3em] text-primary-foreground/30 mb-4 block"
             >
-              FREE ATHLETE EVALUATION
+              STEP 1 — VAULT EVALUATION
             </motion.span>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -128,9 +128,9 @@ const FreeEvaluation = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-6xl font-display leading-[0.9] mb-4"
             >
-              WHERE DOES YOUR ATHLETE
+              MEASURE THE ATHLETE.
               <br />
-              <span className="text-primary-foreground/40">ACTUALLY STAND?</span>
+              <span className="text-primary-foreground/40">BUILD THE PLAN.</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 12 }}
@@ -138,7 +138,7 @@ const FreeEvaluation = () => {
               transition={{ delay: 0.2 }}
               className="text-primary-foreground/50 max-w-lg mx-auto"
             >
-              Get a development rating, velocity potential, and personalized program recommendation — in under 2 minutes. No card required.
+              A 2-minute baseline returns a development tier, velocity ceiling, and the exact program to start. Standardized scoring. No card.
             </motion.p>
           </div>
         </div>

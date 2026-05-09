@@ -127,7 +127,7 @@ const RemoteTrainingHub = () => {
                   REMOTE TRAINING
                 </span>
                 <h1 className="text-3xl md:text-4xl font-display text-foreground">YOUR TRAINING HUB</h1>
-                <p className="text-muted-foreground mt-1">Structured development. Live coaching. Measured progress.</p>
+                <p className="text-muted-foreground mt-1">One dashboard. Baselines, blocks, sessions, and the next move — auto-updated.</p>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => navigate("/remote-lessons")}>
