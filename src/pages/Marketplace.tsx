@@ -57,8 +57,8 @@ const Marketplace = () => {
             <Badge variant="outline" className="mb-4 border-background/30 text-background/70 text-xs tracking-widest">
               VAULT COACH NETWORK
             </Badge>
-            <h1 className="text-5xl md:text-7xl font-display mb-4">
-              ONE STANDARD. EVERY COACH.
+            <h1 className="text-4xl md:text-7xl font-display mb-4 leading-[0.95]">
+              ONE STANDARD.<br className="md:hidden" /> EVERY COACH.
             </h1>
             <p className="text-lg text-background/60 max-w-2xl mx-auto mb-8">
               Book certified coaches who train inside the VAULT system — same protocols, same metrics, same outcomes. No guesswork, no mismatched philosophies.
