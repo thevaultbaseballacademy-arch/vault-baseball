@@ -112,6 +112,19 @@ const Tryouts = () => {
           </div>
         )}
 
+        {!isLoading && filtered.length === 0 && (
+          <EmptyState
+            icon={<Calendar className="w-7 h-7 text-muted-foreground" />}
+            title="No tryouts scheduled"
+            description={filter === "all"
+              ? "New tryouts and showcases drop monthly. Check back soon — or get a free evaluation while you wait."
+              : "Nothing in this age group right now. Try a different filter or check back soon."}
+            actionLabel={filter === "all" ? "Get a free evaluation" : "Show all ages"}
+            actionHref={filter === "all" ? "/evaluate" : undefined}
+            onAction={filter === "all" ? undefined : () => setFilter("all")}
+          />
+        )}
+
         <div className="space-y-3">
           {filtered.map((evt) => (
             <Card key={evt.id} className="hover:border-foreground/30 transition-colors">
@@ -119,12 +132,14 @@ const Tryouts = () => {
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
                     <h2 className="text-lg font-display tracking-wide">{evt.name}</h2>
-                    <Badge variant="outline" className="mt-1 text-[10px] uppercase tracking-wider">
-                      Ages {evt.age_group}
-                    </Badge>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xl font-semibold">${(evt.price_cents / 100).toFixed(0)}</div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
+                        Ages {evt.age_group}
+                      </Badge>
+                      <Badge className="text-[10px] uppercase tracking-wider bg-primary/10 text-primary border-primary/20">
+                        Free
+                      </Badge>
+                    </div>
                   </div>
                 </div>
 
@@ -144,7 +159,7 @@ const Tryouts = () => {
                 </div>
 
                 <Button asChild className="w-full">
-                  <Link to={`/tryouts/${evt.id}/register`}>Register</Link>
+                  <Link to={`/tryouts/${evt.id}/register`}>Reserve Spot</Link>
                 </Button>
               </CardContent>
             </Card>
