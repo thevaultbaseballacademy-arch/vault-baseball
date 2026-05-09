@@ -140,10 +140,13 @@
     scroll-behavior: smooth;
     /* iOS 100vh fix — use dynamic viewport height where supported */
     height: 100%;
+    /* Defensive: prevent any rogue child element from causing horizontal page scroll */
+    overflow-x: hidden;
   }
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    overflow-x: hidden;
     /* Smooth momentum scrolling on iOS, no rubber-band past edges */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
