@@ -74,7 +74,10 @@ const PLATFORM_FEE_PERCENT = 30;
 
 export const useMarketplaceCoaches = (filters?: { specialty?: string; search?: string }) => {
   return useQuery({
-    queryKey: ["marketplace-coaches", filters],
+    // NOTE: search/specialty filter client-side only — keep them OUT of the
+    // queryKey so we don't refetch on every keystroke.
+    queryKey: ["marketplace-coaches"],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       // Query marketplace profiles joined with coaches — only approved coaches
       let query = supabase
