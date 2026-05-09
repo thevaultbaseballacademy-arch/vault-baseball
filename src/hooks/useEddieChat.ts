@@ -133,7 +133,7 @@ export const useEddieChat = () => {
       setError(e instanceof Error ? e.message : "Failed to send message");
       setIsLoading(false);
     }
-  }, [messages, isLoading, sport, prospectGrades]);
+  }, [messages, isLoading, sport, prospectGrades, pageContext]);
 
   const clearChat = useCallback(() => {
     setMessages([]);
@@ -144,5 +144,9 @@ export const useEddieChat = () => {
     setProspectGrades(grades);
   }, []);
 
-  return { messages, isLoading, error, sendMessage, clearChat, injectMessage, updateProspectGrades, sport };
+  const updatePageContext = useCallback((ctx: EddiePageContext | null) => {
+    setPageContext(ctx);
+  }, []);
+
+  return { messages, isLoading, error, sendMessage, clearChat, injectMessage, updateProspectGrades, updatePageContext, pageContext, sport };
 };
