@@ -173,11 +173,11 @@ export const EddieAIChat = React.forwardRef<HTMLDivElement>((_, ref) => {
       {!isOpen && (
         <button
           onClick={handleOpen}
-          className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-40 flex items-center gap-2.5 px-5 py-3 bg-foreground text-background shadow-lg hover:bg-foreground/90 transition-all hover:scale-[1.03] active:scale-95 font-display text-base tracking-wider"
+          className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-40 flex items-center gap-2.5 px-4 py-3 sm:px-5 bg-foreground text-background shadow-lg hover:bg-foreground/90 transition-all hover:scale-[1.03] active:scale-95 font-display text-sm sm:text-base tracking-wider rounded-full sm:rounded-none"
           aria-label="Ask Eddie AI"
         >
           <MessageCircle className="h-5 w-5" />
-          ASK EDDIE AI
+          <span className="hidden sm:inline">ASK EDDIE AI</span>
         </button>
       )}
 
