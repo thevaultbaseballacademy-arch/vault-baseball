@@ -164,9 +164,13 @@ const Camps = () => {
                       <span className="text-[10px] font-display tracking-wider bg-primary text-primary-foreground px-2 py-0.5">BEST VALUE</span>
                     </div>
                     <p className="text-2xl md:text-3xl font-display text-foreground">{fmtMoney(camp.full_pass_price_cents)}</p>
-                    <p className="text-xs text-primary mt-1">
-                      Save {fmtMoney(camp.full_pass_savings_cents)} vs week-by-week
-                    </p>
+                    {camp.full_pass_savings_cents > 0 ? (
+                      <p className="text-xs text-primary mt-1">
+                        Save {fmtMoney(camp.full_pass_savings_cents)} vs week-by-week
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground mt-1">All 4 weeks · one transaction</p>
+                    )}
                   </CardContent>
                 </Card>
               </div>
