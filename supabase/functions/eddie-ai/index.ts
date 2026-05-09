@@ -353,7 +353,7 @@ serve(async (req) => {
       });
     }
 
-    const { messages, sport, prospectGrades } = body as Record<string, unknown>;
+    const { messages, sport, prospectGrades, pageContext } = body as Record<string, unknown>;
     const validation = validateMessages(messages);
     if (!validation.valid) {
       return new Response(JSON.stringify({ error: validation.error }), {
@@ -365,7 +365,29 @@ serve(async (req) => {
     const sportType = (sport as string) || "baseball";
     const sportSection = sportType === "softball" ? softballAdditions : baseballAdditions;
     const prospectContext = buildProspectContext(prospectGrades as Record<string, number> | null);
-    const fullSystemPrompt = basePrompt + sportSection + prospectContext;
+
+    // ── Page-aware context (5 jobs) ──
+    let pageBlock = "";
+    const pc = pageContext as { bucket?: string | null; page?: string; pathname?: string } | null | undefined;
+    if (pc && pc.page) {
+      const jobByBucket: Record<string, string> = {
+        assess: "INTAKE INTERPRETER + PARENT TRANSLATOR. The user is on an assessment surface. Help them understand their score/grade, what it means in plain English, and the single best next step. Avoid jargon. If a number is shown, explain why it matters.",
+        train: "PRODUCT NAVIGATOR + CONVERSION CLOSER. The user is looking at programs/lessons/bundles. Match them to the right program/bundle by age, position, goals, and current level. Surface specific objections and answer them clearly (price, time commitment, fit). Recommend ONE primary product, then a backup.",
+        get_seen: "RECRUITING NAVIGATOR. The user is on a recruiting/event surface. Explain readiness, gaps, and the realistic college fit (D1/D2/D3/JUCO). Recommend the next concrete action: audit, tryout, camp, or showcase.",
+        scale: "COACH/ORG ASSISTANT. The user is a coach or org leader. Help them choose between certification, marketplace listing, team license, or org licensing. Tie recommendations to roster size, revenue model, and time-to-value.",
+      };
+      const job = pc.bucket && jobByBucket[pc.bucket] ? jobByBucket[pc.bucket] : "Help the user take the next best action on this page.";
+      pageBlock = `
+
+## PAGE-AWARE CONTEXT
+- Current page: ${pc.page} (${pc.pathname ?? "unknown"})
+- IA bucket: ${pc.bucket ?? "general"}
+- Your job on this page: ${job}
+
+Tailor your answer to what is visible on this page first. Do not change the subject unless the user does.`;
+    }
+
+    const fullSystemPrompt = basePrompt + sportSection + prospectContext + pageBlock;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");

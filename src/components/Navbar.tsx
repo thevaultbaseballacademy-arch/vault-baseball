@@ -135,38 +135,60 @@ const Navbar = () => {
     }, 150);
   };
 
+  // 4-bucket VAULT OS information architecture
+  // (single source: src/lib/ia.ts)
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Programs", href: "/courses" },
-    { name: "Tryouts", href: "/tryouts" },
-    { name: "Book Session", href: "/book-session" },
-    { name: "Submit Video", href: "/evaluate" },
-    { 
-      name: "Products", 
+    {
+      name: "Assess",
+      href: "/evaluate",
+      dropdown: [
+        { name: "Free Evaluation", href: "/evaluate" },
+        { name: "Prospect Grader", href: "/recruiting/prospect-grader" },
+        { name: "Velocity Baseline", href: "/velocity-baseline" },
+        { name: "Velo-Check Analysis", href: "/products/velo-check" },
+      ],
+    },
+    {
+      name: "Train",
       href: "/products",
       dropdown: [
-        { name: "All Products", href: "/products" },
+        { name: "All Programs", href: "/products" },
         { name: "12-Week Velocity System", href: "/products/velocity-system" },
         { name: "Velocity Accelerator", href: "/products/velocity-accelerator" },
-        { name: "Velo-Check Analysis", href: "/products/velo-check" },
-        { name: "Recruitment Audit", href: "/products/recruitment" },
         { name: "Longevity System", href: "/products/longevity" },
         { name: "Transfer System", href: "/products/transfer" },
-        { name: "Team Licenses", href: "/products/teams" },
-        { name: "Coach Certification", href: "/products/certified-coach" },
+        { name: "Remote Training", href: "/products/remote-training" },
         { name: "Bundles", href: "/products/bundles" },
-      ]
-    },
-    { 
-      name: "Coaching", 
-      href: "/marketplace",
-      dropdown: [
-        { name: "Coach Marketplace", href: "/marketplace" },
-        { name: "Find a Coach", href: "/find-coach" },
+        { name: "Book a Lesson", href: "/book-session" },
         { name: "Lesson Packages", href: "/lesson-packages" },
         { name: "Group Sessions", href: "/group-sessions" },
+      ],
+    },
+    {
+      name: "Get Seen",
+      href: "/recruiting",
+      dropdown: [
+        { name: "Recruiting Hub", href: "/recruiting" },
+        { name: "Recruitment Audit", href: "/products/recruitment" },
+        { name: "Showcase Prep", href: "/products/showcase-prep" },
+        { name: "Tryouts", href: "/tryouts" },
+        { name: "Summer Camps", href: "/camps" },
+        { name: "Wall of Wins", href: "/wins" },
+      ],
+    },
+    {
+      name: "Scale",
+      href: "/marketplace",
+      dropdown: [
+        { name: "Coach Network (Marketplace)", href: "/marketplace" },
+        { name: "Find a Coach", href: "/find-coach" },
         { name: "Become a Coach", href: "/coach-register" },
-      ]
+        { name: "Coach Certification", href: "/products/certified-coach" },
+        { name: "Team Licenses", href: "/products/teams" },
+        { name: "Org Licensing", href: "/products/org-licensing" },
+        { name: "Org Starter Pack", href: "/products/org-starter-pack" },
+      ],
     },
   ];
 
@@ -235,12 +257,13 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-2">
-            <Button 
-              size="sm" 
-              onClick={() => handleNavigate("/products/founders-access")}
-              className="mr-1 bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold text-xs"
+            <Button
+              size="sm"
+              variant="vault"
+              onClick={() => handleNavigate("/evaluate")}
+              className="mr-1 font-display tracking-wide"
             >
-              🔥 $499 Lifetime
+              FREE EVALUATION
             </Button>
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
@@ -356,11 +379,12 @@ const Navbar = () => {
 
                 {/* Mobile Auth/User Section */}
                 <div className="flex flex-col gap-1.5 pt-3 mt-2 border-t border-border px-2">
-                  <Button 
-                    className="justify-center bg-amber-500 hover:bg-amber-600 text-[#181818] font-bold" 
-                    onClick={() => handleNavigate("/products/founders-access")}
+                  <Button
+                    variant="vault"
+                    className="justify-center font-display tracking-wide"
+                    onClick={() => handleNavigate("/evaluate")}
                   >
-                    🔥 $499 Lifetime - Limited Window
+                    GET YOUR FREE EVALUATION
                   </Button>
                   {user ? (
                     <>

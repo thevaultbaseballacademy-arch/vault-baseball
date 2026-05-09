@@ -242,7 +242,57 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ═══════════ PROBLEM: PAIN POINTS ═══════════ */}
+      {/* ═══════════ VAULT OS — 4 PATHS ═══════════ */}
+      <section className="py-16 md:py-24 border-b border-border">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeUp} className="max-w-5xl mx-auto">
+            <div className="text-center mb-10 md:mb-14">
+              <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-3 block">THE VAULT OPERATING SYSTEM</span>
+              <h2 className="text-3xl md:text-5xl font-display text-foreground leading-[0.95] mb-3">
+                FOUR PATHS. ONE SYSTEM.
+              </h2>
+              <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+                Start with a free evaluation. Get matched to the path that fits your athlete today.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+              {[
+                { k: "ASSESS", title: "Find your level", desc: "Free AI evaluation, prospect grader, baseline metrics.", href: "/evaluate", cta: "Start free" },
+                { k: "TRAIN", title: "Build the engine", desc: "Pillar-based programs, bundles, and remote training.", href: "/products", cta: "See programs" },
+                { k: "GET SEEN", title: "Get in front of coaches", desc: "Recruiting audit, tryouts, camps, showcases.", href: "/recruiting", cta: "Plan recruiting" },
+                { k: "SCALE", title: "For coaches & orgs", desc: "Certification, marketplace, team and org licenses.", href: "/marketplace", cta: "Explore network" },
+              ].map((b, i) => (
+                <motion.button
+                  key={b.k}
+                  onClick={() => navigate(b.href)}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={stagger(i)}
+                  className="group text-left bg-card border border-border hover:border-foreground/40 transition-colors p-5 md:p-6 flex flex-col h-full"
+                >
+                  <span className="text-[10px] font-display tracking-[0.3em] text-muted-foreground mb-3">{b.k}</span>
+                  <h3 className="text-lg md:text-xl font-display text-foreground mb-2">{b.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground mb-5 flex-1">{b.desc}</p>
+                  <span className="inline-flex items-center text-[11px] font-display tracking-[0.2em] text-foreground group-hover:translate-x-0.5 transition-transform">
+                    {b.cta.toUpperCase()} <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+
+            <div className="mt-8 text-center">
+              <Button variant="vault" size="lg" onClick={() => navigate("/evaluate")} className="font-display tracking-wide">
+                START WITH A FREE EVALUATION
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <p className="text-[11px] text-muted-foreground mt-3">No credit card. Results in under 2 minutes.</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="max-w-4xl mx-auto">

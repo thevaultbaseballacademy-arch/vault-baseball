@@ -4,12 +4,18 @@ import { useSport } from "@/contexts/SportContext";
 const EDDIE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/eddie-ai`;
 
 export type Message = { role: "user" | "assistant"; content: string };
+export type EddiePageContext = {
+  bucket: "assess" | "train" | "get_seen" | "scale" | null;
+  page: string;     // human label: "Recruitment Audit product page"
+  pathname: string; // raw route
+};
 
 export const useEddieChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [prospectGrades, setProspectGrades] = useState<Record<string, number> | null>(null);
+  const [pageContext, setPageContext] = useState<EddiePageContext | null>(null);
   const { sport } = useSport();
 
   const streamChat = async ({
@@ -31,6 +37,7 @@ export const useEddieChat = () => {
         messages,
         sport,
         prospectGrades,
+        pageContext,
       }),
     });
 
@@ -126,7 +133,7 @@ export const useEddieChat = () => {
       setError(e instanceof Error ? e.message : "Failed to send message");
       setIsLoading(false);
     }
-  }, [messages, isLoading, sport, prospectGrades]);
+  }, [messages, isLoading, sport, prospectGrades, pageContext]);
 
   const clearChat = useCallback(() => {
     setMessages([]);
@@ -137,5 +144,9 @@ export const useEddieChat = () => {
     setProspectGrades(grades);
   }, []);
 
-  return { messages, isLoading, error, sendMessage, clearChat, injectMessage, updateProspectGrades, sport };
+  const updatePageContext = useCallback((ctx: EddiePageContext | null) => {
+    setPageContext(ctx);
+  }, []);
+
+  return { messages, isLoading, error, sendMessage, clearChat, injectMessage, updateProspectGrades, updatePageContext, pageContext, sport };
 };

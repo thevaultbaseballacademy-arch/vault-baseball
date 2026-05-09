@@ -342,9 +342,56 @@ const FreeEvaluation = () => {
                     </Button>
                   </div>
 
+                  {/* ═══════════ YOUR PATH (4-bucket router) ═══════════ */}
+                  <div className="mt-8 border-t border-border pt-8">
+                    <p className="text-xs font-display tracking-[0.25em] text-muted-foreground mb-1">YOUR PATH</p>
+                    <h3 className="text-xl font-display text-foreground mb-4">WHAT TO DO NEXT — IN ORDER</h3>
+                    <div className="space-y-3">
+                      {[
+                        { k: "1 · TRAIN", title: result.recommended_program, desc: "Your matched development program.", href: programRoutes[result.recommended_program] || "/products" },
+                        {
+                          k: "2 · GET SEEN",
+                          title: result.development_tier === "Recruiting Ready" || result.development_tier === "Elite" ? "Recruitment Audit" : "Plan Your Recruiting Path",
+                          desc: result.development_tier === "Recruiting Ready" || result.development_tier === "Elite"
+                            ? "Lock in a 0–100 profile score and college fit list."
+                            : "Build the recruiting timeline early — even at the Foundation stage.",
+                          href: result.development_tier === "Recruiting Ready" || result.development_tier === "Elite" ? "/products/recruitment" : "/recruiting",
+                        },
+                        {
+                          k: "3 · ASSESS LIVE",
+                          title: "Open Tryouts & Camps",
+                          desc: "Get evaluated in person and accelerate development.",
+                          href: "/tryouts",
+                        },
+                        {
+                          k: "4 · COACH SUPPORT",
+                          title: "Find a Vault-Verified Coach",
+                          desc: "1-on-1 lessons with a coach trained in this exact system.",
+                          href: "/find-coach",
+                        },
+                      ].map((step) => (
+                        <button
+                          key={step.k}
+                          onClick={() => navigate(step.href)}
+                          className="group w-full text-left flex items-center gap-4 border border-border hover:border-foreground/40 transition-colors bg-card p-4"
+                        >
+                          <span className="text-[10px] font-display tracking-[0.25em] text-muted-foreground shrink-0 w-24">{step.k}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-display text-foreground truncate">{step.title}</p>
+                            <p className="text-xs text-muted-foreground truncate">{step.desc}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground text-center mt-4">
+                      Not sure which to do first? Ask Eddie AI — he'll personalize it for your athlete.
+                    </p>
+                  </div>
+
                   <Button
                     variant="outline"
-                    className="w-full mt-4 font-display tracking-wide"
+                    className="w-full mt-6 font-display tracking-wide"
                     onClick={() => { setResult(null); setFormData({ athlete_name: "", email: "", parent_email: "", age: "", position: "", current_velocity: "" }); }}
                   >
                     EVALUATE ANOTHER ATHLETE
