@@ -1,13 +1,13 @@
 // VAULT × 22M — Elite Summer Development Camp registration.
 // Two location/age cohorts, weekly + full-pass options, early-bird pricing.
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import {
   CalendarDays, MapPin, Clock, Users, CheckCircle2, ShieldCheck, Trophy,
   Target, ArrowRight, Loader2, Mail, Phone, DollarSign, Flame, Zap,
-  Activity, Brain, Dumbbell,
+  Activity, Brain, Dumbbell, AlertCircle,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -174,8 +174,13 @@ const SummerCamp = () => {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<string>("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [confirmation, setConfirmation] = useState<{ id: string; paid: boolean } | null>(null);
+  // Hard guard against duplicate submits (survives React state batching + double-clicks)
+  const inFlightRef = useRef(false);
+  const slowTimerRef = useRef<number | null>(null);
 
   const isEarlyBird = useMemo(() => Date.now() < EARLY_BIRD_DEADLINE.getTime(), []);
   const weeklyPrice = isEarlyBird ? PRICING.week.earlyBird : PRICING.week.regular;
@@ -242,8 +247,29 @@ const SummerCamp = () => {
     document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // Race a promise against a timeout — never let the spinner spin forever.
+  const withTimeout = async <T,>(p: Promise<T>, ms: number, label: string): Promise<T> => {
+    let to: number | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      to = window.setTimeout(
+        () => reject(new Error(`${label} is taking longer than expected. Please check your connection and try again.`)),
+        ms,
+      );
+    });
+    try {
+      return await Promise.race([p, timeout]);
+    } finally {
+      if (to) window.clearTimeout(to);
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Hard double-submit guard (refs aren't subject to React batching)
+    if (inFlightRef.current) return;
+
+    setSubmitError(null);
+
     const parsed = FormSchema.safeParse(values);
     if (!parsed.success) {
       const fieldErrors: FormErrors = {};
@@ -252,6 +278,12 @@ const SummerCamp = () => {
         if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
       }
       setErrors(fieldErrors);
+      // Scroll to first error so the user sees what's wrong on mobile
+      requestAnimationFrame(() => {
+        document.querySelector<HTMLElement>("[data-error='true']")?.scrollIntoView({
+          behavior: "smooth", block: "center",
+        });
+      });
       toast({ title: "Please review the form", description: "Some fields need attention.", variant: "destructive" });
       return;
     }
@@ -266,7 +298,15 @@ const SummerCamp = () => {
       return;
     }
 
+    inFlightRef.current = true;
     setSubmitting(true);
+    setSubmitStatus("Submitting your registration…");
+
+    // If overall flow takes >6s, surface a "still working" message so users don't think it's frozen.
+    slowTimerRef.current = window.setTimeout(() => {
+      setSubmitStatus("Still working — finalizing your spot. Don't refresh.");
+    }, 6000);
+
     try {
       const isFull = parsed.data.registration_type === "full_pass";
       const sessions = isFull ? SESSIONS.map((s) => s.value) : parsed.data.selected_sessions;
@@ -298,40 +338,84 @@ const SummerCamp = () => {
         amount_cents:       amountCents,
       };
 
-      const { data, error } = await (supabase
+      console.info("[SummerCamp] saving registration");
+      const t0 = performance.now();
+      const insertPromise = (supabase
         .from("summer_camp_registrations" as any) as any)
         .insert(payload)
         .select("id")
         .single();
+      const { data, error } = await withTimeout(insertPromise as Promise<any>, 15000, "Saving your registration");
       if (error) throw error;
       const registrationId = (data as any).id as string;
+      console.info(`[SummerCamp] registration saved in ${Math.round(performance.now() - t0)}ms`, { registrationId });
 
       if (PAYMENT_ENABLED) {
+        setSubmitStatus("Opening secure checkout…");
         const origin = window.location.origin;
         const successUrl = `${origin}/summer-camp?paid=1&rid=${registrationId}&session_id={CHECKOUT_SESSION_ID}`;
         const cancelUrl  = `${origin}/summer-camp?canceled=1&rid=${registrationId}`;
-        const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
+
+        const t1 = performance.now();
+        const payPromise = supabase.functions.invoke("create-payment", {
           body: { priceId, quantity, successUrl, cancelUrl },
         });
-        if (payErr || !payData?.url) {
-          throw new Error(payErr?.message || "Couldn't open the secure checkout. Please try again.");
+        const { data: payData, error: payErr } = await withTimeout(
+          payPromise as Promise<any>,
+          20000,
+          "Opening secure checkout",
+        );
+        console.info(`[SummerCamp] checkout session in ${Math.round(performance.now() - t1)}ms`);
+
+        if (payErr) {
+          throw new Error(payErr?.message || "Couldn't open the secure checkout.");
         }
+        if (!payData?.url) {
+          throw new Error("Checkout link missing — please try again or contact us.");
+        }
+
+        setSubmitStatus("Redirecting to checkout…");
         await openCheckout(payData.url);
+        // Leave inFlightRef true: page is navigating away. If for some reason it doesn't,
+        // surface a manual link so the user isn't stuck.
+        window.setTimeout(() => {
+          if (!document.hidden) {
+            setSubmitError(
+              `If checkout didn't open, tap here: ${payData.url}`,
+            );
+            setSubmitting(false);
+            inFlightRef.current = false;
+          }
+        }, 4000);
         return;
       }
 
+      // Non-payment fallback
       setConfirmation({ id: registrationId, paid: false });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
       console.error("[SummerCamp] submit failed", err);
+      const msg = err?.message ?? "Please try again or contact us directly.";
+      setSubmitError(msg);
       toast({
         title: "Couldn't submit registration",
-        description: err?.message ?? "Please try again or contact us directly.",
+        description: msg,
         variant: "destructive",
       });
     } finally {
-      setSubmitting(false);
+      if (slowTimerRef.current) {
+        window.clearTimeout(slowTimerRef.current);
+        slowTimerRef.current = null;
+      }
+      // Redirect path returns early before this finally runs, so reaching here
+      // means we either hit an error or we're in the non-payment fallback —
+      // either way, free the form back up.
+      {
+        setSubmitting(false);
+        setSubmitStatus("");
+        inFlightRef.current = false;
+      }
     }
   };
 
@@ -745,13 +829,42 @@ const SummerCamp = () => {
                   </div>
                 </div>
 
-                <Button type="submit" variant="vault" size="lg" className="w-full" disabled={submitting}>
+                {submitError && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm"
+                  >
+                    <AlertCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-foreground font-semibold">Couldn't complete your registration.</p>
+                      <p className="text-muted-foreground mt-1 break-words">{submitError}</p>
+                      <p className="text-muted-foreground mt-2">
+                        Try again below. If it keeps failing, text us — we'll lock in your spot manually.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="vault"
+                  size="lg"
+                  className="w-full"
+                  disabled={submitting}
+                  aria-busy={submitting}
+                >
                   {submitting ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> SUBMITTING…</>
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {submitStatus || "SUBMITTING…"}</>
                   ) : (
-                    <>{PAYMENT_ENABLED ? `REGISTER NOW · $${totalAmount || 0}` : "REGISTER NOW"}<ArrowRight className="w-4 h-4 ml-2" /></>
+                    <>{submitError ? "TRY AGAIN" : (PAYMENT_ENABLED ? `REGISTER NOW · $${totalAmount || 0}` : "REGISTER NOW")}<ArrowRight className="w-4 h-4 ml-2" /></>
                   )}
                 </Button>
+
+                {submitting && submitStatus && (
+                  <p className="text-[12px] text-muted-foreground text-center" aria-live="polite">
+                    {submitStatus}
+                  </p>
+                )}
 
                 <p className="text-[11px] text-muted-foreground text-center">
                   {PAYMENT_ENABLED
@@ -832,7 +945,7 @@ const SummerCamp = () => {
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
-    <div>
+    <div data-error={error ? "true" : undefined}>
       <Label className="text-xs text-muted-foreground mb-1.5 block">{label}</Label>
       {children}
       {error ? <p className="text-[11px] text-destructive mt-1">{error}</p> : null}
