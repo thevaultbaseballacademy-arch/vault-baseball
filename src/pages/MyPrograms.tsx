@@ -14,6 +14,7 @@ import { allCourses } from "@/pages/Courses";
 import { Link, useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 import CourseCertificatesList from "@/components/certifications/CourseCertificatesList";
+import { NextActionStrip } from "@/components/pathway/NextActionStrip";
 
 const MyPrograms = () => {
   const [user, setUser] = useState<{ id: string } | null>(null);
