@@ -135,7 +135,30 @@ const SummerCamp = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [confirmation, setConfirmation] = useState<{ id: string; sessionLabel: string } | null>(null);
+  const [confirmation, setConfirmation] = useState<{ id: string; sessionLabel: string; paid: boolean } | null>(null);
+
+  // Handle return-from-Stripe: ?paid=1&rid=...&session_id=...
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paid = params.get("paid");
+    const rid = params.get("rid");
+    const canceled = params.get("canceled");
+    if (canceled) {
+      toast({ title: "Checkout canceled", description: "Your spot wasn't reserved. Try again when you're ready." });
+      const url = new URL(window.location.href);
+      url.search = "";
+      window.history.replaceState({}, "", url.toString());
+      return;
+    }
+    if (paid === "1" && rid) {
+      setConfirmation({ id: rid, sessionLabel: "your selected session", paid: true });
+      setSubmitted(true);
+      // Clean the URL
+      const url = new URL(window.location.href);
+      url.search = "";
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [toast]);
 
   const set = <K extends keyof FormValues>(k: K, v: FormValues[K]) => {
     setValues((p) => ({ ...p, [k]: v }));
