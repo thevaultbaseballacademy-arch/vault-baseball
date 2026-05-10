@@ -174,8 +174,13 @@ const SummerCamp = () => {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<string>("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [confirmation, setConfirmation] = useState<{ id: string; paid: boolean } | null>(null);
+  // Hard guard against duplicate submits (survives React state batching + double-clicks)
+  const inFlightRef = useRef(false);
+  const slowTimerRef = useRef<number | null>(null);
 
   const isEarlyBird = useMemo(() => Date.now() < EARLY_BIRD_DEADLINE.getTime(), []);
   const weeklyPrice = isEarlyBird ? PRICING.week.earlyBird : PRICING.week.regular;
