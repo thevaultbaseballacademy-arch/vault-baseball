@@ -19,10 +19,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { openCheckout } from "@/lib/openCheckout";
 
 // ─────────────────────────────────────────────────────────────────
 // EDIT THIS BLOCK before publishing — placeholder camp details.
 // ─────────────────────────────────────────────────────────────────
+const STRIPE_PRICES = {
+  week: "price_1TVZTFPhXS410TO5Mi4IcUTx",       // Single week — $250
+  full_pass: "price_1TVZTGPhXS410TO5rM6oDJ8v",  // Full 4-week pass — $1000
+};
+
 const CAMP_DETAILS = {
   name: "VAULT SUMMER ELITE CAMP",
   tagline: "Four weeks. Measurable gains. One system.",
@@ -30,14 +36,14 @@ const CAMP_DETAILS = {
   time: "9:00 AM – 12:00 PM daily (Mon–Fri)",
   location: "VAULT Performance Facility — 1245 Sportsplex Dr, Houston, TX 77024",
   ageGroups: "Ages 8–18 (grouped by skill + age)",
-  price: "$295 / week  ·  $995 Full 4-Week Pass (save $185)",
+  price: "$250 / week  ·  $1,000 Full 4-Week Pass",
   spotsAvailable: 24, // per session
   sessions: [
-    { value: "week-1", label: "Week 1 · June 22–26, 2026" },
-    { value: "week-2", label: "Week 2 · June 29 – July 3, 2026" },
-    { value: "week-3", label: "Week 3 · July 6–10, 2026" },
-    { value: "week-4", label: "Week 4 · July 13–17, 2026" },
-    { value: "full-pass", label: "Full 4-Week Pass (all sessions)" },
+    { value: "week-1",    label: "Week 1 · June 22–26, 2026",        priceId: STRIPE_PRICES.week,      amountCents: 25000 },
+    { value: "week-2",    label: "Week 2 · June 29 – July 3, 2026",  priceId: STRIPE_PRICES.week,      amountCents: 25000 },
+    { value: "week-3",    label: "Week 3 · July 6–10, 2026",         priceId: STRIPE_PRICES.week,      amountCents: 25000 },
+    { value: "week-4",    label: "Week 4 · July 13–17, 2026",        priceId: STRIPE_PRICES.week,      amountCents: 25000 },
+    { value: "full-pass", label: "Full 4-Week Pass (all sessions)",  priceId: STRIPE_PRICES.full_pass, amountCents: 100000 },
   ],
   included: [
     "Daily baseline measurements (velo, exit velo, sprint, mobility)",
@@ -47,7 +53,7 @@ const CAMP_DETAILS = {
     "Personalized exit report with next-step development plan",
     "Daily hydration, snacks, and recovery protocols",
   ],
-  paymentEnabled: false, // set true once Stripe price/checkout is wired
+  paymentEnabled: true, // Stripe is wired — checkout runs after form submit
 };
 // ─────────────────────────────────────────────────────────────────
 
