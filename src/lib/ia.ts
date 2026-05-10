@@ -88,7 +88,7 @@ export function bucketForPath(pathname: string): BucketKey | null {
   const p = pathname.toLowerCase();
   if (p.startsWith("/evaluate") || p.startsWith("/free-evaluation") || p.startsWith("/velocity-baseline") || p.includes("prospect-grader") || p === "/products/velo-check") return "assess";
   if (p.startsWith("/recruiting") || p.startsWith("/tryouts") || p.startsWith("/camps") || p === "/products/recruitment" || p === "/products/showcase-prep" || p.startsWith("/wins")) return "get_seen";
-  if (p.startsWith("/marketplace") || p.startsWith("/find-coach") || p.startsWith("/coach-register") || p === "/products/certified-coach" || p === "/products/teams" || p === "/products/org-licensing" || p === "/products/org-starter-pack") return "scale";
+  if (p === "/scale" || p.startsWith("/marketplace") || p.startsWith("/find-coach") || p.startsWith("/coach-register") || p === "/products/certified-coach" || p === "/products/teams" || p === "/products/org-licensing" || p === "/products/org-starter-pack") return "scale";
   if (p.startsWith("/products") || p.startsWith("/book-session") || p.startsWith("/lesson-packages") || p.startsWith("/group-sessions") || p.startsWith("/courses") || p.startsWith("/my-programs") || p.startsWith("/remote-")) return "train";
   return null;
 }
