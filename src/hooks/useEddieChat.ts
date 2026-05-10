@@ -19,6 +19,39 @@ export const useEddieChat = () => {
   const [prospectGrades, setProspectGrades] = useState<Record<string, number> | null>(null);
   const [pageContext, setPageContext] = useState<EddiePageContext | null>(null);
   const { sport } = useSport();
+  const athleteState = useAthleteState();
+
+  const athleteContext = useMemo(() => {
+    if (!athleteState || athleteState.loading) return null;
+    const recs = computeNextActions(athleteState).slice(0, 3).map(r => ({
+      label: r.label, reason: r.reason, bucket: r.bucket, kind: r.kind, href: r.href,
+    }));
+    return {
+      role: athleteState.role,
+      sport: athleteState.sport,
+      age: athleteState.age,
+      graduation_year: athleteState.graduation_year,
+      stage: athleteState.stage,
+      evaluation: {
+        score: athleteState.evaluation.latest_score,
+        weakest_pillar: athleteState.evaluation.weakest_pillar,
+        strongest_pillar: athleteState.evaluation.strongest_pillar,
+        needs_reassessment: athleteState.evaluation.needs_reassessment,
+      },
+      training: {
+        active: athleteState.training.active_programs.map(p => ({ name: p.name, progress_pct: p.progress_pct })),
+        completed_count: athleteState.training.completed_programs.length,
+        streak_days: athleteState.training.streak_days,
+      },
+      recruiting: {
+        has_profile: athleteState.recruiting.has_profile,
+        readiness_score: athleteState.recruiting.readiness_score,
+        completeness: athleteState.recruiting.profile_completeness,
+        commitment: athleteState.recruiting.commitment_status,
+      },
+      next_actions: recs,
+    };
+  }, [athleteState]);
 
   const streamChat = async ({
     messages,
