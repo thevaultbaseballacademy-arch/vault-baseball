@@ -19,6 +19,7 @@ import { PlayerHomeworkChecklist } from "@/components/dashboard/PlayerHomeworkCh
 import { LessonFeedbackReport } from "@/components/dashboard/LessonFeedbackReport";
 import { AthleteDevScore } from "@/components/dashboard/AthleteDevScore";
 import YourPathCard from "@/components/pathway/YourPathCard";
+import { ProgressPulse } from "@/components/pathway/ProgressPulse";
 import DevelopmentIntelligence from "@/components/intelligence/DevelopmentIntelligence";
 import ActivationChecklist from "@/components/dashboard/ActivationChecklist";
 import UpsellCards from "@/components/dashboard/UpsellCards";
