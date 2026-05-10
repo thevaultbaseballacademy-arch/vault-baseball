@@ -156,6 +156,11 @@ const MyPrograms = () => {
       {/* Main Content */}
       <section className="py-12">
         <div className="container mx-auto px-4">
+          <NextActionStrip
+            title="Train — your active programs"
+            audience="Athletes & Parents"
+            description="Eddie surfaces what to do next across Assess, Train, and Get Seen based on your latest progress."
+          />
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left Column - Progress Charts */}
             <div className="lg:col-span-1 space-y-6">
