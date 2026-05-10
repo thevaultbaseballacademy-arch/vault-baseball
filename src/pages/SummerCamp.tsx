@@ -247,8 +247,29 @@ const SummerCamp = () => {
     document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // Race a promise against a timeout — never let the spinner spin forever.
+  const withTimeout = async <T,>(p: Promise<T>, ms: number, label: string): Promise<T> => {
+    let to: number | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      to = window.setTimeout(
+        () => reject(new Error(`${label} is taking longer than expected. Please check your connection and try again.`)),
+        ms,
+      );
+    });
+    try {
+      return await Promise.race([p, timeout]);
+    } finally {
+      if (to) window.clearTimeout(to);
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Hard double-submit guard (refs aren't subject to React batching)
+    if (inFlightRef.current) return;
+
+    setSubmitError(null);
+
     const parsed = FormSchema.safeParse(values);
     if (!parsed.success) {
       const fieldErrors: FormErrors = {};
@@ -257,6 +278,12 @@ const SummerCamp = () => {
         if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
       }
       setErrors(fieldErrors);
+      // Scroll to first error so the user sees what's wrong on mobile
+      requestAnimationFrame(() => {
+        document.querySelector<HTMLElement>("[data-error='true']")?.scrollIntoView({
+          behavior: "smooth", block: "center",
+        });
+      });
       toast({ title: "Please review the form", description: "Some fields need attention.", variant: "destructive" });
       return;
     }
@@ -271,7 +298,15 @@ const SummerCamp = () => {
       return;
     }
 
+    inFlightRef.current = true;
     setSubmitting(true);
+    setSubmitStatus("Submitting your registration…");
+
+    // If overall flow takes >6s, surface a "still working" message so users don't think it's frozen.
+    slowTimerRef.current = window.setTimeout(() => {
+      setSubmitStatus("Still working — finalizing your spot. Don't refresh.");
+    }, 6000);
+
     try {
       const isFull = parsed.data.registration_type === "full_pass";
       const sessions = isFull ? SESSIONS.map((s) => s.value) : parsed.data.selected_sessions;
@@ -303,40 +338,84 @@ const SummerCamp = () => {
         amount_cents:       amountCents,
       };
 
-      const { data, error } = await (supabase
+      console.info("[SummerCamp] saving registration");
+      const t0 = performance.now();
+      const insertPromise = (supabase
         .from("summer_camp_registrations" as any) as any)
         .insert(payload)
         .select("id")
         .single();
+      const { data, error } = await withTimeout(insertPromise as Promise<any>, 15000, "Saving your registration");
       if (error) throw error;
       const registrationId = (data as any).id as string;
+      console.info(`[SummerCamp] registration saved in ${Math.round(performance.now() - t0)}ms`, { registrationId });
 
       if (PAYMENT_ENABLED) {
+        setSubmitStatus("Opening secure checkout…");
         const origin = window.location.origin;
         const successUrl = `${origin}/summer-camp?paid=1&rid=${registrationId}&session_id={CHECKOUT_SESSION_ID}`;
         const cancelUrl  = `${origin}/summer-camp?canceled=1&rid=${registrationId}`;
-        const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
+
+        const t1 = performance.now();
+        const payPromise = supabase.functions.invoke("create-payment", {
           body: { priceId, quantity, successUrl, cancelUrl },
         });
-        if (payErr || !payData?.url) {
-          throw new Error(payErr?.message || "Couldn't open the secure checkout. Please try again.");
+        const { data: payData, error: payErr } = await withTimeout(
+          payPromise as Promise<any>,
+          20000,
+          "Opening secure checkout",
+        );
+        console.info(`[SummerCamp] checkout session in ${Math.round(performance.now() - t1)}ms`);
+
+        if (payErr) {
+          throw new Error(payErr?.message || "Couldn't open the secure checkout.");
         }
+        if (!payData?.url) {
+          throw new Error("Checkout link missing — please try again or contact us.");
+        }
+
+        setSubmitStatus("Redirecting to checkout…");
         await openCheckout(payData.url);
+        // Leave inFlightRef true: page is navigating away. If for some reason it doesn't,
+        // surface a manual link so the user isn't stuck.
+        window.setTimeout(() => {
+          if (!document.hidden) {
+            setSubmitError(
+              `If checkout didn't open, tap here: ${payData.url}`,
+            );
+            setSubmitting(false);
+            inFlightRef.current = false;
+          }
+        }, 4000);
         return;
       }
 
+      // Non-payment fallback
       setConfirmation({ id: registrationId, paid: false });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
       console.error("[SummerCamp] submit failed", err);
+      const msg = err?.message ?? "Please try again or contact us directly.";
+      setSubmitError(msg);
       toast({
         title: "Couldn't submit registration",
-        description: err?.message ?? "Please try again or contact us directly.",
+        description: msg,
         variant: "destructive",
       });
     } finally {
-      setSubmitting(false);
+      if (slowTimerRef.current) {
+        window.clearTimeout(slowTimerRef.current);
+        slowTimerRef.current = null;
+      }
+      // Only clear in-flight if we didn't navigate away (handled above for the redirect case).
+      // For errors / non-payment success, free the form back up.
+      if (!PAYMENT_ENABLED || submitError !== null || true) {
+        // Always clear submitting; the redirect path returns early before reaching here.
+        setSubmitting(false);
+        setSubmitStatus("");
+        inFlightRef.current = false;
+      }
     }
   };
 
