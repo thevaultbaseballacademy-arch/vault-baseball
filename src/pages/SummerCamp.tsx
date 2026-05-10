@@ -1,12 +1,13 @@
-// VAULT — Summer Camp Registration (shareable landing + form).
-// Edit CAMP_DETAILS below to update the page before publishing.
+// VAULT × 22M — Elite Summer Development Camp registration.
+// Two location/age cohorts, weekly + full-pass options, early-bird pricing.
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import {
-  CalendarDays, MapPin, Clock, Users, DollarSign, CheckCircle2,
-  ShieldCheck, Trophy, Target, ArrowRight, Loader2, Mail, Phone,
+  CalendarDays, MapPin, Clock, Users, CheckCircle2, ShieldCheck, Trophy,
+  Target, ArrowRight, Loader2, Mail, Phone, DollarSign, Flame, Zap,
+  Activity, Brain, Dumbbell,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -16,53 +17,85 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { openCheckout } from "@/lib/openCheckout";
 
 // ─────────────────────────────────────────────────────────────────
-// EDIT THIS BLOCK before publishing — placeholder camp details.
+// EDIT THIS BLOCK before publishing.
 // ─────────────────────────────────────────────────────────────────
 const STRIPE_PRICES = {
-  week: "price_1TVZTFPhXS410TO5Mi4IcUTx",       // Single week — $250
-  full_pass: "price_1TVZTGPhXS410TO5rM6oDJ8v",  // Full 4-week pass — $1000
+  week_regular:        "price_1TVZTFPhXS410TO5Mi4IcUTx", // $250
+  week_earlybird:      "price_1TVZh9PhXS410TO5HP7ytMkO", // $225
+  full_pass_regular:   "price_1TVZTGPhXS410TO5rM6oDJ8v", // $1000
+  full_pass_earlybird: "price_1TVZhAPhXS410TO5EFYaacZ6", // $850
 };
 
-const CAMP_DETAILS = {
-  name: "VAULT SUMMER ELITE CAMP",
-  tagline: "Four weeks. Measurable gains. One system.",
-  dates: "June 22 – July 17, 2026",
-  time: "9:00 AM – 12:00 PM daily (Mon–Fri)",
-  location: "VAULT Performance Facility — 1245 Sportsplex Dr, Houston, TX 77024",
-  ageGroups: "Ages 8–18 (grouped by skill + age)",
-  price: "$250 / week  ·  $1,000 Full 4-Week Pass",
-  spotsAvailable: 24, // per session
-  sessions: [
-    { value: "week-1",    label: "Week 1 · June 22–26, 2026",        priceId: STRIPE_PRICES.week,      amountCents: 25000 },
-    { value: "week-2",    label: "Week 2 · June 29 – July 3, 2026",  priceId: STRIPE_PRICES.week,      amountCents: 25000 },
-    { value: "week-3",    label: "Week 3 · July 6–10, 2026",         priceId: STRIPE_PRICES.week,      amountCents: 25000 },
-    { value: "week-4",    label: "Week 4 · July 13–17, 2026",        priceId: STRIPE_PRICES.week,      amountCents: 25000 },
-    { value: "full-pass", label: "Full 4-Week Pass (all sessions)",  priceId: STRIPE_PRICES.full_pass, amountCents: 100000 },
-  ],
-  included: [
-    "Daily baseline measurements (velo, exit velo, sprint, mobility)",
-    "Pillar-based training blocks: Velocity · Mechanics · Mental · Recovery",
-    "Position-specific skill work (hitting, pitching, fielding, catching)",
-    "VAULT camp t-shirt + training journal",
-    "Personalized exit report with next-step development plan",
-    "Daily hydration, snacks, and recovery protocols",
-  ],
-  paymentEnabled: true, // Stripe is wired — checkout runs after form submit
+const EARLY_BIRD_DEADLINE = new Date("2026-05-01T23:59:59-04:00");
+
+const PRICING = {
+  week:      { regular: 250,  earlyBird: 225 },
+  fullPass:  { regular: 1000, earlyBird: 850 },
 };
+
+type SessionDef = { value: string; label: string; short: string; dates: string };
+const SESSIONS: SessionDef[] = [
+  { value: "week-1", short: "Week 1", label: "Week 1 · June 29 – July 2",  dates: "Jun 29 – Jul 2" },
+  { value: "week-2", short: "Week 2", label: "Week 2 · July 6 – July 9",   dates: "Jul 6 – Jul 9" },
+  { value: "week-3", short: "Week 3", label: "Week 3 · July 13 – July 16", dates: "Jul 13 – Jul 16" },
+  { value: "week-4", short: "Week 4", label: "Week 4 · July 20 – July 24", dates: "Jul 20 – Jul 24" },
+];
+
+type Cohort = {
+  id: string;
+  name: string;
+  ageRange: string;
+  ageMin: number;
+  ageMax: number;
+  venue: string;
+  city: string;
+  spotsPerWeek: number;
+};
+const COHORTS: Cohort[] = [
+  {
+    id: "ross-7-10",
+    name: "Ages 7–10",
+    ageRange: "Ages 7 – 10",
+    ageMin: 7, ageMax: 10,
+    venue: "Ross Field",
+    city: "Keyport, NJ",
+    spotsPerWeek: 24,
+  },
+  {
+    id: "gravelly-11-15",
+    name: "Ages 11–15",
+    ageRange: "Ages 11 – 15",
+    ageMin: 11, ageMax: 15,
+    venue: "Gravelly Brook Park",
+    city: "Matawan, NJ",
+    spotsPerWeek: 24,
+  },
+];
+
+const FOCUS_AREAS = [
+  { icon: Flame,    title: "Hitting Mechanics & Bat Speed" },
+  { icon: Zap,      title: "Pitching Velocity Development" },
+  { icon: Activity, title: "Arm Care & Throwing Programs" },
+  { icon: Target,   title: "Defensive Footwork & Glove Work" },
+  { icon: Dumbbell, title: "Speed & Athletic Performance" },
+  { icon: Brain,    title: "Game IQ & Situational Play" },
+];
+
+const PAYMENT_ENABLED = true;
 // ─────────────────────────────────────────────────────────────────
 
 const POSITIONS = [
   "Pitcher", "Catcher", "First Base", "Second Base", "Shortstop", "Third Base",
   "Left Field", "Center Field", "Right Field", "Utility", "Designated Hitter",
 ];
-
-const TSHIRT_SIZES: { value: string; label: string }[] = [
+const TSHIRT_SIZES = [
   { value: "YS", label: "Youth Small" },
   { value: "YM", label: "Youth Medium" },
   { value: "YL", label: "Youth Large" },
@@ -75,26 +108,27 @@ const TSHIRT_SIZES: { value: string; label: string }[] = [
 
 const FormSchema = z.object({
   athlete_first_name: z.string().trim().min(1, "First name is required").max(60),
-  athlete_last_name: z.string().trim().min(1, "Last name is required").max(60),
-  athlete_age: z.coerce.number().int().min(4, "Age must be 4 or older").max(25, "Age must be 25 or younger"),
-  sport: z.enum(["baseball", "softball"], { required_error: "Pick a sport" }),
-  primary_position: z.string().min(1, "Pick a position"),
-  parent_name: z.string().trim().min(1, "Parent name is required").max(120),
-  parent_email: z.string().trim().email("Enter a valid email").max(255),
-  parent_phone: z.string().trim().min(7, "Enter a valid phone number").max(30),
-  emergency_contact: z.string().trim().min(3, "Emergency contact is required").max(200),
-  medical_notes: z.string().max(1000).optional().or(z.literal("")),
-  tshirt_size: z.string().min(1, "Pick a size"),
-  preferred_session: z.string().min(1, "Pick a session"),
+  athlete_last_name:  z.string().trim().min(1, "Last name is required").max(60),
+  athlete_age:        z.coerce.number().int().min(4, "Age must be 4 or older").max(25, "Age must be 25 or younger"),
+  sport:              z.enum(["baseball", "softball"]),
+  primary_position:   z.string().min(1, "Pick a position"),
+  parent_name:        z.string().trim().min(1, "Parent name is required").max(120),
+  parent_email:       z.string().trim().email("Enter a valid email").max(255),
+  parent_phone:       z.string().trim().min(7, "Enter a valid phone number").max(30),
+  emergency_contact:  z.string().trim().min(3, "Emergency contact is required").max(200),
+  medical_notes:      z.string().max(1000).optional().or(z.literal("")),
+  tshirt_size:        z.string().min(1, "Pick a size"),
+  cohort_id:          z.string().min(1, "Pick a camp location / age group"),
+  registration_type:  z.enum(["weekly", "full_pass"]),
+  selected_sessions:  z.array(z.string()).min(1, "Select at least one week"),
 });
-
 type FormValues = z.infer<typeof FormSchema>;
 type FormErrors = Partial<Record<keyof FormValues, string>>;
 
 const initialValues: FormValues = {
   athlete_first_name: "",
   athlete_last_name: "",
-  athlete_age: 12 as unknown as number,
+  athlete_age: "" as unknown as number,
   sport: "baseball",
   primary_position: "",
   parent_name: "",
@@ -103,29 +137,35 @@ const initialValues: FormValues = {
   emergency_contact: "",
   medical_notes: "",
   tshirt_size: "",
-  preferred_session: "",
+  cohort_id: "",
+  registration_type: "weekly",
+  selected_sessions: [],
 };
 
 const FAQS = [
   {
     q: "What should my athlete bring each day?",
-    a: "Glove, cleats + turf shoes, bat (if they have one), water bottle, hat, and athletic clothing. We provide everything else, including a camp t-shirt and training journal.",
+    a: "Glove, cleats + turf shoes, bat (if they have one), water bottle, hat, sunscreen, and athletic clothing. We provide the camp shirt and all training equipment.",
   },
   {
     q: "What if it rains?",
-    a: "We have full indoor turf and cages. Camp runs rain or shine — no cancellations.",
-  },
-  {
-    q: "Are siblings grouped together?",
-    a: "Yes — request it in the medical notes field and we'll keep siblings in the same age band where possible.",
-  },
-  {
-    q: "Is there a refund policy?",
-    a: "Full refund up to 14 days before your session start date. 50% refund inside 14 days. No refunds once the session begins.",
+    a: "Light rain — camp runs as scheduled. Severe weather — sessions are rescheduled or moved indoors when possible. We notify all parents by text the morning of any change.",
   },
   {
     q: "Can my athlete attend multiple weeks?",
-    a: "Absolutely. Pick the Full 4-Week Pass for the best value, or register separately for individual weeks.",
+    a: "Yes — pick the Full Summer Pass for the best value (all 4 weeks), or check off any combination of individual weeks.",
+  },
+  {
+    q: "Are siblings grouped together?",
+    a: "Siblings of the same age cohort will be grouped together. If they fall in different age cohorts, they'll be at different locations — let us know in the medical notes and we'll coordinate drop-off windows where possible.",
+  },
+  {
+    q: "What's the refund policy?",
+    a: "Full refund up to 14 days before your week starts. 50% refund inside 14 days. No refunds once the week begins. The Full Summer Pass is non-transferable between athletes.",
+  },
+  {
+    q: "What if a week sells out?",
+    a: "Each week is capacity-locked. Once a week fills, registration for that week closes immediately — no exceptions. We recommend the Full Summer Pass to lock in all four.",
   },
 ];
 
@@ -135,9 +175,13 @@ const SummerCamp = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [confirmation, setConfirmation] = useState<{ id: string; sessionLabel: string; paid: boolean } | null>(null);
+  const [confirmation, setConfirmation] = useState<{ id: string; paid: boolean } | null>(null);
 
-  // Handle return-from-Stripe: ?paid=1&rid=...&session_id=...
+  const isEarlyBird = useMemo(() => Date.now() < EARLY_BIRD_DEADLINE.getTime(), []);
+  const weeklyPrice = isEarlyBird ? PRICING.week.earlyBird : PRICING.week.regular;
+  const fullPassPrice = isEarlyBird ? PRICING.fullPass.earlyBird : PRICING.fullPass.regular;
+
+  // Handle return-from-Stripe
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const paid = params.get("paid");
@@ -151,12 +195,16 @@ const SummerCamp = () => {
       return;
     }
     if (paid === "1" && rid) {
-      setConfirmation({ id: rid, sessionLabel: "your selected session", paid: true });
+      setConfirmation({ id: rid, paid: true });
       setSubmitted(true);
-      // Clean the URL
       const url = new URL(window.location.href);
       url.search = "";
       window.history.replaceState({}, "", url.toString());
+    }
+    // Pre-select cohort from ?cohort=ross-7-10
+    const cohort = params.get("cohort");
+    if (cohort && COHORTS.some((c) => c.id === cohort)) {
+      setValues((p) => ({ ...p, cohort_id: cohort }));
     }
   }, [toast]);
 
@@ -165,8 +213,30 @@ const SummerCamp = () => {
     if (errors[k]) setErrors((p) => ({ ...p, [k]: undefined }));
   };
 
-  const sessionLabelFor = (val: string) =>
-    CAMP_DETAILS.sessions.find((s) => s.value === val)?.label ?? val;
+  const toggleSession = (sessionVal: string) => {
+    setValues((p) => {
+      const has = p.selected_sessions.includes(sessionVal);
+      const next = has
+        ? p.selected_sessions.filter((s) => s !== sessionVal)
+        : [...p.selected_sessions, sessionVal];
+      return { ...p, selected_sessions: next };
+    });
+    if (errors.selected_sessions) setErrors((p) => ({ ...p, selected_sessions: undefined }));
+  };
+
+  const setRegistrationType = (t: "weekly" | "full_pass") => {
+    setValues((p) => ({
+      ...p,
+      registration_type: t,
+      selected_sessions: t === "full_pass" ? SESSIONS.map((s) => s.value) : p.selected_sessions,
+    }));
+  };
+
+  const cohort = COHORTS.find((c) => c.id === values.cohort_id);
+  const totalAmount =
+    values.registration_type === "full_pass"
+      ? fullPassPrice
+      : weeklyPrice * values.selected_sessions.length;
 
   const scrollToForm = () => {
     document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -185,14 +255,49 @@ const SummerCamp = () => {
       toast({ title: "Please review the form", description: "Some fields need attention.", variant: "destructive" });
       return;
     }
+    // Cohort age guard
+    const c = COHORTS.find((x) => x.id === parsed.data.cohort_id)!;
+    if (parsed.data.athlete_age < c.ageMin || parsed.data.athlete_age > c.ageMax) {
+      setErrors((p) => ({
+        ...p,
+        cohort_id: `${c.name} is for ages ${c.ageMin}–${c.ageMax}. Pick the matching age group.`,
+      }));
+      toast({ title: "Age doesn't match cohort", description: `${c.name} is for ages ${c.ageMin}–${c.ageMax}.`, variant: "destructive" });
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const sessionMeta = CAMP_DETAILS.sessions.find((s) => s.value === parsed.data.preferred_session);
+      const isFull = parsed.data.registration_type === "full_pass";
+      const sessions = isFull ? SESSIONS.map((s) => s.value) : parsed.data.selected_sessions;
+      const amountCents =
+        (isFull ? fullPassPrice : weeklyPrice * sessions.length) * 100;
+
+      const priceId = isFull
+        ? (isEarlyBird ? STRIPE_PRICES.full_pass_earlybird : STRIPE_PRICES.full_pass_regular)
+        : (isEarlyBird ? STRIPE_PRICES.week_earlybird : STRIPE_PRICES.week_regular);
+      const quantity = isFull ? 1 : sessions.length;
+
       const payload = {
-        ...parsed.data,
-        medical_notes: parsed.data.medical_notes || null,
-        amount_cents: sessionMeta?.amountCents ?? null,
+        athlete_first_name: parsed.data.athlete_first_name,
+        athlete_last_name:  parsed.data.athlete_last_name,
+        athlete_age:        parsed.data.athlete_age,
+        sport:              parsed.data.sport,
+        primary_position:   parsed.data.primary_position,
+        parent_name:        parsed.data.parent_name,
+        parent_email:       parsed.data.parent_email,
+        parent_phone:       parsed.data.parent_phone,
+        emergency_contact:  parsed.data.emergency_contact,
+        medical_notes:      parsed.data.medical_notes || null,
+        tshirt_size:        parsed.data.tshirt_size,
+        preferred_session:  isFull ? "full-pass" : sessions[0],
+        selected_sessions:  sessions,
+        camp_location:      `${c.name} · ${c.venue}, ${c.city}`,
+        registration_type:  parsed.data.registration_type,
+        pricing_tier:       isEarlyBird ? "early_bird" : "regular",
+        amount_cents:       amountCents,
       };
+
       const { data, error } = await (supabase
         .from("summer_camp_registrations" as any) as any)
         .insert(payload)
@@ -201,23 +306,21 @@ const SummerCamp = () => {
       if (error) throw error;
       const registrationId = (data as any).id as string;
 
-      // If Stripe is wired and we have a price for this session → go to checkout.
-      if (CAMP_DETAILS.paymentEnabled && sessionMeta?.priceId) {
+      if (PAYMENT_ENABLED) {
         const origin = window.location.origin;
         const successUrl = `${origin}/summer-camp?paid=1&rid=${registrationId}&session_id={CHECKOUT_SESSION_ID}`;
-        const cancelUrl = `${origin}/summer-camp?canceled=1&rid=${registrationId}`;
+        const cancelUrl  = `${origin}/summer-camp?canceled=1&rid=${registrationId}`;
         const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
-          body: { priceId: sessionMeta.priceId, successUrl, cancelUrl },
+          body: { priceId, quantity, successUrl, cancelUrl },
         });
         if (payErr || !payData?.url) {
           throw new Error(payErr?.message || "Couldn't open the secure checkout. Please try again.");
         }
-        // Persist the Stripe session id (best-effort; URL contains it for verification too)
         await openCheckout(payData.url);
         return;
       }
 
-      setConfirmation({ id: registrationId, sessionLabel: sessionLabelFor(parsed.data.preferred_session), paid: false });
+      setConfirmation({ id: registrationId, paid: false });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
@@ -232,29 +335,13 @@ const SummerCamp = () => {
     }
   };
 
-  const detailRows = useMemo(
-    () => [
-      { icon: CalendarDays, label: "Dates", value: CAMP_DETAILS.dates },
-      { icon: Clock, label: "Time", value: CAMP_DETAILS.time },
-      { icon: MapPin, label: "Location", value: CAMP_DETAILS.location },
-      { icon: Users, label: "Age Groups", value: CAMP_DETAILS.ageGroups },
-      { icon: DollarSign, label: "Price", value: CAMP_DETAILS.price },
-      { icon: Trophy, label: "Spots / session", value: `${CAMP_DETAILS.spotsAvailable} max — capacity locked` },
-    ],
-    [],
-  );
-
   if (submitted && confirmation) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="pt-28 pb-24">
           <div className="container mx-auto px-4 max-w-xl">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center"
-            >
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center">
               <div className="w-16 h-16 bg-foreground flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="w-8 h-8 text-background" />
               </div>
@@ -265,11 +352,9 @@ const SummerCamp = () => {
                 {confirmation.paid ? "YOU'RE LOCKED IN." : "YOU'RE ON THE LIST."}
               </h1>
               <p className="text-sm text-muted-foreground mb-6">
-                {confirmation.paid ? (
-                  <>Payment received. Your spot is reserved — we'll email full camp details shortly.</>
-                ) : (
-                  <>We've saved a spot for <strong className="text-foreground">{values.athlete_first_name} {values.athlete_last_name}</strong> in <strong className="text-foreground">{confirmation.sessionLabel}</strong>.</>
-                )}
+                {confirmation.paid
+                  ? "Payment received. Your spot is reserved — we'll text and email full camp details shortly."
+                  : "We've saved your spot. Final payment instructions are on the way to your email."}
               </p>
 
               <Card className="border-border text-left mb-6">
@@ -278,31 +363,15 @@ const SummerCamp = () => {
                   <div className="flex gap-3">
                     <Mail className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <p className="text-muted-foreground">
-                      A confirmation email is on its way{values.parent_email ? <> to <span className="text-foreground">{values.parent_email}</span></> : null}.
+                      Confirmation email sent{values.parent_email ? <> to <span className="text-foreground">{values.parent_email}</span></> : null}.
                     </p>
                   </div>
-                  {!CAMP_DETAILS.paymentEnabled && !confirmation.paid && (
-                    <div className="flex gap-3">
-                      <DollarSign className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                      <p className="text-muted-foreground">
-                        <span className="text-foreground">Registration received — payment instructions coming soon.</span> We'll send a secure payment link within 24 hours to lock in your spot.
-                      </p>
-                    </div>
-                  )}
-                  {confirmation.paid && (
-                    <div className="flex gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                      <p className="text-muted-foreground">
-                        <span className="text-foreground">Payment confirmed via Stripe.</span> A receipt was emailed to you.
-                      </p>
-                    </div>
-                  )}
-                  {values.parent_phone ? (
+                  {values.parent_phone && (
                     <div className="flex gap-3">
                       <Phone className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                      <p className="text-muted-foreground">Questions? Call or text us — we'll reach out at {values.parent_phone}.</p>
+                      <p className="text-muted-foreground">We'll text reminders + drop-off info to {values.parent_phone}.</p>
                     </div>
-                  ) : null}
+                  )}
                 </CardContent>
               </Card>
 
@@ -323,93 +392,173 @@ const SummerCamp = () => {
 
       <main className="pt-24 pb-20">
         {/* HERO */}
-        <section className="container mx-auto px-4 max-w-5xl text-center mb-12">
+        <section className="container mx-auto px-4 max-w-5xl text-center mb-10">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
             <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground block mb-3">
-              VAULT · SUMMER CAMP 2026
+              22M SUMMER DEVELOPMENT PROGRAM · 2026
             </span>
-            <h1 className="text-4xl md:text-6xl font-display text-foreground mb-4 leading-tight">
-              {CAMP_DETAILS.name}
+            <h1 className="text-4xl md:text-6xl font-display text-foreground mb-3 leading-tight">
+              ELITE SUMMER<br className="hidden sm:block" /> DEVELOPMENT CAMP
             </h1>
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-7">
-              {CAMP_DETAILS.tagline}
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
+              Four weeks. Two locations. Real coaching. Built by 22M Baseball, run on the VAULT system.
             </p>
-            <Button variant="vault" size="lg" onClick={scrollToForm} className="min-w-[220px]">
-              SAVE MY SPOT
+
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-6 text-[11px] font-display tracking-[0.2em] text-muted-foreground">
+              <span className="px-3 py-1.5 border border-border">JUN 29 – JUL 24</span>
+              <span className="px-3 py-1.5 border border-border">9 AM – 3 PM</span>
+              <span className="px-3 py-1.5 border border-border">KEYPORT + MATAWAN, NJ</span>
+            </div>
+
+            <Button variant="vault" size="lg" onClick={scrollToForm} className="min-w-[240px]">
+              REGISTER NOW
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mt-3">
-              {CAMP_DETAILS.spotsAvailable} SPOTS PER SESSION · CAPACITY LOCKED
+              LIMITED SPOTS · ONCE FULL, REGISTRATION CLOSES
             </p>
+            {isEarlyBird && (
+              <p className="text-[11px] font-display tracking-[0.2em] text-primary mt-2">
+                EARLY BIRD PRICING ENDS MAY 1
+              </p>
+            )}
           </motion.div>
         </section>
 
-        {/* DETAILS GRID */}
-        <section className="container mx-auto px-4 max-w-5xl mb-14">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {detailRows.map((row) => (
-              <Card key={row.label} className="border-border">
-                <CardContent className="p-4 flex items-start gap-3">
-                  <row.icon className="w-4 h-4 text-primary mt-1 shrink-0" />
-                  <div>
-                    <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground">{row.label.toUpperCase()}</p>
-                    <p className="text-sm text-foreground mt-0.5 leading-snug">{row.value}</p>
+        {/* COHORT / LOCATION CARDS */}
+        <section className="container mx-auto px-4 max-w-5xl mb-12">
+          <p className="text-[11px] font-display tracking-[0.3em] text-muted-foreground text-center mb-4">
+            CHOOSE YOUR CAMP
+          </p>
+          <div className="grid md:grid-cols-2 gap-4">
+            {COHORTS.map((c) => {
+              const selected = values.cohort_id === c.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => { set("cohort_id", c.id); scrollToForm(); }}
+                  className={`text-left rounded-md border-2 p-5 transition-all ${
+                    selected ? "border-foreground bg-foreground/[0.03]" : "border-border hover:border-foreground/40"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="text-[10px] font-display tracking-[0.25em] text-muted-foreground">
+                      {c.ageRange.toUpperCase()}
+                    </span>
+                    {selected && <CheckCircle2 className="w-4 h-4 text-foreground" />}
                   </div>
+                  <h3 className="text-xl font-display text-foreground mb-1">{c.venue}</h3>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5 mb-4">
+                    <MapPin className="w-3.5 h-3.5" /> {c.city}
+                  </p>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{c.spotsPerWeek} spots / week</span>
+                    <span className="text-foreground font-display tracking-wider">SELECT →</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* PRICING */}
+        <section className="container mx-auto px-4 max-w-5xl mb-14">
+          <p className="text-[11px] font-display tracking-[0.3em] text-muted-foreground text-center mb-4">PRICING</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card className="border-border">
+              <CardContent className="p-6">
+                <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">WEEKLY</p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-4xl font-display text-foreground">${weeklyPrice}</span>
+                  {isEarlyBird && (
+                    <span className="text-base text-muted-foreground line-through">${PRICING.week.regular}</span>
+                  )}
+                  <span className="text-sm text-muted-foreground">/ week</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Pick any single week or mix and match. Mon–Thu (Wk 1–3) or Mon–Fri (Wk 4), 9 AM – 3 PM.
+                </p>
+                <Button variant="vaultOutline" className="w-full" onClick={() => { setRegistrationType("weekly"); scrollToForm(); }}>
+                  REGISTER WEEKLY
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-foreground border-2 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-foreground text-background text-[10px] font-display tracking-[0.25em] px-3 py-1">
+                BEST VALUE
+              </div>
+              <CardContent className="p-6">
+                <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">FULL SUMMER PASS</p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-4xl font-display text-foreground">${fullPassPrice}</span>
+                  {isEarlyBird && (
+                    <span className="text-base text-muted-foreground line-through">${PRICING.fullPass.regular}</span>
+                  )}
+                  <span className="text-sm text-muted-foreground">/ all 4 weeks</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  All four weeks locked in. Best per-week value, guaranteed spot before sessions sell out.
+                  {isEarlyBird && <> Save <span className="text-foreground font-semibold">${PRICING.fullPass.regular - PRICING.fullPass.earlyBird}</span> with early bird.</>}
+                </p>
+                <Button variant="vault" className="w-full" onClick={() => { setRegistrationType("full_pass"); scrollToForm(); }}>
+                  GET THE FULL PASS
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+          <p className="text-[11px] text-muted-foreground text-center mt-3">
+            {isEarlyBird
+              ? "Early bird pricing ends May 1. Regular pricing applies after."
+              : "Early bird ended May 1 — current pricing reflects regular rates."}
+          </p>
+        </section>
+
+        {/* DEVELOPMENT FOCUS */}
+        <section className="container mx-auto px-4 max-w-5xl mb-14">
+          <div className="text-center mb-5">
+            <p className="text-[11px] font-display tracking-[0.3em] text-muted-foreground mb-2">DEVELOPMENT FOCUS</p>
+            <h2 className="text-2xl md:text-3xl font-display text-foreground">WHAT ATHLETES WILL WORK ON</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {FOCUS_AREAS.map((f) => (
+              <Card key={f.title} className="border-border">
+                <CardContent className="p-4 flex items-start gap-3">
+                  <f.icon className="w-4 h-4 text-primary mt-1 shrink-0" />
+                  <p className="text-sm text-foreground leading-snug">{f.title}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         </section>
 
-        {/* OVERVIEW + WHO + WHAT */}
+        {/* WHO IT'S FOR + WHY 22M */}
         <section className="container mx-auto px-4 max-w-5xl mb-14">
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card className="border-border md:col-span-1">
-              <CardContent className="p-5">
-                <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">OVERVIEW</p>
-                <h3 className="text-lg font-display text-foreground mb-2">The VAULT system, run live.</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card className="border-border">
+              <CardContent className="p-6">
+                <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">WHO THIS CAMP IS FOR</p>
+                <h3 className="text-lg font-display text-foreground mb-2">Competitive ballplayers, 7–15.</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Daily baselines. Pillar-based training. Real measurables. Athletes leave with data, an exit report, and a development plan that lives in their VAULT account.
+                  Athletes who want real coaching — measurable swings, throws, and reps — not field babysitting.
+                  Open to all skill levels: travel-ball players sharpening tools, and rec players ready to take
+                  it to the next level.
                 </p>
               </CardContent>
             </Card>
-            <Card className="border-border md:col-span-1">
-              <CardContent className="p-5">
-                <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">WHO IT'S FOR</p>
-                <h3 className="text-lg font-display text-foreground mb-2">Serious athletes 8–18.</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Baseball or softball players who want measurable improvement, structured programming, and feedback from VAULT-certified coaches — not generic field time.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-border md:col-span-1">
-              <CardContent className="p-5">
-                <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">WHAT YOU'LL WORK ON</p>
-                <ul className="text-sm text-muted-foreground space-y-1.5">
-                  {["Velocity & exit velocity", "Mechanics & efficiency", "Position-specific skills", "Mental performance", "Recovery & mobility"].map((x) => (
-                    <li key={x} className="flex gap-2"><Target className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />{x}</li>
-                  ))}
+            <Card className="border-border">
+              <CardContent className="p-6">
+                <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">WHY FAMILIES CHOOSE 22M</p>
+                <ul className="text-sm text-muted-foreground space-y-2">
+                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" /> Coaches with college and pro playing backgrounds</li>
+                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" /> Capacity-locked groups — every athlete gets reps and feedback</li>
+                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" /> Daily skill blocks across hitting, pitching, defense, speed</li>
+                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" /> Built on the VAULT player development system</li>
                 </ul>
               </CardContent>
             </Card>
           </div>
-        </section>
-
-        {/* WHAT'S INCLUDED */}
-        <section className="container mx-auto px-4 max-w-3xl mb-14">
-          <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-3 text-center">WHAT'S INCLUDED</p>
-          <Card className="border-border">
-            <CardContent className="p-6">
-              <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-3">
-                {CAMP_DETAILS.included.map((item) => (
-                  <li key={item} className="flex gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
         </section>
 
         {/* REGISTRATION FORM */}
@@ -424,8 +573,97 @@ const SummerCamp = () => {
 
           <Card className="border-border">
             <CardContent className="p-5 md:p-7">
-              <form onSubmit={onSubmit} className="space-y-5" noValidate>
-                {/* Athlete */}
+              <form onSubmit={onSubmit} className="space-y-6" noValidate>
+                {/* COHORT */}
+                <div>
+                  <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-3">CAMP LOCATION / AGE GROUP</p>
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {COHORTS.map((c) => {
+                      const selected = values.cohort_id === c.id;
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => set("cohort_id", c.id)}
+                          className={`text-left rounded-md border-2 p-3 transition ${
+                            selected ? "border-foreground bg-foreground/[0.03]" : "border-border hover:border-foreground/40"
+                          }`}
+                        >
+                          <p className="text-[10px] font-display tracking-[0.2em] text-muted-foreground">{c.ageRange.toUpperCase()}</p>
+                          <p className="text-sm text-foreground font-semibold mt-1">{c.venue}</p>
+                          <p className="text-xs text-muted-foreground">{c.city}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.cohort_id && <p className="text-[11px] text-destructive mt-1">{errors.cohort_id}</p>}
+                </div>
+
+                {/* REG TYPE */}
+                <div>
+                  <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-3">REGISTRATION TYPE</p>
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => setRegistrationType("weekly")}
+                      className={`rounded-md border-2 p-3 text-left transition ${
+                        values.registration_type === "weekly" ? "border-foreground bg-foreground/[0.03]" : "border-border"
+                      }`}
+                    >
+                      <p className="text-sm font-display text-foreground">WEEKLY</p>
+                      <p className="text-xs text-muted-foreground">${weeklyPrice} per week</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRegistrationType("full_pass")}
+                      className={`rounded-md border-2 p-3 text-left transition ${
+                        values.registration_type === "full_pass" ? "border-foreground bg-foreground/[0.03]" : "border-border"
+                      }`}
+                    >
+                      <p className="text-sm font-display text-foreground">FULL SUMMER PASS</p>
+                      <p className="text-xs text-muted-foreground">${fullPassPrice} · all 4 weeks</p>
+                    </button>
+                  </div>
+
+                  <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">
+                    {values.registration_type === "full_pass" ? "ALL WEEKS INCLUDED" : "SELECT WEEK(S)"}
+                  </p>
+                  <div className="space-y-2">
+                    {SESSIONS.map((s) => {
+                      const checked = values.selected_sessions.includes(s.value);
+                      const disabled = values.registration_type === "full_pass";
+                      return (
+                        <label
+                          key={s.value}
+                          className={`flex items-center gap-3 rounded-md border p-3 cursor-pointer transition ${
+                            checked ? "border-foreground bg-foreground/[0.03]" : "border-border"
+                          } ${disabled ? "opacity-90 cursor-default" : ""}`}
+                        >
+                          <Checkbox
+                            checked={checked}
+                            disabled={disabled}
+                            onCheckedChange={() => !disabled && toggleSession(s.value)}
+                          />
+                          <div className="flex-1">
+                            <p className="text-sm text-foreground">{s.short}</p>
+                            <p className="text-xs text-muted-foreground">{s.dates}</p>
+                          </div>
+                          <span className="text-xs text-muted-foreground">${weeklyPrice}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {errors.selected_sessions && <p className="text-[11px] text-destructive mt-1">{errors.selected_sessions}</p>}
+
+                  {values.selected_sessions.length > 0 && (
+                    <div className="flex items-center justify-between mt-3 p-3 bg-foreground/[0.03] rounded-md">
+                      <span className="text-xs font-display tracking-wider text-muted-foreground">TOTAL</span>
+                      <span className="text-lg font-display text-foreground">${totalAmount}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* ATHLETE */}
                 <div>
                   <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-3">ATHLETE</p>
                   <div className="grid sm:grid-cols-2 gap-3">
@@ -436,9 +674,11 @@ const SummerCamp = () => {
                       <Input value={values.athlete_last_name} onChange={(e) => set("athlete_last_name", e.target.value)} autoComplete="family-name" />
                     </Field>
                     <Field label="Age" error={errors.athlete_age}>
-                      <Input type="number" inputMode="numeric" min={4} max={25}
+                      <Input
+                        type="number" inputMode="numeric" min={4} max={25}
                         value={values.athlete_age as any}
-                        onChange={(e) => set("athlete_age", e.target.value as any)} />
+                        onChange={(e) => set("athlete_age", e.target.value as any)}
+                      />
                     </Field>
                     <Field label="Sport" error={errors.sport}>
                       <Select value={values.sport} onValueChange={(v) => set("sport", v as FormValues["sport"])}>
@@ -459,10 +699,20 @@ const SummerCamp = () => {
                         </Select>
                       </Field>
                     </div>
+                    <div className="sm:col-span-2">
+                      <Field label="T-shirt size" error={errors.tshirt_size}>
+                        <Select value={values.tshirt_size} onValueChange={(v) => set("tshirt_size", v)}>
+                          <SelectTrigger><SelectValue placeholder="Select a size" /></SelectTrigger>
+                          <SelectContent>
+                            {TSHIRT_SIZES.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                    </div>
                   </div>
                 </div>
 
-                {/* Parent */}
+                {/* PARENT */}
                 <div>
                   <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-3">PARENT / GUARDIAN</p>
                   <div className="grid sm:grid-cols-2 gap-3">
@@ -472,43 +722,18 @@ const SummerCamp = () => {
                       </Field>
                     </div>
                     <Field label="Email" error={errors.parent_email}>
-                      <Input type="email" inputMode="email" value={values.parent_email}
-                        onChange={(e) => set("parent_email", e.target.value)} autoComplete="email" />
+                      <Input type="email" inputMode="email" value={values.parent_email} onChange={(e) => set("parent_email", e.target.value)} autoComplete="email" />
                     </Field>
                     <Field label="Phone" error={errors.parent_phone}>
-                      <Input type="tel" inputMode="tel" value={values.parent_phone}
-                        onChange={(e) => set("parent_phone", e.target.value)} autoComplete="tel" />
+                      <Input type="tel" inputMode="tel" value={values.parent_phone} onChange={(e) => set("parent_phone", e.target.value)} autoComplete="tel" />
                     </Field>
                     <div className="sm:col-span-2">
                       <Field label="Emergency contact (name + phone)" error={errors.emergency_contact}>
                         <Input value={values.emergency_contact} onChange={(e) => set("emergency_contact", e.target.value)} placeholder="e.g. Jane Doe — 555-123-4567" />
                       </Field>
                     </div>
-                  </div>
-                </div>
-
-                {/* Logistics */}
-                <div>
-                  <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-3">CAMP LOGISTICS</p>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <Field label="T-shirt size" error={errors.tshirt_size}>
-                      <Select value={values.tshirt_size} onValueChange={(v) => set("tshirt_size", v)}>
-                        <SelectTrigger><SelectValue placeholder="Select a size" /></SelectTrigger>
-                        <SelectContent>
-                          {TSHIRT_SIZES.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </Field>
-                    <Field label="Preferred session" error={errors.preferred_session}>
-                      <Select value={values.preferred_session} onValueChange={(v) => set("preferred_session", v)}>
-                        <SelectTrigger><SelectValue placeholder="Pick a session" /></SelectTrigger>
-                        <SelectContent>
-                          {CAMP_DETAILS.sessions.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </Field>
                     <div className="sm:col-span-2">
-                      <Field label="Medical notes or allergies (optional)" error={errors.medical_notes}>
+                      <Field label="Medical notes / allergies (optional)" error={errors.medical_notes}>
                         <Textarea
                           value={values.medical_notes ?? ""}
                           onChange={(e) => set("medical_notes", e.target.value)}
@@ -521,12 +746,16 @@ const SummerCamp = () => {
                 </div>
 
                 <Button type="submit" variant="vault" size="lg" className="w-full" disabled={submitting}>
-                  {submitting ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" /> SUBMITTING…</>) : (<>{CAMP_DETAILS.paymentEnabled ? "CONTINUE TO PAYMENT" : "REGISTER NOW"}<ArrowRight className="w-4 h-4 ml-2" /></>)}
+                  {submitting ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> SUBMITTING…</>
+                  ) : (
+                    <>{PAYMENT_ENABLED ? `REGISTER NOW · $${totalAmount || 0}` : "REGISTER NOW"}<ArrowRight className="w-4 h-4 ml-2" /></>
+                  )}
                 </Button>
 
                 <p className="text-[11px] text-muted-foreground text-center">
-                  {CAMP_DETAILS.paymentEnabled
-                    ? "You'll be redirected to a secure checkout to lock in your spot."
+                  {PAYMENT_ENABLED
+                    ? "You'll be redirected to a secure Stripe checkout to lock in your spot."
                     : "We'll email payment instructions within 24 hours to confirm your spot."}
                 </p>
               </form>
@@ -538,9 +767,9 @@ const SummerCamp = () => {
         <section className="container mx-auto px-4 max-w-4xl mb-14">
           <div className="grid sm:grid-cols-3 gap-3">
             {[
-              { icon: ShieldCheck, label: "VAULT-Certified Coaches", body: "Every coach trained on the VAULT 5-Pillar system." },
-              { icon: Users, label: "Capacity-Locked Groups", body: "We cap each session so every athlete gets reps and feedback." },
-              { icon: Trophy, label: "Measurable Outcomes", body: "Daily baselines + exit report. You see the gains." },
+              { icon: ShieldCheck, label: "VAULT-Certified Coaches", body: "College and pro playing backgrounds. Trained on the 22M / VAULT system." },
+              { icon: Users, label: "Capacity-Locked Groups", body: "Each week is capped — every athlete gets reps and feedback." },
+              { icon: Trophy, label: "Built for Real Results", body: "Daily focus blocks across hitting, pitching, defense, and speed." },
             ].map((t) => (
               <Card key={t.label} className="border-border">
                 <CardContent className="p-4 flex items-start gap-3">
@@ -571,11 +800,25 @@ const SummerCamp = () => {
           </Accordion>
         </section>
 
+        {/* REFUND POLICY */}
+        <section className="container mx-auto px-4 max-w-3xl mb-14">
+          <Card className="border-border">
+            <CardContent className="p-5">
+              <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground mb-2">REFUND POLICY</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Limited refunds. Full refund up to 14 days before your week's start date. 50% refund inside 14 days.
+                <span className="text-foreground"> No refunds once the week begins.</span> The Full Summer Pass is non-transferable
+                between athletes. Camp runs rain or shine; severe-weather cancellations are rescheduled, not refunded.
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+
         {/* Final CTA */}
         <section className="container mx-auto px-4 max-w-3xl text-center">
           <h2 className="text-2xl md:text-3xl font-display text-foreground mb-3">SPOTS GO FAST.</h2>
           <p className="text-sm text-muted-foreground mb-5">Lock your week in under 2 minutes.</p>
-          <Button variant="vault" size="lg" onClick={scrollToForm} className="min-w-[220px]">
+          <Button variant="vault" size="lg" onClick={scrollToForm} className="min-w-[240px]">
             REGISTER NOW
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
@@ -587,7 +830,6 @@ const SummerCamp = () => {
   );
 };
 
-// Tiny labeled-field wrapper with inline error.
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>

@@ -39,6 +39,8 @@ const VALID_PAYMENT_PRICE_IDS = [
   // Summer Camp 2026
   'price_1TVZTFPhXS410TO5Mi4IcUTx', // summer_camp_week $250
   'price_1TVZTGPhXS410TO5rM6oDJ8v', // summer_camp_full_pass $1000
+  'price_1TVZh9PhXS410TO5HP7ytMkO', // summer_camp_week_early_bird $225
+  'price_1TVZhAPhXS410TO5EFYaacZ6', // summer_camp_full_pass_early_bird $850
 ];
 
 const logStep = (step: string, details?: Record<string, unknown>) => {
@@ -93,7 +95,8 @@ serve(async (req) => {
       });
     }
 
-    const { priceId, successUrl, cancelUrl } = requestBody;
+    const { priceId, successUrl, cancelUrl, quantity: rawQty } = requestBody;
+    const quantity = Math.max(1, Math.min(10, Number.isFinite(Number(rawQty)) ? Math.floor(Number(rawQty)) : 1));
     
     // Validate priceId is a non-empty string
     if (!priceId || typeof priceId !== 'string') {
@@ -171,7 +174,7 @@ serve(async (req) => {
       line_items: [
         {
           price: priceId,
-          quantity: 1,
+          quantity,
         },
       ],
       mode: "payment",

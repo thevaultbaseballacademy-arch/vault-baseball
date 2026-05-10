@@ -6312,6 +6312,7 @@ export type Database = {
           athlete_age: number
           athlete_first_name: string
           athlete_last_name: string
+          camp_location: string | null
           created_at: string
           emergency_contact: string
           id: string
@@ -6321,7 +6322,10 @@ export type Database = {
           parent_name: string
           parent_phone: string
           preferred_session: string
+          pricing_tier: string | null
           primary_position: string
+          registration_type: string | null
+          selected_sessions: string[] | null
           sport: string
           status: string
           stripe_session_id: string | null
@@ -6333,6 +6337,7 @@ export type Database = {
           athlete_age: number
           athlete_first_name: string
           athlete_last_name: string
+          camp_location?: string | null
           created_at?: string
           emergency_contact: string
           id?: string
@@ -6342,7 +6347,10 @@ export type Database = {
           parent_name: string
           parent_phone: string
           preferred_session: string
+          pricing_tier?: string | null
           primary_position: string
+          registration_type?: string | null
+          selected_sessions?: string[] | null
           sport: string
           status?: string
           stripe_session_id?: string | null
@@ -6354,6 +6362,7 @@ export type Database = {
           athlete_age?: number
           athlete_first_name?: string
           athlete_last_name?: string
+          camp_location?: string | null
           created_at?: string
           emergency_contact?: string
           id?: string
@@ -6363,7 +6372,10 @@ export type Database = {
           parent_name?: string
           parent_phone?: string
           preferred_session?: string
+          pricing_tier?: string | null
           primary_position?: string
+          registration_type?: string | null
+          selected_sessions?: string[] | null
           sport?: string
           status?: string
           stripe_session_id?: string | null
