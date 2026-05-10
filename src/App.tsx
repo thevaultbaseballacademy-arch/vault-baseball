@@ -43,6 +43,7 @@ const Account = lazy(() => import("./pages/Account"));
 const Schedule = lazy(() => import("./pages/Schedule"));
 const Checkin = lazy(() => import("./pages/Checkin"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const YourPath = lazy(() => import("./pages/YourPath"));
 const VaultDashboard = lazy(() => import("./pages/VaultDashboard"));
 const CoachDashboard = lazy(() => import("./pages/CoachDashboard"));
 const CoachDashboardLayout = lazy(() => import("./components/coach/CoachDashboardLayout"));
@@ -253,6 +254,7 @@ const App = () => (
           <PageTransition>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/path" element={<AuthGuard><YourPath /></AuthGuard>} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/tryouts" element={<Tryouts />} />
             <Route path="/tryouts/register/:id" element={<LegacyTryoutRegisterRedirect />} />
