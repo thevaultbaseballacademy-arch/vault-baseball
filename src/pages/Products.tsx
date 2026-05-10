@@ -18,6 +18,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductFilters, { Category, PriceRange } from "@/components/products/ProductFilters";
 import { EmptyState } from "@/components/ui/empty-state";
+import { NextActionStrip } from "@/components/pathway/NextActionStrip";
 import { formatPrice, PRODUCT_PRICES } from "@/lib/productPricing";
 
 interface Product {
@@ -273,6 +274,11 @@ const Products = () => {
       {/* Hero Section */}
       <section className="pt-8 pb-8 bg-gradient-to-b from-muted/50 to-background">
         <div className="container mx-auto px-4">
+          <NextActionStrip
+            title="Train — pillar-based programs and bundles"
+            audience="Athletes & Parents"
+            description="Pick a system matched to your stage, weakest pillar, and goals. Eddie can recommend one if you're unsure."
+          />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

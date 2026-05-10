@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { NextActionStrip } from "@/components/pathway/NextActionStrip";
 import { useRecruitingProfile } from "@/hooks/useRecruitingProfile";
 import { useSport } from "@/contexts/SportContext";
 
@@ -58,6 +59,11 @@ const RecruitingHub = () => {
       <Navbar />
       <section className="pt-24 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
+          <NextActionStrip
+            title="Get Seen — recruiting readiness"
+            audience="Athletes & Parents (14U+)"
+            description="Audit, profile, college contacts, showcases. Your readiness score and next checklist item update as you go."
+          />
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
             <div className="flex items-center gap-3 mb-2">

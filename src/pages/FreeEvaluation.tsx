@@ -273,6 +273,15 @@ const FreeEvaluation = () => {
                     <h2 className="text-2xl font-display text-foreground">EVALUATION COMPLETE</h2>
                   </div>
 
+                  {/* Primary CTA: take athlete to their personalized Path */}
+                  <Button
+                    className="w-full mb-6 font-display tracking-wide"
+                    onClick={() => navigate("/path")}
+                  >
+                    OPEN YOUR PATH
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+
                   {/* Score card */}
                   <div className="border border-border bg-card p-6 mb-6">
                     <div className="flex items-center justify-between mb-4">
