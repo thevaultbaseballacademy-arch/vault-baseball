@@ -408,10 +408,10 @@ const SummerCamp = () => {
         window.clearTimeout(slowTimerRef.current);
         slowTimerRef.current = null;
       }
-      // Only clear in-flight if we didn't navigate away (handled above for the redirect case).
-      // For errors / non-payment success, free the form back up.
-      if (!PAYMENT_ENABLED || submitError !== null || true) {
-        // Always clear submitting; the redirect path returns early before reaching here.
+      // Redirect path returns early before this finally runs, so reaching here
+      // means we either hit an error or we're in the non-payment fallback —
+      // either way, free the form back up.
+      {
         setSubmitting(false);
         setSubmitStatus("");
         inFlightRef.current = false;
