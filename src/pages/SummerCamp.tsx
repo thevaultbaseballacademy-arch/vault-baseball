@@ -945,7 +945,7 @@ const SummerCamp = () => {
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
-    <div>
+    <div data-error={error ? "true" : undefined}>
       <Label className="text-xs text-muted-foreground mb-1.5 block">{label}</Label>
       {children}
       {error ? <p className="text-[11px] text-destructive mt-1">{error}</p> : null}
