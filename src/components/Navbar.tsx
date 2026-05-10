@@ -180,8 +180,9 @@ const Navbar = () => {
     },
     {
       name: "Scale",
-      href: "/marketplace",
+      href: "/scale",
       dropdown: [
+        { name: "Scale Hub", href: "/scale" },
         { name: "Coach Network (Marketplace)", href: "/marketplace" },
         { name: "Find a Coach", href: "/find-coach" },
         { name: "Become a Coach", href: "/coach-register" },
