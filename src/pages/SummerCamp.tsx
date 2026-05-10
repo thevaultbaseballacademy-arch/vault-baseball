@@ -164,14 +164,37 @@ const SummerCamp = () => {
     }
     setSubmitting(true);
     try {
-      const payload = { ...parsed.data, medical_notes: parsed.data.medical_notes || null };
+      const sessionMeta = CAMP_DETAILS.sessions.find((s) => s.value === parsed.data.preferred_session);
+      const payload = {
+        ...parsed.data,
+        medical_notes: parsed.data.medical_notes || null,
+        amount_cents: sessionMeta?.amountCents ?? null,
+      };
       const { data, error } = await (supabase
         .from("summer_camp_registrations" as any) as any)
         .insert(payload)
         .select("id")
         .single();
       if (error) throw error;
-      setConfirmation({ id: (data as any).id, sessionLabel: sessionLabelFor(parsed.data.preferred_session) });
+      const registrationId = (data as any).id as string;
+
+      // If Stripe is wired and we have a price for this session → go to checkout.
+      if (CAMP_DETAILS.paymentEnabled && sessionMeta?.priceId) {
+        const origin = window.location.origin;
+        const successUrl = `${origin}/summer-camp?paid=1&rid=${registrationId}&session_id={CHECKOUT_SESSION_ID}`;
+        const cancelUrl = `${origin}/summer-camp?canceled=1&rid=${registrationId}`;
+        const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
+          body: { priceId: sessionMeta.priceId, successUrl, cancelUrl },
+        });
+        if (payErr || !payData?.url) {
+          throw new Error(payErr?.message || "Couldn't open the secure checkout. Please try again.");
+        }
+        // Persist the Stripe session id (best-effort; URL contains it for verification too)
+        await openCheckout(payData.url);
+        return;
+      }
+
+      setConfirmation({ id: registrationId, sessionLabel: sessionLabelFor(parsed.data.preferred_session) });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
