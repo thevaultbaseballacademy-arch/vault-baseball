@@ -266,6 +266,8 @@ const App = () => (
             <Route path="/camps" element={<Camps />} />
             <Route path="/camps/:cohortId/register" element={<CampRegister />} />
             <Route path="/camps/success" element={<CampSuccess />} />
+            <Route path="/summer-camp" element={<SummerCamp />} />
+            <Route path="/register/summer-camp" element={<SummerCamp />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
