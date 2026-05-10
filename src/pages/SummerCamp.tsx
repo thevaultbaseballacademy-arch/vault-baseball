@@ -217,7 +217,7 @@ const SummerCamp = () => {
         return;
       }
 
-      setConfirmation({ id: registrationId, sessionLabel: sessionLabelFor(parsed.data.preferred_session) });
+      setConfirmation({ id: registrationId, sessionLabel: sessionLabelFor(parsed.data.preferred_session), paid: false });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
