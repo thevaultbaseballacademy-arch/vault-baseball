@@ -145,7 +145,8 @@ function summarizeRecruiting(rec: any | null): AthleteRecruitingSummary {
 }
 
 export function useAthleteState(): AthleteState {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, state: authState } = useAuth();
+  const authLoading = authState === "loading";
 
   const composed = useQuery({
     queryKey: ["athlete-state", user?.id],
