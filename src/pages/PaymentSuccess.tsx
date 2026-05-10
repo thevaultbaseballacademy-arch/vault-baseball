@@ -214,10 +214,15 @@ const PaymentSuccess = () => {
                   transition={{ delay: 0.5 }}
                   className="flex flex-col gap-3"
                 >
-                  <Link to={`/athlete-onboarding${productKey ? `?product=${productKey}` : ""}`}>
+                  <Link to="/path">
                     <Button variant="vault" size="lg" className="w-full">
-                      COMPLETE ONBOARDING
+                      OPEN YOUR PATH
                       <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                  <Link to={`/athlete-onboarding${productKey ? `?product=${productKey}` : ""}`}>
+                    <Button variant="vaultOutline" size="lg" className="w-full">
+                      COMPLETE ONBOARDING
                     </Button>
                   </Link>
                   <Link to="/dashboard">

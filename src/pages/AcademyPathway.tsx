@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, Target, TrendingUp, Dumbbell, BarChart3, Clock, Flame } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { NextActionStrip } from "@/components/pathway/NextActionStrip";
 
 const AcademyPathway = () => {
   const priorities = [
@@ -103,6 +104,13 @@ const AcademyPathway = () => {
               Developing high-performance athletes through structured training, 
               measurable progress, and sustainable development practices.
             </p>
+          </div>
+          <div className="max-w-4xl mx-auto mt-10">
+            <NextActionStrip
+              title="Assess — baseline your athlete"
+              audience="Athletes & Parents (13-18)"
+              description="Take the free evaluation to anchor your pathway, then Eddie maps the next step in Train and Get Seen."
+            />
           </div>
         </div>
       </section>
