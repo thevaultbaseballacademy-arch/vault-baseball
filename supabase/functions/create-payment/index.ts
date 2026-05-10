@@ -174,7 +174,7 @@ serve(async (req) => {
       line_items: [
         {
           price: priceId,
-          quantity: 1,
+          quantity,
         },
       ],
       mode: "payment",
