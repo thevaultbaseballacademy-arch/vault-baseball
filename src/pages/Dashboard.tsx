@@ -161,6 +161,9 @@ const Dashboard = () => {
             <YourPathCard compact />
           </div>
 
+          {/* VAULT OS — Progress Pulse (Phase 2: what changed / what's next) */}
+          <ProgressPulse />
+
           {/* Main Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Content - 2 columns */}
