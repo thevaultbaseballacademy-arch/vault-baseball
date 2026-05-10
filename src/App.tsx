@@ -256,6 +256,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/path" element={<AuthGuard><YourPath /></AuthGuard>} />
+            <Route path="/scale" element={<ScaleHub />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/tryouts" element={<Tryouts />} />
             <Route path="/tryouts/register/:id" element={<LegacyTryoutRegisterRedirect />} />
