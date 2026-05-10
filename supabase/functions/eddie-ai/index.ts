@@ -353,7 +353,7 @@ serve(async (req) => {
       });
     }
 
-    const { messages, sport, prospectGrades, pageContext } = body as Record<string, unknown>;
+    const { messages, sport, prospectGrades, pageContext, athleteContext } = body as Record<string, unknown>;
     const validation = validateMessages(messages);
     if (!validation.valid) {
       return new Response(JSON.stringify({ error: validation.error }), {
@@ -387,7 +387,42 @@ serve(async (req) => {
 Tailor your answer to what is visible on this page first. Do not change the subject unless the user does.`;
     }
 
-    const fullSystemPrompt = basePrompt + sportSection + prospectContext + pageBlock;
+    // ── Athlete state context (Pathway-aware) ──
+    let athleteBlock = "";
+    const ac = athleteContext as any;
+    if (ac && typeof ac === "object") {
+      const evalLine = ac.evaluation?.score != null
+        ? `score ${ac.evaluation.score}/100, weakest pillar: ${ac.evaluation.weakest_pillar ?? "n/a"}, strongest: ${ac.evaluation.strongest_pillar ?? "n/a"}${ac.evaluation.needs_reassessment ? " (REASSESSMENT OVERDUE)" : ""}`
+        : "no evaluation taken yet";
+      const trainLine = ac.training?.active?.length
+        ? ac.training.active.map((p: any) => `${p.name} (${Math.round(p.progress_pct)}%)`).join(", ")
+        : "no active program";
+      const recruitLine = ac.recruiting?.has_profile
+        ? `profile ${ac.recruiting.completeness}% complete, readiness ${ac.recruiting.readiness_score ?? "n/a"}, commitment: ${ac.recruiting.commitment ?? "uncommitted"}`
+        : "no recruiting profile";
+      const nextLines = Array.isArray(ac.next_actions) && ac.next_actions.length
+        ? ac.next_actions.map((r: any, i: number) => `  ${i + 1}. ${r.label} → ${r.href} — ${r.reason}`).join("\n")
+        : "  (none — recommend taking the Free Evaluation first)";
+
+      athleteBlock = `
+
+## ATHLETE CONTEXT (read silently — use to personalize)
+- Role: ${ac.role ?? "athlete"} | Sport: ${ac.sport ?? "baseball"} | Age: ${ac.age ?? "unknown"} | Grad year: ${ac.graduation_year ?? "unknown"}
+- Stage: ${ac.stage ?? "unassessed"}
+- Evaluation: ${evalLine}
+- Training: ${trainLine} | completed programs: ${ac.training?.completed_count ?? 0} | streak: ${ac.training?.streak_days ?? 0}d
+- Recruiting: ${recruitLine}
+
+### TOP NEXT ACTIONS (from Pathway Engine — recommend these by name when relevant)
+${nextLines}
+
+Rules:
+- Reference this context naturally; never dump it back to the user.
+- When the user asks "what should I do next?" lead with the #1 next action above.
+- If they ask a generic question, tie your answer back to their stage and weakest pillar.`;
+    }
+
+    const fullSystemPrompt = basePrompt + sportSection + prospectContext + pageBlock + athleteBlock;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
