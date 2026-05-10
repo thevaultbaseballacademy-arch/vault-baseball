@@ -27,6 +27,7 @@ import TryoutRegister from "./pages/TryoutRegister";
 import CancelTryout from "./pages/CancelTryout";
 const Camps = lazy(() => import("./pages/Camps"));
 const CampRegister = lazy(() => import("./pages/CampRegister"));
+const SummerCamp = lazy(() => import("./pages/SummerCamp"));
 const CampSuccess = lazy(() => import("./pages/CampSuccess"));
 
 // Global loading fallback
