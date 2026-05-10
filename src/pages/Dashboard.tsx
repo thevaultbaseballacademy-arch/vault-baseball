@@ -18,6 +18,7 @@ import CoachAssignmentRequests from "@/components/athlete/CoachAssignmentRequest
 import { PlayerHomeworkChecklist } from "@/components/dashboard/PlayerHomeworkChecklist";
 import { LessonFeedbackReport } from "@/components/dashboard/LessonFeedbackReport";
 import { AthleteDevScore } from "@/components/dashboard/AthleteDevScore";
+import YourPathCard from "@/components/pathway/YourPathCard";
 import DevelopmentIntelligence from "@/components/intelligence/DevelopmentIntelligence";
 import ActivationChecklist from "@/components/dashboard/ActivationChecklist";
 import UpsellCards from "@/components/dashboard/UpsellCards";
@@ -153,6 +154,11 @@ const Dashboard = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
+
+          {/* VAULT OS — Your Path (top of dashboard) */}
+          <div className="mb-6">
+            <YourPathCard compact />
+          </div>
 
           {/* Main Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
