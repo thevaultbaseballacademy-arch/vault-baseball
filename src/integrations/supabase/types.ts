@@ -6306,6 +6306,63 @@ export type Database = {
         }
         Relationships: []
       }
+      summer_camp_registrations: {
+        Row: {
+          athlete_age: number
+          athlete_first_name: string
+          athlete_last_name: string
+          created_at: string
+          emergency_contact: string
+          id: string
+          medical_notes: string | null
+          parent_email: string
+          parent_name: string
+          parent_phone: string
+          preferred_session: string
+          primary_position: string
+          sport: string
+          status: string
+          tshirt_size: string
+          updated_at: string
+        }
+        Insert: {
+          athlete_age: number
+          athlete_first_name: string
+          athlete_last_name: string
+          created_at?: string
+          emergency_contact: string
+          id?: string
+          medical_notes?: string | null
+          parent_email: string
+          parent_name: string
+          parent_phone: string
+          preferred_session: string
+          primary_position: string
+          sport: string
+          status?: string
+          tshirt_size: string
+          updated_at?: string
+        }
+        Update: {
+          athlete_age?: number
+          athlete_first_name?: string
+          athlete_last_name?: string
+          created_at?: string
+          emergency_contact?: string
+          id?: string
+          medical_notes?: string | null
+          parent_email?: string
+          parent_name?: string
+          parent_phone?: string
+          preferred_session?: string
+          primary_position?: string
+          sport?: string
+          status?: string
+          tshirt_size?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
