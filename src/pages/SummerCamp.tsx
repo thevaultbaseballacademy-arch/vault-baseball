@@ -1,7 +1,7 @@
 // VAULT — Summer Camp Registration (shareable landing + form).
 // Edit CAMP_DETAILS below to update the page before publishing.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import {
