@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, Target, TrendingUp, Dumbbell, BarChart3, Clock, Flame } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { NextActionStrip } from "@/components/pathway/NextActionStrip";
 
 const AcademyPathway = () => {
   const priorities = [
