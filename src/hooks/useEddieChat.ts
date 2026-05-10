@@ -169,7 +169,7 @@ export const useEddieChat = () => {
       setError(e instanceof Error ? e.message : "Failed to send message");
       setIsLoading(false);
     }
-  }, [messages, isLoading, sport, prospectGrades, pageContext]);
+  }, [messages, isLoading, sport, prospectGrades, pageContext, athleteContext]);
 
   const clearChat = useCallback(() => {
     setMessages([]);
