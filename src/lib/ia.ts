@@ -70,7 +70,7 @@ export const IA_BUCKETS: IABucket[] = [
     name: "Scale",
     tagline: "For coaches and organizations building developmental programs.",
     icon: Building2,
-    primary: { name: "Coach Network", href: "/marketplace", description: "Certified coaches and licensing." },
+    primary: { name: "Scale Hub", href: "/scale", description: "Coach network, certification, and org licensing." },
     links: [
       { name: "Coach Network (Marketplace)", href: "/marketplace" },
       { name: "Find a Coach", href: "/find-coach" },
