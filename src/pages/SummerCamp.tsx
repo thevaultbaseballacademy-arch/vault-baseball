@@ -829,13 +829,42 @@ const SummerCamp = () => {
                   </div>
                 </div>
 
-                <Button type="submit" variant="vault" size="lg" className="w-full" disabled={submitting}>
+                {submitError && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm"
+                  >
+                    <AlertCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-foreground font-semibold">Couldn't complete your registration.</p>
+                      <p className="text-muted-foreground mt-1 break-words">{submitError}</p>
+                      <p className="text-muted-foreground mt-2">
+                        Try again below. If it keeps failing, text us — we'll lock in your spot manually.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="vault"
+                  size="lg"
+                  className="w-full"
+                  disabled={submitting}
+                  aria-busy={submitting}
+                >
                   {submitting ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> SUBMITTING…</>
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {submitStatus || "SUBMITTING…"}</>
                   ) : (
-                    <>{PAYMENT_ENABLED ? `REGISTER NOW · $${totalAmount || 0}` : "REGISTER NOW"}<ArrowRight className="w-4 h-4 ml-2" /></>
+                    <>{submitError ? "TRY AGAIN" : (PAYMENT_ENABLED ? `REGISTER NOW · $${totalAmount || 0}` : "REGISTER NOW")}<ArrowRight className="w-4 h-4 ml-2" /></>
                   )}
                 </Button>
+
+                {submitting && submitStatus && (
+                  <p className="text-[12px] text-muted-foreground text-center" aria-live="polite">
+                    {submitStatus}
+                  </p>
+                )}
 
                 <p className="text-[11px] text-muted-foreground text-center">
                   {PAYMENT_ENABLED
