@@ -1,5 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useSport } from "@/contexts/SportContext";
+import { useAthleteState } from "@/hooks/useAthleteState";
+import { computeNextActions } from "@/lib/pathway/engine";
 
 const EDDIE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/eddie-ai`;
 
