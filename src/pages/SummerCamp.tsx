@@ -1,13 +1,13 @@
 // VAULT × 22M — Elite Summer Development Camp registration.
 // Two location/age cohorts, weekly + full-pass options, early-bird pricing.
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import {
   CalendarDays, MapPin, Clock, Users, CheckCircle2, ShieldCheck, Trophy,
   Target, ArrowRight, Loader2, Mail, Phone, DollarSign, Flame, Zap,
-  Activity, Brain, Dumbbell,
+  Activity, Brain, Dumbbell, AlertCircle,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
