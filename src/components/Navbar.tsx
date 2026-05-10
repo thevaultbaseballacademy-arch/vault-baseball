@@ -139,6 +139,7 @@ const Navbar = () => {
   // (single source: src/lib/ia.ts)
   const navLinks = [
     { name: "Home", href: "/" },
+    ...(user ? [{ name: "Your Path", href: "/path" }] : []),
     {
       name: "Assess",
       href: "/evaluate",
