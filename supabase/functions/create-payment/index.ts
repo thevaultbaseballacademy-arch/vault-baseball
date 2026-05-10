@@ -36,6 +36,9 @@ const VALID_PAYMENT_PRICE_IDS = [
   // Lesson Packages
   'price_1T1LZOPhXS410TO5lhAYrmKO', // 8-lesson pack $349
   'price_1T1LZNPhXS410TO5u5o2Szl4', // 4-lesson pack $199
+  // Summer Camp 2026
+  'price_1TVZTFPhXS410TO5Mi4IcUTx', // summer_camp_week $250
+  'price_1TVZTGPhXS410TO5rM6oDJ8v', // summer_camp_full_pass $1000
 ];
 
 const logStep = (step: string, details?: Record<string, unknown>) => {

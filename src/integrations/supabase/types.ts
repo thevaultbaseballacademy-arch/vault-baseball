@@ -6308,6 +6308,7 @@ export type Database = {
       }
       summer_camp_registrations: {
         Row: {
+          amount_cents: number | null
           athlete_age: number
           athlete_first_name: string
           athlete_last_name: string
@@ -6315,6 +6316,7 @@ export type Database = {
           emergency_contact: string
           id: string
           medical_notes: string | null
+          paid_at: string | null
           parent_email: string
           parent_name: string
           parent_phone: string
@@ -6322,10 +6324,12 @@ export type Database = {
           primary_position: string
           sport: string
           status: string
+          stripe_session_id: string | null
           tshirt_size: string
           updated_at: string
         }
         Insert: {
+          amount_cents?: number | null
           athlete_age: number
           athlete_first_name: string
           athlete_last_name: string
@@ -6333,6 +6337,7 @@ export type Database = {
           emergency_contact: string
           id?: string
           medical_notes?: string | null
+          paid_at?: string | null
           parent_email: string
           parent_name: string
           parent_phone: string
@@ -6340,10 +6345,12 @@ export type Database = {
           primary_position: string
           sport: string
           status?: string
+          stripe_session_id?: string | null
           tshirt_size: string
           updated_at?: string
         }
         Update: {
+          amount_cents?: number | null
           athlete_age?: number
           athlete_first_name?: string
           athlete_last_name?: string
@@ -6351,6 +6358,7 @@ export type Database = {
           emergency_contact?: string
           id?: string
           medical_notes?: string | null
+          paid_at?: string | null
           parent_email?: string
           parent_name?: string
           parent_phone?: string
@@ -6358,6 +6366,7 @@ export type Database = {
           primary_position?: string
           sport?: string
           status?: string
+          stripe_session_id?: string | null
           tshirt_size?: string
           updated_at?: string
         }

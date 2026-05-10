@@ -1,7 +1,7 @@
 // VAULT — Summer Camp Registration (shareable landing + form).
 // Edit CAMP_DETAILS below to update the page before publishing.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import {
@@ -19,10 +19,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { openCheckout } from "@/lib/openCheckout";
 
 // ─────────────────────────────────────────────────────────────────
 // EDIT THIS BLOCK before publishing — placeholder camp details.
 // ─────────────────────────────────────────────────────────────────
+const STRIPE_PRICES = {
+  week: "price_1TVZTFPhXS410TO5Mi4IcUTx",       // Single week — $250
+  full_pass: "price_1TVZTGPhXS410TO5rM6oDJ8v",  // Full 4-week pass — $1000
+};
+
 const CAMP_DETAILS = {
   name: "VAULT SUMMER ELITE CAMP",
   tagline: "Four weeks. Measurable gains. One system.",
@@ -30,14 +36,14 @@ const CAMP_DETAILS = {
   time: "9:00 AM – 12:00 PM daily (Mon–Fri)",
   location: "VAULT Performance Facility — 1245 Sportsplex Dr, Houston, TX 77024",
   ageGroups: "Ages 8–18 (grouped by skill + age)",
-  price: "$295 / week  ·  $995 Full 4-Week Pass (save $185)",
+  price: "$250 / week  ·  $1,000 Full 4-Week Pass",
   spotsAvailable: 24, // per session
   sessions: [
-    { value: "week-1", label: "Week 1 · June 22–26, 2026" },
-    { value: "week-2", label: "Week 2 · June 29 – July 3, 2026" },
-    { value: "week-3", label: "Week 3 · July 6–10, 2026" },
-    { value: "week-4", label: "Week 4 · July 13–17, 2026" },
-    { value: "full-pass", label: "Full 4-Week Pass (all sessions)" },
+    { value: "week-1",    label: "Week 1 · June 22–26, 2026",        priceId: STRIPE_PRICES.week,      amountCents: 25000 },
+    { value: "week-2",    label: "Week 2 · June 29 – July 3, 2026",  priceId: STRIPE_PRICES.week,      amountCents: 25000 },
+    { value: "week-3",    label: "Week 3 · July 6–10, 2026",         priceId: STRIPE_PRICES.week,      amountCents: 25000 },
+    { value: "week-4",    label: "Week 4 · July 13–17, 2026",        priceId: STRIPE_PRICES.week,      amountCents: 25000 },
+    { value: "full-pass", label: "Full 4-Week Pass (all sessions)",  priceId: STRIPE_PRICES.full_pass, amountCents: 100000 },
   ],
   included: [
     "Daily baseline measurements (velo, exit velo, sprint, mobility)",
@@ -47,7 +53,7 @@ const CAMP_DETAILS = {
     "Personalized exit report with next-step development plan",
     "Daily hydration, snacks, and recovery protocols",
   ],
-  paymentEnabled: false, // set true once Stripe price/checkout is wired
+  paymentEnabled: true, // Stripe is wired — checkout runs after form submit
 };
 // ─────────────────────────────────────────────────────────────────
 
@@ -129,7 +135,30 @@ const SummerCamp = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [confirmation, setConfirmation] = useState<{ id: string; sessionLabel: string } | null>(null);
+  const [confirmation, setConfirmation] = useState<{ id: string; sessionLabel: string; paid: boolean } | null>(null);
+
+  // Handle return-from-Stripe: ?paid=1&rid=...&session_id=...
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paid = params.get("paid");
+    const rid = params.get("rid");
+    const canceled = params.get("canceled");
+    if (canceled) {
+      toast({ title: "Checkout canceled", description: "Your spot wasn't reserved. Try again when you're ready." });
+      const url = new URL(window.location.href);
+      url.search = "";
+      window.history.replaceState({}, "", url.toString());
+      return;
+    }
+    if (paid === "1" && rid) {
+      setConfirmation({ id: rid, sessionLabel: "your selected session", paid: true });
+      setSubmitted(true);
+      // Clean the URL
+      const url = new URL(window.location.href);
+      url.search = "";
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [toast]);
 
   const set = <K extends keyof FormValues>(k: K, v: FormValues[K]) => {
     setValues((p) => ({ ...p, [k]: v }));
@@ -158,14 +187,37 @@ const SummerCamp = () => {
     }
     setSubmitting(true);
     try {
-      const payload = { ...parsed.data, medical_notes: parsed.data.medical_notes || null };
+      const sessionMeta = CAMP_DETAILS.sessions.find((s) => s.value === parsed.data.preferred_session);
+      const payload = {
+        ...parsed.data,
+        medical_notes: parsed.data.medical_notes || null,
+        amount_cents: sessionMeta?.amountCents ?? null,
+      };
       const { data, error } = await (supabase
         .from("summer_camp_registrations" as any) as any)
         .insert(payload)
         .select("id")
         .single();
       if (error) throw error;
-      setConfirmation({ id: (data as any).id, sessionLabel: sessionLabelFor(parsed.data.preferred_session) });
+      const registrationId = (data as any).id as string;
+
+      // If Stripe is wired and we have a price for this session → go to checkout.
+      if (CAMP_DETAILS.paymentEnabled && sessionMeta?.priceId) {
+        const origin = window.location.origin;
+        const successUrl = `${origin}/summer-camp?paid=1&rid=${registrationId}&session_id={CHECKOUT_SESSION_ID}`;
+        const cancelUrl = `${origin}/summer-camp?canceled=1&rid=${registrationId}`;
+        const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
+          body: { priceId: sessionMeta.priceId, successUrl, cancelUrl },
+        });
+        if (payErr || !payData?.url) {
+          throw new Error(payErr?.message || "Couldn't open the secure checkout. Please try again.");
+        }
+        // Persist the Stripe session id (best-effort; URL contains it for verification too)
+        await openCheckout(payData.url);
+        return;
+      }
+
+      setConfirmation({ id: registrationId, sessionLabel: sessionLabelFor(parsed.data.preferred_session), paid: false });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
@@ -207,13 +259,17 @@ const SummerCamp = () => {
                 <CheckCircle2 className="w-8 h-8 text-background" />
               </div>
               <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground block mb-2">
-                REGISTRATION RECEIVED
+                {confirmation.paid ? "PAYMENT CONFIRMED" : "REGISTRATION RECEIVED"}
               </span>
               <h1 className="text-3xl md:text-4xl font-display text-foreground mb-3">
-                YOU'RE ON THE LIST.
+                {confirmation.paid ? "YOU'RE LOCKED IN." : "YOU'RE ON THE LIST."}
               </h1>
               <p className="text-sm text-muted-foreground mb-6">
-                We've saved a spot for <strong className="text-foreground">{values.athlete_first_name} {values.athlete_last_name}</strong> in <strong className="text-foreground">{confirmation.sessionLabel}</strong>.
+                {confirmation.paid ? (
+                  <>Payment received. Your spot is reserved — we'll email full camp details shortly.</>
+                ) : (
+                  <>We've saved a spot for <strong className="text-foreground">{values.athlete_first_name} {values.athlete_last_name}</strong> in <strong className="text-foreground">{confirmation.sessionLabel}</strong>.</>
+                )}
               </p>
 
               <Card className="border-border text-left mb-6">
@@ -221,9 +277,11 @@ const SummerCamp = () => {
                   <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground">WHAT HAPPENS NEXT</p>
                   <div className="flex gap-3">
                     <Mail className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <p className="text-muted-foreground">A confirmation email is on its way to <span className="text-foreground">{values.parent_email}</span>.</p>
+                    <p className="text-muted-foreground">
+                      A confirmation email is on its way{values.parent_email ? <> to <span className="text-foreground">{values.parent_email}</span></> : null}.
+                    </p>
                   </div>
-                  {!CAMP_DETAILS.paymentEnabled && (
+                  {!CAMP_DETAILS.paymentEnabled && !confirmation.paid && (
                     <div className="flex gap-3">
                       <DollarSign className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                       <p className="text-muted-foreground">
@@ -231,10 +289,20 @@ const SummerCamp = () => {
                       </p>
                     </div>
                   )}
-                  <div className="flex gap-3">
-                    <Phone className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <p className="text-muted-foreground">Questions? Call or text us — we'll reach out at {values.parent_phone}.</p>
-                  </div>
+                  {confirmation.paid && (
+                    <div className="flex gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      <p className="text-muted-foreground">
+                        <span className="text-foreground">Payment confirmed via Stripe.</span> A receipt was emailed to you.
+                      </p>
+                    </div>
+                  )}
+                  {values.parent_phone ? (
+                    <div className="flex gap-3">
+                      <Phone className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                      <p className="text-muted-foreground">Questions? Call or text us — we'll reach out at {values.parent_phone}.</p>
+                    </div>
+                  ) : null}
                 </CardContent>
               </Card>
 
