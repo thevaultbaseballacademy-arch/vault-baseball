@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { NextActionStrip } from "@/components/pathway/NextActionStrip";
 import { useRecruitingProfile } from "@/hooks/useRecruitingProfile";
 import { useSport } from "@/contexts/SportContext";
 
