@@ -107,6 +107,7 @@ export function pageContextLabel(pathname: string): string {
     "/products/showcase-prep": "Showcase Prep product page",
     "/tryouts": "open tryouts list",
     "/camps": "summer camps registration",
+    "/scale": "Scale Hub (coaches & orgs)",
     "/marketplace": "coach marketplace",
     "/find-coach": "find a coach",
     "/coach-register": "coach onboarding",
