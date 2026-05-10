@@ -259,13 +259,17 @@ const SummerCamp = () => {
                 <CheckCircle2 className="w-8 h-8 text-background" />
               </div>
               <span className="text-[11px] font-display tracking-[0.3em] text-muted-foreground block mb-2">
-                REGISTRATION RECEIVED
+                {confirmation.paid ? "PAYMENT CONFIRMED" : "REGISTRATION RECEIVED"}
               </span>
               <h1 className="text-3xl md:text-4xl font-display text-foreground mb-3">
-                YOU'RE ON THE LIST.
+                {confirmation.paid ? "YOU'RE LOCKED IN." : "YOU'RE ON THE LIST."}
               </h1>
               <p className="text-sm text-muted-foreground mb-6">
-                We've saved a spot for <strong className="text-foreground">{values.athlete_first_name} {values.athlete_last_name}</strong> in <strong className="text-foreground">{confirmation.sessionLabel}</strong>.
+                {confirmation.paid ? (
+                  <>Payment received. Your spot is reserved — we'll email full camp details shortly.</>
+                ) : (
+                  <>We've saved a spot for <strong className="text-foreground">{values.athlete_first_name} {values.athlete_last_name}</strong> in <strong className="text-foreground">{confirmation.sessionLabel}</strong>.</>
+                )}
               </p>
 
               <Card className="border-border text-left mb-6">
@@ -273,9 +277,11 @@ const SummerCamp = () => {
                   <p className="text-[10px] font-display tracking-[0.25em] text-muted-foreground">WHAT HAPPENS NEXT</p>
                   <div className="flex gap-3">
                     <Mail className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <p className="text-muted-foreground">A confirmation email is on its way to <span className="text-foreground">{values.parent_email}</span>.</p>
+                    <p className="text-muted-foreground">
+                      A confirmation email is on its way{values.parent_email ? <> to <span className="text-foreground">{values.parent_email}</span></> : null}.
+                    </p>
                   </div>
-                  {!CAMP_DETAILS.paymentEnabled && (
+                  {!CAMP_DETAILS.paymentEnabled && !confirmation.paid && (
                     <div className="flex gap-3">
                       <DollarSign className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                       <p className="text-muted-foreground">
@@ -283,10 +289,20 @@ const SummerCamp = () => {
                       </p>
                     </div>
                   )}
-                  <div className="flex gap-3">
-                    <Phone className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <p className="text-muted-foreground">Questions? Call or text us — we'll reach out at {values.parent_phone}.</p>
-                  </div>
+                  {confirmation.paid && (
+                    <div className="flex gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      <p className="text-muted-foreground">
+                        <span className="text-foreground">Payment confirmed via Stripe.</span> A receipt was emailed to you.
+                      </p>
+                    </div>
+                  )}
+                  {values.parent_phone ? (
+                    <div className="flex gap-3">
+                      <Phone className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                      <p className="text-muted-foreground">Questions? Call or text us — we'll reach out at {values.parent_phone}.</p>
+                    </div>
+                  ) : null}
                 </CardContent>
               </Card>
 
