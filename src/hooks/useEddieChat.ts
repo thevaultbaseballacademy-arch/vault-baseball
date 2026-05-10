@@ -73,6 +73,7 @@ export const useEddieChat = () => {
         sport,
         prospectGrades,
         pageContext,
+        athleteContext,
       }),
     });
 
