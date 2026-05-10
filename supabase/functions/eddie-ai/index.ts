@@ -353,7 +353,7 @@ serve(async (req) => {
       });
     }
 
-    const { messages, sport, prospectGrades, pageContext } = body as Record<string, unknown>;
+    const { messages, sport, prospectGrades, pageContext, athleteContext } = body as Record<string, unknown>;
     const validation = validateMessages(messages);
     if (!validation.valid) {
       return new Response(JSON.stringify({ error: validation.error }), {
