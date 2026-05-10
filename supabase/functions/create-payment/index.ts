@@ -95,7 +95,8 @@ serve(async (req) => {
       });
     }
 
-    const { priceId, successUrl, cancelUrl } = requestBody;
+    const { priceId, successUrl, cancelUrl, quantity: rawQty } = requestBody;
+    const quantity = Math.max(1, Math.min(10, Number.isFinite(Number(rawQty)) ? Math.floor(Number(rawQty)) : 1));
     
     // Validate priceId is a non-empty string
     if (!priceId || typeof priceId !== 'string') {
