@@ -158,6 +158,7 @@ serve(async (req) => {
       p_photo_release_consent: data.photo_release_consent,
     });
 
+    console.log(`[register-for-camp] rpc ${Date.now() - tRpc}ms`);
     if (rpcErr) {
       console.error("[register-for-camp] rpc error", rpcErr);
       return json({ error: "Could not create registration" }, 500);
