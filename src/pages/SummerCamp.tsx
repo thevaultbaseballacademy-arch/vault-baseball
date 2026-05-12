@@ -900,6 +900,29 @@ const SummerCamp = () => {
                   </div>
                 </div>
 
+                {checkoutFallbackUrl && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-2 rounded-md border border-primary/40 bg-primary/5 p-3 text-sm"
+                  >
+                    <AlertCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-foreground font-semibold">Checkout didn't open automatically.</p>
+                      <p className="text-muted-foreground mt-1">
+                        Your spot is reserved. Tap below to finish payment securely on Stripe.
+                      </p>
+                      <a
+                        href={checkoutFallbackUrl}
+                        target="_top"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-primary-foreground font-semibold hover:opacity-90"
+                      >
+                        Open secure checkout <ArrowRight className="w-4 h-4 ml-2" />
+                      </a>
+                    </div>
+                  </div>
+                )}
+
                 {submitError && (
                   <div
                     role="alert"
