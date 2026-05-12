@@ -279,6 +279,7 @@ const App = () => (
             <Route path="/camps/success" element={<CampSuccess />} />
             <Route path="/summer-camp" element={<SummerCamp />} />
             <Route path="/register/summer-camp" element={<SummerCamp />} />
+            <Route path="/payment/bank-instructions/:orderId" element={<BankInstructions />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
