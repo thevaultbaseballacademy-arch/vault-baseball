@@ -76,11 +76,17 @@ const Auth = () => {
     // Do NOT call mfa.getAuthenticatorAssuranceLevel() here — it hits GoTrue's
     // /user endpoint which has been observed taking 9+ seconds and locks the UI.
     // MFA is enforced post-login inside handleSubmit instead.
+    let cancelled = false;
+    const t = setTimeout(() => {
+      // Hard cap: never let the landing-on-/auth session check stall the page
+      console.warn("[auth] initial getSession() exceeded 3s — ignoring");
+    }, 3000);
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        routeByRole(session.user.id);
-      }
-    });
+      clearTimeout(t);
+      if (cancelled) return;
+      if (session?.user) routeByRole(session.user.id);
+    }).catch(() => clearTimeout(t));
+    return () => { cancelled = true; clearTimeout(t); };
   }, []);
 
   /** Race a promise against a timeout. Returns null on timeout/error so callers never hang. */
