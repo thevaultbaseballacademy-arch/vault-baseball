@@ -429,6 +429,14 @@ const App = () => (
             {/* Payment Pages */}
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
+            {/* Scheduling OS — admin/coach only */}
+            <Route path="/ops" element={<StaffGuard><OpsLayout /></StaffGuard>}>
+              <Route index element={<OpsHub />} />
+              <Route path="calendar" element={<OpsCalendar />} />
+              <Route path="bookings" element={<OpsBookings />} />
+              <Route path="resources" element={<OpsResources />} />
+              <Route path="coaches" element={<OpsCoaches />} />
+            </Route>
             {/* Product Pages */}
             <Route path="/products" element={<Products />} />
             <Route path="/products/longevity" element={<LongevitySystem />} />
