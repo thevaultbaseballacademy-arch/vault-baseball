@@ -1,96 +1,102 @@
-# Reusable Payment Architecture: Card + Bank Transfer
+# Phase 2 — Rollout Plan: Shared Checkout Across VAULT
 
-## Goal
-Add a second payment path (bank transfer) alongside the existing Stripe Checkout flow, built as a reusable module so any paid VAULT product (summer camp, programs, bundles, lessons) can plug in without touching existing Stripe logic.
+## Scope decision
 
-## Architecture Overview
+The Phase 1 architecture (`payment_orders` row → fast Stripe session → `checkout_failed` lead capture → idempotency key) only fits **one-off** payments. Subscriptions, payouts, and the locked legacy ESSA/Course flows must not be folded in.
+
+| Edge function | Today's role | Phase 2 action |
+|---|---|---|
+| `register-summer-camp` | Summer camp one-off | ✅ Done in Phase 1 |
+| `create-payment` | Generic one-off (lessons, bundles, programs via `useProductCheckout`) | **Migrate** to shared architecture |
+| `certification-checkout` | Certification one-off | **Migrate** to shared architecture |
+| `create-facility-checkout` | ESSA facility lessons/packages | **Wrap** — keep the function (it's part of the locked ESSA system per project memory), but standardize the client error handling and logging only |
+| `create-checkout` | Subscriptions (Pricing, Trial, products) | **Leave alone** — subscriptions use Stripe's own lifecycle; do not force into `payment_orders` |
+| `camp-stripe-webhook` / `essa-stripe-webhook` / `verify-summer-camp-payment` / `verify-camp-payment` | Stripe → DB sync | **Extend** webhooks to also finalize `payment_orders` via the existing `finalize_summer_camp_payment_order` pattern, generalized |
+| `process-coach-payout` | Connect payouts | Out of scope |
+
+## State model (unchanged from Phase 1)
 
 ```text
-                    ┌─────────────────────────────┐
-                    │  Product page (e.g. Camp)   │
-                    │  <PaymentMethodSelector />  │
-                    └──────────────┬──────────────┘
-                                   │
-                ┌──────────────────┴──────────────────┐
-                │                                     │
-        Pay by Card (default)                Pay by Bank Transfer
-                │                                     │
-   create-checkout-session  edge fn        create-pending-order edge fn
-   (existing logic, untouched)             (new, shared)
-                │                                     │
-        Stripe Checkout                    Pending order row +
-                │                          instructions screen +
-        Stripe webhook                     instructions email
-                │                                     │
-        order.status = 'paid'              order.status = 'pending_bank_transfer'
-                                                      │
-                                            Admin "Mark as paid" action
-                                                      │
-                                             order.status = 'paid'
+              ┌──── paid ────────────────────────► confirmed
+pending ─────►├──── canceled ────────────────────► canceled
+              ├──── checkout_failed ─────────────► pending_followup (admin queue)
+              └──── (Stripe webhook timeout 24h) ─► failed
+pending_bank_transfer ─── admin confirm ─────────► paid
 ```
 
-## Data Model
+## Implementation steps (in order)
 
-New shared table `payment_orders` (one row per paid product purchase, regardless of method):
+### Step 1 — Generalize the shared helpers
 
-- `id`
-- `user_id` (nullable for guest)
-- `product_type` (`summer_camp`, `program`, `bundle`, `lesson`, …)
-- `product_id` (FK / reference into the originating record, e.g. summer camp registration id)
-- `amount_cents`, `currency`
-- `payment_method` (`card` | `bank_transfer`)
-- `status` (`pending` | `pending_bank_transfer` | `paid` | `failed` | `canceled`)
-- `stripe_session_id` (nullable)
-- `stripe_payment_intent_id` (nullable)
-- `confirmed_by` (admin user_id, nullable) + `confirmed_at`
-- `customer_email`, `customer_name`, `metadata jsonb`
+Create `supabase/functions/_shared/payment-orders.ts` (Deno-compatible) exporting:
+- `createPendingOrder({ supabase, productType, amountCents, customerEmail, customerName, idempotencyKey, metadata, productId? })` → returns `{ id, reference_code }`
+- `markCheckoutFailed(supabase, orderId, message)` and `attachStripeSession(supabase, orderId, session)`
+- `findReusableOrder(supabase, idempotencyKey)`
 
-RLS: users see their own orders; admins see all; service role writes from edge functions.
+Both `register-summer-camp`, `create-payment`, and `certification-checkout` import from this single module.
 
-`summer_camp_registrations` gets a nullable `payment_order_id` link so existing data stays intact.
+### Step 2 — Migrate `create-payment`
 
-## Edge Functions
+Used by `useProductCheckout` for one-off products and `LessonPackages.tsx` for lesson-package purchases. The migrated function:
+1. Validates `priceId` and customer email (auth user OR guest email).
+2. Creates a `payment_orders` row with `product_type` = body.product_type (e.g. `'lesson_package'`, `'program'`, `'bundle'`, `'product'`) and `product_id` = body.product_id when present.
+3. Creates the Stripe session (mode `payment`).
+4. On Stripe failure → marks the order `checkout_failed`, returns `CHECKOUT_FAILED_FOLLOWUP` with `order_id`.
+5. Returns `{ checkout_url, order_id }`.
 
-1. `create-checkout-session` (existing summer-camp function stays as-is for card path; will be generalized later but not changed in this pass).
-2. `create-pending-order` (new, shared) — creates a `payment_orders` row with status `pending_bank_transfer`, sends instructions email via the existing email queue, returns the order id + instructions payload.
-3. `admin-confirm-bank-transfer` (new) — admin-only; flips status to `paid`, stamps `confirmed_by`/`confirmed_at`, triggers the same downstream effects the Stripe webhook triggers (mark camp registration paid, send receipt).
-4. Stripe webhook (existing) — also writes the `paid` status into `payment_orders` keyed by `stripe_session_id`.
+Frontend `useProductCheckout` is updated to:
+- Generate an `idempotency_key` per click cycle.
+- Use `invokeCheckout()` from `src/lib/checkoutInvoke.ts` (already handles sanitized errors + retry).
+- Pass `product_type` so the order is categorized.
 
-## Frontend
+### Step 3 — Migrate `certification-checkout`
 
-- `<PaymentMethodSelector />` — reusable component:
-  - Two cards: **Pay by Card** (primary, "Instant secure checkout") and **Pay by Bank Transfer** (secondary, "Reserve your spot, pay within X days").
-  - Mobile-first, single column on small screens.
-  - Accepts `productType`, `productId`, `amountCents`, `customer` props and a `onCardCheckout` / `onBankTransfer` pair, so each product page wires its own card-session creator.
-- `/payment/bank-instructions/:orderId` — branded instructions page (account name, bank, account #, routing/IBAN, reference = order id, amount, deadline, support contact). Shown after bank transfer is chosen and also linked from the email.
-- Status chips on the user's registration view: **Reserved – awaiting bank transfer**, **Pending review**, **Confirmed**.
-- Existing success / cancel pages reused for card flow; new pending page for bank flow.
+Same shape as `create-payment` but with `product_type = 'certification'`. `Certifications.tsx` switches to `invokeCheckout()` and sends an `idempotency_key`.
 
-## Admin
+### Step 4 — Standardize client error handling for ESSA facility
 
-- New page `/admin/payments` (admin-only via existing role check):
-  - Filter by status (`pending_bank_transfer` by default), product type, date.
-  - Row actions: **Mark as paid**, **Cancel**, **View details**.
-  - "Mark as paid" calls `admin-confirm-bank-transfer`.
-- Reuses existing admin layout / auth guard, no redesign.
+Do **not** restructure the facility edge function (locked legacy). Only update `useEssaCheckout.ts` to:
+- Use `invokeCheckout()` so users see sanitized errors instead of raw Stripe URLs / "request timed out" copy.
+- Add a per-attempt idempotency key passed through to the function (the function already accepts arbitrary metadata).
 
-## Bank Account Details
-Stored as project secrets (`BANK_TRANSFER_INSTRUCTIONS_JSON`) so they can be updated without code changes and never live in the repo. The instructions page and email pull from a single edge-function-served config endpoint.
+If the user later decides to retire the facility legacy, that is a separate, scoped task.
 
-## Rollout in this PR
-1. Migration: `payment_orders` table + RLS + link column on summer camp registrations.
-2. Edge functions: `create-pending-order`, `admin-confirm-bank-transfer`; small webhook patch to upsert into `payment_orders`.
-3. UI: `<PaymentMethodSelector />`, bank instructions page, pending status on the camp confirmation screen.
-4. Wire selector into **Summer Camp registration** only (other products keep current flow; selector is drop-in for the next pass).
-5. Admin payments page with bank-transfer queue + manual confirm.
-6. Email template for bank transfer instructions (uses existing email queue).
+### Step 5 — Extend Stripe webhook(s) to finalize `payment_orders`
 
-## Out of Scope (intentional)
-- No changes to existing card checkout logic, retry behavior, or the recent `register-summer-camp` fixes.
-- No redesign of the camp page — only the payment step gets the selector.
-- Other paid products will adopt the selector in follow-up passes.
+Generalize the existing `finalize_summer_camp_payment_order` SQL function into `finalize_payment_order(p_order_id, p_status, ...)` that updates only the order. Per-product table updates (e.g. `summer_camp_registrations`, `lesson_packages_orders`) stay handled by the existing webhooks; the new function is the central place where the order row transitions to `paid`/`canceled`/`failed`.
 
-## Secrets Needed
-- `BANK_TRANSFER_INSTRUCTIONS_JSON` — JSON blob with: `account_name`, `bank_name`, `account_number`, `routing_number` (or IBAN/SWIFT), `reference_prefix`, `payment_deadline_days`, `support_email`. You'll provide values; I'll add the secret before deploying.
+Inside `camp-stripe-webhook` and `essa-stripe-webhook` (already wired), look up the order by `metadata.payment_order_id` from the Stripe session and call `finalize_payment_order`.
 
-Confirm and I'll implement in this order: migration → edge functions → selector + bank pages → admin queue → wire into Summer Camp.
+### Step 6 — Admin payments dashboard scope expansion
+
+`/admin/payments` already lists `payment_orders`. Add a `product_type` filter chip row so admins can triage `summer_camp`, `certification`, `lesson_package`, `program`, `bundle` separately. (Single component update.)
+
+### Step 7 — Remove conflicting / duplicated code
+
+Only delete after the migrations above are live and verified:
+- The bespoke duplicate-detection block inside `create-payment` (if any).
+- Inline ad-hoc error toasts in callers that conflict with `invokeCheckout()`'s sanitized messages.
+
+Subscriptions, payouts, the ESSA facility function body, and the locked legacy WebRTC/Course Access systems are **not** touched.
+
+## What stays untouched
+
+- `create-checkout` (subscriptions)
+- `process-coach-payout`
+- ESSA facility business logic
+- Legacy WebRTC, Course Access, baseball booking systems (per project memory)
+
+## Risk controls
+
+- Each migrated function keeps the same request signature so existing callers continue to work during the transition.
+- Old behavior remains until each caller is switched, one PR per area: `useProductCheckout` → `LessonPackages` → `Certifications` → `useEssaCheckout`.
+- Webhooks remain backward-compatible: if `metadata.payment_order_id` is missing they behave exactly as today.
+
+## Verification
+
+For each migrated path:
+1. Trigger a successful Stripe test checkout → `payment_orders.status` flips to `paid`.
+2. Force a Stripe error (bad `priceId`) → `payment_orders.status` = `checkout_failed`, registration row exists in `pending_followup`, friendly toast shown, no raw Stripe URL leaked.
+3. Click submit twice quickly with same `idempotency_key` → only one order row is created.
+
+Approve this scope and I'll implement Steps 1–4 first, then wire webhooks and the dashboard filter in a follow-up message.
