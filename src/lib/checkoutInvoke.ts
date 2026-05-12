@@ -21,6 +21,9 @@ const FRIENDLY: Record<string, string> = {
   INVALID_KEY_TYPE: "Payments are temporarily unavailable. Please try again shortly.",
   AUTH_REQUIRED: "Please sign in to continue with your purchase.",
   AUTH_FAILED: "Please sign in to continue with your purchase.",
+  PRICE_NOT_AUTHORIZED: "This product is currently unavailable. Please contact support.",
+  INVALID_PRICE: "This product is currently unavailable. Please contact support.",
+  CHECKOUT_ERROR: "Unable to start checkout. Please try again.",
   TIMEOUT: "The request took too long. Please check your connection and try again.",
 };
 

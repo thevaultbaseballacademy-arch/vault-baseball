@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { isIOS, IOS_SUBSCRIPTION_NOTICE } from "@/lib/appleIAP";
+import { invokeCheckout } from "@/lib/checkoutInvoke";
+import { openCheckout } from "@/lib/openCheckout";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
@@ -145,17 +147,17 @@ const Pricing = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session");
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: SUBSCRIPTION_TIERS[tier].price_id },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
+      toast({
+        title: "Starting secure checkout…",
+        description: "Redirecting to Stripe.",
       });
 
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
+      const { checkoutUrl } = await invokeCheckout(
+        "create-checkout",
+        { priceId: SUBSCRIPTION_TIERS[tier].price_id },
+        { authToken: session.access_token, timeoutMs: 25_000 },
+      );
+      await openCheckout(checkoutUrl);
     } catch (error: any) {
       toast({
         title: "Error",
