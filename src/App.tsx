@@ -101,6 +101,8 @@ const AdminCoaches = lazy(() => import("./pages/admin/AdminCoaches"));
 const AdminExams = lazy(() => import("./pages/admin/AdminExams"));
 const AdminCertifications = lazy(() => import("./pages/admin/AdminCertifications"));
 const AdminPayouts = lazy(() => import("./pages/admin/AdminPayouts"));
+const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
+const BankInstructions = lazy(() => import("./pages/BankInstructions"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
 const LongevitySystem = lazy(() => import("./pages/products/LongevitySystem"));
