@@ -113,6 +113,14 @@ const RecruitmentAudit = lazy(() => import("./pages/products/RecruitmentAudit"))
 const CertifiedCoach = lazy(() => import("./pages/products/CertifiedCoach"));
 const TransferIntensive = lazy(() => import("./pages/products/TransferIntensive"));
 const VaultVerifiedCoach = lazy(() => import("./pages/products/VaultVerifiedCoach"));
+
+// Scheduling OS (Phase 1) — admin/coach only
+const OpsLayout = lazy(() => import("./components/ops/OpsLayout"));
+const OpsHub = lazy(() => import("./pages/ops/OpsHub"));
+const OpsCalendar = lazy(() => import("./pages/ops/OpsCalendar"));
+const OpsBookings = lazy(() => import("./pages/ops/OpsBookings"));
+const OpsResources = lazy(() => import("./pages/ops/OpsResources"));
+const OpsCoaches = lazy(() => import("./pages/ops/OpsCoaches"));
 const ShowcasePrep = lazy(() => import("./pages/products/ShowcasePrep"));
 const VideoAnalysis = lazy(() => import("./pages/products/VideoAnalysis"));
 const OrgStarterPack = lazy(() => import("./pages/products/OrgStarterPack"));
