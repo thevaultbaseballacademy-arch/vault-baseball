@@ -135,6 +135,7 @@ serve(async (req) => {
       req.headers.get("cf-connecting-ip") || null;
 
     // Atomic registration (capacity locks)
+    const tRpc = Date.now();
     const { data: rpcRows, error: rpcErr } = await supabase.rpc("create_camp_registration_atomic", {
       p_camp_id: data.camp_id,
       p_cohort_id: data.cohort_id,
