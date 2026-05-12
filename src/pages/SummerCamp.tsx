@@ -431,7 +431,12 @@ const SummerCamp = () => {
             successUrl,
             cancelUrl,
           },
-          { timeoutMs: 20000 },
+          {
+            timeoutMs: 20000,
+            retries: 1,
+            retryDelayMs: 1200,
+            onRetry: () => setSubmitStatus("Still working — retrying secure checkout…"),
+          },
         );
         const { checkoutUrl, raw } = await withTimeout(
           checkoutPromise,
