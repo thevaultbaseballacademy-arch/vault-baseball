@@ -1001,6 +1001,15 @@ const SummerCamp = () => {
                   </div>
                 </div>
 
+                {PAYMENT_ENABLED && (
+                  <PaymentMethodSelector
+                    value={paymentMethod}
+                    onChange={setPaymentMethod}
+                    disabled={submitting}
+                    amountLabel={totalAmount ? `$${totalAmount}` : undefined}
+                  />
+                )}
+
                 {checkoutFallbackUrl && (
                   <div
                     role="alert"
