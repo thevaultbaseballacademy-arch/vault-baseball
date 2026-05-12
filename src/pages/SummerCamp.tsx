@@ -21,7 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { openCheckout } from "@/lib/openCheckout";
+import { closePreparedCheckoutTarget, openCheckout, prepareCheckoutTarget } from "@/lib/openCheckout";
 import { invokeCheckout } from "@/lib/checkoutInvoke";
 
 // ─────────────────────────────────────────────────────────────────
@@ -361,7 +361,10 @@ const SummerCamp = () => {
     }
     // Cohort age guard
     const c = COHORTS.find((x) => x.id === parsed.data.cohort_id)!;
+    const preparedCheckoutTarget = PAYMENT_ENABLED ? prepareCheckoutTarget() : null;
+
     if (parsed.data.athlete_age < c.ageMin || parsed.data.athlete_age > c.ageMax) {
+      closePreparedCheckoutTarget(preparedCheckoutTarget);
       setErrors((p) => ({
         ...p,
         cohort_id: `${c.name} is for ages ${c.ageMin}–${c.ageMax}. Pick the matching age group.`,
@@ -436,11 +439,12 @@ const SummerCamp = () => {
         console.info(`[SummerCamp] checkout session in ${Math.round(performance.now() - t1)}ms`);
 
         setSubmitStatus("Redirecting to checkout…");
-        await openCheckout(checkoutUrl);
+        await openCheckout(checkoutUrl, preparedCheckoutTarget);
         // Leave inFlightRef true: page is navigating away. If for some reason it doesn't,
         // surface a manual link so the user isn't stuck.
         window.setTimeout(() => {
-          if (!document.hidden) {
+          const shouldShowManualFallback = !preparedCheckoutTarget && !document.hidden;
+          if (shouldShowManualFallback) {
             setSubmitError(
               `If checkout didn't open, tap here: ${checkoutUrl}`,
             );
@@ -450,6 +454,8 @@ const SummerCamp = () => {
         }, 4000);
         return;
       }
+
+      closePreparedCheckoutTarget(preparedCheckoutTarget);
 
       // Non-payment fallback
       setConfirmation({
@@ -461,6 +467,7 @@ const SummerCamp = () => {
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
+      closePreparedCheckoutTarget(preparedCheckoutTarget);
       console.error("[SummerCamp] submit failed", err);
       const msg = err?.message ?? "Please try again or contact us directly.";
       setSubmitError(msg);
