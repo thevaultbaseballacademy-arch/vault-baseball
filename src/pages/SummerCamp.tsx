@@ -1060,7 +1060,13 @@ const SummerCamp = () => {
                   {submitting ? (
                     <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {submitStatus || "SUBMITTING…"}</>
                   ) : (
-                    <>{submitError ? "TRY AGAIN" : (PAYMENT_ENABLED ? `REGISTER NOW · $${totalAmount || 0}` : "REGISTER NOW")}<ArrowRight className="w-4 h-4 ml-2" /></>
+                    <>{submitError
+                      ? "TRY AGAIN"
+                      : (PAYMENT_ENABLED
+                          ? (paymentMethod === "bank_transfer"
+                              ? `RESERVE SPOT · BANK TRANSFER · $${totalAmount || 0}`
+                              : `PAY BY CARD · $${totalAmount || 0}`)
+                          : "REGISTER NOW")}<ArrowRight className="w-4 h-4 ml-2" /></>
                   )}
                 </Button>
 
@@ -1072,7 +1078,9 @@ const SummerCamp = () => {
 
                 <p className="text-[11px] text-muted-foreground text-center">
                   {PAYMENT_ENABLED
-                    ? "You'll be redirected to a secure Stripe checkout to lock in your spot."
+                    ? (paymentMethod === "bank_transfer"
+                        ? "We'll reserve your spot and email you bank transfer instructions. Confirmed once funds arrive."
+                        : "You'll be redirected to a secure Stripe checkout to lock in your spot.")
                     : "We'll email payment instructions within 24 hours to confirm your spot."}
                 </p>
               </form>
