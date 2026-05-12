@@ -21,6 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { closePreparedCheckoutTarget, openCheckout, prepareCheckoutTarget } from "@/lib/openCheckout";
+import PaymentMethodSelector from "@/components/payments/PaymentMethodSelector";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
