@@ -157,7 +157,16 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        // Hard 12s cap on the sign-in network call so the spinner can NEVER hang forever.
+        const signInResult = await withTimeout(
+          Promise.resolve(supabase.auth.signInWithPassword({ email, password })),
+          12000,
+          "signInWithPassword"
+        );
+        if (!signInResult) {
+          throw new Error("Sign-in is taking longer than expected. Please check your connection and try again.");
+        }
+        const { data, error } = signInResult as any;
         if (error) throw error;
 
         // Fire-and-forget telemetry — never block navigation
