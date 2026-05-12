@@ -1362,6 +1362,36 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_blackouts: {
+        Row: {
+          coach_user_id: string
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          reason: string | null
+          starts_at: string
+        }
+        Insert: {
+          coach_user_id: string
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          reason?: string | null
+          starts_at: string
+        }
+        Update: {
+          coach_user_id?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          reason?: string | null
+          starts_at?: string
+        }
+        Relationships: []
+      }
       coach_invite_tokens: {
         Row: {
           created_at: string
@@ -3294,7 +3324,11 @@ export type Database = {
       facility_reservations: {
         Row: {
           attendee_count: number | null
+          booking_type: string | null
+          buffer_after_min: number
+          buffer_before_min: number
           cancellation_reason: string | null
+          client_user_id: string | null
           coach_availability_id: string | null
           coach_user_id: string | null
           color: string | null
@@ -3303,6 +3337,7 @@ export type Database = {
           credit_id: string | null
           ends_at: string
           id: string
+          internal_notes: string | null
           notes: string | null
           recurrence_group_id: string | null
           recurrence_rule: string | null
@@ -3315,7 +3350,11 @@ export type Database = {
         }
         Insert: {
           attendee_count?: number | null
+          booking_type?: string | null
+          buffer_after_min?: number
+          buffer_before_min?: number
           cancellation_reason?: string | null
+          client_user_id?: string | null
           coach_availability_id?: string | null
           coach_user_id?: string | null
           color?: string | null
@@ -3324,6 +3363,7 @@ export type Database = {
           credit_id?: string | null
           ends_at: string
           id?: string
+          internal_notes?: string | null
           notes?: string | null
           recurrence_group_id?: string | null
           recurrence_rule?: string | null
@@ -3336,7 +3376,11 @@ export type Database = {
         }
         Update: {
           attendee_count?: number | null
+          booking_type?: string | null
+          buffer_after_min?: number
+          buffer_before_min?: number
           cancellation_reason?: string | null
+          client_user_id?: string | null
           coach_availability_id?: string | null
           coach_user_id?: string | null
           color?: string | null
@@ -3345,6 +3389,7 @@ export type Database = {
           credit_id?: string | null
           ends_at?: string
           id?: string
+          internal_notes?: string | null
           notes?: string | null
           recurrence_group_id?: string | null
           recurrence_rule?: string | null
@@ -5901,6 +5946,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduling_audit_log: {
+        Row: {
+          action: string
+          actor_role: string | null
+          actor_user_id: string | null
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          id: string
+          reason: string | null
+          reservation_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_role?: string | null
+          actor_user_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          reservation_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_role?: string | null
+          actor_user_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          reservation_id?: string | null
+        }
+        Relationships: []
+      }
       session_bookings: {
         Row: {
           athlete_age: number | null
@@ -8094,6 +8175,21 @@ export type Database = {
           purchased_at: string
           status: string
           user_id: string
+        }[]
+      }
+      lock_facility_reservation_window: {
+        Args: {
+          p_buffer_after_min?: number
+          p_buffer_before_min?: number
+          p_coach_user_id: string
+          p_ends_at: string
+          p_exclude_reservation_id?: string
+          p_space_id: string
+          p_starts_at: string
+        }
+        Returns: {
+          conflict_kind: string
+          conflicting_id: string
         }[]
       }
       move_to_dlq: {
