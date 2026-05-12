@@ -23,13 +23,31 @@ const FRIENDLY: Record<string, string> = {
   AUTH_FAILED: "Please sign in to continue with your purchase.",
   PRICE_NOT_AUTHORIZED: "This product is currently unavailable. Please contact support.",
   INVALID_PRICE: "This product is currently unavailable. Please contact support.",
+  INVALID_REQUEST: "Please review the details and try again.",
   CHECKOUT_ERROR: "Unable to start checkout. Please try again.",
   CHECKOUT_RETRYABLE: "Checkout is taking longer than expected. Retrying now…",
+  CHECKOUT_FAILED_FOLLOWUP: "We saved your registration, but secure checkout didn’t open. Our team will follow up to help you finish.",
   NETWORK_ERROR: "We couldn't reach checkout. Please try again.",
   TIMEOUT: "The request took too long. Please check your connection and try again.",
 };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const sanitizeCheckoutMessage = (message: string) => {
+  if (!message) return "Unable to start checkout. Please try again.";
+
+  const withoutUrls = message
+    .replace(/https?:\/\/\S+/gi, "secure checkout link")
+    .replace(/cs_(test|live)_[A-Za-z0-9_]+/gi, "secure checkout session")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (/secure checkout link|secure checkout session/i.test(withoutUrls)) {
+    return "Unable to start checkout. Please try again.";
+  }
+
+  return withoutUrls;
+};
 
 export async function invokeCheckout(
   fnName: string,
@@ -74,7 +92,7 @@ export async function invokeCheckout(
       if (error) {
         const ctxBody = (error as any)?.context?.body;
         const code = ctxBody?.code || (typeof ctxBody === "object" ? ctxBody?.error_code : undefined);
-        const message = ctxBody?.error || error.message || "Checkout request failed";
+        const message = sanitizeCheckoutMessage(ctxBody?.error || error.message || "Checkout request failed");
         console.error(`${tag} invoke error`, { error, ctxBody, attempt: attempt + 1 });
         throw Object.assign(new Error(message), {
           code: code || (/Failed to send a request|network|fetch/i.test(message) ? "NETWORK_ERROR" : undefined),
@@ -84,7 +102,7 @@ export async function invokeCheckout(
       const res = (data ?? {}) as CheckoutInvokeResult;
       if (res.error) {
         console.error(`${tag} edge error`, { res, attempt: attempt + 1 });
-        throw Object.assign(new Error(res.error), { code: res.code });
+        throw Object.assign(new Error(sanitizeCheckoutMessage(res.error)), { code: res.code });
       }
 
       const checkoutUrl = res.checkout_url || res.url;
@@ -104,7 +122,7 @@ export async function invokeCheckout(
 
       const normalizedError = code && FRIENDLY[code]
         ? Object.assign(new Error(FRIENDLY[code]), { code })
-        : e;
+        : Object.assign(new Error(sanitizeCheckoutMessage(e?.message || "Checkout request failed")), { code });
 
       const shouldRetry = attempt < retries && !!code && retryOnCodes.has(code);
       if (shouldRetry) {
