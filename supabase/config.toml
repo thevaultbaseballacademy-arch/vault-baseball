@@ -17,6 +17,8 @@ project_id = "hhvdxkxaiauzikavtpuj"
     verify_jwt = false
   [functions.register-for-camp]
     verify_jwt = false
+  [functions.verify-camp-payment]
+    verify_jwt = false
   [functions.check-subscription]
     verify_jwt = false
   [functions.create-checkout]

@@ -16,20 +16,39 @@ const CampSuccess = () => {
   useEffect(() => {
     if (!sessionId) { setStatus("pending"); return; }
     let cancel = false;
-    let tries = 0;
-    const poll = async () => {
-      tries++;
-      const { data } = await (supabase.from("camp_registrations" as any) as any)
-        .select("status")
-        .eq("stripe_checkout_session_id", sessionId)
-        .maybeSingle();
-      if (cancel) return;
-      const s = (data as any)?.status;
-      if (s === "confirmed") { setStatus("confirmed"); return; }
-      if (tries < 12) setTimeout(poll, 2000);
-      else setStatus("pending");
+
+    const verifyAndPoll = async () => {
+      // 1) Immediately ask the server to verify with Stripe and fulfill (no webhook needed)
+      try {
+        const { data: v } = await supabase.functions.invoke("verify-camp-payment", {
+          body: { sessionId },
+        });
+        if (cancel) return;
+        if ((v as any)?.status === "confirmed") {
+          setStatus("confirmed");
+          return;
+        }
+      } catch (err) {
+        console.warn("[CampSuccess] verify failed, falling back to poll", err);
+      }
+
+      // 2) Fallback: poll the DB in case the webhook beats us or verify is retrying
+      let tries = 0;
+      const poll = async () => {
+        tries++;
+        const { data } = await (supabase.from("camp_registrations" as any) as any)
+          .select("status")
+          .eq("stripe_checkout_session_id", sessionId)
+          .maybeSingle();
+        if (cancel) return;
+        if ((data as any)?.status === "confirmed") { setStatus("confirmed"); return; }
+        if (tries < 8) setTimeout(poll, 2000);
+        else setStatus("pending");
+      };
+      poll();
     };
-    poll();
+
+    verifyAndPoll();
     return () => { cancel = true; };
   }, [sessionId]);
 
