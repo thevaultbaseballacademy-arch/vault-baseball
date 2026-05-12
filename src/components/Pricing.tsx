@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { isIOS, IOS_SUBSCRIPTION_NOTICE } from "@/lib/appleIAP";
+import { invokeCheckout } from "@/lib/checkoutInvoke";
+import { openCheckout } from "@/lib/openCheckout";
 
 const SUBSCRIPTION_TIERS = {
   basic: {
