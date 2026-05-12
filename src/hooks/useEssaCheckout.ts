@@ -37,7 +37,7 @@ export const useEssaCheckout = () => {
         description: "Redirecting to Stripe.",
       });
 
-      const { invokeCheckout: _ignored } = { invokeCheckout };
+      
       const { checkoutUrl } = await invokeCheckout(
         "create-facility-checkout",
         { priceId, quantity, metadata },
