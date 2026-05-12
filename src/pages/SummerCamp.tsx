@@ -279,6 +279,7 @@ const SummerCamp = () => {
   const [submitStatus, setSubmitStatus] = useState<string>("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [checkoutFallbackUrl, setCheckoutFallbackUrl] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "bank_transfer">("card");
   const [submitted, setSubmitted] = useState(false);
   const [confirmation, setConfirmation] = useState<{
     id: string;
