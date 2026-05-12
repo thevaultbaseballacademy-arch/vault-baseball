@@ -366,6 +366,9 @@ const App = () => (
               <Route path="tryouts" element={
                 <RoleGuard requires="view_facility_schedule"><AdminTryouts /></RoleGuard>
               } />
+              <Route path="payments" element={
+                <RoleGuard requires="view_revenue_dashboard"><AdminPayments /></RoleGuard>
+              } />
               <Route path="tryouts/:id" element={
                 <RoleGuard requires="view_facility_schedule"><AdminTryoutDetail /></RoleGuard>
               } />
