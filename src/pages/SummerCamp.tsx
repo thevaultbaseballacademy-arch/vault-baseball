@@ -20,9 +20,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { closePreparedCheckoutTarget, openCheckout, prepareCheckoutTarget } from "@/lib/openCheckout";
-import { invokeCheckout } from "@/lib/checkoutInvoke";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+const SUMMER_CAMP_REGISTER_URL = `${SUPABASE_URL}/functions/v1/register-summer-camp`;
+const SUMMER_CAMP_VERIFY_URL = `${SUPABASE_URL}/functions/v1/verify-summer-camp-payment`;
+const SUMMER_CAMP_HEADERS = {
+  "Content-Type": "application/json",
+  apikey: SUPABASE_KEY,
+  Authorization: `Bearer ${SUPABASE_KEY}`,
+} as const;
 
 // ─────────────────────────────────────────────────────────────────
 // EDIT THIS BLOCK before publishing.
@@ -170,6 +178,99 @@ const FAQS = [
   },
 ];
 
+type SummerCampCheckoutResponse = {
+  checkout_url?: string;
+  stripe_session_id?: string;
+  registration_id?: string;
+  success?: boolean;
+  error?: string;
+  code?: string;
+};
+
+type SummerCampVerifyResponse = {
+  status?: string;
+  registrationId?: string;
+  parentEmail?: string;
+  parentPhone?: string;
+  error?: string;
+};
+
+const postSummerCampFunction = async <T,>(
+  url: string,
+  body: Record<string, unknown>,
+  timeoutMs: number,
+): Promise<T> => {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: SUMMER_CAMP_HEADERS,
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    let data: any = null;
+    try {
+      data = await response.json();
+    } catch {
+      // Ignore JSON parse failures so we can still surface HTTP status errors.
+    }
+
+    if (!response.ok) {
+      throw new Error(data?.error || `Request failed (${response.status})`);
+    }
+
+    if (data?.error) {
+      throw new Error(data.error);
+    }
+
+    return (data ?? {}) as T;
+  } catch (error: any) {
+    if (error?.name === "AbortError") {
+      throw new Error("Opening secure checkout is taking longer than expected. Please check your connection and try again.");
+    }
+
+    if (/Failed to fetch|Load failed|NetworkError/i.test(error?.message ?? "")) {
+      throw new Error("We couldn't reach secure checkout. Please check your connection and try again.");
+    }
+
+    throw new Error(error?.message || "Request failed");
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+};
+
+const startSummerCampCheckout = async (payload: Record<string, unknown>) => {
+  const data = await postSummerCampFunction<SummerCampCheckoutResponse>(
+    SUMMER_CAMP_REGISTER_URL,
+    payload,
+    20000,
+  );
+
+  if (!data.checkout_url) {
+    throw new Error("Checkout session did not return a payment URL.");
+  }
+
+  return {
+    checkoutUrl: data.checkout_url,
+    raw: data,
+  };
+};
+
+const verifySummerCampPayment = (sessionId: string) =>
+  postSummerCampFunction<SummerCampVerifyResponse>(
+    SUMMER_CAMP_VERIFY_URL,
+    { sessionId },
+    12000,
+  );
+
+const isRetryableCheckoutError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  return /taking longer than expected|couldn't reach secure checkout|network|fetch|load failed/i.test(message);
+};
+
 const SummerCamp = () => {
   const { toast } = useToast();
   const [values, setValues] = useState<FormValues>(initialValues);
@@ -220,20 +321,9 @@ const SummerCamp = () => {
 
       void (async () => {
         try {
-          const { data, error } = await supabase.functions.invoke("verify-summer-camp-payment", {
-            body: { sessionId },
-          });
+          const payload = await verifySummerCampPayment(sessionId);
 
           if (cancelled) return;
-          if (error) throw error;
-
-          const payload = (data ?? {}) as {
-            status?: string;
-            registrationId?: string;
-            parentEmail?: string;
-            parentPhone?: string;
-            error?: string;
-          };
 
           if (payload.status !== "confirmed") {
             throw new Error(payload.error ?? "We're still finalizing your registration.");
@@ -422,27 +512,31 @@ const SummerCamp = () => {
         const cancelUrl  = `${origin}/summer-camp?canceled=1`;
 
         const t1 = performance.now();
-        const checkoutPromise = invokeCheckout(
-          "register-summer-camp",
-          {
-            ...payload,
-            priceId,
-            quantity,
-            successUrl,
-            cancelUrl,
-          },
-          {
-            timeoutMs: 20000,
-            retries: 1,
-            retryDelayMs: 1200,
-            onRetry: () => setSubmitStatus("Still working — retrying secure checkout…"),
-          },
-        );
-        const { checkoutUrl, raw } = await withTimeout(
-          checkoutPromise,
-          20000,
-          "Opening secure checkout",
-        );
+        const checkoutBody = {
+          ...payload,
+          priceId,
+          quantity,
+          successUrl,
+          cancelUrl,
+        };
+
+        let checkoutUrl = "";
+        try {
+          ({ checkoutUrl } = await withTimeout(
+            startSummerCampCheckout(checkoutBody),
+            20000,
+            "Opening secure checkout",
+          ));
+        } catch (error) {
+          if (!isRetryableCheckoutError(error)) throw error;
+
+          setSubmitStatus("Still working — retrying secure checkout…");
+          ({ checkoutUrl } = await withTimeout(
+            startSummerCampCheckout(checkoutBody),
+            20000,
+            "Opening secure checkout",
+          ));
+        }
         console.info(`[SummerCamp] checkout session in ${Math.round(performance.now() - t1)}ms`);
 
         setSubmitStatus("Redirecting to checkout…");
