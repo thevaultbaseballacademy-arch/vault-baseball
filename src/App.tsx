@@ -12,6 +12,7 @@ import SessionExpiryHandler from "@/components/auth/SessionExpiryHandler";
 import SessionVisibilityRefresh from "@/components/auth/SessionVisibilityRefresh";
 import BiometricGate from "@/components/auth/BiometricGate";
 import AuthGuard from "@/components/auth/AuthGuard";
+import StaffGuard from "@/components/auth/StaffGuard";
 import TrialProtectedRoute from "@/components/TrialProtectedRoute";
 import RoleGuard from "@/components/RoleGuard";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -113,6 +114,14 @@ const RecruitmentAudit = lazy(() => import("./pages/products/RecruitmentAudit"))
 const CertifiedCoach = lazy(() => import("./pages/products/CertifiedCoach"));
 const TransferIntensive = lazy(() => import("./pages/products/TransferIntensive"));
 const VaultVerifiedCoach = lazy(() => import("./pages/products/VaultVerifiedCoach"));
+
+// Scheduling OS (Phase 1) — admin/coach only
+const OpsLayout = lazy(() => import("./components/ops/OpsLayout"));
+const OpsHub = lazy(() => import("./pages/ops/OpsHub"));
+const OpsCalendar = lazy(() => import("./pages/ops/OpsCalendar"));
+const OpsBookings = lazy(() => import("./pages/ops/OpsBookings"));
+const OpsResources = lazy(() => import("./pages/ops/OpsResources"));
+const OpsCoaches = lazy(() => import("./pages/ops/OpsCoaches"));
 const ShowcasePrep = lazy(() => import("./pages/products/ShowcasePrep"));
 const VideoAnalysis = lazy(() => import("./pages/products/VideoAnalysis"));
 const OrgStarterPack = lazy(() => import("./pages/products/OrgStarterPack"));
@@ -420,6 +429,14 @@ const App = () => (
             {/* Payment Pages */}
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
+            {/* Scheduling OS — admin/coach only */}
+            <Route path="/ops" element={<StaffGuard><OpsLayout /></StaffGuard>}>
+              <Route index element={<OpsHub />} />
+              <Route path="calendar" element={<OpsCalendar />} />
+              <Route path="bookings" element={<OpsBookings />} />
+              <Route path="resources" element={<OpsResources />} />
+              <Route path="coaches" element={<OpsCoaches />} />
+            </Route>
             {/* Product Pages */}
             <Route path="/products" element={<Products />} />
             <Route path="/products/longevity" element={<LongevitySystem />} />

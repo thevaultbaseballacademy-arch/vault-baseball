@@ -1,238 +1,164 @@
+# VAULT Scheduling OS — Internal Booking & Calendar Hub
 
-# VAULT OS — Architecture & Rollout Plan
+## 1. Audit of what already exists (will be reused, not replaced)
 
-Mode: design first, build second. No rebrand. No products removed. The premium black/gold identity, mobile-first feel, and existing offers all stay. What changes is the **connective tissue** between them.
+**Pages already shipping booking/scheduling:**
+- `/admin/facility` — `OwnerFacility` + `DayGridView`, `WeekView`, `MultiResourceBookingWizard`, `ReservationDialog`, `FloorPlanEditor`, `FacilitySettingsPanel`
+- `/admin/essa-bookings` — `OwnerEssaBookings` (private-lesson ops)
+- `/coach/schedule` — `CoachSchedule` (personal day/week)
+- `/coach/essa-day` — `CoachEssaDay` (today's lessons for the coach)
+- `/coach/lessons` — `CoachLessons` (assigned remote/in-person lessons)
+- Client-facing (untouched): `/book-session`, `/remote-lessons`, `/lesson-packages`, `/find-coach`
 
----
+**Tables already in place (will be reused):**
+- `facility_reservations` — has `space_id`, `coach_user_id`, `coach_availability_id`, `status`, `created_by`, `recurrence_rule`, `cancellation_reason`. This is already the canonical "booking" row.
+- `facility_spaces` + `facility_settings` + `facility_hours` — resource catalog
+- `coach_availability` — recurring weekly blocks per coach
+- `remote_lessons`, `marketplace_bookings`, `session_bookings`, `lesson_credits` — legacy/specialized (read-only joins)
+- `schedule_assignments` — training-plan assignments
 
-## 1. Audit — what exists today
+**Verdict:** the data model is solid. We do **not** need new core tables — only thin additions for buffer time, audit trail, blackout blocks, and a unified status enum. The fix is **organization + access control + a single ops cockpit** on top of what exists.
 
-**Already in place (good foundation):**
-- Free Evaluation, Pillar Programs, Bundles, Coach Certification, Coach Marketplace, Recruiting Audit/Hub, Tryouts, Camps, Org Licensing, Eddie AI chat, Athlete/Parent/Coach/Owner dashboards.
-- 4-bucket nav (Assess / Train / Get Seen / Scale) was recently introduced in `src/lib/ia.ts`.
-- Sport parity (Baseball + Softball), unified onboarding, role system, lesson credit system, Intelligence Engine for drill/program assignment.
-- Eddie has sport + page context hooks (`EddieAIChat.tsx`, `useEddieChat.ts`).
-
-**The gap (why it doesn't feel like an OS yet):**
-- Product pages, evaluation, recruiting, marketplace, and dashboards each have their own data models and CTAs. They don't share a single "athlete state" object.
-- `useEffect` fetches per page → no shared "where am I in the journey" signal.
-- Eddie reacts to the page route, but doesn't read the athlete's profile/recommendations to make decisions.
-- No "Your Path" surface. Dashboard is a stat board, not a next-action engine.
-- Org Command Center exists in pieces (OwnerOverview, TeamHub) but isn't framed as the org product surface.
-
----
-
-## 2. Revised Information Architecture
-
-Keep the 4 top-level buckets. Re-anchor every existing page underneath them. No new top-level concepts.
+## 2. Architecture — additive, not a rewrite
 
 ```text
-ASSESS                TRAIN                 GET SEEN              SCALE
-─────────             ─────────             ───────────           ─────────
-Free Evaluation       Pillar Programs       Recruiting Audit      Coach Certification
-Athlete Profile       Bundles               Recruiting Hub        Coach Marketplace (sell)
-Your Path (NEW)       My Programs           Showcases             Org Licensing
-Reassessment          Progress OS (NEW)     Tryouts               Team Hub / Practice Plans
-Baselines & KPIs      Coach Lessons         Prospect Grader       Facility Scheduling
-                      Workload / Arm Care   Wall of Wins          Org Command Center
+                   ┌───────────────────────────────────┐
+                   │   /ops  (Scheduling OS hub)       │  ← NEW shell
+                   │   AuthGuard + role gate           │
+                   └────────────┬──────────────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        ▼                       ▼                       ▼
+   /ops/calendar          /ops/bookings           /ops/resources
+   day/week/month         table + filters         spaces + blackouts
+        │                       │                       │
+        └────────── reads/writes via ────────────────────┘
+                    useSchedulingOps (new hook)
+                              │
+       ┌──────────────────────┼─────────────────────────┐
+       ▼                      ▼                         ▼
+  facility_reservations   coach_availability     facility_spaces
+  remote_lessons (RO)     coach_blackouts (NEW)  facility_settings
+  marketplace_bookings(RO)
 ```
 
-Every page in the app will declare which bucket it belongs to (already partially done in `ia.ts`). This drives nav, breadcrumbs, Eddie context, and "next action" suggestions.
+- **No legacy table is altered.** The legacy WebRTC, Course Access, and Baseball booking systems remain locked per project memory.
+- All new UI lives under `/ops/*` and reuses the existing components (`DayGridView`, `WeekView`, `ReservationDialog`, `MultiResourceBookingWizard`).
+- One new edge function (`scheduling-mutate`) wraps create/update/cancel so we get atomic conflict checks + audit logging in one place.
 
----
+## 3. Role / permission model
 
-## 3. The 5 OS Layers — concrete shape
+| Capability | Admin / Owner | Coach | Client |
+|---|---|---|---|
+| Access `/ops/*` | ✅ | ✅ | ❌ (404 redirect via `<AuthGuard requireRole={['owner','coach']}/>`) |
+| See all coach calendars | ✅ | ❌ (own only) | — |
+| Create/cancel any booking | ✅ | ✅ own + assigned | — |
+| Reassign coach on a booking | ✅ | ❌ | — |
+| Edit `facility_spaces` / blackouts | ✅ | ❌ | — |
+| Override availability | ✅ | ❌ | — |
+| Audit log view | ✅ | ❌ | — |
 
-### Layer 1 — Unified Athlete Profile (the spine)
+Enforcement layers (defense in depth):
+1. **Route gate** — `<AuthGuard requireRole>` blocks render
+2. **Nav visibility** — `Navbar`/sidebar hides `/ops` for non-staff
+3. **RLS** — all new policies use the existing `has_role()` security-definer; coaches see WHERE `coach_user_id = auth.uid()`, owners see all
+4. **Edge function** — `scheduling-mutate` re-checks role server-side before any write
 
-One canonical object, read by every page, written by evaluation/training/recruiting flows.
+## 4. Dashboard & calendar structure
+
+### `/ops` (default landing — "Today")
+- Top strip: today's count by status (Confirmed / Pending / Completed / No-show / Canceled)
+- Left: today's timeline grouped by coach (admin) or own day (coach)
+- Right: quick actions — New booking · Block time · Find conflict
+- Realtime badge using existing `RealtimeStatusBadge`
+
+### `/ops/calendar`
+- Toggle: **Day · Week · Month**
+- Filters: coach, space, booking type, status
+- Reuses `DayGridView` / `WeekView`; adds a lightweight Month grid
+- Click cell → `ReservationDialog` (existing) extended with new booking-type & buffer fields
+- Drag-to-reschedule (admin-only) calling `scheduling-mutate`
+
+### `/ops/bookings`
+- Searchable, filterable table (coach, client, type, location, date range, status)
+- Bulk actions: confirm, cancel, mark no-show, export CSV
+- Row drawer: full detail + audit history
+
+### `/ops/resources`
+- Spaces, hours, blackouts (uses `FacilitySettingsPanel` + `FloorPlanEditor`)
+- New: per-space buffer minutes, allowed booking types
+
+### `/ops/coaches` (admin only)
+- Per-coach availability editor (reuses `CoachAvailabilitySync`)
+- Blackout windows
+- Quick "view as coach" link
+
+## 5. Reusable booking workflow
+
+One hook, one server entrypoint, used by every surface:
 
 ```text
-AthleteState {
-  identity:    user_id, sport, age, role, org_id?
-  stage:       baseline | developing | advanced | recruiting | committed
-  evaluation:  latest_score, pillar_breakdown, last_taken_at
-  training:    active_programs[], completed_programs[], current_streak
-  purchases:   active_products[], bundles[], credits
-  recruiting:  readiness_score, profile_completeness, tier_target
-  events:      tryouts_attended[], camps[], showcases[]
-  coaches:     assigned_coach?, recent_lessons[]
-  next_action: { kind, label, href, reason }   ← computed by Pathway Engine
-}
+useSchedulingOps()
+  ├─ list({ from, to, coachId?, spaceId?, status?, type? })
+  ├─ create(draft)        ──► edge: scheduling-mutate (action:'create')
+  ├─ update(id, patch)    ──► edge: scheduling-mutate (action:'update')
+  ├─ cancel(id, reason)   ──► edge: scheduling-mutate (action:'cancel')
+  └─ subscribe()          (realtime channel on facility_reservations)
 ```
 
-Surface: a single `useAthleteState()` hook + React Query cache. Backed by a thin `vw_athlete_state` view in the DB that joins existing tables (no schema rewrite — it stitches what we already have).
+The `scheduling-mutate` edge function:
+1. Validates role + ownership
+2. Runs `lock_facility_reservation_window(space_id, coach_id, starts_at, ends_at, buffer_min)` — a new SECURITY DEFINER RPC that takes a row-lock on conflicting rows and returns a conflict code if any exist (or with the buffer)
+3. Inserts/updates `facility_reservations`
+4. Writes a row to `scheduling_audit_log`
+5. Returns the saved booking
 
-### Layer 2 — Personalized Pathway Engine
+This guarantees **no double-booking** even under concurrent clicks, and gives us **full auditability** out of the box.
 
-Pure function: `computeNextAction(AthleteState) → Recommendation[]`.
+## 6. Phased implementation
 
-Rules (all from existing data, no new ML):
-- No evaluation → "Take Free Evaluation".
-- Evaluation done, no program → recommend pillar program matching weakest pillar.
-- Program in progress → "Continue Week N" + recommend bundle if 70%+ complete.
-- Age ≥ 14 + score ≥ threshold + no recruiting profile → "Start Recruiting Audit".
-- Recruiting profile incomplete → next missing checklist item.
-- Stage = recruiting + no showcase → recommend nearest tryout/showcase.
-- Coach role → certification status → marketplace listing.
-- Org admin → adoption gap → license expansion CTA.
+**Phase 1 — Access shell + cockpit (small, ships immediately)**
+- Add `<AuthGuard requireRole={['owner','coach']}>` capability
+- New routes `/ops`, `/ops/calendar`, `/ops/bookings`, `/ops/resources`, `/ops/coaches`
+- New `OpsLayout` with sidebar; nav entry visible only to staff
+- "Today" cockpit reading existing `facility_reservations`
 
-Lives in `src/lib/pathway/engine.ts`. Returns ranked `Recommendation[]` consumed by Your Path, Eddie, dashboards, and post-evaluation screens.
+**Phase 2 — Unified calendar + filters**
+- Mount existing `DayGridView`/`WeekView` under `/ops/calendar` with admin/coach scoping
+- Add Month view (lightweight grid)
+- Filter bar (coach / space / type / status)
 
-### Layer 3 — Eddie AI as Operating Intelligence
+**Phase 3 — Booking lifecycle hardening (DB + edge)**
+- Migration: add `booking_type`, `buffer_before_min`, `buffer_after_min`, `internal_notes` columns to `facility_reservations`; add `scheduling_audit_log` and `coach_blackouts` tables; add `lock_facility_reservation_window` RPC
+- New `scheduling-mutate` edge function
+- Refactor `ReservationDialog` to use it
+- Status enum normalized: `pending | confirmed | completed | canceled | no_show`
 
-Eddie stops being "chat about this page" and becomes "decision helper that knows the athlete".
+**Phase 4 — Coach self-service & admin overrides**
+- Coach availability editor under `/ops/coaches/me`
+- Admin "view as coach" + reassign action
+- Bulk actions on bookings table
+- CSV export + simple operational report (bookings/coach/week, utilization/space)
 
-Every Eddie request will include:
-- current route + bucket
-- `AthleteState` summary (stage, last evaluation, active program, gaps)
-- top 3 `Recommendation[]` from the Pathway Engine
+**Phase 5 — Polish**
+- Mobile-tuned day view for coaches on the floor
+- Drag-to-reschedule (admin)
+- Realtime conflict badges
+- Empty/loading/error states standardized
 
-Eddie behavior map:
+## 7. What is explicitly NOT changing
+- `/book-session`, `/remote-lessons`, `/lesson-packages`, `/find-coach` (client-facing flows) — untouched
+- Legacy WebRTC, Course Access, Baseball booking — untouched (per Core memory)
+- `marketplace_bookings`, `remote_lessons`, `session_bookings` schemas — read-only joins in the new UI
+- Existing `/admin/facility` and `/coach/schedule` keep working; `/ops` becomes the canonical hub and old routes can later redirect once parity is proven
 
-| Context           | Eddie's job |
-|-------------------|-------------|
-| Evaluation result | Explain pillar scores, name top strength + top gap, surface 1 recommended program. |
-| Program page      | Compare to athlete's weakest pillar, explain fit, offer bundle if applicable. |
-| Bundle page       | Compare against athlete's purchases + stage, recommend lighter/heavier option. |
-| Recruiting        | Read readiness + checklist, name the single highest-leverage missing item. |
-| Coach pages       | Certification status → next exam, marketplace readiness, payout setup. |
-| Org/License       | Seat usage, adoption %, suggested tier. |
-| Anywhere idle     | Surface the current top Pathway recommendation. |
+## Technical details (for engineering)
 
-Implementation: extend `useEddieChat` to inject `AthleteState` + recommendations into the system prompt. No new chat UI.
+- **Auth gate component:** extend existing `AuthGuard` to accept `requireRole?: AppRole[]`. If user lacks role → redirect to `/dashboard` (or `/` for non-auth).
+- **RLS additions:** every new table uses `has_role(auth.uid(),'owner')` or `coach_user_id = auth.uid()` patterns — no recursive policies.
+- **No price/payment work.** Internal scheduling does not touch the checkout service we just unified.
+- **Idempotency:** `scheduling-mutate` accepts an optional client `idempotency_key` to dedupe accidental double-submits.
+- **Realtime:** `ALTER PUBLICATION supabase_realtime ADD TABLE facility_reservations` (verify if not already added) so the cockpit and calendars update live.
+- **Mobile:** stays inside the same Capacitor shell; no native changes needed.
 
-### Layer 4 — Progress OS
-
-A retention layer over existing data. No new product, just a synthesis surface.
-
-Components:
-- **Milestones** — derived from program completion %, evaluation deltas, lessons completed, recruiting checklist items.
-- **Reassessment cadence** — every 60 days, prompt re-evaluation; show delta vs baseline.
-- **Monthly progress summary** — auto-generated card on dashboard ("3 milestones, +6 ADS pts, 2 lessons").
-- **Streak/consistency** — already partially in `useActivityFeed`; expose as a single `streak_days` field.
-- **What changed / what to do next** — every dashboard visit shows last delta + Pathway recommendation.
-
-### Layer 5 — Organization Command Center
-
-Frame the existing owner/admin pages as the deliverable for the Org License product.
-
-Sections (most exist; this is consolidation, not new pages):
-- **Athletes** — roster, stage distribution, evaluation completion rate.
-- **Coaches** — certification status, lesson volume, marketplace activity.
-- **Programs** — adoption %, completion %, top pillars trained.
-- **Outcomes** — recruiting placements, showcase attendance, average ADS lift.
-- **Licensing** — seats used / available, renewal date, expansion CTA.
-
-Surface as `/org` (admin/owner only), with cards that link into existing detail pages.
-
----
-
-## 4. The Unified Athlete Journey
-
-```text
-   LAND                ASSESS              TRAIN               GET SEEN           SCALE
-   ────                ──────              ─────               ────────           ─────
- Home / Eddie  →   Free Evaluation  →   Your Path (Programs/  →  Recruiting    →  (Coach: Cert+Mktplc)
- entry CTA         (creates Profile)    Bundles + Coach)         Audit + Events    (Org: License+Cmd Ctr)
-                          │                   │                       │
-                          ▼                   ▼                       ▼
-                   AthleteState         Progress OS            Recruiting Hub
-                   (one object)         (milestones,           (checklist, contacts,
-                                         streaks, deltas)       showcases, profile)
-                          ▲                   ▲                       ▲
-                          └─── Eddie reads all of these on every page ────┘
-```
-
-Every page answers three questions in a single header strip:
-1. **What is this?** (one-line description)
-2. **Who is it for?** (chip: Athlete / Parent / Coach / Org)
-3. **What should I do next?** (Pathway Engine button)
-
----
-
-## 5. "Your Path" surface
-
-A single screen at `/path` (also embedded as the top card on `/dashboard`):
-
-```text
-┌─────────────────────────────────────────────┐
-│  YOUR PATH                  Stage: Developing│
-│  ─────────────────────────────────────────── │
-│  ▸ NEXT ACTION                               │
-│    Continue Velocity System — Week 3         │
-│    [Resume program]                          │
-│                                              │
-│  ▸ ALSO RECOMMENDED                          │
-│    • Recruiting Audit (you're 14U+)          │
-│    • Book a velo check with Coach Bernard    │
-│                                              │
-│  ▸ THIS MONTH                                │
-│    +6 ADS pts · 2 lessons · 9-day streak     │
-│    [See progress details]                    │
-└─────────────────────────────────────────────┘
-```
-
-Driven entirely by `AthleteState` + `computeNextAction`. No new data sources.
-
----
-
-## 6. Phased rollout
-
-I'll ship in phases, each independently shippable, no rework.
-
-```text
-PHASE A — Foundation (the spine)
-  A1. Build vw_athlete_state DB view + useAthleteState() hook
-  A2. Build pathway engine (pure TS, fully unit-testable)
-  A3. Add /path route + dashboard "Your Path" card
-  A4. Wire 3-question header strip component (used by every bucket page)
-
-PHASE B — Eddie becomes intelligent
-  B1. Inject AthleteState + top recommendations into Eddie prompts
-  B2. Eddie behavior map per bucket (Assess / Train / Get Seen / Scale)
-  B3. Idle prompts surface top Pathway recommendation
-
-PHASE C — Progress OS
-  C1. Milestones derivation from existing tables
-  C2. Reassessment cadence + delta display
-  C3. Monthly summary card + streak indicator
-  C4. "What changed / what next" on dashboard
-
-PHASE D — Org Command Center consolidation
-  D1. /org landing under Scale bucket
-  D2. Roster, coach activity, program adoption cards
-  D3. License seat tracker + expansion CTA
-  D4. Outcomes view (placements, showcase attendance, ADS lift)
-
-PHASE E — Connective polish
-  E1. Every product page gets Pathway-aware "next step" CTA
-  E2. Post-purchase flows route into Your Path, not a generic success page
-  E3. Coach + Org variants of Your Path
-  E4. End-to-end smoke test of the 5 personas
-```
-
-Recommended order: **A → B → C → D → E**. Phase A is the unlock — once `AthleteState` and the Pathway Engine exist, B/C/D are mostly wiring.
-
----
-
-## 7. Constraints respected
-
-- No rebrand. No homepage hero copy edits.
-- No removed products. No removed routes.
-- No legacy WebRTC, Course Access, or Baseball booking changes.
-- Sport parity preserved (every layer reads `sport` from profile).
-- Mobile checkout still uses `openCheckout`.
-- No cookie banners.
-- Additions are **modular** — `useAthleteState`, `pathway/engine`, `<NextActionStrip>`, `/path`, `/org` consolidation. Existing pages keep working untouched until they opt in.
-
----
-
-## 8. Open questions before I start Phase A
-
-1. **DB view vs computed in app**: prefer a Postgres view (`vw_athlete_state`) so RLS handles security and dashboards stay fast. OK to add this read-only view? (Recommended: yes.)
-2. **Pathway Engine source of truth**: pure TS in `src/lib/pathway/` so it's testable and runs client-side. Edge function only if a recommendation requires data the client can't see. OK? (Recommended: yes.)
-3. **Your Path placement**: new `/path` route + embedded card on `/dashboard`. Should `/dashboard` redirect to `/path` for athletes, or keep both? (Recommended: keep both, dashboard embeds the card.)
-4. **Eddie prompt size**: injecting `AthleteState` adds ~400–800 tokens per request. OK to accept the cost for the intelligence upgrade? (Recommended: yes — gate the heaviest fields behind the bucket.)
-
-Approve the plan (or answer the 4 questions) and I'll start with **Phase A1 — `vw_athlete_state` view + `useAthleteState()` hook**.
+Approve this plan and I'll start with Phase 1 (access shell + cockpit) and Phase 3's migration in parallel, since those are the foundation everything else builds on.
