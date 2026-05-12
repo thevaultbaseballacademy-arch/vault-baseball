@@ -177,6 +177,7 @@ const SummerCamp = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<string>("");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [checkoutFallbackUrl, setCheckoutFallbackUrl] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [confirmation, setConfirmation] = useState<{
     id: string;
@@ -440,18 +441,14 @@ const SummerCamp = () => {
 
         setSubmitStatus("Redirecting to checkout…");
         await openCheckout(checkoutUrl, preparedCheckoutTarget);
-        // Leave inFlightRef true: page is navigating away. If for some reason it doesn't,
-        // surface a manual link so the user isn't stuck.
+        // Always surface a clickable fallback link after a short delay in case the
+        // automatic redirect was blocked (popup blockers, sandboxed iframes, etc.).
         window.setTimeout(() => {
-          const shouldShowManualFallback = !preparedCheckoutTarget && !document.hidden;
-          if (shouldShowManualFallback) {
-            setSubmitError(
-              `If checkout didn't open, tap here: ${checkoutUrl}`,
-            );
-            setSubmitting(false);
-            inFlightRef.current = false;
-          }
-        }, 4000);
+          if (document.hidden) return; // user is on the Stripe tab — leave them alone
+          setCheckoutFallbackUrl(checkoutUrl);
+          setSubmitting(false);
+          inFlightRef.current = false;
+        }, 3500);
         return;
       }
 
