@@ -342,6 +342,7 @@ const SummerCamp = () => {
     if (inFlightRef.current) return;
 
     setSubmitError(null);
+    setCheckoutFallbackUrl(null);
 
     const parsed = FormSchema.safeParse(values);
     if (!parsed.success) {
