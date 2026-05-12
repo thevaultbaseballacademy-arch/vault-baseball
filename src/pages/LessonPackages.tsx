@@ -58,15 +58,19 @@ const LessonPackages = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { return; }
 
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { priceId: pkg.stripe_price_id },
-        headers: { Authorization: `Bearer ${session.access_token}` },
+      toast({
+        title: "Starting secure checkout…",
+        description: "Redirecting to Stripe.",
       });
 
-      if (error) throw error;
-      if (data?.url) await openCheckout(data.url);
+      const { checkoutUrl } = await invokeCheckout(
+        "create-payment",
+        { priceId: pkg.stripe_price_id },
+        { authToken: session.access_token, timeoutMs: 25_000 },
+      );
+      await openCheckout(checkoutUrl);
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: "Checkout Error", description: error.message, variant: "destructive" });
     } finally {
       setPurchasing(null);
     }
