@@ -37,10 +37,16 @@ export const useEssaCheckout = () => {
         description: "Redirecting to Stripe.",
       });
 
-      
+      // Stable per-attempt idempotency key (1-minute window) — prevents duplicate Stripe sessions on rapid double-taps.
+      const idempotencyKey = `essa_${priceId}_${sessionData.session.user.id}_${quantity}_${Math.floor(Date.now() / 60000)}`;
+
       const { checkoutUrl } = await invokeCheckout(
         "create-facility-checkout",
-        { priceId, quantity, metadata },
+        {
+          priceId,
+          quantity,
+          metadata: { ...(metadata ?? {}), idempotency_key: idempotencyKey },
+        },
         { authToken: sessionData.session.access_token, timeoutMs: 25_000 },
       );
 
@@ -48,7 +54,11 @@ export const useEssaCheckout = () => {
       await openCheckout(checkoutUrl);
     } catch (err: any) {
       console.error("[ESSA checkout] error", err);
-      toast.error(err?.message || "Something went wrong starting checkout.");
+      if (err?.code === "CHECKOUT_FAILED_FOLLOWUP") {
+        toast.error("We saved your booking details. Our team will reach out to finish payment.");
+      } else {
+        toast.error(err?.message || "Something went wrong starting checkout.");
+      }
     } finally {
       setIsLoading(false);
     }
