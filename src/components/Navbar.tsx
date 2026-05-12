@@ -160,10 +160,12 @@ const Navbar = () => {
         { name: "Longevity System", href: "/products/longevity" },
         { name: "Transfer System", href: "/products/transfer" },
         { name: "Remote Training", href: "/products/remote-training" },
+        { name: "Remote Lessons", href: "/remote-lessons" },
         { name: "Bundles", href: "/products/bundles" },
         { name: "Book a Lesson", href: "/book-session" },
         { name: "Lesson Packages", href: "/lesson-packages" },
         { name: "Group Sessions", href: "/group-sessions" },
+        { name: "Courses & Education", href: "/courses" },
       ],
     },
     {
