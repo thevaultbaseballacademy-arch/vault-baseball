@@ -25,7 +25,9 @@ export type SchedulingBooking = {
   color?: string | null;
 };
 
-type MutateResult = { ok: true; reservation: any } | { ok: false; error: string; conflicts?: any[] };
+type MutateOk = { ok: true; reservation: any; error?: undefined; conflicts?: undefined };
+type MutateErr = { ok: false; error: string; conflicts?: any[]; reservation?: undefined };
+type MutateResult = MutateOk | MutateErr;
 
 const callFn = async (body: any): Promise<MutateResult> => {
   const { data, error } = await supabase.functions.invoke("scheduling-mutate", { body });
