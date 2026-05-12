@@ -1,164 +1,96 @@
-# VAULT Scheduling OS — Internal Booking & Calendar Hub
+# Reusable Payment Architecture: Card + Bank Transfer
 
-## 1. Audit of what already exists (will be reused, not replaced)
+## Goal
+Add a second payment path (bank transfer) alongside the existing Stripe Checkout flow, built as a reusable module so any paid VAULT product (summer camp, programs, bundles, lessons) can plug in without touching existing Stripe logic.
 
-**Pages already shipping booking/scheduling:**
-- `/admin/facility` — `OwnerFacility` + `DayGridView`, `WeekView`, `MultiResourceBookingWizard`, `ReservationDialog`, `FloorPlanEditor`, `FacilitySettingsPanel`
-- `/admin/essa-bookings` — `OwnerEssaBookings` (private-lesson ops)
-- `/coach/schedule` — `CoachSchedule` (personal day/week)
-- `/coach/essa-day` — `CoachEssaDay` (today's lessons for the coach)
-- `/coach/lessons` — `CoachLessons` (assigned remote/in-person lessons)
-- Client-facing (untouched): `/book-session`, `/remote-lessons`, `/lesson-packages`, `/find-coach`
-
-**Tables already in place (will be reused):**
-- `facility_reservations` — has `space_id`, `coach_user_id`, `coach_availability_id`, `status`, `created_by`, `recurrence_rule`, `cancellation_reason`. This is already the canonical "booking" row.
-- `facility_spaces` + `facility_settings` + `facility_hours` — resource catalog
-- `coach_availability` — recurring weekly blocks per coach
-- `remote_lessons`, `marketplace_bookings`, `session_bookings`, `lesson_credits` — legacy/specialized (read-only joins)
-- `schedule_assignments` — training-plan assignments
-
-**Verdict:** the data model is solid. We do **not** need new core tables — only thin additions for buffer time, audit trail, blackout blocks, and a unified status enum. The fix is **organization + access control + a single ops cockpit** on top of what exists.
-
-## 2. Architecture — additive, not a rewrite
+## Architecture Overview
 
 ```text
-                   ┌───────────────────────────────────┐
-                   │   /ops  (Scheduling OS hub)       │  ← NEW shell
-                   │   AuthGuard + role gate           │
-                   └────────────┬──────────────────────┘
-                                │
-        ┌───────────────────────┼───────────────────────┐
-        ▼                       ▼                       ▼
-   /ops/calendar          /ops/bookings           /ops/resources
-   day/week/month         table + filters         spaces + blackouts
-        │                       │                       │
-        └────────── reads/writes via ────────────────────┘
-                    useSchedulingOps (new hook)
-                              │
-       ┌──────────────────────┼─────────────────────────┐
-       ▼                      ▼                         ▼
-  facility_reservations   coach_availability     facility_spaces
-  remote_lessons (RO)     coach_blackouts (NEW)  facility_settings
-  marketplace_bookings(RO)
+                    ┌─────────────────────────────┐
+                    │  Product page (e.g. Camp)   │
+                    │  <PaymentMethodSelector />  │
+                    └──────────────┬──────────────┘
+                                   │
+                ┌──────────────────┴──────────────────┐
+                │                                     │
+        Pay by Card (default)                Pay by Bank Transfer
+                │                                     │
+   create-checkout-session  edge fn        create-pending-order edge fn
+   (existing logic, untouched)             (new, shared)
+                │                                     │
+        Stripe Checkout                    Pending order row +
+                │                          instructions screen +
+        Stripe webhook                     instructions email
+                │                                     │
+        order.status = 'paid'              order.status = 'pending_bank_transfer'
+                                                      │
+                                            Admin "Mark as paid" action
+                                                      │
+                                             order.status = 'paid'
 ```
 
-- **No legacy table is altered.** The legacy WebRTC, Course Access, and Baseball booking systems remain locked per project memory.
-- All new UI lives under `/ops/*` and reuses the existing components (`DayGridView`, `WeekView`, `ReservationDialog`, `MultiResourceBookingWizard`).
-- One new edge function (`scheduling-mutate`) wraps create/update/cancel so we get atomic conflict checks + audit logging in one place.
+## Data Model
 
-## 3. Role / permission model
+New shared table `payment_orders` (one row per paid product purchase, regardless of method):
 
-| Capability | Admin / Owner | Coach | Client |
-|---|---|---|---|
-| Access `/ops/*` | ✅ | ✅ | ❌ (404 redirect via `<AuthGuard requireRole={['owner','coach']}/>`) |
-| See all coach calendars | ✅ | ❌ (own only) | — |
-| Create/cancel any booking | ✅ | ✅ own + assigned | — |
-| Reassign coach on a booking | ✅ | ❌ | — |
-| Edit `facility_spaces` / blackouts | ✅ | ❌ | — |
-| Override availability | ✅ | ❌ | — |
-| Audit log view | ✅ | ❌ | — |
+- `id`
+- `user_id` (nullable for guest)
+- `product_type` (`summer_camp`, `program`, `bundle`, `lesson`, …)
+- `product_id` (FK / reference into the originating record, e.g. summer camp registration id)
+- `amount_cents`, `currency`
+- `payment_method` (`card` | `bank_transfer`)
+- `status` (`pending` | `pending_bank_transfer` | `paid` | `failed` | `canceled`)
+- `stripe_session_id` (nullable)
+- `stripe_payment_intent_id` (nullable)
+- `confirmed_by` (admin user_id, nullable) + `confirmed_at`
+- `customer_email`, `customer_name`, `metadata jsonb`
 
-Enforcement layers (defense in depth):
-1. **Route gate** — `<AuthGuard requireRole>` blocks render
-2. **Nav visibility** — `Navbar`/sidebar hides `/ops` for non-staff
-3. **RLS** — all new policies use the existing `has_role()` security-definer; coaches see WHERE `coach_user_id = auth.uid()`, owners see all
-4. **Edge function** — `scheduling-mutate` re-checks role server-side before any write
+RLS: users see their own orders; admins see all; service role writes from edge functions.
 
-## 4. Dashboard & calendar structure
+`summer_camp_registrations` gets a nullable `payment_order_id` link so existing data stays intact.
 
-### `/ops` (default landing — "Today")
-- Top strip: today's count by status (Confirmed / Pending / Completed / No-show / Canceled)
-- Left: today's timeline grouped by coach (admin) or own day (coach)
-- Right: quick actions — New booking · Block time · Find conflict
-- Realtime badge using existing `RealtimeStatusBadge`
+## Edge Functions
 
-### `/ops/calendar`
-- Toggle: **Day · Week · Month**
-- Filters: coach, space, booking type, status
-- Reuses `DayGridView` / `WeekView`; adds a lightweight Month grid
-- Click cell → `ReservationDialog` (existing) extended with new booking-type & buffer fields
-- Drag-to-reschedule (admin-only) calling `scheduling-mutate`
+1. `create-checkout-session` (existing summer-camp function stays as-is for card path; will be generalized later but not changed in this pass).
+2. `create-pending-order` (new, shared) — creates a `payment_orders` row with status `pending_bank_transfer`, sends instructions email via the existing email queue, returns the order id + instructions payload.
+3. `admin-confirm-bank-transfer` (new) — admin-only; flips status to `paid`, stamps `confirmed_by`/`confirmed_at`, triggers the same downstream effects the Stripe webhook triggers (mark camp registration paid, send receipt).
+4. Stripe webhook (existing) — also writes the `paid` status into `payment_orders` keyed by `stripe_session_id`.
 
-### `/ops/bookings`
-- Searchable, filterable table (coach, client, type, location, date range, status)
-- Bulk actions: confirm, cancel, mark no-show, export CSV
-- Row drawer: full detail + audit history
+## Frontend
 
-### `/ops/resources`
-- Spaces, hours, blackouts (uses `FacilitySettingsPanel` + `FloorPlanEditor`)
-- New: per-space buffer minutes, allowed booking types
+- `<PaymentMethodSelector />` — reusable component:
+  - Two cards: **Pay by Card** (primary, "Instant secure checkout") and **Pay by Bank Transfer** (secondary, "Reserve your spot, pay within X days").
+  - Mobile-first, single column on small screens.
+  - Accepts `productType`, `productId`, `amountCents`, `customer` props and a `onCardCheckout` / `onBankTransfer` pair, so each product page wires its own card-session creator.
+- `/payment/bank-instructions/:orderId` — branded instructions page (account name, bank, account #, routing/IBAN, reference = order id, amount, deadline, support contact). Shown after bank transfer is chosen and also linked from the email.
+- Status chips on the user's registration view: **Reserved – awaiting bank transfer**, **Pending review**, **Confirmed**.
+- Existing success / cancel pages reused for card flow; new pending page for bank flow.
 
-### `/ops/coaches` (admin only)
-- Per-coach availability editor (reuses `CoachAvailabilitySync`)
-- Blackout windows
-- Quick "view as coach" link
+## Admin
 
-## 5. Reusable booking workflow
+- New page `/admin/payments` (admin-only via existing role check):
+  - Filter by status (`pending_bank_transfer` by default), product type, date.
+  - Row actions: **Mark as paid**, **Cancel**, **View details**.
+  - "Mark as paid" calls `admin-confirm-bank-transfer`.
+- Reuses existing admin layout / auth guard, no redesign.
 
-One hook, one server entrypoint, used by every surface:
+## Bank Account Details
+Stored as project secrets (`BANK_TRANSFER_INSTRUCTIONS_JSON`) so they can be updated without code changes and never live in the repo. The instructions page and email pull from a single edge-function-served config endpoint.
 
-```text
-useSchedulingOps()
-  ├─ list({ from, to, coachId?, spaceId?, status?, type? })
-  ├─ create(draft)        ──► edge: scheduling-mutate (action:'create')
-  ├─ update(id, patch)    ──► edge: scheduling-mutate (action:'update')
-  ├─ cancel(id, reason)   ──► edge: scheduling-mutate (action:'cancel')
-  └─ subscribe()          (realtime channel on facility_reservations)
-```
+## Rollout in this PR
+1. Migration: `payment_orders` table + RLS + link column on summer camp registrations.
+2. Edge functions: `create-pending-order`, `admin-confirm-bank-transfer`; small webhook patch to upsert into `payment_orders`.
+3. UI: `<PaymentMethodSelector />`, bank instructions page, pending status on the camp confirmation screen.
+4. Wire selector into **Summer Camp registration** only (other products keep current flow; selector is drop-in for the next pass).
+5. Admin payments page with bank-transfer queue + manual confirm.
+6. Email template for bank transfer instructions (uses existing email queue).
 
-The `scheduling-mutate` edge function:
-1. Validates role + ownership
-2. Runs `lock_facility_reservation_window(space_id, coach_id, starts_at, ends_at, buffer_min)` — a new SECURITY DEFINER RPC that takes a row-lock on conflicting rows and returns a conflict code if any exist (or with the buffer)
-3. Inserts/updates `facility_reservations`
-4. Writes a row to `scheduling_audit_log`
-5. Returns the saved booking
+## Out of Scope (intentional)
+- No changes to existing card checkout logic, retry behavior, or the recent `register-summer-camp` fixes.
+- No redesign of the camp page — only the payment step gets the selector.
+- Other paid products will adopt the selector in follow-up passes.
 
-This guarantees **no double-booking** even under concurrent clicks, and gives us **full auditability** out of the box.
+## Secrets Needed
+- `BANK_TRANSFER_INSTRUCTIONS_JSON` — JSON blob with: `account_name`, `bank_name`, `account_number`, `routing_number` (or IBAN/SWIFT), `reference_prefix`, `payment_deadline_days`, `support_email`. You'll provide values; I'll add the secret before deploying.
 
-## 6. Phased implementation
-
-**Phase 1 — Access shell + cockpit (small, ships immediately)**
-- Add `<AuthGuard requireRole={['owner','coach']}>` capability
-- New routes `/ops`, `/ops/calendar`, `/ops/bookings`, `/ops/resources`, `/ops/coaches`
-- New `OpsLayout` with sidebar; nav entry visible only to staff
-- "Today" cockpit reading existing `facility_reservations`
-
-**Phase 2 — Unified calendar + filters**
-- Mount existing `DayGridView`/`WeekView` under `/ops/calendar` with admin/coach scoping
-- Add Month view (lightweight grid)
-- Filter bar (coach / space / type / status)
-
-**Phase 3 — Booking lifecycle hardening (DB + edge)**
-- Migration: add `booking_type`, `buffer_before_min`, `buffer_after_min`, `internal_notes` columns to `facility_reservations`; add `scheduling_audit_log` and `coach_blackouts` tables; add `lock_facility_reservation_window` RPC
-- New `scheduling-mutate` edge function
-- Refactor `ReservationDialog` to use it
-- Status enum normalized: `pending | confirmed | completed | canceled | no_show`
-
-**Phase 4 — Coach self-service & admin overrides**
-- Coach availability editor under `/ops/coaches/me`
-- Admin "view as coach" + reassign action
-- Bulk actions on bookings table
-- CSV export + simple operational report (bookings/coach/week, utilization/space)
-
-**Phase 5 — Polish**
-- Mobile-tuned day view for coaches on the floor
-- Drag-to-reschedule (admin)
-- Realtime conflict badges
-- Empty/loading/error states standardized
-
-## 7. What is explicitly NOT changing
-- `/book-session`, `/remote-lessons`, `/lesson-packages`, `/find-coach` (client-facing flows) — untouched
-- Legacy WebRTC, Course Access, Baseball booking — untouched (per Core memory)
-- `marketplace_bookings`, `remote_lessons`, `session_bookings` schemas — read-only joins in the new UI
-- Existing `/admin/facility` and `/coach/schedule` keep working; `/ops` becomes the canonical hub and old routes can later redirect once parity is proven
-
-## Technical details (for engineering)
-
-- **Auth gate component:** extend existing `AuthGuard` to accept `requireRole?: AppRole[]`. If user lacks role → redirect to `/dashboard` (or `/` for non-auth).
-- **RLS additions:** every new table uses `has_role(auth.uid(),'owner')` or `coach_user_id = auth.uid()` patterns — no recursive policies.
-- **No price/payment work.** Internal scheduling does not touch the checkout service we just unified.
-- **Idempotency:** `scheduling-mutate` accepts an optional client `idempotency_key` to dedupe accidental double-submits.
-- **Realtime:** `ALTER PUBLICATION supabase_realtime ADD TABLE facility_reservations` (verify if not already added) so the cockpit and calendars update live.
-- **Mobile:** stays inside the same Capacitor shell; no native changes needed.
-
-Approve this plan and I'll start with Phase 1 (access shell + cockpit) and Phase 3's migration in parallel, since those are the foundation everything else builds on.
+Confirm and I'll implement in this order: migration → edge functions → selector + bank pages → admin queue → wire into Summer Camp.

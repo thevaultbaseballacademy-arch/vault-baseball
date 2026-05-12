@@ -137,15 +137,19 @@ serve(async (req) => {
       quantity,
       successUrl,
       cancelUrl,
+      paymentMethod,
       ...registration
     } = (body ?? {}) as RegistrationPayload & {
       priceId?: string;
       quantity?: unknown;
       successUrl?: string;
       cancelUrl?: string;
+      paymentMethod?: "card" | "bank_transfer";
     };
 
-    if (!priceId || typeof priceId !== "string") {
+    const method: "card" | "bank_transfer" = paymentMethod === "bank_transfer" ? "bank_transfer" : "card";
+
+    if (method === "card" && (!priceId || typeof priceId !== "string")) {
       return json({ error: "Invalid price ID format", code: "INVALID_PRICE_ID" }, 400);
     }
 
@@ -158,6 +162,86 @@ serve(async (req) => {
     const origin = req.headers.get("origin") || "https://vault-baseball.lovable.app";
     const resolvedSuccessUrl = successUrl || `${origin}/summer-camp?paid=1&session_id={CHECKOUT_SESSION_ID}`;
     const resolvedCancelUrl = cancelUrl || `${origin}/summer-camp?canceled=1`;
+
+    // === BANK TRANSFER PATH ===
+    if (method === "bank_transfer") {
+      const amountCents = Number(registration.amount_cents ?? 0);
+      const { data: order, error: orderError } = await supabase
+        .from("payment_orders")
+        .insert({
+          product_type: "summer_camp",
+          amount_cents: amountCents,
+          currency: "usd",
+          payment_method: "bank_transfer",
+          status: "pending_bank_transfer",
+          customer_email: normalizedEmail,
+          customer_name: `${registration.athlete_first_name ?? ""} ${registration.athlete_last_name ?? ""}`.trim() || null,
+          metadata: {
+            camp_location: registration.camp_location ?? null,
+            registration_type: registration.registration_type ?? null,
+            pricing_tier: registration.pricing_tier ?? null,
+            selected_sessions: registration.selected_sessions ?? null,
+            parent_phone: registration.parent_phone ?? null,
+          },
+        })
+        .select("id, reference_code")
+        .single();
+
+      if (orderError || !order) {
+        console.error("[register-summer-camp] order insert failed", orderError);
+        return json({ error: "Could not create order" }, 500);
+      }
+
+      const { data: regRow, error: regError } = await supabase
+        .from("summer_camp_registrations")
+        .insert({
+          ...registration,
+          parent_email: normalizedEmail,
+          status: "pending_bank_transfer",
+          payment_method: "bank_transfer",
+          payment_order_id: order.id,
+        })
+        .select("id")
+        .single();
+
+      if (regError || !regRow) {
+        console.error("[register-summer-camp] reg insert failed", regError);
+        return json({ error: "Could not save registration" }, 500);
+      }
+
+      await supabase
+        .from("payment_orders")
+        .update({ product_id: regRow.id })
+        .eq("id", order.id);
+
+      // Fire-and-forget instructions email (best-effort)
+      try {
+        await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "bank-transfer-instructions",
+            recipientEmail: normalizedEmail,
+            idempotencyKey: `bank-transfer-${order.id}`,
+            templateData: {
+              reference: order.reference_code,
+              amountCents,
+              campName: registration.camp_location,
+              athleteName: `${registration.athlete_first_name ?? ""} ${registration.athlete_last_name ?? ""}`.trim(),
+            },
+          },
+        });
+      } catch (emailErr) {
+        console.warn("[register-summer-camp] instructions email failed", emailErr);
+      }
+
+      return json({
+        success: true,
+        payment_method: "bank_transfer",
+        registration_id: regRow.id,
+        order_id: order.id,
+        reference_code: order.reference_code,
+        instructions_url: `${origin}/payment/bank-instructions/${order.id}`,
+      });
+    }
 
     const { data: recentRegistrations, error: lookupError } = await supabase
       .from("summer_camp_registrations")

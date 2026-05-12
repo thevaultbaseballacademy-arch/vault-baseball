@@ -4818,6 +4818,72 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_orders: {
+        Row: {
+          amount_cents: number
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          currency: string
+          customer_email: string | null
+          customer_name: string | null
+          id: string
+          metadata: Json
+          notes: string | null
+          payment_method: string
+          product_id: string | null
+          product_type: string
+          reference_code: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          payment_method: string
+          product_id?: string | null
+          product_type: string
+          reference_code?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          payment_method?: string
+          product_id?: string | null
+          product_type?: string
+          reference_code?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       pitch_counts: {
         Row: {
           avg_velocity: number | null
@@ -6402,6 +6468,8 @@ export type Database = {
           parent_email: string
           parent_name: string
           parent_phone: string
+          payment_method: string | null
+          payment_order_id: string | null
           preferred_session: string
           pricing_tier: string | null
           primary_position: string
@@ -6427,6 +6495,8 @@ export type Database = {
           parent_email: string
           parent_name: string
           parent_phone: string
+          payment_method?: string | null
+          payment_order_id?: string | null
           preferred_session: string
           pricing_tier?: string | null
           primary_position: string
@@ -6452,6 +6522,8 @@ export type Database = {
           parent_email?: string
           parent_name?: string
           parent_phone?: string
+          payment_method?: string | null
+          payment_order_id?: string | null
           preferred_session?: string
           pricing_tier?: string | null
           primary_position?: string
@@ -6463,7 +6535,15 @@ export type Database = {
           tshirt_size?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "summer_camp_registrations_payment_order_id_fkey"
+            columns: ["payment_order_id"]
+            isOneToOne: false
+            referencedRelation: "payment_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       suppressed_emails: {
         Row: {

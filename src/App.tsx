@@ -101,6 +101,8 @@ const AdminCoaches = lazy(() => import("./pages/admin/AdminCoaches"));
 const AdminExams = lazy(() => import("./pages/admin/AdminExams"));
 const AdminCertifications = lazy(() => import("./pages/admin/AdminCertifications"));
 const AdminPayouts = lazy(() => import("./pages/admin/AdminPayouts"));
+const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
+const BankInstructions = lazy(() => import("./pages/BankInstructions"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
 const LongevitySystem = lazy(() => import("./pages/products/LongevitySystem"));
@@ -277,6 +279,7 @@ const App = () => (
             <Route path="/camps/success" element={<CampSuccess />} />
             <Route path="/summer-camp" element={<SummerCamp />} />
             <Route path="/register/summer-camp" element={<SummerCamp />} />
+            <Route path="/payment/bank-instructions/:orderId" element={<BankInstructions />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
@@ -362,6 +365,9 @@ const App = () => (
               } />
               <Route path="tryouts" element={
                 <RoleGuard requires="view_facility_schedule"><AdminTryouts /></RoleGuard>
+              } />
+              <Route path="payments" element={
+                <RoleGuard requires="view_revenue_dashboard"><AdminPayments /></RoleGuard>
               } />
               <Route path="tryouts/:id" element={
                 <RoleGuard requires="view_facility_schedule"><AdminTryoutDetail /></RoleGuard>

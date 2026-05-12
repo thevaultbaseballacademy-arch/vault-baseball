@@ -21,6 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { closePreparedCheckoutTarget, openCheckout, prepareCheckoutTarget } from "@/lib/openCheckout";
+import PaymentMethodSelector from "@/components/payments/PaymentMethodSelector";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
@@ -279,6 +280,7 @@ const SummerCamp = () => {
   const [submitStatus, setSubmitStatus] = useState<string>("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [checkoutFallbackUrl, setCheckoutFallbackUrl] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "bank_transfer">("card");
   const [submitted, setSubmitted] = useState(false);
   const [confirmation, setConfirmation] = useState<{
     id: string;
@@ -504,6 +506,30 @@ const SummerCamp = () => {
         pricing_tier:       isEarlyBird ? "early_bird" : "regular",
         amount_cents:       amountCents,
       };
+
+      if (PAYMENT_ENABLED && paymentMethod === "bank_transfer") {
+        setSubmitStatus("Reserving your spot…");
+        const res = await fetch(SUMMER_CAMP_REGISTER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+          },
+          body: JSON.stringify({ ...payload, paymentMethod: "bank_transfer" }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.error || "Could not reserve your spot. Please try again.");
+        }
+        closePreparedCheckoutTarget(preparedCheckoutTarget);
+        toast({
+          title: "Spot reserved",
+          description: "Check your email for bank transfer instructions.",
+        });
+        window.location.href = data.instructions_url || `/payment/bank-instructions/${data.order_id}`;
+        return;
+      }
 
       if (PAYMENT_ENABLED) {
         setSubmitStatus("Opening secure checkout…");
@@ -999,6 +1025,15 @@ const SummerCamp = () => {
                   </div>
                 </div>
 
+                {PAYMENT_ENABLED && (
+                  <PaymentMethodSelector
+                    value={paymentMethod}
+                    onChange={setPaymentMethod}
+                    disabled={submitting}
+                    amountLabel={totalAmount ? `$${totalAmount}` : undefined}
+                  />
+                )}
+
                 {checkoutFallbackUrl && (
                   <div
                     role="alert"
@@ -1049,7 +1084,13 @@ const SummerCamp = () => {
                   {submitting ? (
                     <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {submitStatus || "SUBMITTING…"}</>
                   ) : (
-                    <>{submitError ? "TRY AGAIN" : (PAYMENT_ENABLED ? `REGISTER NOW · $${totalAmount || 0}` : "REGISTER NOW")}<ArrowRight className="w-4 h-4 ml-2" /></>
+                    <>{submitError
+                      ? "TRY AGAIN"
+                      : (PAYMENT_ENABLED
+                          ? (paymentMethod === "bank_transfer"
+                              ? `RESERVE SPOT · BANK TRANSFER · $${totalAmount || 0}`
+                              : `PAY BY CARD · $${totalAmount || 0}`)
+                          : "REGISTER NOW")}<ArrowRight className="w-4 h-4 ml-2" /></>
                   )}
                 </Button>
 
@@ -1061,7 +1102,9 @@ const SummerCamp = () => {
 
                 <p className="text-[11px] text-muted-foreground text-center">
                   {PAYMENT_ENABLED
-                    ? "You'll be redirected to a secure Stripe checkout to lock in your spot."
+                    ? (paymentMethod === "bank_transfer"
+                        ? "We'll reserve your spot and email you bank transfer instructions. Confirmed once funds arrive."
+                        : "You'll be redirected to a secure Stripe checkout to lock in your spot.")
                     : "We'll email payment instructions within 24 hours to confirm your spot."}
                 </p>
               </form>
