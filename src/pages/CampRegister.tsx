@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { openCheckout } from "@/lib/openCheckout";
+import { invokeCheckout } from "@/lib/checkoutInvoke";
 
 type Cohort = {
   id: string; camp_id: string; age_label: string; age_min: number; age_max: number;
@@ -124,9 +125,16 @@ const CampRegister = () => {
     if (err) { toast({ title: "Check the form", description: err, variant: "destructive" }); return; }
 
     setSubmitting(true);
+    // Immediate feedback so the user never wonders if their click registered.
+    toast({
+      title: "Securing your spot…",
+      description: "Redirecting to secure checkout. This usually takes a few seconds.",
+    });
+
     try {
-      const { data, error } = await supabase.functions.invoke("register-for-camp", {
-        body: {
+      const { checkoutUrl } = await invokeCheckout(
+        "register-for-camp",
+        {
           camp_id: camp.id,
           cohort_id: cohort.id,
           session_ids: picked,
@@ -136,13 +144,17 @@ const CampRegister = () => {
           medical_notes: form.medical_notes || null,
           waiver_accepted: true,
         },
-      });
-      if (error) throw new Error(error.message);
-      const res = data as any;
-      if (!res?.checkout_url) throw new Error(res?.error || "Could not start checkout");
-      await openCheckout(res.checkout_url);
+        { timeoutMs: 25_000 }
+      );
+      await openCheckout(checkoutUrl);
     } catch (e: any) {
-      toast({ title: "Registration failed", description: e?.message ?? "Try again", variant: "destructive" });
+      toast({
+        title: "Registration failed",
+        description:
+          e?.message ??
+          "We couldn't start checkout. Please try again — your spot has not been charged.",
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(false);
     }
