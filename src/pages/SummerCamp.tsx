@@ -321,20 +321,9 @@ const SummerCamp = () => {
 
       void (async () => {
         try {
-          const { data, error } = await supabase.functions.invoke("verify-summer-camp-payment", {
-            body: { sessionId },
-          });
+          const payload = await verifySummerCampPayment(sessionId);
 
           if (cancelled) return;
-          if (error) throw error;
-
-          const payload = (data ?? {}) as {
-            status?: string;
-            registrationId?: string;
-            parentEmail?: string;
-            parentPhone?: string;
-            error?: string;
-          };
 
           if (payload.status !== "confirmed") {
             throw new Error(payload.error ?? "We're still finalizing your registration.");
@@ -523,27 +512,31 @@ const SummerCamp = () => {
         const cancelUrl  = `${origin}/summer-camp?canceled=1`;
 
         const t1 = performance.now();
-        const checkoutPromise = invokeCheckout(
-          "register-summer-camp",
-          {
-            ...payload,
-            priceId,
-            quantity,
-            successUrl,
-            cancelUrl,
-          },
-          {
-            timeoutMs: 20000,
-            retries: 1,
-            retryDelayMs: 1200,
-            onRetry: () => setSubmitStatus("Still working — retrying secure checkout…"),
-          },
-        );
-        const { checkoutUrl, raw } = await withTimeout(
-          checkoutPromise,
-          20000,
-          "Opening secure checkout",
-        );
+        const checkoutBody = {
+          ...payload,
+          priceId,
+          quantity,
+          successUrl,
+          cancelUrl,
+        };
+
+        let checkoutUrl = "";
+        try {
+          ({ checkoutUrl } = await withTimeout(
+            startSummerCampCheckout(checkoutBody),
+            20000,
+            "Opening secure checkout",
+          ));
+        } catch (error) {
+          if (!isRetryableCheckoutError(error)) throw error;
+
+          setSubmitStatus("Still working — retrying secure checkout…");
+          ({ checkoutUrl } = await withTimeout(
+            startSummerCampCheckout(checkoutBody),
+            20000,
+            "Opening secure checkout",
+          ));
+        }
         console.info(`[SummerCamp] checkout session in ${Math.round(performance.now() - t1)}ms`);
 
         setSubmitStatus("Redirecting to checkout…");
