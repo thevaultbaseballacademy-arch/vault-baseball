@@ -22,6 +22,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { openCheckout } from "@/lib/openCheckout";
+import { invokeCheckout } from "@/lib/checkoutInvoke";
 
 // ─────────────────────────────────────────────────────────────────
 // EDIT THIS BLOCK before publishing.
@@ -177,7 +178,12 @@ const SummerCamp = () => {
   const [submitStatus, setSubmitStatus] = useState<string>("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const [confirmation, setConfirmation] = useState<{ id: string; paid: boolean } | null>(null);
+  const [confirmation, setConfirmation] = useState<{
+    id: string;
+    paid: boolean;
+    parentEmail?: string;
+    parentPhone?: string;
+  } | null>(null);
   // Hard guard against duplicate submits (survives React state batching + double-clicks)
   const inFlightRef = useRef(false);
   const slowTimerRef = useRef<number | null>(null);
@@ -192,25 +198,91 @@ const SummerCamp = () => {
     const paid = params.get("paid");
     const rid = params.get("rid");
     const canceled = params.get("canceled");
-    if (canceled) {
-      toast({ title: "Checkout canceled", description: "Your spot wasn't reserved. Try again when you're ready." });
+    const sessionId = params.get("session_id");
+    const clearParams = () => {
       const url = new URL(window.location.href);
       url.search = "";
       window.history.replaceState({}, "", url.toString());
+    };
+
+    let cancelled = false;
+
+    if (canceled) {
+      toast({ title: "Checkout canceled", description: "Your spot wasn't reserved. Try again when you're ready." });
+      clearParams();
       return;
     }
+
+    if (paid === "1" && sessionId) {
+      setSubmitStatus("Confirming your payment…");
+      setSubmitting(true);
+
+      void (async () => {
+        try {
+          const { data, error } = await supabase.functions.invoke("verify-summer-camp-payment", {
+            body: { sessionId },
+          });
+
+          if (cancelled) return;
+          if (error) throw error;
+
+          const payload = (data ?? {}) as {
+            status?: string;
+            registrationId?: string;
+            parentEmail?: string;
+            parentPhone?: string;
+            error?: string;
+          };
+
+          if (payload.status !== "confirmed") {
+            throw new Error(payload.error ?? "We're still finalizing your registration.");
+          }
+
+          setConfirmation({
+            id: payload.registrationId ?? rid ?? sessionId,
+            paid: true,
+            parentEmail: payload.parentEmail,
+            parentPhone: payload.parentPhone,
+          });
+          setSubmitted(true);
+          clearParams();
+        } catch (err) {
+          console.error("[SummerCamp] payment verification failed", err);
+          toast({
+            title: "Payment received",
+            description: "We're confirming your registration now. If you don't receive a confirmation shortly, contact us and we'll finish it manually.",
+          });
+          setConfirmation({ id: rid ?? sessionId, paid: true });
+          setSubmitted(true);
+          clearParams();
+        } finally {
+          if (!cancelled) {
+            setSubmitting(false);
+            setSubmitStatus("");
+          }
+        }
+      })();
+
+      return () => {
+        cancelled = true;
+      };
+    }
+
     if (paid === "1" && rid) {
       setConfirmation({ id: rid, paid: true });
       setSubmitted(true);
-      const url = new URL(window.location.href);
-      url.search = "";
-      window.history.replaceState({}, "", url.toString());
+      clearParams();
     }
+
     // Pre-select cohort from ?cohort=ross-7-10
     const cohort = params.get("cohort");
     if (cohort && COHORTS.some((c) => c.id === cohort)) {
       setValues((p) => ({ ...p, cohort_id: cohort }));
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [toast]);
 
   const set = <K extends keyof FormValues>(k: K, v: FormValues[K]) => {
@@ -338,50 +410,39 @@ const SummerCamp = () => {
         amount_cents:       amountCents,
       };
 
-      console.info("[SummerCamp] saving registration");
-      const t0 = performance.now();
-      const insertPromise = (supabase
-        .from("summer_camp_registrations" as any) as any)
-        .insert(payload)
-        .select("id")
-        .single();
-      const { data, error } = await withTimeout(insertPromise as Promise<any>, 15000, "Saving your registration");
-      if (error) throw error;
-      const registrationId = (data as any).id as string;
-      console.info(`[SummerCamp] registration saved in ${Math.round(performance.now() - t0)}ms`, { registrationId });
-
       if (PAYMENT_ENABLED) {
         setSubmitStatus("Opening secure checkout…");
         const origin = window.location.origin;
-        const successUrl = `${origin}/summer-camp?paid=1&rid=${registrationId}&session_id={CHECKOUT_SESSION_ID}`;
-        const cancelUrl  = `${origin}/summer-camp?canceled=1&rid=${registrationId}`;
+        const successUrl = `${origin}/summer-camp?paid=1&session_id={CHECKOUT_SESSION_ID}`;
+        const cancelUrl  = `${origin}/summer-camp?canceled=1`;
 
         const t1 = performance.now();
-        const payPromise = supabase.functions.invoke("create-payment", {
-          body: { priceId, quantity, successUrl, cancelUrl },
-        });
-        const { data: payData, error: payErr } = await withTimeout(
-          payPromise as Promise<any>,
+        const checkoutPromise = invokeCheckout(
+          "register-summer-camp",
+          {
+            ...payload,
+            priceId,
+            quantity,
+            successUrl,
+            cancelUrl,
+          },
+          { timeoutMs: 20000 },
+        );
+        const { checkoutUrl, raw } = await withTimeout(
+          checkoutPromise,
           20000,
           "Opening secure checkout",
         );
         console.info(`[SummerCamp] checkout session in ${Math.round(performance.now() - t1)}ms`);
 
-        if (payErr) {
-          throw new Error(payErr?.message || "Couldn't open the secure checkout.");
-        }
-        if (!payData?.url) {
-          throw new Error("Checkout link missing — please try again or contact us.");
-        }
-
         setSubmitStatus("Redirecting to checkout…");
-        await openCheckout(payData.url);
+        await openCheckout(checkoutUrl);
         // Leave inFlightRef true: page is navigating away. If for some reason it doesn't,
         // surface a manual link so the user isn't stuck.
         window.setTimeout(() => {
           if (!document.hidden) {
             setSubmitError(
-              `If checkout didn't open, tap here: ${payData.url}`,
+              `If checkout didn't open, tap here: ${checkoutUrl}`,
             );
             setSubmitting(false);
             inFlightRef.current = false;
@@ -391,7 +452,12 @@ const SummerCamp = () => {
       }
 
       // Non-payment fallback
-      setConfirmation({ id: registrationId, paid: false });
+      setConfirmation({
+        id: (raw as { registration_id?: string } | undefined)?.registration_id ?? crypto.randomUUID(),
+        paid: false,
+        parentEmail: values.parent_email,
+        parentPhone: values.parent_phone,
+      });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
@@ -447,13 +513,13 @@ const SummerCamp = () => {
                   <div className="flex gap-3">
                     <Mail className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <p className="text-muted-foreground">
-                      Confirmation email sent{values.parent_email ? <> to <span className="text-foreground">{values.parent_email}</span></> : null}.
+                      Confirmation email sent{confirmation.parentEmail ? <> to <span className="text-foreground">{confirmation.parentEmail}</span></> : null}.
                     </p>
                   </div>
-                  {values.parent_phone && (
+                  {confirmation.parentPhone && (
                     <div className="flex gap-3">
                       <Phone className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                      <p className="text-muted-foreground">We'll text reminders + drop-off info to {values.parent_phone}.</p>
+                      <p className="text-muted-foreground">We'll text reminders + drop-off info to {confirmation.parentPhone}.</p>
                     </div>
                   )}
                 </CardContent>
