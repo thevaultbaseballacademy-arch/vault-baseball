@@ -4818,22 +4818,72 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_events: {
+        Row: {
+          created_at: string
+          event_data: Json
+          id: string
+          message: string
+          order_id: string | null
+          product_type: string
+          severity: string
+          stage: string
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json
+          id?: string
+          message: string
+          order_id?: string | null
+          product_type: string
+          severity?: string
+          stage: string
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json
+          id?: string
+          message?: string
+          order_id?: string | null
+          product_type?: string
+          severity?: string
+          stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "payment_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_orders: {
         Row: {
           amount_cents: number
+          canceled_at: string | null
+          checkout_completed_at: string | null
+          checkout_last_error: string | null
+          checkout_started_at: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
           currency: string
           customer_email: string | null
           customer_name: string | null
+          follow_up_reason: string | null
+          follow_up_required: boolean
           id: string
+          last_retried_at: string | null
           metadata: Json
           notes: string | null
           payment_method: string
           product_id: string | null
+          product_key: string | null
           product_type: string
           reference_code: string | null
+          retry_count: number
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
@@ -4842,19 +4892,28 @@ export type Database = {
         }
         Insert: {
           amount_cents: number
+          canceled_at?: string | null
+          checkout_completed_at?: string | null
+          checkout_last_error?: string | null
+          checkout_started_at?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          follow_up_reason?: string | null
+          follow_up_required?: boolean
           id?: string
+          last_retried_at?: string | null
           metadata?: Json
           notes?: string | null
           payment_method: string
           product_id?: string | null
+          product_key?: string | null
           product_type: string
           reference_code?: string | null
+          retry_count?: number
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -4863,19 +4922,28 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
+          canceled_at?: string | null
+          checkout_completed_at?: string | null
+          checkout_last_error?: string | null
+          checkout_started_at?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          follow_up_reason?: string | null
+          follow_up_required?: boolean
           id?: string
+          last_retried_at?: string | null
           metadata?: Json
           notes?: string | null
           payment_method?: string
           product_id?: string | null
+          product_key?: string | null
           product_type?: string
           reference_code?: string | null
+          retry_count?: number
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -8025,6 +8093,21 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      finalize_summer_camp_payment_order: {
+        Args: {
+          p_order_id: string
+          p_reason?: string
+          p_status: string
+          p_stripe_payment_intent_id?: string
+          p_stripe_session_id?: string
+        }
+        Returns: {
+          order_id: string
+          order_status: string
+          registration_id: string
+          registration_status: string
+        }[]
+      }
       generate_certificate_number: { Args: never; Returns: string }
       get_assigned_athlete_profiles: {
         Args: { coach_id: string }
@@ -8239,6 +8322,45 @@ export type Database = {
         Returns: undefined
       }
       increment_invite_usage: { Args: { token_id: string }; Returns: undefined }
+      increment_payment_order_retry: {
+        Args: { p_order_id: string; p_reason?: string }
+        Returns: {
+          amount_cents: number
+          canceled_at: string | null
+          checkout_completed_at: string | null
+          checkout_last_error: string | null
+          checkout_started_at: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          currency: string
+          customer_email: string | null
+          customer_name: string | null
+          follow_up_reason: string | null
+          follow_up_required: boolean
+          id: string
+          last_retried_at: string | null
+          metadata: Json
+          notes: string | null
+          payment_method: string
+          product_id: string | null
+          product_key: string | null
+          product_type: string
+          reference_code: string | null
+          retry_count: number
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       is_active_coach_for_athlete: {
         Args: { _athlete_id: string; _coach_id: string }
         Returns: boolean
