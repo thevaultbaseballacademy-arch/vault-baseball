@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { openCheckout } from "@/lib/openCheckout";
+import { invokeCheckout } from "@/lib/checkoutInvoke";
 import { hapticImpact, hapticSuccess } from "@/lib/haptics";
 import { toast } from "sonner";
 
