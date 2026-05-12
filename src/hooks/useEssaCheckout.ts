@@ -32,23 +32,19 @@ export const useEssaCheckout = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke("create-facility-checkout", {
-        body: { priceId, quantity, metadata },
+      toast.message("Starting secure checkout…", {
+        description: "Redirecting to Stripe.",
       });
 
-      if (error) {
-        console.error("[ESSA checkout] invoke error", error);
-        toast.error(error.message || "Could not start checkout. Please try again.");
-        return;
-      }
-
-      if (!data?.url) {
-        toast.error(data?.error || "No checkout URL returned. Please try again.");
-        return;
-      }
+      const { invokeCheckout } = await import("@/lib/checkoutInvoke");
+      const { checkoutUrl } = await invokeCheckout(
+        "create-facility-checkout",
+        { priceId, quantity, metadata },
+        { authToken: sessionData.session.access_token, timeoutMs: 25_000 },
+      );
 
       await hapticSuccess();
-      await openCheckout(data.url);
+      await openCheckout(checkoutUrl);
     } catch (err: any) {
       console.error("[ESSA checkout] error", err);
       toast.error(err?.message || "Something went wrong starting checkout.");
