@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { CoachBlackoutsPanel } from "@/components/ops/CoachBlackoutsPanel";
+import { CoachAvailabilityPanel } from "@/components/ops/CoachAvailabilityPanel";
 import { useStaffAccess } from "@/hooks/useStaffAccess";
 
 const OpsCoaches = () => {
@@ -15,6 +16,7 @@ const OpsCoaches = () => {
         <p className="text-sm text-muted-foreground">Coach availability, blackouts, and assignments.</p>
       </div>
 
+      <CoachAvailabilityPanel />
       <CoachBlackoutsPanel />
 
       {isAdmin && (
