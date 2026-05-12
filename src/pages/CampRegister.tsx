@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { openCheckout } from "@/lib/openCheckout";
+import { invokeCheckout } from "@/lib/checkoutInvoke";
 
 type Cohort = {
   id: string; camp_id: string; age_label: string; age_min: number; age_max: number;
