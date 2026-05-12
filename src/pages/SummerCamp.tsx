@@ -20,9 +20,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { closePreparedCheckoutTarget, openCheckout, prepareCheckoutTarget } from "@/lib/openCheckout";
-import { invokeCheckout } from "@/lib/checkoutInvoke";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+const SUMMER_CAMP_REGISTER_URL = `${SUPABASE_URL}/functions/v1/register-summer-camp`;
+const SUMMER_CAMP_VERIFY_URL = `${SUPABASE_URL}/functions/v1/verify-summer-camp-payment`;
+const SUMMER_CAMP_HEADERS = {
+  "Content-Type": "application/json",
+  apikey: SUPABASE_KEY,
+  Authorization: `Bearer ${SUPABASE_KEY}`,
+} as const;
 
 // ─────────────────────────────────────────────────────────────────
 // EDIT THIS BLOCK before publishing.
@@ -169,6 +177,99 @@ const FAQS = [
     a: "Each week is capacity-locked. Once a week fills, registration for that week closes immediately — no exceptions. We recommend the Full Summer Pass to lock in all four.",
   },
 ];
+
+type SummerCampCheckoutResponse = {
+  checkout_url?: string;
+  stripe_session_id?: string;
+  registration_id?: string;
+  success?: boolean;
+  error?: string;
+  code?: string;
+};
+
+type SummerCampVerifyResponse = {
+  status?: string;
+  registrationId?: string;
+  parentEmail?: string;
+  parentPhone?: string;
+  error?: string;
+};
+
+const postSummerCampFunction = async <T,>(
+  url: string,
+  body: Record<string, unknown>,
+  timeoutMs: number,
+): Promise<T> => {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: SUMMER_CAMP_HEADERS,
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    let data: any = null;
+    try {
+      data = await response.json();
+    } catch {
+      // Ignore JSON parse failures so we can still surface HTTP status errors.
+    }
+
+    if (!response.ok) {
+      throw new Error(data?.error || `Request failed (${response.status})`);
+    }
+
+    if (data?.error) {
+      throw new Error(data.error);
+    }
+
+    return (data ?? {}) as T;
+  } catch (error: any) {
+    if (error?.name === "AbortError") {
+      throw new Error("Opening secure checkout is taking longer than expected. Please check your connection and try again.");
+    }
+
+    if (/Failed to fetch|Load failed|NetworkError/i.test(error?.message ?? "")) {
+      throw new Error("We couldn't reach secure checkout. Please check your connection and try again.");
+    }
+
+    throw new Error(error?.message || "Request failed");
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+};
+
+const startSummerCampCheckout = async (payload: Record<string, unknown>) => {
+  const data = await postSummerCampFunction<SummerCampCheckoutResponse>(
+    SUMMER_CAMP_REGISTER_URL,
+    payload,
+    20000,
+  );
+
+  if (!data.checkout_url) {
+    throw new Error("Checkout session did not return a payment URL.");
+  }
+
+  return {
+    checkoutUrl: data.checkout_url,
+    raw: data,
+  };
+};
+
+const verifySummerCampPayment = (sessionId: string) =>
+  postSummerCampFunction<SummerCampVerifyResponse>(
+    SUMMER_CAMP_VERIFY_URL,
+    { sessionId },
+    12000,
+  );
+
+const isRetryableCheckoutError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  return /taking longer than expected|couldn't reach secure checkout|network|fetch|load failed/i.test(message);
+};
 
 const SummerCamp = () => {
   const { toast } = useToast();
