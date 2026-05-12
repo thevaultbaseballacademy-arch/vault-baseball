@@ -185,6 +185,7 @@ serve(async (req) => {
       ? `${camp.name} — Full 4-Week Pass (${cohort.age_label})`
       : `${camp.name} — ${data.session_ids.length} Week${data.session_ids.length > 1 ? "s" : ""} (${cohort.age_label})`;
 
+    const tStripe = Date.now();
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -211,13 +212,26 @@ serve(async (req) => {
         registration_type: data.registration_type,
       },
     });
+    console.log(`[register-for-camp] stripe ${Date.now() - tStripe}ms`);
 
-    // Persist stripe_checkout_session_id on the registration so the webhook can match
-    await supabase
+    // Persist stripe_checkout_session_id in the background — webhook matches by
+    // registration_id in metadata, so the response doesn't need to wait on this write.
+    const persistSessionId = supabase
       .from("camp_registrations")
       .update({ stripe_checkout_session_id: checkoutSession.id })
-      .eq("id", registrationId);
+      .eq("id", registrationId)
+      .then(({ error }) => {
+        if (error) console.error("[register-for-camp] session_id persist failed", error);
+      });
+    try {
+      // @ts-ignore EdgeRuntime is provided by the Supabase Edge runtime
+      if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(persistSessionId);
+      }
+    } catch (_) { /* no-op */ }
 
+    console.log(`[register-for-camp] total ${Date.now() - t0}ms`);
     return json({
       success: true,
       registration_id: registrationId,
