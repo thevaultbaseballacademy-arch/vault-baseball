@@ -25,18 +25,17 @@ export type SchedulingBooking = {
   color?: string | null;
 };
 
-type MutateResult<T = any> = { ok: true; reservation: T } | { ok: false; error: string; conflicts?: any[] };
+type MutateResult = { ok: true; reservation: any } | { ok: false; error: string; conflicts?: any[] };
 
-const callFn = async (body: any) => {
+const callFn = async (body: any): Promise<MutateResult> => {
   const { data, error } = await supabase.functions.invoke("scheduling-mutate", { body });
   if (error) {
-    // Edge function returned non-2xx → context.error.message is generic. Try to read context.
     const ctxBody = (error as any)?.context?.body ?? data;
     const errMsg = ctxBody?.error ?? error.message ?? "Scheduling failed";
-    return { ok: false, error: typeof errMsg === "string" ? errMsg : "conflict", conflicts: ctxBody?.conflicts } as MutateResult;
+    return { ok: false, error: typeof errMsg === "string" ? errMsg : "conflict", conflicts: ctxBody?.conflicts };
   }
-  if (data?.error) return { ok: false, error: String(data.error), conflicts: data.conflicts } as MutateResult;
-  return { ok: true, reservation: data.reservation } as MutateResult;
+  if (data?.error) return { ok: false, error: String(data.error), conflicts: data.conflicts };
+  return { ok: true, reservation: data.reservation };
 };
 
 export const useSchedulingOps = () => {
