@@ -507,6 +507,30 @@ const SummerCamp = () => {
         amount_cents:       amountCents,
       };
 
+      if (PAYMENT_ENABLED && paymentMethod === "bank_transfer") {
+        setSubmitStatus("Reserving your spot…");
+        const res = await fetch(SUMMER_CAMP_REGISTER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+          },
+          body: JSON.stringify({ ...payload, paymentMethod: "bank_transfer" }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.error || "Could not reserve your spot. Please try again.");
+        }
+        closePreparedCheckoutTarget(preparedCheckoutTarget);
+        toast({
+          title: "Spot reserved",
+          description: "Check your email for bank transfer instructions.",
+        });
+        window.location.href = data.instructions_url || `/payment/bank-instructions/${data.order_id}`;
+        return;
+      }
+
       if (PAYMENT_ENABLED) {
         setSubmitStatus("Opening secure checkout…");
         const origin = window.location.origin;
