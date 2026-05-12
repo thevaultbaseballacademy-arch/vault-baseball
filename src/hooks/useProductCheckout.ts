@@ -52,14 +52,13 @@ export const useProductCheckout = () => {
           ...(isSubscription
             ? {}
             : {
-                product_type:
-                  product.category === 'bundle'
-                    ? 'bundle'
-                    : product.category === 'program'
-                      ? 'program'
-                      : 'product',
+                product_type: /pack$/i.test(productKey)
+                  ? 'bundle'
+                  : /system|blueprint|intensive|prep|accelerator/i.test(productKey)
+                    ? 'program'
+                    : 'product',
                 product_key: productKey,
-                amount_cents: product.price_cents,
+                amount_cents: (product as { price: number }).price,
                 customer_email: session?.user?.email,
                 idempotency_key: idempotencyKey,
               }),
