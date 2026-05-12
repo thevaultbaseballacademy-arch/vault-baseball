@@ -70,13 +70,37 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    // Load camp + cohort for pricing + venue
-    const { data: camp, error: campErr } = await supabase
-      .from("camps")
-      .select("id, name, status, weekly_price_cents, full_pass_price_cents, registration_opens_at, registration_closes_at")
-      .eq("id", data.camp_id)
-      .maybeSingle();
-    if (campErr || !camp) return json({ error: "Camp not found" }, 404);
+    const t0 = Date.now();
+
+    // Fail fast on full_pass shape before hitting the DB
+    if (data.registration_type === "full_pass" && data.session_ids.length !== 4) {
+      return json({ error: "Full Pass requires all 4 weeks selected" }, 400);
+    }
+
+    // Parallelize the three independent reads (camp + cohort + first session)
+    const [campRes, cohortRes, firstSessionRes] = await Promise.all([
+      supabase
+        .from("camps")
+        .select("id, name, status, weekly_price_cents, full_pass_price_cents, registration_opens_at, registration_closes_at")
+        .eq("id", data.camp_id)
+        .maybeSingle(),
+      supabase
+        .from("camp_cohorts")
+        .select("id, age_min, age_max, age_label, venue_name")
+        .eq("id", data.cohort_id)
+        .maybeSingle(),
+      supabase
+        .from("camp_sessions")
+        .select("starts_on")
+        .in("id", data.session_ids)
+        .order("starts_on", { ascending: true })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+    console.log(`[register-for-camp] reads ${Date.now() - t0}ms`);
+
+    const camp = campRes.data;
+    if (campRes.error || !camp) return json({ error: "Camp not found" }, 404);
     if (camp.status !== "published") return json({ error: "Registration is not open for this camp" }, 400);
 
     const now = Date.now();
@@ -87,17 +111,8 @@ serve(async (req) => {
       return json({ error: "Registration is closed" }, 400);
     }
 
-    const { data: cohort } = await supabase
-      .from("camp_cohorts")
-      .select("id, age_min, age_max, age_label, venue_name")
-      .eq("id", data.cohort_id)
-      .maybeSingle();
+    const cohort = cohortRes.data;
     if (!cohort) return json({ error: "Cohort not found" }, 404);
-
-    // Validate full_pass requires all 4 sessions
-    if (data.registration_type === "full_pass" && data.session_ids.length !== 4) {
-      return json({ error: "Full Pass requires all 4 weeks selected" }, 400);
-    }
 
     // Compute amount
     const amount =
@@ -105,14 +120,7 @@ serve(async (req) => {
         ? camp.full_pass_price_cents
         : camp.weekly_price_cents * data.session_ids.length;
 
-    // Age at first session
-    const { data: firstSession } = await supabase
-      .from("camp_sessions")
-      .select("starts_on")
-      .in("id", data.session_ids)
-      .order("starts_on", { ascending: true })
-      .limit(1)
-      .maybeSingle();
+    const firstSession = firstSessionRes.data;
     const ageAt = ageOn(data.player_dob, firstSession ? new Date(firstSession.starts_on) : new Date());
 
     if (ageAt < cohort.age_min || ageAt > cohort.age_max) {
