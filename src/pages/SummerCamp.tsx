@@ -443,7 +443,8 @@ const SummerCamp = () => {
         // Leave inFlightRef true: page is navigating away. If for some reason it doesn't,
         // surface a manual link so the user isn't stuck.
         window.setTimeout(() => {
-          if (!document.hidden) {
+          const shouldShowManualFallback = !preparedCheckoutTarget && !document.hidden;
+          if (shouldShowManualFallback) {
             setSubmitError(
               `If checkout didn't open, tap here: ${checkoutUrl}`,
             );
