@@ -487,7 +487,12 @@ const SummerCamp = () => {
         : (isEarlyBird ? STRIPE_PRICES.week_earlybird : STRIPE_PRICES.week_regular);
       const quantity = isFull ? 1 : sessions.length;
 
+      // Stable per-attempt idempotency key — survives retry within this submit cycle
+      // so a flaky network can't create duplicate orders.
+      const idempotencyKey = `sc_${parsed.data.parent_email.toLowerCase()}_${parsed.data.athlete_first_name}_${parsed.data.athlete_last_name}_${Date.now()}`.replace(/\s+/g, "_");
+
       const payload = {
+        idempotency_key: idempotencyKey,
         athlete_first_name: parsed.data.athlete_first_name,
         athlete_last_name:  parsed.data.athlete_last_name,
         athlete_age:        parsed.data.athlete_age,

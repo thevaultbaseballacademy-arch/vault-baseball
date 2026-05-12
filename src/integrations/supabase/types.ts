@@ -4866,15 +4866,19 @@ export type Database = {
           checkout_completed_at: string | null
           checkout_last_error: string | null
           checkout_started_at: string | null
+          checkout_url: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
           currency: string
           customer_email: string | null
           customer_name: string | null
+          error_message: string | null
+          expires_at: string | null
           follow_up_reason: string | null
           follow_up_required: boolean
           id: string
+          idempotency_key: string | null
           last_retried_at: string | null
           metadata: Json
           notes: string | null
@@ -4896,15 +4900,19 @@ export type Database = {
           checkout_completed_at?: string | null
           checkout_last_error?: string | null
           checkout_started_at?: string | null
+          checkout_url?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          error_message?: string | null
+          expires_at?: string | null
           follow_up_reason?: string | null
           follow_up_required?: boolean
           id?: string
+          idempotency_key?: string | null
           last_retried_at?: string | null
           metadata?: Json
           notes?: string | null
@@ -4926,15 +4934,19 @@ export type Database = {
           checkout_completed_at?: string | null
           checkout_last_error?: string | null
           checkout_started_at?: string | null
+          checkout_url?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          error_message?: string | null
+          expires_at?: string | null
           follow_up_reason?: string | null
           follow_up_required?: boolean
           id?: string
+          idempotency_key?: string | null
           last_retried_at?: string | null
           metadata?: Json
           notes?: string | null
@@ -8330,15 +8342,19 @@ export type Database = {
           checkout_completed_at: string | null
           checkout_last_error: string | null
           checkout_started_at: string | null
+          checkout_url: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
           currency: string
           customer_email: string | null
           customer_name: string | null
+          error_message: string | null
+          expires_at: string | null
           follow_up_reason: string | null
           follow_up_required: boolean
           id: string
+          idempotency_key: string | null
           last_retried_at: string | null
           metadata: Json
           notes: string | null
