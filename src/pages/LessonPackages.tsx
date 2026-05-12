@@ -63,14 +63,30 @@ const LessonPackages = () => {
         description: "Redirecting to Stripe.",
       });
 
+      const idempotencyKey = `lpkg_${pkg.id}_${session.user.id}_${Math.floor(Date.now() / 60000)}`;
       const { checkoutUrl } = await invokeCheckout(
         "create-payment",
-        { priceId: pkg.stripe_price_id },
+        {
+          priceId: pkg.stripe_price_id,
+          product_type: "lesson_package",
+          product_key: pkg.package_type ?? pkg.id,
+          amount_cents: pkg.price_cents,
+          customer_email: session.user.email,
+          idempotency_key: idempotencyKey,
+          metadata: { package_id: pkg.id, lesson_count: pkg.lesson_count },
+        },
         { authToken: session.access_token, timeoutMs: 25_000 },
       );
       await openCheckout(checkoutUrl);
     } catch (error: any) {
-      toast({ title: "Checkout Error", description: error.message, variant: "destructive" });
+      if (error?.code === 'CHECKOUT_FAILED_FOLLOWUP') {
+        toast({
+          title: "We saved your order",
+          description: "Secure checkout didn't open. Our team will reach out to finish payment.",
+        });
+      } else {
+        toast({ title: "Checkout Error", description: error.message, variant: "destructive" });
+      }
     } finally {
       setPurchasing(null);
     }

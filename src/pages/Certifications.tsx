@@ -315,19 +315,32 @@ const Certifications = () => {
 
     setPurchaseLoading(certType);
     try {
-      const { data, error } = await supabase.functions.invoke('certification-checkout', {
-        body: { 
-          priceId, 
-          certificationLabel: getCertificationDisplayName(certType) 
-        },
-      });
-
-      if (error) throw error;
-      if (data.url) {
-        await openCheckout(data.url);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please sign in to enroll.');
+        navigate(`/auth?redirect=${encodeURIComponent(window.location.pathname)}`);
+        return;
       }
+
+      const { invokeCheckout } = await import('@/lib/checkoutInvoke');
+      const idempotencyKey = `cert_${certType}_${session.user.id}_${Math.floor(Date.now() / 60000)}`;
+
+      const { checkoutUrl } = await invokeCheckout(
+        'certification-checkout',
+        {
+          priceId,
+          certificationLabel: getCertificationDisplayName(certType),
+          idempotency_key: idempotencyKey,
+        },
+        { authToken: session.access_token, timeoutMs: 25_000 },
+      );
+      await openCheckout(checkoutUrl);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to start checkout');
+      if (error?.code === 'CHECKOUT_FAILED_FOLLOWUP') {
+        toast.success('Saved your enrollment — our team will follow up to finish payment.');
+      } else {
+        toast.error(error.message || 'Failed to start checkout');
+      }
     } finally {
       setPurchaseLoading(null);
     }

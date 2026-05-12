@@ -37,15 +37,46 @@ export const useProductCheckout = () => {
         description: 'Redirecting to Stripe. This usually takes a few seconds.',
       });
 
+      // One-off payments use the shared payment_orders architecture; subscriptions go straight to create-checkout.
+      const isSubscription = product.type === 'subscription';
+      const idempotencyKey = isSubscription
+        ? undefined
+        : `pp_${productKey}_${session?.user?.id ?? 'guest'}_${Math.floor(Date.now() / 60000)}`;
+
       const { checkoutUrl } = await invokeCheckout(
         endpoint,
-        { priceId: product.price_id, successUrl, cancelUrl },
+        {
+          priceId: product.price_id,
+          successUrl,
+          cancelUrl,
+          ...(isSubscription
+            ? {}
+            : {
+                product_type:
+                  product.category === 'bundle'
+                    ? 'bundle'
+                    : product.category === 'program'
+                      ? 'program'
+                      : 'product',
+                product_key: productKey,
+                amount_cents: product.price_cents,
+                customer_email: session?.user?.email,
+                idempotency_key: idempotencyKey,
+              }),
+        },
         { authToken: session?.access_token, timeoutMs: 25_000 },
       );
       await openCheckout(checkoutUrl);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to start checkout';
-      toast({ title: 'Checkout Error', description: message, variant: 'destructive' });
+    } catch (error: any) {
+      if (error?.code === 'CHECKOUT_FAILED_FOLLOWUP') {
+        toast({
+          title: 'We saved your order',
+          description: "Secure checkout didn't open. Our team will reach out to finish payment.",
+        });
+      } else {
+        const message = error instanceof Error ? error.message : 'Failed to start checkout';
+        toast({ title: 'Checkout Error', description: message, variant: 'destructive' });
+      }
     } finally {
       setLoading(null);
     }
