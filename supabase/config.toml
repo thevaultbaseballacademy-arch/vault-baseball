@@ -63,3 +63,5 @@ project_id = "hhvdxkxaiauzikavtpuj"
     verify_jwt = false
   [functions.weekly-maintenance]
     verify_jwt = false
+  [functions.get-bank-instructions]
+    verify_jwt = false
