@@ -453,7 +453,7 @@ const SummerCamp = () => {
 
       // Non-payment fallback
       setConfirmation({
-        id: (raw as { registration_id?: string } | undefined)?.registration_id ?? crypto.randomUUID(),
+        id: crypto.randomUUID(),
         paid: false,
         parentEmail: values.parent_email,
         parentPhone: values.parent_phone,
