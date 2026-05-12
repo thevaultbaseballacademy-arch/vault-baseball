@@ -50,15 +50,18 @@ export const CoachBlackoutsPanel = () => {
 
   const loadCoaches = async () => {
     if (!isAdmin) return;
-    const { data } = await supabase
+    const { data: roleRows } = await supabase
       .from("user_roles")
-      .select("user_id, profiles:user_id(full_name)")
+      .select("user_id")
       .eq("role", "coach" as any);
-    const list: Coach[] = (data ?? []).map((r: any) => ({
-      user_id: r.user_id,
-      full_name: r.profiles?.full_name ?? null,
-    }));
-    setCoaches(list);
+    const ids = Array.from(new Set((roleRows ?? []).map((r: any) => r.user_id)));
+    if (ids.length === 0) { setCoaches([]); return; }
+    const { data: profs } = await supabase
+      .from("profiles")
+      .select("user_id, full_name")
+      .in("user_id", ids);
+    const byId = new Map((profs ?? []).map((p: any) => [p.user_id, p.full_name]));
+    setCoaches(ids.map((id) => ({ user_id: id, full_name: byId.get(id) ?? null })));
   };
 
   useEffect(() => {
