@@ -107,18 +107,16 @@ const Trial = () => {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-          const { data, error } = await supabase.functions.invoke('create-checkout', {
-            body: { priceId: VAULT_TRIAL_PRICE_ID },
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
+          toast({
+            title: "Starting secure checkout…",
+            description: "Redirecting to Stripe.",
           });
-          
-          if (error) throw error;
-          
-          if (data?.url) {
-            await openCheckout(data.url);
-          }
+          const { checkoutUrl } = await invokeCheckout(
+            "create-checkout",
+            { priceId: VAULT_TRIAL_PRICE_ID },
+            { authToken: session.access_token, timeoutMs: 25_000 },
+          );
+          await openCheckout(checkoutUrl);
         } else {
           // Fallback: redirect to velocity baseline if no session
           toast({
