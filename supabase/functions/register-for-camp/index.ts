@@ -70,13 +70,37 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    // Load camp + cohort for pricing + venue
-    const { data: camp, error: campErr } = await supabase
-      .from("camps")
-      .select("id, name, status, weekly_price_cents, full_pass_price_cents, registration_opens_at, registration_closes_at")
-      .eq("id", data.camp_id)
-      .maybeSingle();
-    if (campErr || !camp) return json({ error: "Camp not found" }, 404);
+    const t0 = Date.now();
+
+    // Fail fast on full_pass shape before hitting the DB
+    if (data.registration_type === "full_pass" && data.session_ids.length !== 4) {
+      return json({ error: "Full Pass requires all 4 weeks selected" }, 400);
+    }
+
+    // Parallelize the three independent reads (camp + cohort + first session)
+    const [campRes, cohortRes, firstSessionRes] = await Promise.all([
+      supabase
+        .from("camps")
+        .select("id, name, status, weekly_price_cents, full_pass_price_cents, registration_opens_at, registration_closes_at")
+        .eq("id", data.camp_id)
+        .maybeSingle(),
+      supabase
+        .from("camp_cohorts")
+        .select("id, age_min, age_max, age_label, venue_name")
+        .eq("id", data.cohort_id)
+        .maybeSingle(),
+      supabase
+        .from("camp_sessions")
+        .select("starts_on")
+        .in("id", data.session_ids)
+        .order("starts_on", { ascending: true })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+    console.log(`[register-for-camp] reads ${Date.now() - t0}ms`);
+
+    const camp = campRes.data;
+    if (campRes.error || !camp) return json({ error: "Camp not found" }, 404);
     if (camp.status !== "published") return json({ error: "Registration is not open for this camp" }, 400);
 
     const now = Date.now();
@@ -87,17 +111,8 @@ serve(async (req) => {
       return json({ error: "Registration is closed" }, 400);
     }
 
-    const { data: cohort } = await supabase
-      .from("camp_cohorts")
-      .select("id, age_min, age_max, age_label, venue_name")
-      .eq("id", data.cohort_id)
-      .maybeSingle();
+    const cohort = cohortRes.data;
     if (!cohort) return json({ error: "Cohort not found" }, 404);
-
-    // Validate full_pass requires all 4 sessions
-    if (data.registration_type === "full_pass" && data.session_ids.length !== 4) {
-      return json({ error: "Full Pass requires all 4 weeks selected" }, 400);
-    }
 
     // Compute amount
     const amount =
@@ -105,14 +120,7 @@ serve(async (req) => {
         ? camp.full_pass_price_cents
         : camp.weekly_price_cents * data.session_ids.length;
 
-    // Age at first session
-    const { data: firstSession } = await supabase
-      .from("camp_sessions")
-      .select("starts_on")
-      .in("id", data.session_ids)
-      .order("starts_on", { ascending: true })
-      .limit(1)
-      .maybeSingle();
+    const firstSession = firstSessionRes.data;
     const ageAt = ageOn(data.player_dob, firstSession ? new Date(firstSession.starts_on) : new Date());
 
     if (ageAt < cohort.age_min || ageAt > cohort.age_max) {
@@ -127,6 +135,7 @@ serve(async (req) => {
       req.headers.get("cf-connecting-ip") || null;
 
     // Atomic registration (capacity locks)
+    const tRpc = Date.now();
     const { data: rpcRows, error: rpcErr } = await supabase.rpc("create_camp_registration_atomic", {
       p_camp_id: data.camp_id,
       p_cohort_id: data.cohort_id,
@@ -149,6 +158,7 @@ serve(async (req) => {
       p_photo_release_consent: data.photo_release_consent,
     });
 
+    console.log(`[register-for-camp] rpc ${Date.now() - tRpc}ms`);
     if (rpcErr) {
       console.error("[register-for-camp] rpc error", rpcErr);
       return json({ error: "Could not create registration" }, 500);
@@ -175,6 +185,7 @@ serve(async (req) => {
       ? `${camp.name} — Full 4-Week Pass (${cohort.age_label})`
       : `${camp.name} — ${data.session_ids.length} Week${data.session_ids.length > 1 ? "s" : ""} (${cohort.age_label})`;
 
+    const tStripe = Date.now();
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -201,13 +212,26 @@ serve(async (req) => {
         registration_type: data.registration_type,
       },
     });
+    console.log(`[register-for-camp] stripe ${Date.now() - tStripe}ms`);
 
-    // Persist stripe_checkout_session_id on the registration so the webhook can match
-    await supabase
+    // Persist stripe_checkout_session_id in the background — webhook matches by
+    // registration_id in metadata, so the response doesn't need to wait on this write.
+    const persistSessionId = supabase
       .from("camp_registrations")
       .update({ stripe_checkout_session_id: checkoutSession.id })
-      .eq("id", registrationId);
+      .eq("id", registrationId)
+      .then(({ error }) => {
+        if (error) console.error("[register-for-camp] session_id persist failed", error);
+      });
+    try {
+      // @ts-ignore EdgeRuntime is provided by the Supabase Edge runtime
+      if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(persistSessionId);
+      }
+    } catch (_) { /* no-op */ }
 
+    console.log(`[register-for-camp] total ${Date.now() - t0}ms`);
     return json({
       success: true,
       registration_id: registrationId,
