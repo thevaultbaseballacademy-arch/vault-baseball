@@ -316,7 +316,7 @@ async function handleSummerCamp(
         }),
         sendEmail("staff-notification", {
           templateName: "summer-camp-staff-notification",
-          recipientEmail: "emejia2291@gmail.com",
+          recipientEmail: "staff@methods22.com",
           idempotencyKey: `summer-camp-staff-${registrationId}`,
           templateData: {
             athleteName,
