@@ -588,15 +588,27 @@ const SummerCamp = () => {
 
       closePreparedCheckoutTarget(preparedCheckoutTarget);
 
-      // Non-payment fallback
-      setConfirmation({
-        id: crypto.randomUUID(),
-        paid: false,
-        parentEmail: values.parent_email,
-        parentPhone: values.parent_phone,
+      // Payments disabled → reserve spot via bank transfer and send to instructions page
+      setSubmitStatus("Reserving your spot…");
+      const res = await fetch(SUMMER_CAMP_REGISTER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+        },
+        body: JSON.stringify({ ...payload, paymentMethod: "bank_transfer" }),
       });
-      setSubmitted(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      const data = await res.json();
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.error || "Could not reserve your spot. Please try again.");
+      }
+      toast({
+        title: "Spot reserved",
+        description: "Bank transfer instructions are on the next screen.",
+      });
+      window.location.href = data.instructions_url || `/payment/bank-instructions/${data.order_id}`;
+      return;
     } catch (err: any) {
       closePreparedCheckoutTarget(preparedCheckoutTarget);
       console.error("[SummerCamp] submit failed", err);
