@@ -120,12 +120,56 @@ const CampRegister = () => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Stripe payment is temporarily disabled until we go live.
-    toast({
-      title: "Registration opening soon",
-      description:
-        "Online payment isn't live yet. Email staff@methods22.com to reserve your spot — we'll confirm by reply.",
-    });
+    const err = validate();
+    if (err) {
+      toast({ title: "Check your form", description: err, variant: "destructive" });
+      return;
+    }
+    if (!camp || !cohort) return;
+
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("register-for-camp", {
+        body: {
+          camp_id: camp.id,
+          cohort_id: cohort.id,
+          session_ids: picked,
+          registration_type: type,
+          payment_method: "bank_transfer",
+          player_first_name: form.player_first_name.trim(),
+          player_last_name: form.player_last_name.trim(),
+          player_dob: form.player_dob,
+          parent_name: form.parent_name.trim(),
+          parent_email: form.parent_email.trim().toLowerCase(),
+          parent_phone: form.parent_phone.trim(),
+          emergency_contact_name: form.emergency_contact_name.trim(),
+          emergency_contact_phone: form.emergency_contact_phone.trim(),
+          emergency_contact_relationship: form.emergency_contact_relationship.trim(),
+          medical_notes: form.medical_notes?.trim() || null,
+          photo_release_consent: form.photo_release_consent,
+          waiver_accepted: true,
+          waiver_signature_name: form.waiver_signature_name.trim(),
+        },
+      });
+
+      const payload: any = data ?? (error as any)?.context?.body;
+      if (error || !payload?.success) {
+        const msg = payload?.error || error?.message || "Could not reserve your spot.";
+        toast({ title: "Registration failed", description: msg, variant: "destructive" });
+        setSubmitting(false);
+        return;
+      }
+
+      toast({
+        title: "Spot reserved",
+        description: "Follow the bank transfer instructions to complete payment.",
+      });
+      const url = payload.instructions_url || `/payment/bank-instructions/${payload.order_id}`;
+      navigate(url.replace(/^https?:\/\/[^/]+/, ""));
+    } catch (e: any) {
+      toast({ title: "Registration failed", description: e?.message ?? "Try again.", variant: "destructive" });
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
