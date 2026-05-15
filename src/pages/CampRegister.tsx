@@ -305,12 +305,12 @@ const CampRegister = () => {
                 <p className="text-2xl font-display text-foreground">{fmtMoney(amountCents)}</p>
                 <p className="text-xs text-muted-foreground">{type === "full_pass" ? "Full 4-week pass" : `${picked.length} week${picked.length === 1 ? "" : "s"}`}</p>
               </div>
-              <Button type="submit" variant="vault" size="lg" disabled>
-                Payment coming soon
+              <Button type="submit" variant="vault" size="lg" disabled={submitting}>
+                {submitting ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Reserving…</>) : (<>Reserve spot · Pay by bank transfer <ArrowRight className="w-4 h-4 ml-2" /></>)}
               </Button>
             </div>
             <p className="text-[11px] text-muted-foreground text-center flex items-center justify-center gap-1">
-              <ShieldCheck className="w-3 h-3" /> Online payment is temporarily disabled · Email staff@methods22.com to register
+              <ShieldCheck className="w-3 h-3" /> Spot held while you complete the bank transfer · Instructions shown next & emailed
             </p>
           </form>
         </div>
