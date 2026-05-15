@@ -43,7 +43,7 @@ const STRIPE_PRICES = {
   full_pass_earlybird: "price_1TVZhAPhXS410TO5EFYaacZ6", // $850
 };
 
-const EARLY_BIRD_DEADLINE = new Date("2026-05-01T23:59:59-04:00");
+const EARLY_BIRD_DEADLINE = new Date("2026-05-22T23:59:59-04:00");
 
 const PRICING = {
   week:      { regular: 250,  earlyBird: 225 },
@@ -704,7 +704,7 @@ const SummerCamp = () => {
             </p>
             {isEarlyBird && (
               <p className="text-[11px] font-display tracking-[0.2em] text-primary mt-2">
-                EARLY BIRD PRICING ENDS MAY 1
+                EARLY BIRD PRICING ENDS MAY 22
               </p>
             )}
           </motion.div>
@@ -795,8 +795,8 @@ const SummerCamp = () => {
           </div>
           <p className="text-[11px] text-muted-foreground text-center mt-3">
             {isEarlyBird
-              ? "Early bird pricing ends May 1. Regular pricing applies after."
-              : "Early bird ended May 1 — current pricing reflects regular rates."}
+              ? "Early bird pricing ends May 22. Regular pricing applies after."
+              : "Early bird ended May 22 — current pricing reflects regular rates."}
           </p>
         </section>
 
