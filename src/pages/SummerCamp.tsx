@@ -795,8 +795,8 @@ const SummerCamp = () => {
           </div>
           <p className="text-[11px] text-muted-foreground text-center mt-3">
             {isEarlyBird
-              ? "Early bird pricing ends May 1. Regular pricing applies after."
-              : "Early bird ended May 1 — current pricing reflects regular rates."}
+              ? "Early bird pricing ends May 22. Regular pricing applies after."
+              : "Early bird ended May 22 — current pricing reflects regular rates."}
           </p>
         </section>
 
