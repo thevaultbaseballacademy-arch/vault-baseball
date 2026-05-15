@@ -704,7 +704,7 @@ const SummerCamp = () => {
             </p>
             {isEarlyBird && (
               <p className="text-[11px] font-display tracking-[0.2em] text-primary mt-2">
-                EARLY BIRD PRICING ENDS MAY 1
+                EARLY BIRD PRICING ENDS MAY 22
               </p>
             )}
           </motion.div>
