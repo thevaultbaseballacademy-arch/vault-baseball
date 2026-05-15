@@ -207,3 +207,167 @@ serve(async (req) => {
     return new Response("error", { status: 500 });
   }
 });
+
+// ───────────────────────── SUMMER CAMP HANDLER ─────────────────────────
+// Finalizes summer_camp_registrations + payment_orders, sends parent confirmation
+// and staff notification. Idempotent on stripe_session_id.
+async function handleSummerCamp(
+  event: Stripe.Event,
+  session: Stripe.Checkout.Session,
+  supa: ReturnType<typeof createClient>,
+): Promise<Response> {
+  const registrationId = session.metadata?.registration_id;
+  const paymentOrderId = session.metadata?.payment_order_id;
+  if (!registrationId) {
+    log("[summer-camp] missing registration_id");
+    return new Response("ok", { status: 200 });
+  }
+
+  try {
+    if (event.type === "checkout.session.completed") {
+      const { data: reg } = await supa
+        .from("summer_camp_registrations")
+        .select("id, status, parent_email, parent_name, parent_phone, athlete_first_name, athlete_last_name, athlete_age, camp_location, registration_type, selected_sessions, amount_cents, emergency_contact, medical_notes, tshirt_size, payment_order_id")
+        .eq("id", registrationId)
+        .maybeSingle();
+
+      if (!reg) {
+        log("[summer-camp] registration not found", { registrationId });
+        return new Response("ok", { status: 200 });
+      }
+
+      if (reg.status === "confirmed") {
+        log("[summer-camp] already confirmed", { registrationId });
+        return new Response("ok", { status: 200 });
+      }
+
+      const paidAt = new Date().toISOString();
+      const paymentIntentId =
+        typeof session.payment_intent === "string"
+          ? session.payment_intent
+          : session.payment_intent?.id ?? null;
+
+      const { error: updErr } = await supa
+        .from("summer_camp_registrations")
+        .update({
+          status: "confirmed",
+          paid_at: paidAt,
+          stripe_session_id: session.id,
+        })
+        .eq("id", registrationId)
+        .neq("status", "confirmed");
+
+      if (updErr) {
+        log("[summer-camp] reg update failed", { err: updErr.message });
+        return new Response("error", { status: 500 });
+      }
+
+      const orderId = reg.payment_order_id ?? paymentOrderId;
+      if (orderId) {
+        await supa
+          .from("payment_orders")
+          .update({
+            status: "paid",
+            paid_at: paidAt,
+            stripe_session_id: session.id,
+            stripe_payment_intent_id: paymentIntentId,
+          })
+          .eq("id", orderId);
+      }
+
+      const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+      const athleteName = `${reg.athlete_first_name ?? ""} ${reg.athlete_last_name ?? ""}`.trim();
+      const amountPaid = fmtMoney(reg.amount_cents ?? 0);
+      const confirmationNumber = `CAMP-${registrationId.slice(0, 8).toUpperCase()}`;
+
+      const sendEmail = async (label: string, payload: Record<string, unknown>) => {
+        try {
+          const res = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: anonKey,
+              Authorization: `Bearer ${anonKey}`,
+            },
+            body: JSON.stringify(payload),
+          });
+          const text = await res.text();
+          log(`[summer-camp] email:${label}`, { status: res.status, body: text.slice(0, 200) });
+        } catch (err) {
+          log(`[summer-camp] email:${label} failed`, { err: String(err) });
+        }
+      };
+
+      await Promise.allSettled([
+        sendEmail("parent-confirmation", {
+          templateName: "summer-camp-confirmation",
+          recipientEmail: reg.parent_email,
+          idempotencyKey: `summer-camp-confirm-${registrationId}`,
+          templateData: {
+            parentName: reg.parent_name,
+            athleteName,
+            campLocation: reg.camp_location,
+            registrationType: reg.registration_type,
+            selectedSessions: reg.selected_sessions,
+            amountPaid,
+            confirmationNumber,
+          },
+        }),
+        sendEmail("staff-notification", {
+          templateName: "summer-camp-staff-notification",
+          recipientEmail: "emejia2291@gmail.com",
+          idempotencyKey: `summer-camp-staff-${registrationId}`,
+          templateData: {
+            athleteName,
+            athleteAge: reg.athlete_age,
+            campLocation: reg.camp_location,
+            registrationType: reg.registration_type,
+            selectedSessions: reg.selected_sessions,
+            amountPaid,
+            parentName: reg.parent_name,
+            parentEmail: reg.parent_email,
+            parentPhone: reg.parent_phone,
+            emergencyContact: reg.emergency_contact,
+            medicalNotes: reg.medical_notes,
+            tshirtSize: reg.tshirt_size,
+            confirmationNumber,
+          },
+        }),
+      ]);
+
+      log("[summer-camp] fulfilled", { registrationId });
+      return new Response("ok", { status: 200 });
+    }
+
+    if (event.type === "checkout.session.expired" || event.type === "payment_intent.payment_failed") {
+      await supa
+        .from("summer_camp_registrations")
+        .update({ status: "checkout_expired" })
+        .eq("id", registrationId)
+        .eq("status", "pending_payment");
+
+      const orderId = paymentOrderId;
+      if (orderId) {
+        await supa
+          .from("payment_orders")
+          .update({
+            status: event.type === "checkout.session.expired" ? "expired" : "failed",
+            error_message: `Stripe event: ${event.type}`,
+            follow_up_required: true,
+            follow_up_reason: event.type,
+          })
+          .eq("id", orderId)
+          .neq("status", "paid");
+      }
+
+      log("[summer-camp] released pending", { registrationId, type: event.type });
+      return new Response("ok", { status: 200 });
+    }
+
+    return new Response("ok", { status: 200 });
+  } catch (e: any) {
+    log("[summer-camp] handler error", { err: e?.message });
+    return new Response("error", { status: 500 });
+  }
+}
