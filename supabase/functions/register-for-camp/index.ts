@@ -61,8 +61,10 @@ serve(async (req) => {
     }
     const data = parsed.data;
 
+    const method = data.payment_method ?? "card";
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey || stripeKey.startsWith("pk_")) {
+    if (method === "card" && (!stripeKey || stripeKey.startsWith("pk_"))) {
       return json({ error: "Stripe not configured" }, 500);
     }
 
