@@ -120,44 +120,12 @@ const CampRegister = () => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!camp || !cohort) return;
-    const err = validate();
-    if (err) { toast({ title: "Check the form", description: err, variant: "destructive" }); return; }
-
-    setSubmitting(true);
-    // Immediate feedback so the user never wonders if their click registered.
+    // Stripe payment is temporarily disabled until we go live.
     toast({
-      title: "Securing your spot…",
-      description: "Redirecting to secure checkout. This usually takes a few seconds.",
+      title: "Registration opening soon",
+      description:
+        "Online payment isn't live yet. Email staff@methods22.com to reserve your spot — we'll confirm by reply.",
     });
-
-    try {
-      const { checkoutUrl } = await invokeCheckout(
-        "register-for-camp",
-        {
-          camp_id: camp.id,
-          cohort_id: cohort.id,
-          session_ids: picked,
-          registration_type: type,
-          ...form,
-          parent_email: form.parent_email.trim().toLowerCase(),
-          medical_notes: form.medical_notes || null,
-          waiver_accepted: true,
-        },
-        { timeoutMs: 25_000 }
-      );
-      await openCheckout(checkoutUrl);
-    } catch (e: any) {
-      toast({
-        title: "Registration failed",
-        description:
-          e?.message ??
-          "We couldn't start checkout. Please try again — your spot has not been charged.",
-        variant: "destructive",
-      });
-    } finally {
-      setSubmitting(false);
-    }
   };
 
   if (loading) {
