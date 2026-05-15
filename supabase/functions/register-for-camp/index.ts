@@ -31,6 +31,7 @@ const RegSchema = z.object({
   photo_release_consent: z.boolean(),
   waiver_accepted: z.literal(true),
   waiver_signature_name: z.string().trim().min(1).max(120),
+  payment_method: z.enum(["card", "bank_transfer"]).optional(),
 });
 
 function ageOn(dob: string, on: Date): number {
@@ -60,8 +61,10 @@ serve(async (req) => {
     }
     const data = parsed.data;
 
+    const method = data.payment_method ?? "card";
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey || stripeKey.startsWith("pk_")) {
+    if (method === "card" && (!stripeKey || stripeKey.startsWith("pk_"))) {
       return json({ error: "Stripe not configured" }, 500);
     }
 
@@ -176,14 +179,74 @@ serve(async (req) => {
       return json({ error: map[row.conflict_code] ?? row.conflict_code, code: row.conflict_code, conflict_session_id: row.conflict_session_id }, 409);
     }
     const registrationId: string = row.registration_id;
-
-    // Build Stripe checkout session
-    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const origin = req.headers.get("origin") ?? "https://vault-baseball.lovable.app";
 
     const productName = data.registration_type === "full_pass"
       ? `${camp.name} — Full 4-Week Pass (${cohort.age_label})`
       : `${camp.name} — ${data.session_ids.length} Week${data.session_ids.length > 1 ? "s" : ""} (${cohort.age_label})`;
+
+    // ─── BANK TRANSFER PATH ──────────────────────────────────────────
+    if (method === "bank_transfer") {
+      const customerName = `${data.player_first_name} ${data.player_last_name}`.trim();
+      const { data: order, error: orderError } = await supabase
+        .from("payment_orders")
+        .insert({
+          product_type: "camp",
+          product_id: registrationId,
+          amount_cents: amount,
+          currency: "usd",
+          payment_method: "bank_transfer",
+          status: "pending_bank_transfer",
+          customer_email: data.parent_email.toLowerCase(),
+          customer_name: customerName,
+          metadata: {
+            source: "camps",
+            camp_id: data.camp_id,
+            camp_name: camp.name,
+            cohort_id: data.cohort_id,
+            cohort_label: cohort.age_label,
+            registration_id: registrationId,
+            registration_type: data.registration_type,
+            session_ids: data.session_ids,
+            parent_phone: data.parent_phone,
+            product_name: productName,
+          },
+        })
+        .select("id, reference_code")
+        .single();
+
+      if (orderError || !order) {
+        console.error("[register-for-camp] bank order insert failed", orderError);
+        return json({ error: "Could not create order" }, 500);
+      }
+
+      // Best-effort confirmation email (non-blocking)
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "bank-transfer-instructions",
+          recipientEmail: data.parent_email.toLowerCase(),
+          idempotencyKey: `bank-transfer-${order.id}`,
+          templateData: {
+            reference: order.reference_code,
+            amountCents: amount,
+            campName: productName,
+            athleteName: customerName,
+          },
+        },
+      }).catch((err) => console.error("[register-for-camp] instructions email failed", err));
+
+      return json({
+        success: true,
+        payment_method: "bank_transfer",
+        registration_id: registrationId,
+        order_id: order.id,
+        reference_code: order.reference_code,
+        instructions_url: `${origin}/payment/bank-instructions/${order.id}`,
+      });
+    }
+
+    // ─── CARD / STRIPE CHECKOUT PATH ─────────────────────────────────
+    const stripe = new Stripe(stripeKey!, { apiVersion: "2025-08-27.basil" });
 
     const tStripe = Date.now();
     const checkoutSession = await stripe.checkout.sessions.create({
