@@ -120,44 +120,12 @@ const CampRegister = () => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!camp || !cohort) return;
-    const err = validate();
-    if (err) { toast({ title: "Check the form", description: err, variant: "destructive" }); return; }
-
-    setSubmitting(true);
-    // Immediate feedback so the user never wonders if their click registered.
+    // Stripe payment is temporarily disabled until we go live.
     toast({
-      title: "Securing your spot…",
-      description: "Redirecting to secure checkout. This usually takes a few seconds.",
+      title: "Registration opening soon",
+      description:
+        "Online payment isn't live yet. Email staff@methods22.com to reserve your spot — we'll confirm by reply.",
     });
-
-    try {
-      const { checkoutUrl } = await invokeCheckout(
-        "register-for-camp",
-        {
-          camp_id: camp.id,
-          cohort_id: cohort.id,
-          session_ids: picked,
-          registration_type: type,
-          ...form,
-          parent_email: form.parent_email.trim().toLowerCase(),
-          medical_notes: form.medical_notes || null,
-          waiver_accepted: true,
-        },
-        { timeoutMs: 25_000 }
-      );
-      await openCheckout(checkoutUrl);
-    } catch (e: any) {
-      toast({
-        title: "Registration failed",
-        description:
-          e?.message ??
-          "We couldn't start checkout. Please try again — your spot has not been charged.",
-        variant: "destructive",
-      });
-    } finally {
-      setSubmitting(false);
-    }
   };
 
   if (loading) {
@@ -293,14 +261,12 @@ const CampRegister = () => {
                 <p className="text-2xl font-display text-foreground">{fmtMoney(amountCents)}</p>
                 <p className="text-xs text-muted-foreground">{type === "full_pass" ? "Full 4-week pass" : `${picked.length} week${picked.length === 1 ? "" : "s"}`}</p>
               </div>
-              <Button type="submit" variant="vault" size="lg" disabled={submitting || amountCents === 0}>
-                {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                {submitting ? "Starting checkout…" : "Continue to payment"}
-                {!submitting && <ArrowRight className="w-4 h-4 ml-2" />}
+              <Button type="submit" variant="vault" size="lg" disabled>
+                Payment coming soon
               </Button>
             </div>
             <p className="text-[11px] text-muted-foreground text-center flex items-center justify-center gap-1">
-              <ShieldCheck className="w-3 h-3" /> Secure payment via Stripe · Spot held for 30 minutes
+              <ShieldCheck className="w-3 h-3" /> Online payment is temporarily disabled · Email staff@methods22.com to register
             </p>
           </form>
         </div>

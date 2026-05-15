@@ -98,7 +98,10 @@ const FOCUS_AREAS = [
   { icon: Brain,    title: "Game IQ & Situational Play" },
 ];
 
-const PAYMENT_ENABLED = true;
+// Stripe payment temporarily disabled until we go live.
+// When PAYMENT_ENABLED is false, the form saves the registration and we
+// follow up with payment instructions by email.
+const PAYMENT_ENABLED = false;
 // ─────────────────────────────────────────────────────────────────
 
 const POSITIONS = [
