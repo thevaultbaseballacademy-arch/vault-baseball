@@ -31,6 +31,7 @@ const RegSchema = z.object({
   photo_release_consent: z.boolean(),
   waiver_accepted: z.literal(true),
   waiver_signature_name: z.string().trim().min(1).max(120),
+  payment_method: z.enum(["card", "bank_transfer"]).optional(),
 });
 
 function ageOn(dob: string, on: Date): number {
