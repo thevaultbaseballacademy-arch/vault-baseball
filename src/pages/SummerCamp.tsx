@@ -43,7 +43,7 @@ const STRIPE_PRICES = {
   full_pass_earlybird: "price_1TVZhAPhXS410TO5EFYaacZ6", // $850
 };
 
-const EARLY_BIRD_DEADLINE = new Date("2026-05-01T23:59:59-04:00");
+const EARLY_BIRD_DEADLINE = new Date("2026-05-22T23:59:59-04:00");
 
 const PRICING = {
   week:      { regular: 250,  earlyBird: 225 },
