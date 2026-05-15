@@ -52,9 +52,14 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
 
-  // Only handle camp events
+  // Handle both legacy `camps` and new `summer-camp` flows.
   const session = event.data.object as Stripe.Checkout.Session;
   const source = session.metadata?.source;
+
+  if (source === "summer-camp") {
+    return await handleSummerCamp(event, session, supa);
+  }
+
   if (source !== "camps") {
     return new Response("ok", { status: 200 });
   }
