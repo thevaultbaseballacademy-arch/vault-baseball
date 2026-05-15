@@ -153,7 +153,7 @@ export default function BankInstructions() {
                   <ol className="list-decimal pl-5 text-muted-foreground space-y-1">
                     <li>Send the transfer using the details above.</li>
                     <li><strong>Always include your reference code</strong> so we can match the payment.</li>
-                    <li>We'll email a confirmation to <strong>{order.customer_email}</strong> within 1–3 business days of receiving funds.</li>
+                    <li>We'll email a confirmation to <strong>Eddie@methods22.com</strong> within 1–3 business days of receiving funds.</li>
                   </ol>
                   <p className="text-xs text-muted-foreground pt-1">
                     Questions? Email <a className="underline" href={`mailto:${instructions.support_email}`}>{instructions.support_email}</a> with your reference code.
