@@ -183,7 +183,7 @@ serve(async (req) => {
             medicalNotes: reg.medical_notes,
             confirmationNumber,
           },
-        }),
+        })),
       ]);
 
       log("fulfilled", { registrationId });
