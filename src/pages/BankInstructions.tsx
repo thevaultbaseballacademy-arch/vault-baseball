@@ -150,7 +150,10 @@ export default function BankInstructions() {
                   const payLink = isEarlyBird
                     ? (isFullPass ? links.fullEarly : links.weeklyEarly)
                     : (isFullPass ? links.fullRegular : links.weeklyRegular);
-                  const displayAmount = isEarlyBird ? (isFullPass ? 85000 : 22500) : (isFullPass ? 100000 : 25000);
+                  const regularPrice = isFullPass ? 100000 : 25000;
+                  const earlyPrice = isFullPass ? 85000 : 22500;
+                  const displayAmount = isEarlyBird ? earlyPrice : regularPrice;
+                  const savings = regularPrice - earlyPrice;
                   return (
                     <div className="rounded-lg border border-primary/40 bg-primary/5 p-4 space-y-3">
                       <div className="flex items-center justify-between gap-2">
@@ -164,19 +167,39 @@ export default function BankInstructions() {
                           </span>
                         )}
                       </div>
+
+                      <div className="rounded-md bg-background/60 border border-border/60 p-3 space-y-2">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-xs text-muted-foreground">Early Bird</span>
+                          <span className={`font-semibold ${isEarlyBird ? "text-primary text-lg" : "text-foreground"}`}>
+                            {fmtMoney(earlyPrice, order.currency)}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-xs text-muted-foreground">Regular</span>
+                          <span className={`font-semibold ${!isEarlyBird ? "text-primary text-lg" : "text-muted-foreground line-through"}`}>
+                            {fmtMoney(regularPrice, order.currency)}
+                          </span>
+                        </div>
+                        {isEarlyBird && (
+                          <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/60">
+                            <span className="text-xs font-medium text-primary">You save</span>
+                            <span className="text-sm font-bold text-primary">
+                              {fmtMoney(savings, order.currency)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
                       {isEarlyBird && (
-                        <p className="text-xs text-primary">
-                          Save {isFullPass ? "$150" : "$25"} — Early Bird pricing ends May 22.
+                        <p className="text-[11px] text-primary text-center">
+                          Early Bird pricing ends May 22.
                         </p>
                       )}
+
                       <Button asChild className="w-full">
                         <a href={payLink} target="_blank" rel="noopener noreferrer">
                           Pay {fmtMoney(displayAmount, order.currency)} by Card
-                          {isEarlyBird && (
-                            <span className="ml-2 text-xs line-through opacity-70">
-                              {fmtMoney(isFullPass ? 100000 : 25000, order.currency)}
-                            </span>
-                          )}
                         </a>
                       </Button>
                       <p className="text-[11px] text-muted-foreground text-center">
