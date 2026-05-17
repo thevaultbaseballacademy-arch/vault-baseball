@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
+import { openCheckout } from "@/lib/openCheckout";
 
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string) ?? "";
 const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string) ?? "";
@@ -189,10 +190,12 @@ export default function BankInstructions() {
                         </p>
                       )}
 
-                      <Button asChild size="lg" className="w-full">
-                        <a href={payLink} target="_blank" rel="noopener noreferrer">
-                          Pay {fmtMoney(displayAmount, order.currency)} by Card
-                        </a>
+                      <Button
+                        size="lg"
+                        className="w-full active:scale-[0.98] transition-transform"
+                        onClick={() => openCheckout(payLink)}
+                      >
+                        Pay {fmtMoney(displayAmount, order.currency)} by Card
                       </Button>
                       <p className="text-[11px] text-muted-foreground text-center">
                         Spot confirmed immediately. After paying, email your receipt + reference <strong>{order.reference_code}</strong> to {instructions.support_email}.

@@ -192,6 +192,9 @@ serve(async (req) => {
         success_url: successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: cancelUrl || `${origin}/payment-canceled`,
         allow_promotion_codes: true,
+        payment_intent_data: {
+          receipt_email: customerEmail,
+        },
         metadata: {
           user_id: userId || "guest",
           price_id: priceId,

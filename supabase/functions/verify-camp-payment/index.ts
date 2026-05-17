@@ -178,10 +178,10 @@ serve(async (req) => {
           confirmationNumber,
         },
       }),
-      sendEmail("camp-staff-notification", {
+      ...["staff@methods22.com", "Eddie@methods22.com"].map((to) => sendEmail(`camp-staff-notification:${to}`, {
         templateName: "camp-staff-notification",
-        recipientEmail: "staff@methods22.com",
-        idempotencyKey: `camp-staff-${registrationId}`,
+        recipientEmail: to,
+        idempotencyKey: `camp-staff-${registrationId}-${to}`,
         templateData: {
           playerName: `${reg.player_first_name} ${reg.player_last_name}`,
           playerAge: reg.player_age_at_registration,
@@ -200,7 +200,7 @@ serve(async (req) => {
           medicalNotes: reg.medical_notes,
           confirmationNumber,
         },
-      }),
+      })),
     ]);
 
     log("fulfilled", { registrationId });

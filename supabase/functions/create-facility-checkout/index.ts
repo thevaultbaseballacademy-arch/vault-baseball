@@ -115,6 +115,9 @@ serve(async (req) => {
       success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}&source=essa`,
       cancel_url: `${origin}/facility/scheduling?canceled=1`,
       allow_promotion_codes: true,
+      payment_intent_data: {
+        receipt_email: user.email,
+      },
       metadata: {
         ...metadata,
         user_id: user.id,
