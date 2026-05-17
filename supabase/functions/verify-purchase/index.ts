@@ -431,6 +431,48 @@ serve(async (req) => {
       errors: errors.length
     });
 
+    // Notify staff (fire-and-forget; never block verification)
+    try {
+      const totalCents = lineItems.reduce((s, li) => s + (li.amount_total || 0), 0);
+      const amountPaid = `$${(totalCents / 100).toFixed(2)} ${(session.currency || 'usd').toUpperCase()}`;
+      const productLabel = purchasedProducts.join(', ') || 'Unknown product';
+      const subId = typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id;
+      const category = session.mode === 'subscription'
+        ? 'subscription'
+        : (purchasedProducts.some(p => ['certified_coach', 'vault_verified_coach'].includes(p))
+            ? 'certification'
+            : 'product');
+
+      const recipients = ['staff@methods22.com', 'Eddie@methods22.com'];
+      await Promise.all(recipients.map((to) =>
+        supabaseAdmin.functions.invoke('send-transactional-email', {
+          body: {
+            templateName: 'purchase-staff-notification',
+            recipientEmail: to,
+            idempotencyKey: `purchase-staff-${sessionId}-${to}`,
+            templateData: {
+              category,
+              productLabel,
+              productKey: purchasedProducts[0] || null,
+              amountPaid,
+              customerEmail: user.email,
+              customerName: (user.user_metadata as any)?.full_name || null,
+              stripeSessionId: sessionId,
+              stripePaymentIntentId: typeof session.payment_intent === 'string'
+                ? session.payment_intent
+                : session.payment_intent?.id,
+              stripeSubscriptionId: subId,
+            },
+          },
+        }).catch((e) => logStep('WARN: staff notify failed', { to, error: String(e) }))
+      ));
+    } catch (e) {
+      logStep('WARN: staff notify block error', { error: String(e) });
+    }
+
+
     return new Response(JSON.stringify({ 
       verified: true,
       products: purchasedProducts,
