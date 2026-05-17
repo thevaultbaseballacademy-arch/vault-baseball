@@ -131,5 +131,38 @@ serve(async (req) => {
   });
 
   log("fulfilled", { userId, lessonCount: pkg.lessonCount, sessionId });
+
+  // Notify staff (fire-and-forget)
+  try {
+    const amountPaid = `$${((session.amount_total ?? 0) / 100).toFixed(2)} ${(session.currency || 'usd').toUpperCase()}`;
+    const customerEmail = session.customer_details?.email
+      || (typeof session.customer_email === 'string' ? session.customer_email : undefined);
+    const customerName = session.customer_details?.name || undefined;
+    const recipients = ['staff@methods22.com', 'Eddie@methods22.com'];
+    await Promise.all(recipients.map((to) =>
+      supa.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'purchase-staff-notification',
+          recipientEmail: to,
+          idempotencyKey: `purchase-staff-${sessionId}-${to}`,
+          templateData: {
+            category: 'facility-lesson-package',
+            productLabel: `${pkg.id} (${pkg.lessonCount} lessons)`,
+            productKey: pkg.id,
+            amountPaid,
+            customerEmail,
+            customerName,
+            stripeSessionId: sessionId,
+            stripePaymentIntentId: typeof session.payment_intent === 'string'
+              ? session.payment_intent
+              : session.payment_intent?.id,
+          },
+        },
+      }).catch((e) => log('WARN: staff notify failed', { to, error: String(e) }))
+    ));
+  } catch (e) {
+    log('WARN: staff notify block error', { error: String(e) });
+  }
+
   return new Response("ok", { status: 200 });
 });
