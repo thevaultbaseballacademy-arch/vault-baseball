@@ -138,22 +138,45 @@ export default function BankInstructions() {
                 </div>
 
                 {(() => {
-                  const payLink =
-                    order.amount_cents >= 100000
-                      ? "https://buy.stripe.com/test_cNi00j4A01FudWBb3U4wM01"
-                      : "https://buy.stripe.com/test_14AcN56I8fwk5q57RI4wM00";
+                  const EARLY_BIRD_END = new Date("2026-05-23T00:00:00-05:00").getTime();
+                  const isEarlyBird = Date.now() < EARLY_BIRD_END;
+                  const isFullPass = order.amount_cents >= 80000;
+                  const links = {
+                    weeklyRegular: "https://buy.stripe.com/test_14AcN56I8fwk5q57RI4wM00",
+                    fullRegular: "https://buy.stripe.com/test_cNi00j4A01FudWBb3U4wM01",
+                    weeklyEarly: "https://buy.stripe.com/test_9B6fZhaYo2Jy2dT8VM4wM02",
+                    fullEarly: "https://buy.stripe.com/test_dRm7sLeaA6ZOdWBfka4wM03",
+                  };
+                  const payLink = isEarlyBird
+                    ? (isFullPass ? links.fullEarly : links.weeklyEarly)
+                    : (isFullPass ? links.fullRegular : links.weeklyRegular);
+                  const displayAmount = isEarlyBird ? (isFullPass ? 85000 : 22500) : (isFullPass ? 100000 : 25000);
                   return (
                     <div className="rounded-lg border border-primary/40 bg-primary/5 p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <CreditCard className="w-4 h-4 text-primary" />
-                        Pay instantly by card
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                          <CreditCard className="w-4 h-4 text-primary" />
+                          Pay instantly by card
+                        </div>
+                        {isEarlyBird && (
+                          <span className="rounded-full bg-primary/20 text-primary text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5">
+                            Early Bird
+                          </span>
+                        )}
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Prefer to pay now? Use our secure Stripe checkout — no waiting for bank transfer.
-                      </p>
+                      {isEarlyBird && (
+                        <p className="text-xs text-primary">
+                          Save {isFullPass ? "$150" : "$25"} — Early Bird pricing ends May 22.
+                        </p>
+                      )}
                       <Button asChild className="w-full">
                         <a href={payLink} target="_blank" rel="noopener noreferrer">
-                          Pay {fmtMoney(order.amount_cents, order.currency)} by Card
+                          Pay {fmtMoney(displayAmount, order.currency)} by Card
+                          {isEarlyBird && (
+                            <span className="ml-2 text-xs line-through opacity-70">
+                              {fmtMoney(isFullPass ? 100000 : 25000, order.currency)}
+                            </span>
+                          )}
                         </a>
                       </Button>
                       <p className="text-[11px] text-muted-foreground text-center">
