@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Building2, Copy, Check, Mail, Clock, ArrowLeft } from "lucide-react";
+import { Building2, Copy, Check, Mail, Clock, ArrowLeft, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -135,6 +135,37 @@ export default function BankInstructions() {
                     Please complete your transfer within <strong>{instructions.payment_deadline_days} business days</strong>.
                     Your spot is held until then.
                   </p>
+                </div>
+
+                {(() => {
+                  const payLink =
+                    order.amount_cents >= 100000
+                      ? "https://buy.stripe.com/test_cNi00j4A01FudWBb3U4wM01"
+                      : "https://buy.stripe.com/test_14AcN56I8fwk5q57RI4wM00";
+                  return (
+                    <div className="rounded-lg border border-primary/40 bg-primary/5 p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <CreditCard className="w-4 h-4 text-primary" />
+                        Pay instantly by card
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Prefer to pay now? Use our secure Stripe checkout — no waiting for bank transfer.
+                      </p>
+                      <Button asChild className="w-full">
+                        <a href={payLink} target="_blank" rel="noopener noreferrer">
+                          Pay {fmtMoney(order.amount_cents, order.currency)} by Card
+                        </a>
+                      </Button>
+                      <p className="text-[11px] text-muted-foreground text-center">
+                        After paying, email your receipt + reference <strong>{order.reference_code}</strong> to {instructions.support_email}
+                      </p>
+                    </div>
+                  );
+                })()}
+
+                <div className="relative py-1">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+                  <div className="relative flex justify-center"><span className="bg-background px-2 text-xs text-muted-foreground">or pay by bank transfer</span></div>
                 </div>
 
                 <div className="space-y-2.5">
