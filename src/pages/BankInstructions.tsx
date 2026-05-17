@@ -142,10 +142,10 @@ export default function BankInstructions() {
                   const isEarlyBird = Date.now() < EARLY_BIRD_END;
                   const isFullPass = order.amount_cents >= 80000;
                   const links = {
-                    weeklyRegular: "https://buy.stripe.com/test_14AcN56I8fwk5q57RI4wM00",
-                    fullRegular: "https://buy.stripe.com/test_cNi00j4A01FudWBb3U4wM01",
-                    weeklyEarly: "https://buy.stripe.com/test_9B6fZhaYo2Jy2dT8VM4wM02",
-                    fullEarly: "https://buy.stripe.com/test_dRm7sLeaA6ZOdWBfka4wM03",
+                    weeklyRegular: "https://buy.stripe.com/28EdR89pIcaZcM66il6Na02",
+                    fullRegular: "https://buy.stripe.com/aFadR89pI0shbI22256Na03",
+                    weeklyEarly: "https://buy.stripe.com/4gM5kCeK27UJ27s7mp6Na04",
+                    fullEarly: "https://buy.stripe.com/5kQ00i8lE2ApaDYfSV6Na05",
                   };
                   const payLink = isEarlyBird
                     ? (isFullPass ? links.fullEarly : links.weeklyEarly)
