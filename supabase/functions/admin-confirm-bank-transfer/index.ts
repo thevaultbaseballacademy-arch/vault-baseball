@@ -73,6 +73,62 @@ serve(async (req) => {
           paid_at: newStatus === "paid" ? new Date().toISOString() : null,
         })
         .eq("id", order.product_id);
+
+      // Fire confirmation + staff notifications on paid
+      if (newStatus === "paid") {
+        const { data: reg } = await admin
+          .from("summer_camp_registrations")
+          .select("*")
+          .eq("id", order.product_id)
+          .maybeSingle();
+
+        if (reg) {
+          const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+          const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+          const amountPaid = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
+            .format(((reg as any).amount_paid_cents ?? 0) / 100);
+          const confirmationNumber = `CAMP-${String(order.product_id).slice(0, 8).toUpperCase()}`;
+
+          const send = (payload: Record<string, unknown>) =>
+            fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+              body: JSON.stringify(payload),
+            }).catch(() => {});
+
+          await Promise.allSettled([
+            send({
+              templateName: "camp-confirmation",
+              recipientEmail: (reg as any).parent_email,
+              idempotencyKey: `camp-confirm-bank-${order.product_id}`,
+              templateData: {
+                playerName: (reg as any).player_first_name,
+                parentName: (reg as any).parent_name,
+                campName: (reg as any).camp_location ?? "Summer Development Camp",
+                registrationType: (reg as any).registration_type,
+                amountPaid,
+                confirmationNumber,
+              },
+            }),
+            ...["staff@methods22.com", "Eddie@methods22.com"].map((to) =>
+              send({
+                templateName: "camp-staff-notification",
+                recipientEmail: to,
+                idempotencyKey: `camp-staff-bank-${order.product_id}-${to}`,
+                templateData: {
+                  playerName: `${(reg as any).player_first_name} ${(reg as any).player_last_name}`,
+                  campName: (reg as any).camp_location,
+                  registrationType: (reg as any).registration_type,
+                  amountPaid,
+                  parentName: (reg as any).parent_name,
+                  parentEmail: (reg as any).parent_email,
+                  confirmationNumber,
+                },
+              }),
+            ),
+          ]);
+        }
+      }
     }
 
     return json({ success: true, status: newStatus });
