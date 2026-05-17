@@ -100,6 +100,9 @@ serve(async (req) => {
         mode: "payment",
         success_url: `${origin}/certifications?success=true&certification=${encodeURIComponent(certificationLabel || "")}`,
         cancel_url: `${origin}/certifications?canceled=true`,
+        payment_intent_data: {
+          receipt_email: user.email,
+        },
         metadata: {
           user_id: user.id,
           certification_type: certificationLabel ?? "",

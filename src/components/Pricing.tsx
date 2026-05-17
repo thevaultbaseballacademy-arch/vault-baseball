@@ -183,7 +183,7 @@ const Pricing = () => {
 
       if (error) throw error;
       if (data?.url) {
-        window.location.href = data.url;
+        await openCheckout(data.url);
       }
     } catch (error: any) {
       toast({
