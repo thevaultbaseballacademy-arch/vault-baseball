@@ -16,6 +16,7 @@ import { template as tryoutStaffNotification } from './tryout-staff-notification
 import { template as campConfirmation } from './camp-confirmation.tsx'
 import { template as campCancellation } from './camp-cancellation.tsx'
 import { template as campStaffNotification } from './camp-staff-notification.tsx'
+import { template as bankTransferInstructions } from './bank-transfer-instructions.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'tryout-confirmation': tryoutConfirmation,
@@ -25,4 +26,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'camp-confirmation': campConfirmation,
   'camp-cancellation': campCancellation,
   'camp-staff-notification': campStaffNotification,
+  'bank-transfer-instructions': bankTransferInstructions,
 }
