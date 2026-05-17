@@ -126,17 +126,6 @@ export default function BankInstructions() {
 
             {order && instructions && (
               <>
-                <div className="rounded-lg bg-muted/40 p-4 space-y-1">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-amber-500" />
-                    <span className="font-medium text-amber-600 dark:text-amber-400">Pending payment</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Please complete your transfer within <strong>{instructions.payment_deadline_days} business days</strong>.
-                    Your spot is held until then.
-                  </p>
-                </div>
-
                 {(() => {
                   const EARLY_BIRD_END = new Date("2026-05-23T00:00:00-05:00").getTime();
                   const isEarlyBird = Date.now() < EARLY_BIRD_END;
@@ -155,11 +144,14 @@ export default function BankInstructions() {
                   const displayAmount = isEarlyBird ? earlyPrice : regularPrice;
                   const savings = regularPrice - earlyPrice;
                   return (
-                    <div className="rounded-lg border border-primary/40 bg-primary/5 p-4 space-y-3">
+                    <div className="rounded-lg border-2 border-primary/50 bg-primary/5 p-4 space-y-3 shadow-md">
                       <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 text-sm font-medium">
+                        <div className="flex items-center gap-2 text-sm font-semibold">
                           <CreditCard className="w-4 h-4 text-primary" />
                           Pay instantly by card
+                          <span className="ml-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide px-2 py-0.5">
+                            Recommended
+                          </span>
                         </div>
                         {isEarlyBird && (
                           <span className="rounded-full bg-primary/20 text-primary text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5">
@@ -197,17 +189,28 @@ export default function BankInstructions() {
                         </p>
                       )}
 
-                      <Button asChild className="w-full">
+                      <Button asChild size="lg" className="w-full">
                         <a href={payLink} target="_blank" rel="noopener noreferrer">
                           Pay {fmtMoney(displayAmount, order.currency)} by Card
                         </a>
                       </Button>
                       <p className="text-[11px] text-muted-foreground text-center">
-                        After paying, email your receipt + reference <strong>{order.reference_code}</strong> to {instructions.support_email}
+                        Spot confirmed immediately. After paying, email your receipt + reference <strong>{order.reference_code}</strong> to {instructions.support_email}.
                       </p>
                     </div>
                   );
                 })()}
+
+                <div className="rounded-lg bg-muted/40 p-4 space-y-1">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="w-4 h-4 text-amber-500" />
+                    <span className="font-medium text-amber-600 dark:text-amber-400">Pending payment</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Your spot is held for <strong>{instructions.payment_deadline_days} business days</strong>.
+                    Pay by card above for instant confirmation, or use the bank transfer details below.
+                  </p>
+                </div>
 
                 <div className="relative py-1">
                   <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
