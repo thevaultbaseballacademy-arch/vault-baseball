@@ -123,6 +123,16 @@ serve(async (req) => {
         .then(({ error }) => error && log("link product_id failed", error));
 
       // Fire-and-forget instructions email
+      const EARLY_BIRD_END = new Date("2026-05-23T00:00:00-05:00").getTime();
+      const isEarlyBird = Date.now() < EARLY_BIRD_END;
+      const isFullPass = amountCents >= 80000;
+      const payByCardUrl = isEarlyBird
+        ? (isFullPass
+            ? "https://buy.stripe.com/5kQ00i8lE2ApaDYfSV6Na05"
+            : "https://buy.stripe.com/4gM5kCeK27UJ27s7mp6Na04")
+        : (isFullPass
+            ? "https://buy.stripe.com/aFadR89pI0shbI22256Na03"
+            : "https://buy.stripe.com/28EdR89pIcaZcM66il6Na02");
       supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "bank-transfer-instructions",
@@ -133,6 +143,7 @@ serve(async (req) => {
             amountCents,
             campName: registration.camp_location,
             athleteName: customerName,
+            payByCardUrl,
           },
         },
       }).catch((err) => log("instructions email failed", err));
