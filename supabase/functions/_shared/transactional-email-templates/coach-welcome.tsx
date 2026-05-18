@@ -70,7 +70,7 @@ const CoachWelcome = ({
 
 export const template = {
   component: CoachWelcome,
-  subject: '🏆 You're a VAULT Verified Coach — complete your profile',
+  subject: "🏆 You're a VAULT Verified Coach — complete your profile",
   displayName: 'Coach welcome',
   previewData: {
     coachName: 'Chris',
