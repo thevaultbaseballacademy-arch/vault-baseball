@@ -32,4 +32,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'bank-transfer-instructions': bankTransferInstructions,
   'purchase-staff-notification': purchaseStaffNotification,
   'coach-welcome': coachWelcome,
+  'coach-onboarded-staff-notification': coachOnboardedStaffNotification,
 }
