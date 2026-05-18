@@ -19,6 +19,7 @@ import { template as campStaffNotification } from './camp-staff-notification.tsx
 import { template as bankTransferInstructions } from './bank-transfer-instructions.tsx'
 import { template as purchaseStaffNotification } from './purchase-staff-notification.tsx'
 import { template as coachWelcome } from './coach-welcome.tsx'
+import { template as coachOnboardedStaffNotification } from './coach-onboarded-staff-notification.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'tryout-confirmation': tryoutConfirmation,
@@ -31,4 +32,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'bank-transfer-instructions': bankTransferInstructions,
   'purchase-staff-notification': purchaseStaffNotification,
   'coach-welcome': coachWelcome,
+  'coach-onboarded-staff-notification': coachOnboardedStaffNotification,
 }
