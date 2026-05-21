@@ -143,6 +143,74 @@ const CoachProfile = () => {
         </CardContent>
       </Card>
 
+      {coachRecord?.id && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-primary" /> Shareable Booking Link
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Share this link with athletes and parents so they can view your profile and book lessons directly with you.
+            </p>
+            {(() => {
+              const bookingUrl = `${window.location.origin}/marketplace/coach/${coachRecord.id}`;
+              const subject = encodeURIComponent(`Book a lesson with ${form.display_name || "me"} on Vault OS`);
+              const body = encodeURIComponent(
+                `Hey,\n\nYou can view my coaching profile and book a lesson with me here:\n${bookingUrl}\n\nLooking forward to working with you.`
+              );
+              return (
+                <>
+                  <div className="flex items-center gap-2 p-2 border border-border bg-secondary/30 rounded">
+                    <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <Input value={bookingUrl} readOnly className="border-0 bg-transparent h-8 text-xs font-mono" />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(bookingUrl);
+                        toast.success("Link copied to clipboard");
+                      }}
+                    >
+                      <Copy className="w-4 h-4 mr-1" /> Copy Link
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      asChild
+                    >
+                      <a href={`mailto:?subject=${subject}&body=${body}`}>
+                        <Mail className="w-4 h-4 mr-1" /> Email
+                      </a>
+                    </Button>
+                    {typeof navigator !== "undefined" && (navigator as any).share && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                          try {
+                            await (navigator as any).share({
+                              title: "Book a lesson with me",
+                              text: `Book a lesson with ${form.display_name || "me"} on Vault OS`,
+                              url: bookingUrl,
+                            });
+                          } catch {}
+                        }}
+                      >
+                        <Share2 className="w-4 h-4 mr-1" /> Share
+                      </Button>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
+          </CardContent>
+        </Card>
+      )}
+
       {coachRecord && (
         <Card>
           <CardHeader><CardTitle className="text-sm">Coach Details</CardTitle></CardHeader>
