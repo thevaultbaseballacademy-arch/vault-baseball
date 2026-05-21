@@ -50,11 +50,21 @@ const SessionExpiryHandler = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === "SIGNED_OUT" && hadSession.current) {
-          safeRedirect("Session ended", "Please sign in again to continue.");
+          // Only treat SIGNED_OUT as terminal if there's truly no persisted
+          // session left in storage. Some flows (token refresh races, tab
+          // restores) can emit a transient SIGNED_OUT even though the
+          // session is still valid in storage.
+          supabase.auth.getSession().then(({ data: { session: s } }) => {
+            if (s) {
+              hadSession.current = true;
+              return;
+            }
+            safeRedirect("Session ended", "Please sign in again to continue.");
+          });
         }
 
-        if (event === "TOKEN_REFRESHED" && !session && hadSession.current) {
-          safeRedirect("Session expired", "Your session has expired. Please sign in again.");
+        if (event === "TOKEN_REFRESHED" && session) {
+          hadSession.current = true;
         }
 
         if (session) {
