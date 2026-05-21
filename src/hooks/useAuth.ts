@@ -52,24 +52,47 @@ export const useAuth = () => {
       },
     );
 
-    // Hard timeout: if Supabase auth hangs (e.g. bad_jwt / network stall),
-    // flip to unauthenticated after 4s rather than spinning forever behind AuthGuard.
-    let timedOut = false;
+    // Soft timeout: if Supabase auth hangs, flip `hydrated` so the UI can
+    // render — but if we can see a persisted session token in localStorage,
+    // mark the state as reconnecting (NOT unauthenticated) so AuthGuard
+    // keeps the user on the page instead of bouncing them to /auth.
+    const hasStoredSession = () => {
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith("sb-") && k.endsWith("-auth-token")) {
+            const v = localStorage.getItem(k);
+            if (v && v.length > 10) return true;
+          }
+        }
+      } catch {
+        // ignore (private mode, etc.)
+      }
+      return false;
+    };
+
+    let resolved = false;
     const hydrationTimeout = window.setTimeout(() => {
-      timedOut = true;
-      console.warn("[useAuth] getSession() timed out after 4s — treating as unauthenticated");
+      if (resolved) return;
+      if (hasStoredSession()) {
+        // Treat as reconnecting — onAuthStateChange will fire when it recovers.
+        setGlobalReconnecting(true);
+      }
       setHydrated(true);
-    }, 4000);
+    }, 15000);
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
-      if (timedOut) return; // late resolution; onAuthStateChange will catch real session
+      resolved = true;
       window.clearTimeout(hydrationTimeout);
+      setGlobalReconnecting(false);
       setSession(s);
       setUser(s?.user ?? null);
       setHydrated(true);
     }).catch((err) => {
+      resolved = true;
       console.error("[useAuth] getSession() failed", err);
       window.clearTimeout(hydrationTimeout);
+      if (hasStoredSession()) setGlobalReconnecting(true);
       setHydrated(true);
     });
 
