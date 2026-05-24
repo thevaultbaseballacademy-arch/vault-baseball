@@ -53,17 +53,29 @@ const RemoteLessons = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const safetyTimeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) { return; }
-      setUser(session.user);
-      checkCoachRole(session.user.id);
+    let cancelled = false;
+
+    const hydrate = (sessionUser: any) => {
+      if (!sessionUser || cancelled) return;
+      setUser(sessionUser);
+      checkCoachRole(sessionUser.id);
       fetchCoaches();
-      fetchLessons(session.user.id);
+      fetchLessons(sessionUser.id);
       setLoading(false);
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) hydrate(session.user);
+      else setLoading(false);
     });
+
+    // If the session arrives late (reconnect / token refresh), hydrate then.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user && !user) hydrate(session.user);
+    });
+
+    return () => { cancelled = true; subscription.unsubscribe(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkCoachRole = async (userId: string) => {
