@@ -129,6 +129,24 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (event === "INITIAL_SESSION") return;
+
+      // Guard: a transient TOKEN_REFRESHED / USER_UPDATED with a null session
+      // is almost always a network blip mid-refresh. Don't wipe user state —
+      // that causes role-gated pages (coach dashboard, remote lessons) to
+      // bounce or blank. Re-verify via getSession before clearing.
+      if (!nextSession?.access_token && event !== "SIGNED_OUT") {
+        void supabase.auth.getSession().then(({ data: { session: verified } }) => {
+          if (!active) return;
+          if (verified?.access_token) {
+            applySessionState(verified);
+            setIsLoading(false);
+            void checkSubscription(verified.access_token, verified.user?.email);
+          }
+          // If still null, stay put — SessionExpiryHandler will handle a true sign-out.
+        });
+        return;
+      }
+
       applySessionState(nextSession);
 
       if (!nextSession?.access_token) {
