@@ -82,6 +82,8 @@ export const useRoleAuth = () => {
     gcTime: 10 * 60 * 1000,
   });
 
+  const rolesSettled = !user || !authLoading ? !rolesLoading : false;
+
   const roles = data?.roles ?? [];
   const primaryRole = useMemo(() => getPrimaryRole(roles), [roles]);
 
@@ -99,7 +101,7 @@ export const useRoleAuth = () => {
     user: user ?? null,
     roles,
     primaryRole,
-    isLoading: authLoading || rolesLoading,
+    isLoading: authLoading || !rolesSettled,
     can,
     dashboardRoute,
     isOwner: roles.includes("owner"),

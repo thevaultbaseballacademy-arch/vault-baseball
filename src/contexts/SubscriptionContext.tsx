@@ -122,6 +122,23 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     const initializeAuth = async () => {
       setIsLoading(true);
       const { data: { session: restoredSession } } = await supabase.auth.getSession();
+      if (!restoredSession?.access_token) {
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith("sb-") && key.endsWith("-auth-token")) {
+              const value = localStorage.getItem(key);
+              if (value && value.length > 10) {
+                setIsLoading(false);
+                return;
+              }
+            }
+          }
+        } catch {
+          // ignore storage access issues and fall through
+        }
+      }
+
       await syncSessionState(restoredSession);
     };
 
