@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useRoleAuth } from "@/hooks/useRoleAuth";
 import { CoachAlerts } from "@/components/CoachAlerts";
 import { useCoachAlerts } from "@/hooks/useCoachAlerts";
 import { WeeklySummaryReport } from "@/components/WeeklySummaryReport";
