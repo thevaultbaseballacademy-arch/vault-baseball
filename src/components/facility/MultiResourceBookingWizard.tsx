@@ -358,13 +358,6 @@ const TimeStep = ({
     }));
   }, [slots]);
 
-  const restated = [
-    spaceName ? `**${spaceName}**` : "the selected space",
-    coachName ? `coach **${coachName}**` : null,
-  ]
-    .filter(Boolean)
-    .join(" and ");
-
   return (
     <div className="space-y-4">
       <Card className="p-4 bg-primary/5 border-primary/30">
@@ -372,7 +365,8 @@ const TimeStep = ({
           <Search className="w-4 h-4 text-primary shrink-0 mt-0.5" />
           <div className="text-sm text-foreground">
             Looking for {state.durationMinutes}-minute windows in the next 14 days when{" "}
-            <span dangerouslySetInnerHTML={{ __html: restated.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }} />{" "}
+            {spaceName ? <b>{spaceName}</b> : "the selected space"}
+            {coachName ? <> and coach <b>{coachName}</b></> : null}{" "}
             {coachName ? "are" : "is"} free at the same time.
           </div>
         </div>
