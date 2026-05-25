@@ -85,28 +85,14 @@ export const useSubmitVideoExam = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Fetch correct answers server-side
-      const { data: questions, error: qError } = await supabase
-        .from("video_questions")
-        .select("id, correct_answers")
-        .eq("certification_type", certType)
-        .eq("is_active", true);
-
-      if (qError) throw qError;
-
-      // Grade
-      let score = 0;
-      const totalPoints = (questions?.length || 0) * 4;
-
-      questions?.forEach((q: any) => {
-        const correct = typeof q.correct_answers === "string" ? JSON.parse(q.correct_answers) : q.correct_answers;
-        const userAnswers = answers[q.id];
-        if (!userAnswers) return;
-        if (userAnswers.q1 === correct.q1) score++;
-        if (userAnswers.q2 === correct.q2) score++;
-        if (userAnswers.q3 === correct.q3) score++;
-        if (userAnswers.q4 === correct.q4) score++;
+      // Server-side grading — correct_answers are not exposed to the client
+      const { data: gradeData, error: gradeErr } = await supabase.rpc("grade_video_exam", {
+        _cert_type: certType,
+        _answers: answers as any,
       });
+      if (gradeErr) throw gradeErr;
+      const score = (gradeData as any)?.score ?? 0;
+      const totalPoints = (gradeData as any)?.total_points ?? 0;
 
       const passed = totalPoints > 0 && (score / totalPoints) * 100 >= 80;
 

@@ -6,8 +6,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Simple in-memory IP rate limiter: 5 requests / hour per IP
+const rateBuckets = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 5;
+const WINDOW_MS = 60 * 60 * 1000;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("cf-connecting-ip") || "unknown";
+  const now = Date.now();
+  const bucket = rateBuckets.get(ip);
+  if (bucket && bucket.resetAt > now) {
+    if (bucket.count >= RATE_LIMIT) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": String(Math.ceil((bucket.resetAt - now) / 1000)) },
+      });
+    }
+    bucket.count++;
+  } else {
+    rateBuckets.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+  }
 
   try {
     const { athlete_name, email, parent_email, age, position, current_velocity, video_type } = await req.json();
