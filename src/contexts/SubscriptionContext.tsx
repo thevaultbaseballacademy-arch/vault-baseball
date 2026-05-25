@@ -173,12 +173,6 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
       console.warn(`[SubscriptionContext] persisted session recovery timed out during ${reason}`);
 
-      if (hasStoredSessionToken()) {
-        setGlobalReconnecting(true);
-        setIsLoading(true);
-        return;
-      }
-
       await syncSessionState(null);
     };
 
