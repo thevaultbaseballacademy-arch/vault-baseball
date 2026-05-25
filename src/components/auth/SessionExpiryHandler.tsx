@@ -49,6 +49,11 @@ const SessionExpiryHandler = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (event === "INITIAL_SESSION") {
+          if (session) hadSession.current = true;
+          return;
+        }
+
         if (event === "SIGNED_OUT" && hadSession.current) {
           // Only treat SIGNED_OUT as terminal if there's truly no persisted
           // session left in storage. Some flows (token refresh races, tab
@@ -61,10 +66,16 @@ const SessionExpiryHandler = () => {
             }
             safeRedirect("Session ended", "Please sign in again to continue.");
           });
+          return;
         }
 
-        if (event === "TOKEN_REFRESHED" && session) {
-          hadSession.current = true;
+        if (!session && event !== "SIGNED_OUT") {
+          supabase.auth.getSession().then(({ data: { session: s } }) => {
+            if (s) {
+              hadSession.current = true;
+            }
+          });
+          return;
         }
 
         if (session) {
