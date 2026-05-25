@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo } from "react";
+import { useRoleAuth } from "@/hooks/useRoleAuth";
 
 /**
  * Lightweight staff-access check for the Scheduling OS (`/ops/*`).
@@ -15,50 +15,16 @@ export interface StaffAccess {
 }
 
 export const useStaffAccess = (): StaffAccess => {
-  const [state, setState] = useState<StaffAccess>({
-    userId: null,
-    isAdmin: false,
-    isCoach: false,
-    isStaff: false,
-    isLoading: true,
-  });
+  const { user, isAdmin, isCoach, isLoading } = useRoleAuth();
 
-  useEffect(() => {
-    let cancelled = false;
-    const check = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          if (!cancelled) setState({ userId: null, isAdmin: false, isCoach: false, isStaff: false, isLoading: false });
-          return;
-        }
-        const [{ data: roles }, { data: ownerRow }] = await Promise.all([
-          supabase.from("user_roles").select("role").eq("user_id", user.id),
-          supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle(),
-        ]);
-        const isAdmin = !!roles?.some((r: any) => r.role === "admin") || !!ownerRow;
-        const isCoach = !!roles?.some((r: any) => r.role === "coach");
-        if (!cancelled) {
-          setState({
-            userId: user.id,
-            isAdmin,
-            isCoach,
-            isStaff: isAdmin || isCoach,
-            isLoading: false,
-          });
-        }
-      } catch (e) {
-        console.error("[useStaffAccess]", e);
-        if (!cancelled) setState({ userId: null, isAdmin: false, isCoach: false, isStaff: false, isLoading: false });
-      }
-    };
-    check();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => check());
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  return state;
+  return useMemo(
+    () => ({
+      userId: user?.id ?? null,
+      isAdmin,
+      isCoach,
+      isStaff: isAdmin || isCoach,
+      isLoading,
+    }),
+    [isAdmin, isCoach, isLoading, user?.id],
+  );
 };
