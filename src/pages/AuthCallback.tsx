@@ -9,8 +9,21 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Supabase automatically exchanges the token from the URL hash
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const waitForCallbackSession = async () => {
+          const startedAt = Date.now();
+
+          while (Date.now() - startedAt < 8000) {
+            const result = await supabase.auth.getSession();
+            if (result.error) return result;
+            if (result.data.session?.access_token) return result;
+            await new Promise((resolve) => window.setTimeout(resolve, 250));
+          }
+
+          return await supabase.auth.getSession();
+        };
+
+        // Wait for the callback exchange to fully hydrate before routing.
+        const { data: { session }, error } = await waitForCallbackSession();
         
         if (error) {
           console.error("Auth callback error:", error);

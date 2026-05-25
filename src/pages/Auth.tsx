@@ -132,6 +132,18 @@ const Auth = () => {
     }
   };
 
+  const waitForRestoredSession = async (timeoutMs: number = 5000) => {
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < timeoutMs) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) return session;
+      await new Promise((resolve) => window.setTimeout(resolve, 250));
+    }
+
+    return null;
+  };
+
   const validateForm = () => {
     try {
       authSchema.parse({ email, password, name: isLogin ? undefined : name });
@@ -174,8 +186,13 @@ const Auth = () => {
         toast({ title: "Welcome back!", description: "You're signed in." });
 
         // Navigate immediately; MFA check runs in background and only intervenes if needed.
-        if (data.user) {
-          const userId = data.user.id;
+        const restoredSession = data.session?.access_token ? data.session : await waitForRestoredSession();
+        if (!restoredSession?.user) {
+          throw new Error("Sign-in completed but your session is still restoring. Please try again.");
+        }
+
+        if (restoredSession.user) {
+          const userId = restoredSession.user.id;
           // Kick off MFA check in parallel — if a verified factor exists, prompt for it.
           // Tight 1.5s budget so a stalled GoTrue call cannot delay anything visible.
           withTimeout(
