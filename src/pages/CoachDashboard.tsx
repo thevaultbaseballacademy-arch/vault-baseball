@@ -67,9 +67,12 @@ interface CheckinData {
 }
 
 const CoachDashboard = () => {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [isCoach, setIsCoach] = useState(false);
+  // Centralized auth + role state — survives token refresh / BFCache restore
+  // without ever blanking the dashboard. Replaces the legacy getSession-once
+  // pattern that left isCoach stuck on `false` when the session arrived via
+  // onAuthStateChange after the initial mount.
+  const { user, isCoach, isOwner, isLoading: roleLoading } = useRoleAuth();
+  const isCoachOrOwner = isCoach || isOwner;
   const [coachRecordId, setCoachRecordId] = useState<string | null>(null);
   const [athletes, setAthletes] = useState<AthleteProfile[]>([]);
   const [checkins, setCheckins] = useState<CheckinData[]>([]);
@@ -77,7 +80,7 @@ const CoachDashboard = () => {
   const [athleteSearchTerm, setAthleteSearchTerm] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const {
     alerts,
     unreadCount,
@@ -88,71 +91,21 @@ const CoachDashboard = () => {
     fetchAlerts
   } = useCoachAlerts(user?.id || null);
 
+  // Load coach data whenever the role resolves to coach/owner.
   useEffect(() => {
-    const safetyTimeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) { return; }
-      setUser(session.user);
-      checkCoachRole(session.user.id);
-    });
+    if (!user?.id || !isCoachOrOwner) return;
+    fetchAthletes();
+    fetchAllCheckins();
+    supabase
+      .from('coaches')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => { if (data) setCoachRecordId(data.id); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isCoachOrOwner]);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) { /* AuthGuard handles redirect */ }
-      setUser(session?.user ?? null);
-    });
-
-    clearTimeout(safetyTimeout);
-
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const checkCoachRole = async (userId: string) => {
-    try {
-      // Check user_roles table first
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'coach')
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      // Also check team_whitelist for full_access as fallback
-      let hasTeamAccess = false;
-      if (!data) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user?.email) {
-          const { data: teamData } = await supabase
-            .from('team_whitelist')
-            .select('full_access')
-            .eq('email', user.email.toLowerCase())
-            .maybeSingle();
-          hasTeamAccess = teamData?.full_access ?? false;
-        }
-      }
-
-      if (data || hasTeamAccess) {
-        setIsCoach(true);
-        fetchAthletes();
-        fetchAllCheckins();
-        // Fetch coach record ID for marketplace
-        const { data: coachData } = await supabase
-          .from('coaches')
-          .select('id')
-          .eq('user_id', userId)
-          .maybeSingle();
-        if (coachData) setCoachRecordId(coachData.id);
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error('Error checking coach role:', error);
-      setLoading(false);
-    }
-  };
+  const loading = roleLoading;
 
   useEffect(() => {
     if (isCoach && user?.id && athletes.length > 0) {
