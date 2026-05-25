@@ -166,7 +166,7 @@ const RemoteLessons = () => {
                 <div className="px-4 py-2 bg-primary/10 rounded-full text-primary font-semibold text-sm">
                   {remainingLessons} credit{remainingLessons !== 1 ? 's' : ''} remaining
                 </div>
-                {!isCoach && (
+                {!isCoachView && (
                   <Button variant="vault" onClick={() => remainingLessons > 0 ? setShowBooking(true) : navigate('/lesson-packages')}>
                     <Plus className="w-4 h-4 mr-2" />
                     {remainingLessons > 0 ? 'Book Lesson' : 'Buy Credits'}
@@ -202,7 +202,7 @@ const RemoteLessons = () => {
                             </div>
                             <div>
                               <p className="font-semibold text-foreground">
-                                {isCoach ? `Athlete Session` : getCoachName(lesson.coach_user_id)}
+                                {isCoachView ? `Athlete Session` : getCoachName(lesson.coach_user_id)}
                               </p>
                               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <span className="flex items-center gap-1">
@@ -226,7 +226,7 @@ const RemoteLessons = () => {
                             }`}>{lesson.status}</span>
                             
                             <Button variant="vault" size="sm" onClick={() => handleStartLesson(lesson.id)}>
-                              <Phone className="w-4 h-4 mr-1" /> {isCoach ? 'Start' : 'Join'}
+                              <Phone className="w-4 h-4 mr-1" /> {isCoachView ? 'Start' : 'Join'}
                             </Button>
                             
                             <Button variant="ghost" size="sm" onClick={() => handleCancel(lesson.id)}>
