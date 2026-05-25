@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef, useCallback, Re
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { setGlobalReconnecting } from "@/hooks/useAuth";
 
 type SubscriptionTier = "basic" | "performance" | "elite" | null;
 
@@ -35,6 +36,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   const sessionRef = useRef<Session | null>(null);
   const userRef = useRef<User | null>(null);
+  const restoreAttemptRef = useRef(0);
 
   const applySessionState = useCallback((nextSession: Session | null) => {
     setSession(nextSession);
@@ -50,6 +52,22 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     setSubscriptionTier(null);
     setSubscriptionEnd(null);
     setHasTeamAccess(false);
+  }, []);
+
+  const hasStoredSessionToken = useCallback(() => {
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("sb-") && key.endsWith("-auth-token")) {
+          const value = localStorage.getItem(key);
+          if (value && value.length > 10) return true;
+        }
+      }
+    } catch {
+      // ignore storage access issues
+    }
+
+    return false;
   }, []);
 
   const checkTeamAccess = useCallback(async (email: string | undefined) => {
@@ -104,39 +122,72 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     const syncSessionState = async (nextSession: Session | null) => {
       if (!active) return;
 
+       restoreAttemptRef.current += 1;
+
       applySessionState(nextSession);
 
       if (!nextSession?.access_token) {
+        setGlobalReconnecting(false);
         resetSubscriptionState();
         if (active) setIsLoading(false);
         return;
       }
 
       if (active) {
+        setGlobalReconnecting(false);
         setIsLoading(false);
       }
 
       void checkSubscription(nextSession.access_token, nextSession.user?.email);
     };
 
+    const recoverPersistedSession = async (reason: string) => {
+      const attemptId = ++restoreAttemptRef.current;
+
+      if (!hasStoredSessionToken()) {
+        setGlobalReconnecting(false);
+        await syncSessionState(null);
+        return;
+      }
+
+      setGlobalReconnecting(true);
+      setIsLoading(true);
+
+      const startedAt = Date.now();
+      const maxWaitMs = 12000;
+
+      while (active && attemptId === restoreAttemptRef.current && Date.now() - startedAt < maxWaitMs) {
+        const { data: { session: verified } } = await supabase.auth.getSession();
+
+        if (!active || attemptId !== restoreAttemptRef.current) return;
+
+        if (verified?.access_token) {
+          await syncSessionState(verified);
+          return;
+        }
+
+        await new Promise((resolve) => window.setTimeout(resolve, 350));
+      }
+
+      if (!active || attemptId !== restoreAttemptRef.current) return;
+
+      console.warn(`[SubscriptionContext] persisted session recovery timed out during ${reason}`);
+
+      if (hasStoredSessionToken()) {
+        setGlobalReconnecting(true);
+        setIsLoading(true);
+        return;
+      }
+
+      await syncSessionState(null);
+    };
+
     const initializeAuth = async () => {
       setIsLoading(true);
       const { data: { session: restoredSession } } = await supabase.auth.getSession();
-      if (!restoredSession?.access_token) {
-        try {
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith("sb-") && key.endsWith("-auth-token")) {
-              const value = localStorage.getItem(key);
-              if (value && value.length > 10) {
-                setIsLoading(false);
-                return;
-              }
-            }
-          }
-        } catch {
-          // ignore storage access issues and fall through
-        }
+      if (!restoredSession?.access_token && hasStoredSessionToken()) {
+        await recoverPersistedSession("initial load");
+        return;
       }
 
       await syncSessionState(restoredSession);
@@ -152,21 +203,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       // that causes role-gated pages (coach dashboard, remote lessons) to
       // bounce or blank. Re-verify via getSession before clearing.
       if (!nextSession?.access_token && event !== "SIGNED_OUT") {
-        void supabase.auth.getSession().then(({ data: { session: verified } }) => {
-          if (!active) return;
-          if (verified?.access_token) {
-            applySessionState(verified);
-            setIsLoading(false);
-            void checkSubscription(verified.access_token, verified.user?.email);
-          }
-          // If still null, stay put — SessionExpiryHandler will handle a true sign-out.
-        });
+        void recoverPersistedSession(`auth event ${event}`);
         return;
       }
 
       applySessionState(nextSession);
 
       if (!nextSession?.access_token) {
+        setGlobalReconnecting(false);
         resetSubscriptionState();
         setIsLoading(false);
         return;
