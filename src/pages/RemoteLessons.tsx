@@ -36,11 +36,12 @@ interface RemoteLesson {
 }
 
 const RemoteLessons = () => {
-  const [user, setUser] = useState<any>(null);
-  const [isCoach, setIsCoach] = useState(false);
+  // Centralized auth/role state — rehydrates correctly after token refresh
+  // and tab restores. Replaces the legacy getSession-once + stale-closure
+  // pattern that left lessons empty when the session arrived late.
+  const { user, isCoach, isOwner, isLoading: roleLoading } = useRoleAuth();
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [lessons, setLessons] = useState<RemoteLesson[]>([]);
-  const [loading, setLoading] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [selectedCoach, setSelectedCoach] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -52,36 +53,15 @@ const RemoteLessons = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const loading = roleLoading;
+  const isCoachView = isCoach || isOwner;
+
   useEffect(() => {
-    let cancelled = false;
-
-    const hydrate = (sessionUser: any) => {
-      if (!sessionUser || cancelled) return;
-      setUser(sessionUser);
-      checkCoachRole(sessionUser.id);
-      fetchCoaches();
-      fetchLessons(sessionUser.id);
-      setLoading(false);
-    };
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) hydrate(session.user);
-      else setLoading(false);
-    });
-
-    // If the session arrives late (reconnect / token refresh), hydrate then.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user && !user) hydrate(session.user);
-    });
-
-    return () => { cancelled = true; subscription.unsubscribe(); };
+    if (!user?.id) return;
+    fetchCoaches();
+    fetchLessons(user.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const checkCoachRole = async (userId: string) => {
-    const { data } = await supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'coach').maybeSingle();
-    setIsCoach(!!data);
-  };
+  }, [user?.id]);
 
   const fetchCoaches = async () => {
     // Use coach_marketplace_profiles (publicly readable for active coaches)
@@ -92,7 +72,7 @@ const RemoteLessons = () => {
 
     if (!marketplaceCoaches?.length) return;
     const coachIds = marketplaceCoaches.map(r => r.user_id);
-    
+
     const { data } = await supabase.rpc('get_public_profiles_by_ids', { user_ids: coachIds });
     setCoaches((data || []).map((p: any) => ({ user_id: p.user_id, display_name: p.display_name, avatar_url: p.avatar_url, position: p.player_position })));
   };
