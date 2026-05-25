@@ -8312,6 +8312,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      grade_video_exam: {
+        Args: { _answers: Json; _cert_type: string }
+        Returns: Json
+      }
       has_admin_role: { Args: { user_uuid: string }; Returns: boolean }
       has_role: {
         Args: {
