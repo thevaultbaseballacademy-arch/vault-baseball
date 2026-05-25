@@ -109,10 +109,10 @@ const CoachDashboard = () => {
   const loading = roleLoading;
 
   useEffect(() => {
-    if (isCoach && user?.id && athletes.length > 0) {
+    if (isCoachOrOwner && user?.id && athletes.length > 0) {
       generateAlerts();
     }
-  }, [isCoach, user?.id, athletes.length, generateAlerts]);
+  }, [isCoachOrOwner, user?.id, athletes.length, generateAlerts]);
 
   const fetchAthletes = async () => {
     try {
@@ -251,7 +251,7 @@ const CoachDashboard = () => {
     );
   }
 
-  if (!isCoach) {
+  if (!isCoachOrOwner) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
