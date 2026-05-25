@@ -15,6 +15,7 @@ import { useLessonCredits } from "@/hooks/useLessonCredits";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LiveVideoCall from "@/components/coaching/LiveVideoCall";
+import { useRoleAuth } from "@/hooks/useRoleAuth";
 
 interface Coach {
   user_id: string;
