@@ -198,11 +198,11 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (event === "INITIAL_SESSION") return;
 
-      // Guard: a transient TOKEN_REFRESHED / USER_UPDATED with a null session
-      // is almost always a network blip mid-refresh. Don't wipe user state —
-      // that causes role-gated pages (coach dashboard, remote lessons) to
-      // bounce or blank. Re-verify via getSession before clearing.
-      if (!nextSession?.access_token && event !== "SIGNED_OUT") {
+      // Guard: token refresh, tab restore, and even occasional transient
+      // SIGNED_OUT events can briefly present a null session before auth
+      // storage finishes settling. Re-verify before clearing shared user state
+      // so route guards never bounce a still-signed-in user back to /auth.
+      if (!nextSession?.access_token) {
         void recoverPersistedSession(`auth event ${event}`);
         return;
       }
