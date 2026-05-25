@@ -239,10 +239,24 @@ const LegacyTryoutRegisterRedirect = () => {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes  
-      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes — keep data fresh in cache, avoid refetch storms
+      gcTime: 10 * 60 * 1000, // 10 minutes — keep unused data around for back-nav
+      refetchOnWindowFocus: false, // don't hammer the API when users tab back
+      refetchOnReconnect: 'always', // but do refresh after network drops
+      refetchOnMount: false, // trust cached data while it's still fresh
+      retry: (failureCount, error: any) => {
+        // Don't retry auth/permission errors — they won't get better
+        const status = error?.status ?? error?.statusCode;
+        if (status === 401 || status === 403 || status === 404) return false;
+        return failureCount < 2; // 2 retries for transient errors (network blips)
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000), // exp backoff, max 8s
+      networkMode: 'online', // queue queries when offline instead of failing
+    },
+    mutations: {
       retry: 1,
+      retryDelay: 1500,
+      networkMode: 'online',
     },
   },
 });
