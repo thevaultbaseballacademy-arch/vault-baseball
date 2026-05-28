@@ -62,6 +62,8 @@ const TrialProtectedRoute = ({
     );
   }
 
+  // Coaches, admins, and owners bypass the trial gate entirely.
+  if (isCoach || isAdmin || isOwner) return <>{children}</>;
   if (isFullMember) return <>{children}</>;
   if (isTrialUser && !isTrialExpired) return <>{children}</>;
   if (isTrialUser && isTrialExpired && !allowTrialAccess) {
