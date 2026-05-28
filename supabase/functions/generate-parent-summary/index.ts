@@ -37,6 +37,18 @@ serve(async (req) => {
 
     if (fbError || !feedback) throw new Error("Feedback not found");
 
+    // Authorization: caller must be the coach who created the feedback (or admin)
+    const callerId = claimsRes.claims.sub;
+    if (feedback.coach_user_id !== callerId) {
+      const { data: roleData } = await supabase
+        .from("user_roles").select("role")
+        .eq("user_id", callerId)
+        .in("role", ["admin", "owner"]).maybeSingle();
+      if (!roleData) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     // Get athlete profile
     const { data: profile } = await supabase
       .from("profiles")
