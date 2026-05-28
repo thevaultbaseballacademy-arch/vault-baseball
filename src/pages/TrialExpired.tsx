@@ -1,16 +1,22 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { Shield, AlertTriangle, Lock, Database, TrendingUp, Zap, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import TrialFeedbackForm from "@/components/trial/TrialFeedbackForm";
+import { useRoleAuth } from "@/hooks/useRoleAuth";
 
 const TrialExpired = () => {
   const navigate = useNavigate();
   const { checkout, loading } = useProductCheckout();
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const { isCoach, isAdmin, isOwner, dashboardRoute, isLoading: roleLoading } = useRoleAuth();
+
+  if (!roleLoading && (isCoach || isAdmin || isOwner)) {
+    return <Navigate to={dashboardRoute || "/dashboard"} replace />;
+  }
 
   const handleUpgrade = () => {
     checkout('founders_access', `${window.location.origin}/payment-success`, `${window.location.origin}/trial-expired`);
