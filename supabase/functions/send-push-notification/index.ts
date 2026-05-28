@@ -190,21 +190,50 @@ serve(async (req) => {
     const payload = validation.payload!;
     logStep("Received validated payload", { type: payload.type, broadcast: payload.broadcast });
 
-    // For broadcast notifications, check if user is admin
-    if (payload.broadcast) {
-      const { data: roleData } = await supabaseClient
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", authenticatedUserId)
-        .eq("role", "admin")
-        .maybeSingle();
+    // Check sender's privileged roles
+    const { data: roleRows } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", authenticatedUserId)
+      .in("role", ["admin", "owner", "coach"]);
+    const roles = new Set((roleRows || []).map((r: { role: string }) => r.role));
+    const isAdmin = roles.has("admin") || roles.has("owner");
+    const isCoach = roles.has("coach");
 
-      if (!roleData) {
-        logStep("Broadcast attempted by non-admin", { userId: authenticatedUserId });
-        return new Response(
-          JSON.stringify({ error: "Only admins can send broadcast notifications" }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    // Broadcast requires admin/owner
+    if (payload.broadcast && !isAdmin) {
+      logStep("Broadcast attempted by non-admin", { userId: authenticatedUserId });
+      return new Response(
+        JSON.stringify({ error: "Only admins can send broadcast notifications" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Targeted sends: only admin/owner, or coach to their assigned+approved athletes
+    if (!payload.broadcast && payload.targetUserIds && payload.targetUserIds.length > 0) {
+      if (!isAdmin) {
+        if (!isCoach) {
+          return new Response(
+            JSON.stringify({ error: "Not authorized to send targeted notifications" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        // Coach: verify each target is an active+approved assigned athlete
+        const { data: assignments } = await supabaseClient
+          .from("coach_athlete_assignments")
+          .select("athlete_user_id")
+          .eq("coach_user_id", authenticatedUserId)
+          .eq("is_active", true)
+          .eq("athlete_approved", true)
+          .in("athlete_user_id", payload.targetUserIds);
+        const allowed = new Set((assignments || []).map((a: { athlete_user_id: string }) => a.athlete_user_id));
+        const denied = payload.targetUserIds.filter((id) => !allowed.has(id));
+        if (denied.length > 0) {
+          return new Response(
+            JSON.stringify({ error: "Not authorized for one or more target users" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
       }
     }
 
@@ -268,7 +297,7 @@ serve(async (req) => {
       title: payload.title,
       message: payload.body,
       type: payload.type,
-      actor_id: payload.data?.actorId || authenticatedUserId,
+      actor_id: authenticatedUserId,
       post_id: payload.data?.postId || null,
       is_read: false,
     }));
