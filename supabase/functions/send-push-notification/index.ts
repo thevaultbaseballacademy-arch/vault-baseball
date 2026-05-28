@@ -297,7 +297,7 @@ serve(async (req) => {
       title: payload.title,
       message: payload.body,
       type: payload.type,
-      actor_id: payload.data?.actorId || authenticatedUserId,
+      actor_id: authenticatedUserId,
       post_id: payload.data?.postId || null,
       is_read: false,
     }));
