@@ -4,6 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { isGloballyReconnecting } from "@/hooks/useAuth";
+import { useRoleAuth } from "@/hooks/useRoleAuth";
 
 interface TrialProtectedRouteProps {
   children: React.ReactNode;
@@ -22,6 +23,7 @@ const TrialProtectedRoute = ({
 }: TrialProtectedRouteProps) => {
   const { user, isLoading: authLoading } = useSubscription();
   const { isTrialUser, isTrialExpired, isFullMember, loading } = useTrialStatus();
+  const { isCoach, isAdmin, isOwner } = useRoleAuth();
   const location = useLocation();
 
   const [forceShow, setForceShow] = useState(false);
@@ -60,6 +62,8 @@ const TrialProtectedRoute = ({
     );
   }
 
+  // Coaches, admins, and owners bypass the trial gate entirely.
+  if (isCoach || isAdmin || isOwner) return <>{children}</>;
   if (isFullMember) return <>{children}</>;
   if (isTrialUser && !isTrialExpired) return <>{children}</>;
   if (isTrialUser && isTrialExpired && !allowTrialAccess) {
