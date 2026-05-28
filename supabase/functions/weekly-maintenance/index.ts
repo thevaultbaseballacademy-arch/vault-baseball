@@ -39,9 +39,6 @@ Deno.serve(async (req) => {
 
   if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
     isAuthorized = true;
-  } else if (body?.source === "cron" && authHeader === `Bearer ${anonKey}`) {
-    // Called by pg_cron with anon key
-    isAuthorized = true;
   } else if (authHeader?.startsWith("Bearer ")) {
     const authClient = createClient(supabaseUrl, anonKey);
     const token = authHeader.replace("Bearer ", "");
