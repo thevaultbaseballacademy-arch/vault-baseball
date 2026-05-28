@@ -52,6 +52,18 @@ serve(async (req) => {
     const athleteUserId = feedback.athlete_user_id;
     const coachUserId = feedback.coach_user_id;
 
+    // Authorization: caller must be the coach who owns the feedback (or admin)
+    const callerId = claimsRes.claims.sub;
+    if (coachUserId !== callerId) {
+      const { data: roleData } = await supabase
+        .from("user_roles").select("role")
+        .eq("user_id", callerId)
+        .in("role", ["admin", "owner"]).maybeSingle();
+      if (!roleData) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     // ─── Gather context ──────────────────────────────────────────────────
     const [profileRes, kpisRes, historyRes, progressionRes] = await Promise.all([
       supabase.from("profiles").select("display_name, position, sport_type").eq("user_id", athleteUserId).single(),
