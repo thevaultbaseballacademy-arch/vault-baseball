@@ -40,6 +40,18 @@ serve(async (req) => {
 
     if (fbErr || !feedback) throw new Error("Feedback not found");
 
+    // Authorization: caller must be the coach who created the feedback (or admin)
+    const callerId = claimsRes.claims.sub;
+    if (feedback.coach_user_id !== callerId) {
+      const { data: roleData } = await supabase
+        .from("user_roles").select("role")
+        .eq("user_id", callerId)
+        .in("role", ["admin", "owner"]).maybeSingle();
+      if (!roleData) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     const sportType = feedback.sport_type || "baseball";
     const isSoftball = sportType === "softball";
     const sportLabel = isSoftball ? "softball" : "baseball";
