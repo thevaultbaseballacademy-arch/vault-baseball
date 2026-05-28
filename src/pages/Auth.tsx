@@ -169,13 +169,24 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        // Hard 12s cap on the sign-in network call so the spinner can NEVER hang forever.
+        // Hard 20s cap on the sign-in network call so the spinner can NEVER hang forever.
         const signInResult = await withTimeout(
           Promise.resolve(supabase.auth.signInWithPassword({ email, password })),
-          12000,
+          20000,
           "signInWithPassword"
         );
+
+        // If the network call timed out, the auth request may have actually succeeded
+        // server-side (common on flaky mobile/5G). Check for an established session
+        // before declaring failure — recover silently if one is present.
         if (!signInResult) {
+          const recovered = await waitForRestoredSession(4000);
+          if (recovered?.user) {
+            recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
+            toast({ title: "Welcome back!", description: "You're signed in." });
+            await routeByRole(recovered.user.id);
+            return;
+          }
           throw new Error("Sign-in is taking longer than expected. Please check your connection and try again.");
         }
         const { data, error } = signInResult as any;
@@ -190,6 +201,7 @@ const Auth = () => {
         if (!restoredSession?.user) {
           throw new Error("Sign-in completed but your session is still restoring. Please try again.");
         }
+
 
         if (restoredSession.user) {
           const userId = restoredSession.user.id;

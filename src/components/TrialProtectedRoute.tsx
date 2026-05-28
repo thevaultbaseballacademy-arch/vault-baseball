@@ -23,15 +23,15 @@ const TrialProtectedRoute = ({
 }: TrialProtectedRouteProps) => {
   const { user, isLoading: authLoading } = useSubscription();
   const { isTrialUser, isTrialExpired, isFullMember, loading } = useTrialStatus();
-  const { isCoach, isAdmin, isOwner } = useRoleAuth();
+  const { isCoach, isAdmin, isOwner, isLoading: roleLoading } = useRoleAuth();
   const location = useLocation();
 
   const [forceShow, setForceShow] = useState(false);
   useEffect(() => {
-    if (!loading) return;
+    if (!loading && !roleLoading) return;
     const t = window.setTimeout(() => setForceShow(true), 3000);
     return () => window.clearTimeout(t);
-  }, [loading]);
+  }, [loading, roleLoading]);
 
   // Wait for auth to hydrate before deciding to bounce to /auth.
   if (authLoading && !forceShow) {
@@ -54,7 +54,9 @@ const TrialProtectedRoute = ({
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  if (loading && !forceShow) {
+  // CRITICAL: wait for role lookup to settle before any trial-expired redirect,
+  // otherwise admins/coaches/owners get bounced to /trial-expired on first paint.
+  if ((loading || roleLoading) && !forceShow) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -72,5 +74,6 @@ const TrialProtectedRoute = ({
 
   return <>{children}</>;
 };
+
 
 export default TrialProtectedRoute;
