@@ -75,6 +75,5 @@ const TrialProtectedRoute = ({
   return <>{children}</>;
 };
 
-};
 
 export default TrialProtectedRoute;
