@@ -4,6 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { isGloballyReconnecting } from "@/hooks/useAuth";
+import { useRoleAuth } from "@/hooks/useRoleAuth";
 
 interface TrialProtectedRouteProps {
   children: React.ReactNode;
