@@ -23,6 +23,7 @@ const TrialProtectedRoute = ({
 }: TrialProtectedRouteProps) => {
   const { user, isLoading: authLoading } = useSubscription();
   const { isTrialUser, isTrialExpired, isFullMember, loading } = useTrialStatus();
+  const { isCoach, isAdmin, isOwner } = useRoleAuth();
   const location = useLocation();
 
   const [forceShow, setForceShow] = useState(false);
