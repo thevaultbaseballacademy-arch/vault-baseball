@@ -26,6 +26,7 @@ const VALID_PAYMENT_PRICE_IDS = [
   'price_1SqEW4PhXS410TO51a1fzsw1',
   'price_1SqEGKPhXS410TO5JALh4Imp',
   'price_1SqEGMPhXS410TO5PNwPNJOe',
+  'price_1Tc8hwCgc5Pgku6WrELIHEgR', // Vault Recruitment Audit ($199)
   // Bundles
   'price_1SqEW6PhXS410TO5GbLVm4te',
   'price_1SqEW8PhXS410TO5A7WuQgc6',

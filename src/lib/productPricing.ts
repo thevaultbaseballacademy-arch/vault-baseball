@@ -87,8 +87,8 @@ export const PRODUCT_PRICES = {
     type: 'payment' as const,
   },
   recruitment_audit: {
-    price_id: 'price_1SqEGMPhXS410TO5PNwPNJOe',
-    product_id: 'prod_TnpwJeeXHyjrva',
+    price_id: 'price_1Tc8hwCgc5Pgku6WrELIHEgR',
+    product_id: 'prod_UbLOoJQkeWRPTG',
     name: 'Vault Recruitment Audit',
     price: 19900,
     type: 'payment' as const,
