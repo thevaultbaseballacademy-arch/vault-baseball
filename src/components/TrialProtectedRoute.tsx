@@ -64,6 +64,10 @@ const TrialProtectedRoute = ({
     );
   }
 
+  // Long-term safety: once the spinner cap is reached, fail open rather than
+  // sending a privileged or paid user to /trial-expired on incomplete data.
+  if (forceShow && (loading || roleLoading)) return <>{children}</>;
+
   // Coaches, admins, and owners bypass the trial gate entirely.
   if (isCoach || isAdmin || isOwner) return <>{children}</>;
   if (isFullMember) return <>{children}</>;

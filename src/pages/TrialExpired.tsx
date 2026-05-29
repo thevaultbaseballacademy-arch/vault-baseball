@@ -7,14 +7,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useProductCheckout } from "@/hooks/useProductCheckout";
 import TrialFeedbackForm from "@/components/trial/TrialFeedbackForm";
 import { useRoleAuth } from "@/hooks/useRoleAuth";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 const TrialExpired = () => {
   const navigate = useNavigate();
   const { checkout, loading } = useProductCheckout();
   const [showUpgrade, setShowUpgrade] = useState(false);
   const { isCoach, isAdmin, isOwner, dashboardRoute, isLoading: roleLoading } = useRoleAuth();
+  const { isSubscribed, hasTeamAccess, isLoading: subscriptionLoading } = useSubscription();
 
-  if (!roleLoading && (isCoach || isAdmin || isOwner)) {
+  if (!roleLoading && !subscriptionLoading && (isCoach || isAdmin || isOwner || isSubscribed || hasTeamAccess)) {
     return <Navigate to={dashboardRoute || "/dashboard"} replace />;
   }
 
