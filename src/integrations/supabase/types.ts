@@ -6799,6 +6799,84 @@ export type Database = {
           },
         ]
       }
+      team_registrations: {
+        Row: {
+          amount_paid_cents: number
+          annual_tuition_cents: number
+          created_at: string
+          deposit_cents: number
+          id: string
+          installment_cents: number
+          installment_count: number
+          notes: string | null
+          paid_at: string | null
+          parent_email: string
+          parent_first_name: string
+          parent_last_name: string
+          parent_phone: string
+          payment_plan: string
+          player_dob: string | null
+          player_first_name: string
+          player_last_name: string
+          player_position: string | null
+          status: string
+          stripe_session_id: string | null
+          team_level: string
+          tier: string
+          updated_at: string
+        }
+        Insert: {
+          amount_paid_cents?: number
+          annual_tuition_cents: number
+          created_at?: string
+          deposit_cents?: number
+          id?: string
+          installment_cents?: number
+          installment_count?: number
+          notes?: string | null
+          paid_at?: string | null
+          parent_email: string
+          parent_first_name: string
+          parent_last_name: string
+          parent_phone: string
+          payment_plan: string
+          player_dob?: string | null
+          player_first_name: string
+          player_last_name: string
+          player_position?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          team_level: string
+          tier: string
+          updated_at?: string
+        }
+        Update: {
+          amount_paid_cents?: number
+          annual_tuition_cents?: number
+          created_at?: string
+          deposit_cents?: number
+          id?: string
+          installment_cents?: number
+          installment_count?: number
+          notes?: string | null
+          paid_at?: string | null
+          parent_email?: string
+          parent_first_name?: string
+          parent_last_name?: string
+          parent_phone?: string
+          payment_plan?: string
+          player_dob?: string | null
+          player_first_name?: string
+          player_last_name?: string
+          player_position?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          team_level?: string
+          tier?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       team_whitelist: {
         Row: {
           added_by: string | null
