@@ -104,45 +104,36 @@ const Auth = () => {
       ),
     ]);
 
-  /** Route user to the correct dashboard based on their role */
-  const routeByRole = async (userId: string) => {
+  /** Route user to the correct dashboard based on their role.
+   *  Navigation is INSTANT — we hop to /dashboard right away and let a
+   *  background role lookup refine the destination if needed. This guarantees
+   *  the sign-in UI never blocks on a DB query.
+   */
+  const routeByRole = (userId: string) => {
     const from = (location.state as any)?.from?.pathname;
-    if (from && from !== "/auth") {
-      navigate(from, { replace: true });
-      return;
-    }
+    const safeDefault = from && from !== "/auth" ? from : "/dashboard";
 
-    // Tight 1.5s budget — if the role lookup stalls we ship the user to /dashboard
-    // immediately rather than hanging the login UI. Dashboard handles role nuance itself.
-    const result = await withTimeout(
+    // Navigate immediately — no awaits, no spinners.
+    navigate(safeDefault, { replace: true });
+
+    // Best-effort role refinement in the background. If we get a faster
+    // answer back, hop to the role-specific dashboard. Destination pages
+    // already gate on role so this is purely a UX nicety.
+    if (from && from !== "/auth") return;
+    withTimeout(
       Promise.resolve(supabase.from("user_roles").select("role").eq("user_id", userId)),
-      1500,
+      1200,
       "user_roles lookup"
-    );
-
-    const userRoles = (result as any)?.data?.map((r: any) => r.role) || [];
-
-    if (userRoles.includes("admin")) {
-      navigate("/admin", { replace: true });
-    } else if (userRoles.includes("coach")) {
-      navigate("/coach-dashboard", { replace: true });
-    } else {
-      // Safe default — Dashboard further routes based on profile/role if needed
-      navigate("/dashboard", { replace: true });
-    }
+    ).then((result: any) => {
+      const userRoles = result?.data?.map((r: any) => r.role) || [];
+      if (userRoles.includes("admin")) {
+        navigate("/admin", { replace: true });
+      } else if (userRoles.includes("coach")) {
+        navigate("/coach-dashboard", { replace: true });
+      }
+    }).catch(() => { /* already on /dashboard, no-op */ });
   };
 
-  const waitForRestoredSession = async (timeoutMs: number = 5000) => {
-    const startedAt = Date.now();
-
-    while (Date.now() - startedAt < timeoutMs) {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) return session;
-      await new Promise((resolve) => window.setTimeout(resolve, 250));
-    }
-
-    return null;
-  };
 
   const validateForm = () => {
     try {
