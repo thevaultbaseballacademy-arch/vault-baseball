@@ -159,11 +159,14 @@ export const usePublicTryouts = () =>
     queryKey: ["tryouts", "public"],
     retry: false,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
-    refetchOnReconnect: false,
-    refetchOnMount: false,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
+    staleTime: 1000 * 60,
     initialData: () => {
       const cached = readCache<TryoutEventSummary[]>(PUBLIC_TRYOUTS_CACHE_KEY);
-      return cached ? sortByStartDate(cached.filter(isUpcomingPublishedTryout)) : undefined;
+      if (!cached?.length) return undefined;
+      const filtered = sortByStartDate(cached.filter(isUpcomingPublishedTryout));
+      return filtered.length ? filtered : undefined;
     },
     queryFn: async () => {
       try {
