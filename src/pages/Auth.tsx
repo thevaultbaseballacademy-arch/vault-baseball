@@ -104,45 +104,36 @@ const Auth = () => {
       ),
     ]);
 
-  /** Route user to the correct dashboard based on their role */
-  const routeByRole = async (userId: string) => {
+  /** Route user to the correct dashboard based on their role.
+   *  Navigation is INSTANT — we hop to /dashboard right away and let a
+   *  background role lookup refine the destination if needed. This guarantees
+   *  the sign-in UI never blocks on a DB query.
+   */
+  const routeByRole = (userId: string) => {
     const from = (location.state as any)?.from?.pathname;
-    if (from && from !== "/auth") {
-      navigate(from, { replace: true });
-      return;
-    }
+    const safeDefault = from && from !== "/auth" ? from : "/dashboard";
 
-    // Tight 1.5s budget — if the role lookup stalls we ship the user to /dashboard
-    // immediately rather than hanging the login UI. Dashboard handles role nuance itself.
-    const result = await withTimeout(
+    // Navigate immediately — no awaits, no spinners.
+    navigate(safeDefault, { replace: true });
+
+    // Best-effort role refinement in the background. If we get a faster
+    // answer back, hop to the role-specific dashboard. Destination pages
+    // already gate on role so this is purely a UX nicety.
+    if (from && from !== "/auth") return;
+    withTimeout(
       Promise.resolve(supabase.from("user_roles").select("role").eq("user_id", userId)),
-      1500,
+      1200,
       "user_roles lookup"
-    );
-
-    const userRoles = (result as any)?.data?.map((r: any) => r.role) || [];
-
-    if (userRoles.includes("admin")) {
-      navigate("/admin", { replace: true });
-    } else if (userRoles.includes("coach")) {
-      navigate("/coach-dashboard", { replace: true });
-    } else {
-      // Safe default — Dashboard further routes based on profile/role if needed
-      navigate("/dashboard", { replace: true });
-    }
+    ).then((result: any) => {
+      const userRoles = result?.data?.map((r: any) => r.role) || [];
+      if (userRoles.includes("admin")) {
+        navigate("/admin", { replace: true });
+      } else if (userRoles.includes("coach")) {
+        navigate("/coach-dashboard", { replace: true });
+      }
+    }).catch(() => { /* already on /dashboard, no-op */ });
   };
 
-  const waitForRestoredSession = async (timeoutMs: number = 5000) => {
-    const startedAt = Date.now();
-
-    while (Date.now() - startedAt < timeoutMs) {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) return session;
-      await new Promise((resolve) => window.setTimeout(resolve, 250));
-    }
-
-    return null;
-  };
 
   const validateForm = () => {
     try {
@@ -169,60 +160,48 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        // Hard 20s cap on the sign-in network call so the spinner can NEVER hang forever.
+        // Hard 15s cap on the sign-in network call so the spinner can NEVER hang forever.
         const signInResult = await withTimeout(
           Promise.resolve(supabase.auth.signInWithPassword({ email, password })),
-          20000,
+          15000,
           "signInWithPassword"
         );
 
-        // If the network call timed out, the auth request may have actually succeeded
-        // server-side (common on flaky mobile/5G). Check for an established session
-        // before declaring failure — recover silently if one is present.
         if (!signInResult) {
-          const recovered = await waitForRestoredSession(4000);
-          if (recovered?.user) {
-            recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
-            toast({ title: "Welcome back!", description: "You're signed in." });
-            await routeByRole(recovered.user.id);
-            return;
-          }
           throw new Error("Sign-in is taking longer than expected. Please check your connection and try again.");
         }
         const { data, error } = signInResult as any;
         if (error) throw error;
 
+        const userId = data?.user?.id;
+        if (!userId) {
+          throw new Error("Sign-in completed but no user was returned. Please try again.");
+        }
+
         // Fire-and-forget telemetry — never block navigation
         recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
         toast({ title: "Welcome back!", description: "You're signed in." });
 
-        // Navigate immediately; MFA check runs in background and only intervenes if needed.
-        const restoredSession = data.session?.access_token ? data.session : await waitForRestoredSession();
-        if (!restoredSession?.user) {
-          throw new Error("Sign-in completed but your session is still restoring. Please try again.");
-        }
+        // Kick off MFA check in parallel — if a verified factor exists, prompt for it.
+        // Tight 1.5s budget so a stalled GoTrue call cannot delay anything visible.
+        withTimeout(
+          Promise.resolve(supabase.auth.mfa.listFactors()),
+          1500,
+          "mfa.listFactors"
+        ).then((factorsRes: any) => {
+          const verifiedFactors =
+            factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
+          if (verifiedFactors.length > 0) {
+            setMfaRequired(true);
+            setMfaFactorId(verifiedFactors[0].id);
+            setMfaUserId(userId);
+          }
+        });
 
-
-        if (restoredSession.user) {
-          const userId = restoredSession.user.id;
-          // Kick off MFA check in parallel — if a verified factor exists, prompt for it.
-          // Tight 1.5s budget so a stalled GoTrue call cannot delay anything visible.
-          withTimeout(
-            Promise.resolve(supabase.auth.mfa.listFactors()),
-            1500,
-            "mfa.listFactors"
-          ).then((factorsRes: any) => {
-            const verifiedFactors =
-              factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
-            if (verifiedFactors.length > 0) {
-              setMfaRequired(true);
-              setMfaFactorId(verifiedFactors[0].id);
-              setMfaUserId(userId);
-            }
-          });
-          await routeByRole(userId);
-        }
+        // Navigate IMMEDIATELY — routeByRole is synchronous now.
+        routeByRole(userId);
       } else {
+
         const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
