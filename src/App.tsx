@@ -293,6 +293,7 @@ const App = () => (
             <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
             <Route path="/teams/register" element={<TeamRegister />} />
             <Route path="/teams/register/success" element={<TeamRegisterSuccess />} />
+            <Route path="/register" element={<TeamRegister />} />
             <Route path="/camps" element={<Camps />} />
             <Route path="/camps/:cohortId/register" element={<CampRegister />} />
             <Route path="/camps/success" element={<CampSuccess />} />
