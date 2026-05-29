@@ -135,9 +135,29 @@ serve(async (req) => {
         ? `Full annual tuition for ${pFirst} ${pLast}.`
         : `Deposit of $${(depositCents / 100).toFixed(0)} today. Balance ($${((level.annualTuitionCents - depositCents) / 100).toFixed(0)}) over ${installmentCount} monthly installments of approx $${(installmentCents / 100).toFixed(0)}.`;
 
+    // Reuse existing Stripe customer (linked by parent email) so a family that
+    // previously paid for tryouts/camps shows up as the same customer record.
+    let customerId: string | undefined;
+    try {
+      const existing = await stripe.customers.list({ email: parEmail, limit: 1 });
+      if (existing.data[0]) {
+        customerId = existing.data[0].id;
+      } else {
+        const created = await stripe.customers.create({
+          email: parEmail,
+          name: `${parFirst} ${parLast}`,
+          phone: parPhone,
+          metadata: { source: "team_registration" },
+        });
+        customerId = created.id;
+      }
+    } catch (e) {
+      console.warn("[create-team-registration] customer lookup failed, falling back to customer_email", e);
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      customer_email: parEmail,
+      ...(customerId ? { customer: customerId } : { customer_email: parEmail }),
       line_items: [
         {
           price_data: {
@@ -155,6 +175,7 @@ serve(async (req) => {
         registration_id: regRow.id,
         team_level: level.label,
         payment_plan: plan,
+        parent_email: parEmail,
       },
     });
 
