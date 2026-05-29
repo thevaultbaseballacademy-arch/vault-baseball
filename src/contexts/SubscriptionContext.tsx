@@ -154,7 +154,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
 
       const startedAt = Date.now();
-      const maxWaitMs = 12000;
+      const maxWaitMs = 4000;
 
       while (active && attemptId === restoreAttemptRef.current && Date.now() - startedAt < maxWaitMs) {
         const { data: { session: verified } } = await supabase.auth.getSession();
@@ -166,8 +166,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        await new Promise((resolve) => window.setTimeout(resolve, 350));
+        await new Promise((resolve) => window.setTimeout(resolve, 200));
       }
+
 
       if (!active || attemptId !== restoreAttemptRef.current) return;
 
