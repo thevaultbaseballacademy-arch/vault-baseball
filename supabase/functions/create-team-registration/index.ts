@@ -155,6 +155,27 @@ serve(async (req) => {
       console.warn("[create-team-registration] customer lookup failed, falling back to customer_email", e);
     }
 
+    // Unified parent profile shared across tryouts, camps, and team registrations.
+    try {
+      await supabase
+        .from("parent_profiles")
+        .upsert(
+          {
+            email: parEmail,
+            parent_first_name: parFirst,
+            parent_last_name: parLast,
+            parent_name: `${parFirst} ${parLast}`,
+            parent_phone: parPhone,
+            stripe_customer_id: customerId ?? null,
+            last_seen_at: new Date().toISOString(),
+          },
+          { onConflict: "email" },
+        );
+    } catch (e) {
+      console.warn("[create-team-registration] parent_profiles upsert failed", e);
+    }
+
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       ...(customerId ? { customer: customerId } : { customer_email: parEmail }),
