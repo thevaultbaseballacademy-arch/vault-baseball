@@ -71,8 +71,7 @@ export const useTrialStatus = (): TrialStatus => {
         return { trial } as const;
       }
 
-      // Fallback: check account age
-      return { accountCreatedAt: user.created_at } as const;
+      return null;
     },
     enabled: !!user && !subLoading,
     staleTime: 5 * 60 * 1000,
@@ -123,25 +122,6 @@ export const useTrialStatus = (): TrialStatus => {
       trialExpiresAt: expiresAt,
       loading: false,
     };
-  }
-
-  if ('accountCreatedAt' in trialData && trialData.accountCreatedAt) {
-    const accountCreated = new Date(trialData.accountCreatedAt);
-    const now = new Date();
-    const accountAgeDays = differenceInDays(now, accountCreated);
-
-    if (accountAgeDays > 7) {
-      return {
-        isTrialUser: true,
-        isTrialExpired: true,
-        isFullMember: false,
-        daysRemaining: 0,
-        hoursRemaining: 0,
-        trialStartedAt: accountCreated,
-        trialExpiresAt: new Date(accountCreated.getTime() + 7 * 24 * 60 * 60 * 1000),
-        loading: false,
-      };
-    }
   }
 
   return {
