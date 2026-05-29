@@ -79,6 +79,7 @@ const OwnerFacility = lazy(() => import("./pages/admin/OwnerFacility"));
 const OwnerEssaBookings = lazy(() => import("./pages/admin/OwnerEssaBookings"));
 const AdminTryouts = lazy(() => import("./pages/admin/AdminTryouts"));
 const AdminTeamRegistrations = lazy(() => import("./pages/admin/AdminTeamRegistrations"));
+const AdminPlayerJourney = lazy(() => import("./pages/admin/AdminPlayerJourney"));
 const TeamRegister = lazy(() => import("./pages/teams/TeamRegister"));
 const TeamRegisterSuccess = lazy(() => import("./pages/teams/TeamRegisterSuccess"));
 const AdminTryoutDetail = lazy(() => import("./pages/admin/AdminTryoutDetail"));
