@@ -4,8 +4,8 @@ import { toast } from "sonner";
 
 const TRYOUT_SUMMARY_SELECT = "id, name, age_group, starts_at, ends_at, location_name, address, price_cents, capacity, waitlist_capacity, description, what_to_bring, status, created_at, updated_at";
 const TRYOUT_DETAIL_SELECT = `${TRYOUT_SUMMARY_SELECT}, waiver_text, coach_ids`;
-const PUBLIC_TRYOUTS_CACHE_KEY = "public-tryouts:v3";
-const PUBLIC_TRYOUT_CACHE_KEY = (id: string) => `public-tryout:${id}:v3`;
+const PUBLIC_TRYOUTS_CACHE_KEY = "public-tryouts:v4";
+const PUBLIC_TRYOUT_CACHE_KEY = (id: string) => `public-tryout:${id}:v4`;
 const PUBLIC_TRYOUT_REQUEST_TIMEOUT_MS = 4000;
 const TRYOUT_SUBMIT_TIMEOUT_MS = 12000;
 
@@ -159,11 +159,14 @@ export const usePublicTryouts = () =>
     queryKey: ["tryouts", "public"],
     retry: false,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
-    refetchOnReconnect: false,
-    refetchOnMount: false,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
+    staleTime: 1000 * 60,
     initialData: () => {
       const cached = readCache<TryoutEventSummary[]>(PUBLIC_TRYOUTS_CACHE_KEY);
-      return cached ? sortByStartDate(cached.filter(isUpcomingPublishedTryout)) : undefined;
+      if (!cached?.length) return undefined;
+      const filtered = sortByStartDate(cached.filter(isUpcomingPublishedTryout));
+      return filtered.length ? filtered : undefined;
     },
     queryFn: async () => {
       try {
