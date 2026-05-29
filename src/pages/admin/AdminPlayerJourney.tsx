@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Loader2, Trophy, ClipboardList, DollarSign, Mail, Phone } from "lucide-react";
+import { ArrowLeft, Loader2, Trophy, ClipboardList, DollarSign, Mail, Tent } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,19 @@ type Tryout = {
   paid_at: string | null;
   registered_at: string;
   event_id: string;
+};
+
+type Camp = {
+  id: string;
+  player_first_name: string;
+  player_last_name: string;
+  parent_name: string;
+  parent_phone: string;
+  status: string;
+  amount_paid_cents: number;
+  paid_at: string | null;
+  registered_at: string;
+  registration_type: string;
 };
 
 type Reg = {
@@ -44,14 +57,19 @@ const AdminPlayerJourney = () => {
   const email = decodeURIComponent(rawEmail ?? "").toLowerCase();
   const [loading, setLoading] = useState(true);
   const [tryouts, setTryouts] = useState<Tryout[]>([]);
+  const [camps, setCamps] = useState<Camp[]>([]);
   const [regs, setRegs] = useState<Reg[]>([]);
 
   useEffect(() => {
     if (!email) return;
     (async () => {
-      const [t, r] = await Promise.all([
+      const [t, c, r] = await Promise.all([
         (supabase.from("tryout_registrations" as any) as any)
           .select("id, player_first_name, player_last_name, parent_name, parent_phone, status, paid_at, registered_at, event_id")
+          .eq("parent_email", email)
+          .order("registered_at", { ascending: false }),
+        (supabase.from("camp_registrations" as any) as any)
+          .select("id, player_first_name, player_last_name, parent_name, parent_phone, status, amount_paid_cents, paid_at, registered_at, registration_type")
           .eq("parent_email", email)
           .order("registered_at", { ascending: false }),
         (supabase.from("team_registrations" as any) as any)
@@ -60,6 +78,7 @@ const AdminPlayerJourney = () => {
           .order("created_at", { ascending: false }),
       ]);
       setTryouts((t.data ?? []) as Tryout[]);
+      setCamps((c.data ?? []) as Camp[]);
       setRegs((r.data ?? []) as Reg[]);
       setLoading(false);
     })();
@@ -67,14 +86,17 @@ const AdminPlayerJourney = () => {
 
   const totals = useMemo(() => {
     const tryoutPaid = tryouts.filter((t) => t.paid_at).length;
+    const campPaid = camps.filter((c) => c.paid_at);
     const regPaid = regs.filter((r) => r.status === "paid");
-    const revenue = regPaid.reduce((s, r) => s + (r.amount_paid_cents || 0), 0);
-    return { tryoutPaid, regPaid: regPaid.length, revenue };
-  }, [tryouts, regs]);
+    const revenue =
+      regPaid.reduce((s, r) => s + (r.amount_paid_cents || 0), 0) +
+      campPaid.reduce((s, c) => s + (c.amount_paid_cents || 0), 0);
+    return { tryoutPaid, campPaid: campPaid.length, regPaid: regPaid.length, revenue };
+  }, [tryouts, camps, regs]);
 
   const headerName =
     regs[0] ? `${regs[0].parent_first_name} ${regs[0].parent_last_name}` :
-    tryouts[0]?.parent_name ?? email;
+    tryouts[0]?.parent_name ?? camps[0]?.parent_name ?? email;
 
   return (
     <div>
