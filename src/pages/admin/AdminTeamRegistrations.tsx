@@ -155,7 +155,12 @@ const AdminTeamRegistrations = () => {
                       </td>
                       <td className="p-3">
                         <div>{r.parent_first_name} {r.parent_last_name}</div>
-                        <div className="text-xs text-muted-foreground">{r.parent_email}</div>
+                        <Link
+                          to={`/admin/player-journey/${encodeURIComponent(r.parent_email)}`}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          {r.parent_email}
+                        </Link>
                         <div className="text-xs text-muted-foreground">{r.parent_phone}</div>
                       </td>
                       <td className="p-3 text-xs">
