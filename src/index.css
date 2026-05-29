@@ -142,6 +142,10 @@
     height: 100%;
     /* Defensive: prevent any rogue child element from causing horizontal page scroll */
     overflow-x: hidden;
+    /* Disable native pull-to-refresh (iOS Safari / Chrome Android). A swipe-down
+       should NOT reload the SPA — reload drops in-memory state and the user
+       was reporting it bounced them off their current page mid-session. */
+    overscroll-behavior-y: none;
   }
 
   body {
@@ -149,7 +153,7 @@
     overflow-x: hidden;
     /* Smooth momentum scrolling on iOS, no rubber-band past edges */
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
+    overscroll-behavior-y: none;
     /* Safe-area insets for notch / dynamic island / home indicator */
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
