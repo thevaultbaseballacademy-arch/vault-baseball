@@ -79,6 +79,7 @@ const OwnerFacility = lazy(() => import("./pages/admin/OwnerFacility"));
 const OwnerEssaBookings = lazy(() => import("./pages/admin/OwnerEssaBookings"));
 const AdminTryouts = lazy(() => import("./pages/admin/AdminTryouts"));
 const AdminTeamRegistrations = lazy(() => import("./pages/admin/AdminTeamRegistrations"));
+const AdminPlayerJourney = lazy(() => import("./pages/admin/AdminPlayerJourney"));
 const TeamRegister = lazy(() => import("./pages/teams/TeamRegister"));
 const TeamRegisterSuccess = lazy(() => import("./pages/teams/TeamRegisterSuccess"));
 const AdminTryoutDetail = lazy(() => import("./pages/admin/AdminTryoutDetail"));
@@ -293,6 +294,7 @@ const App = () => (
             <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
             <Route path="/teams/register" element={<TeamRegister />} />
             <Route path="/teams/register/success" element={<TeamRegisterSuccess />} />
+            <Route path="/register" element={<TeamRegister />} />
             <Route path="/camps" element={<Camps />} />
             <Route path="/camps/:cohortId/register" element={<CampRegister />} />
             <Route path="/camps/success" element={<CampSuccess />} />
@@ -387,6 +389,12 @@ const App = () => (
               } />
               <Route path="team-registrations" element={
                 <RoleGuard requires="view_revenue_dashboard"><AdminTeamRegistrations /></RoleGuard>
+              } />
+              <Route path="registrations" element={
+                <RoleGuard requires="view_revenue_dashboard"><AdminTeamRegistrations /></RoleGuard>
+              } />
+              <Route path="player-journey/:email" element={
+                <RoleGuard requires="view_revenue_dashboard"><AdminPlayerJourney /></RoleGuard>
               } />
               <Route path="payments" element={
                 <RoleGuard requires="view_revenue_dashboard"><AdminPayments /></RoleGuard>
