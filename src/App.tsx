@@ -78,6 +78,9 @@ const OwnerExports = lazy(() => import("./pages/admin/OwnerExports"));
 const OwnerFacility = lazy(() => import("./pages/admin/OwnerFacility"));
 const OwnerEssaBookings = lazy(() => import("./pages/admin/OwnerEssaBookings"));
 const AdminTryouts = lazy(() => import("./pages/admin/AdminTryouts"));
+const AdminTeamRegistrations = lazy(() => import("./pages/admin/AdminTeamRegistrations"));
+const TeamRegister = lazy(() => import("./pages/teams/TeamRegister"));
+const TeamRegisterSuccess = lazy(() => import("./pages/teams/TeamRegisterSuccess"));
 const AdminTryoutDetail = lazy(() => import("./pages/admin/AdminTryoutDetail"));
 const Community = lazy(() => import("./pages/Community"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -288,6 +291,8 @@ const App = () => (
             <Route path="/tryouts/register/:id" element={<LegacyTryoutRegisterRedirect />} />
             <Route path="/tryouts/:id/register" element={<TryoutRegister />} />
             <Route path="/tryouts/cancel/:token" element={<CancelTryout />} />
+            <Route path="/teams/register" element={<TeamRegister />} />
+            <Route path="/teams/register/success" element={<TeamRegisterSuccess />} />
             <Route path="/camps" element={<Camps />} />
             <Route path="/camps/:cohortId/register" element={<CampRegister />} />
             <Route path="/camps/success" element={<CampSuccess />} />
@@ -379,6 +384,9 @@ const App = () => (
               } />
               <Route path="tryouts" element={
                 <RoleGuard requires="view_facility_schedule"><AdminTryouts /></RoleGuard>
+              } />
+              <Route path="team-registrations" element={
+                <RoleGuard requires="view_revenue_dashboard"><AdminTeamRegistrations /></RoleGuard>
               } />
               <Route path="payments" element={
                 <RoleGuard requires="view_revenue_dashboard"><AdminPayments /></RoleGuard>
