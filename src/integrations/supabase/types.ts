@@ -4818,6 +4818,51 @@ export type Database = {
         }
         Relationships: []
       }
+      parent_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          parent_first_name: string | null
+          parent_last_name: string | null
+          parent_name: string | null
+          parent_phone: string | null
+          stripe_customer_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          parent_first_name?: string | null
+          parent_last_name?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          stripe_customer_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          parent_first_name?: string | null
+          parent_last_name?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          stripe_customer_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       payment_events: {
         Row: {
           created_at: string
