@@ -1,8 +1,9 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   isGloballyReconnecting,
   setGlobalReconnecting,
+  subscribeToGlobalReconnecting,
 } from "@/lib/authSession";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 
@@ -29,7 +30,9 @@ export type AuthState =
 
 export const useAuth = () => {
   const { user, session, isLoading } = useSubscription();
-  const reconnecting = isGloballyReconnecting();
+  const [reconnecting, setReconnecting] = useState(isGloballyReconnecting());
+
+  useEffect(() => subscribeToGlobalReconnecting(setReconnecting), []);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
