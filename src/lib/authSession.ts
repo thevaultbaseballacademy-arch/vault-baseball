@@ -13,7 +13,9 @@ export const isGloballyReconnecting = () => globalReconnecting;
 
 export const subscribeToGlobalReconnecting = (cb: (v: boolean) => void) => {
   reconnectingListeners.add(cb);
-  return () => reconnectingListeners.delete(cb);
+  return () => {
+    reconnectingListeners.delete(cb);
+  };
 };
 
 export const hasStoredSessionToken = () => {
