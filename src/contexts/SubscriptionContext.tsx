@@ -179,16 +179,6 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      applySessionState(nextSession);
-
-      if (!nextSession?.access_token) {
-        setGlobalReconnecting(false);
-        resetSubscriptionState();
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(false);
       void syncSessionState(nextSession);
     });
 
@@ -203,7 +193,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       subscription.unsubscribe();
       clearInterval(interval);
     };
-  }, [applySessionState, checkSubscription, resetSubscriptionState]);
+  }, [applySessionState, checkSubscription]);
 
   return (
     <SubscriptionContext.Provider
