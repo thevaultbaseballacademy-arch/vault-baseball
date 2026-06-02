@@ -194,23 +194,21 @@ const Auth = () => {
         recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
         toast({ title: "Welcome back!", description: "You're signed in." });
 
-        // Kick off MFA check in parallel — if a verified factor exists, prompt for it.
-        // Tight 1.5s budget so a stalled GoTrue call cannot delay anything visible.
-        withTimeout(
+        const factorsRes = await withTimeout(
           Promise.resolve(supabase.auth.mfa.listFactors()),
           1500,
           "mfa.listFactors"
-        ).then((factorsRes: any) => {
-          const verifiedFactors =
-            factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
-          if (verifiedFactors.length > 0) {
-            setMfaRequired(true);
-            setMfaFactorId(verifiedFactors[0].id);
-            setMfaUserId(userId);
-          }
-        });
+        );
 
-        // Navigate IMMEDIATELY — routeByRole is synchronous now.
+        const verifiedFactors =
+          factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
+        if (verifiedFactors.length > 0) {
+          setMfaRequired(true);
+          setMfaFactorId(verifiedFactors[0].id);
+          setMfaUserId(userId);
+          return;
+        }
+
         routeByRole(userId);
       } else {
 
