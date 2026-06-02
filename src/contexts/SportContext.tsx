@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SportType, SportConfig, getSportConfig } from "@/lib/sportTypes";
+import { useSubscription } from "./SubscriptionContext";
 
 export type SoftballFormat = "fastpitch" | "slowpitch";
 
@@ -27,7 +28,8 @@ export const useSport = () => useContext(SportContext);
 export const SportProvider = ({ children }: { children: ReactNode }) => {
   const [sport, setSportState] = useState<SportType>('baseball');
   const [softballFormat, setSoftballFormatState] = useState<SoftballFormat>('fastpitch');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { user, isLoading: authLoading } = useSubscription();
 
   const loadFromProfile = async (userId: string) => {
     const { data } = await supabase
@@ -46,10 +48,13 @@ export const SportProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const init = async () => {
+      if (authLoading) return;
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          await loadFromProfile(session.user.id);
+        if (user?.id) {
+          await loadFromProfile(user.id);
+        } else {
+          setSportState('baseball');
+          setSoftballFormatState('fastpitch');
         }
       } catch (err) {
         console.error('Error loading sport preference:', err);
@@ -58,19 +63,8 @@ export const SportProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    init();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        await loadFromProfile(session.user.id);
-      } else {
-        setSportState('baseball');
-        setSoftballFormatState('fastpitch');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    void init();
+  }, [authLoading, user?.id]);
 
   const setSport = async (newSport: SportType) => {
     const { data: { session } } = await supabase.auth.getSession();
