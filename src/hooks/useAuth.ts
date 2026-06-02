@@ -8,6 +8,8 @@ import {
   subscribeToGlobalReconnecting,
 } from "@/lib/authSession";
 
+export { isGloballyReconnecting, setGlobalReconnecting } from "@/lib/authSession";
+
 /**
  * Centralized auth state machine. Phase 2 introduces this as the single
  * source of truth for "am I logged in" so future routes don't each call
