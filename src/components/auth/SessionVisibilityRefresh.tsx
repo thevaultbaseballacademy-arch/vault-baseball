@@ -29,20 +29,21 @@ const SessionVisibilityRefresh = () => {
       if (inFlight) return;
       inFlight = true;
       let startedRecovery = false;
+      let recovered = false;
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session || force) {
           startedRecovery = true;
           setReconnecting(true);
           setGlobalReconnecting(true);
-          await waitForRecoveredSession({ timeoutMs: 6000, intervalMs: 200, refresh: true });
+          recovered = !!(await waitForRecoveredSession({ timeoutMs: 6000, intervalMs: 200, refresh: true }));
         }
       } catch {
         // Swallow — onAuthStateChange / SessionExpiryHandler handle terminal failures
       } finally {
         inFlight = false;
         setReconnecting(false);
-        if (!startedRecovery) {
+        if (!startedRecovery || !recovered) {
           setGlobalReconnecting(false);
         }
       }
