@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { waitForRecoveredSession } from "@/lib/authSession";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -9,21 +10,8 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const waitForCallbackSession = async () => {
-          const startedAt = Date.now();
-
-          while (Date.now() - startedAt < 8000) {
-            const result = await supabase.auth.getSession();
-            if (result.error) return result;
-            if (result.data.session?.access_token) return result;
-            await new Promise((resolve) => window.setTimeout(resolve, 250));
-          }
-
-          return await supabase.auth.getSession();
-        };
-
-        // Wait for the callback exchange to fully hydrate before routing.
-        const { data: { session }, error } = await waitForCallbackSession();
+        const session = await waitForRecoveredSession({ timeoutMs: 8000, intervalMs: 250 });
+        const error = null;
         
         if (error) {
           console.error("Auth callback error:", error);
