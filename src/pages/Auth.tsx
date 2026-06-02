@@ -181,7 +181,11 @@ const Auth = () => {
         const { data, error } = signInResult as any;
         if (error) throw error;
 
-        const userId = data?.user?.id;
+        const hydratedSession = data?.session?.access_token
+          ? data.session
+          : await waitForRecoveredSession({ timeoutMs: 4000, intervalMs: 200 });
+
+        const userId = data?.user?.id ?? hydratedSession?.user?.id;
         if (!userId) {
           throw new Error("Sign-in completed but no user was returned. Please try again.");
         }
