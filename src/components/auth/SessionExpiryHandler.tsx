@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { isGloballyReconnecting } from "@/hooks/useAuth";
+import { hasStoredSessionToken, isGloballyReconnecting, waitForRecoveredSession } from "@/lib/authSession";
 
 /**
  * Global component that listens for auth state changes and handles
@@ -29,17 +29,14 @@ const SessionExpiryHandler = () => {
     const safeRedirect = (title: string, description: string) => {
       // If a refresh is in flight, give it a beat. Re-check after the typical
       // refresh window — if still no session, then it's terminal.
-      if (isGloballyReconnecting()) {
-        setTimeout(() => {
-          if (isGloballyReconnecting()) return; // still trying — let it finish
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            if (!session) {
-              hadSession.current = false;
-              toast({ title, description, variant: "destructive" });
-              navigate("/auth", { replace: true });
-            }
-          });
-        }, 2500);
+      if (isGloballyReconnecting() || hasStoredSessionToken()) {
+        void waitForRecoveredSession({ timeoutMs: 6000, intervalMs: 200 }).then((session) => {
+          if (!session) {
+            hadSession.current = false;
+            toast({ title, description, variant: "destructive" });
+            navigate("/auth", { replace: true });
+          }
+        });
         return;
       }
       hadSession.current = false;
