@@ -1,3 +1,6 @@
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+
 let globalReconnecting = false;
 const reconnectingListeners = new Set<(v: boolean) => void>();
 
@@ -27,4 +30,36 @@ export const hasStoredSessionToken = () => {
   }
 
   return false;
+};
+
+export const waitForRecoveredSession = async ({
+  timeoutMs = 6000,
+  intervalMs = 200,
+  refresh = false,
+}: {
+  timeoutMs?: number;
+  intervalMs?: number;
+  refresh?: boolean;
+} = {}): Promise<Session | null> => {
+  if (refresh) {
+    try {
+      await supabase.auth.refreshSession();
+    } catch {
+      // Ignore and fall back to polling getSession.
+    }
+  }
+
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) return session;
+    } catch {
+      // Retry until timeout.
+    }
+
+    await new Promise((resolve) => window.setTimeout(resolve, intervalMs));
+  }
+
+  return null;
 };
