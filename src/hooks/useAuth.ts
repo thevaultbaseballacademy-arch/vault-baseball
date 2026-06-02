@@ -1,6 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
+import {
+  hasStoredSessionToken,
+  isGloballyReconnecting,
+  setGlobalReconnecting,
+  subscribeToGlobalReconnecting,
+} from "@/lib/authSession";
 
 /**
  * Centralized auth state machine. Phase 2 introduces this as the single
@@ -21,44 +27,13 @@ export type AuthState =
   | "reconnecting"
   | "unauthenticated";
 
-let globalReconnecting = false;
-const reconnectingListeners = new Set<(v: boolean) => void>();
-
-/** Called by SessionVisibilityRefresh to mark a refresh window. */
-export const setGlobalReconnecting = (v: boolean) => {
-  globalReconnecting = v;
-  reconnectingListeners.forEach((cb) => cb(v));
-};
-
-/**
- * Synchronous read of the global reconnecting flag. Used by above-guard
- * components like SessionExpiryHandler that need to suppress hard redirects
- * while a session refresh is in flight (avoids the iOS BFCache → /auth race).
- */
-export const isGloballyReconnecting = () => globalReconnecting;
-
 export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [hydrated, setHydrated] = useState(false);
-  const [reconnecting, setReconnecting] = useState(globalReconnecting);
+  const [reconnecting, setReconnecting] = useState(isGloballyReconnecting());
 
   useEffect(() => {
-    const hasStoredSession = () => {
-      try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k && k.startsWith("sb-") && k.endsWith("-auth-token")) {
-            const v = localStorage.getItem(k);
-            if (v && v.length > 10) return true;
-          }
-        }
-      } catch {
-        // ignore (private mode, etc.)
-      }
-      return false;
-    };
-
     const applyAuthState = (nextSession: Session | null) => {
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
@@ -75,7 +50,7 @@ export const useAuth = () => {
           return;
         }
 
-        if (hasStoredSession()) {
+        if (hasStoredSessionToken()) {
           setGlobalReconnecting(true);
           setHydrated(true);
           return;
@@ -85,7 +60,7 @@ export const useAuth = () => {
         applyAuthState(null);
       }).catch((err) => {
         console.error("[useAuth] session recheck failed", err);
-        if (hasStoredSession()) {
+        if (hasStoredSessionToken()) {
           setGlobalReconnecting(true);
           setHydrated(true);
           return;
@@ -122,7 +97,7 @@ export const useAuth = () => {
     let resolved = false;
     const hydrationTimeout = window.setTimeout(() => {
       if (resolved) return;
-      if (hasStoredSession()) {
+      if (hasStoredSessionToken()) {
         // Treat as reconnecting — onAuthStateChange will fire when it recovers.
         setGlobalReconnecting(true);
       }
@@ -137,7 +112,7 @@ export const useAuth = () => {
         return;
       }
 
-      if (hasStoredSession()) {
+      if (hasStoredSessionToken()) {
         setGlobalReconnecting(true);
         setHydrated(true);
         return;
@@ -149,7 +124,7 @@ export const useAuth = () => {
       resolved = true;
       console.error("[useAuth] getSession() failed", err);
       window.clearTimeout(hydrationTimeout);
-      if (hasStoredSession()) {
+      if (hasStoredSessionToken()) {
         setGlobalReconnecting(true);
         setHydrated(true);
         return;
@@ -159,12 +134,11 @@ export const useAuth = () => {
       applyAuthState(null);
     });
 
-    const onReconnecting = (v: boolean) => setReconnecting(v);
-    reconnectingListeners.add(onReconnecting);
+    const unsubscribe = subscribeToGlobalReconnecting((v) => setReconnecting(v));
 
     return () => {
       subscription.unsubscribe();
-      reconnectingListeners.delete(onReconnecting);
+      unsubscribe();
     };
   }, []);
 
