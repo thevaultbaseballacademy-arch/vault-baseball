@@ -11,30 +11,21 @@ const AuthCallback = () => {
     const handleCallback = async () => {
       try {
         const session = await waitForRecoveredSession({ timeoutMs: 8000, intervalMs: 250 });
-        const error = null;
-        
-        if (error) {
-          console.error("Auth callback error:", error);
-          navigate("/auth", { replace: true });
-          return;
-        }
 
         if (session?.user) {
-          navigate("/dashboard", { replace: true });
-
-          supabase
+          const { data: roles } = await supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", session.user.id)
-            .then(({ data: roles }) => {
-              const userRoles = roles?.map(r => r.role) || [];
+            .eq("user_id", session.user.id);
 
-              if (userRoles.includes("admin")) {
-                navigate("/admin", { replace: true });
-              } else if (userRoles.includes("coach")) {
-                navigate("/coach-dashboard", { replace: true });
-              }
-            });
+          const userRoles = roles?.map(r => r.role) || [];
+          const destination = userRoles.includes("admin")
+            ? "/admin"
+            : userRoles.includes("coach")
+              ? "/coach-dashboard"
+              : "/dashboard";
+
+          navigate(destination, { replace: true });
         } else {
           navigate("/auth", { replace: true });
         }
