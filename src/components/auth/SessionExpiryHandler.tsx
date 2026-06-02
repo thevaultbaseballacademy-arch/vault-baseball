@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { isGloballyReconnecting } from "@/hooks/useAuth";
+import { hasStoredSessionToken, isGloballyReconnecting, subscribeToGlobalReconnecting, waitForRecoveredSession } from "@/lib/authSession";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 /**
  * Global component that listens for auth state changes and handles
@@ -20,72 +20,39 @@ const SessionExpiryHandler = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const hadSession = useRef(false);
+  const { session, user, isLoading } = useSubscription();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) hadSession.current = true;
+    if (session?.access_token) {
+      hadSession.current = true;
+      return;
+    }
+
+    if (isLoading || isGloballyReconnecting()) return;
+
+    if (hadSession.current && !user) {
+      void waitForRecoveredSession({ timeoutMs: 6000, intervalMs: 200 }).then((restoredSession) => {
+        if (!restoredSession) {
+          hadSession.current = false;
+          toast({ title: "Session ended", description: "Please sign in again to continue.", variant: "destructive" });
+          navigate("/auth", { replace: true });
+        }
+      });
+    }
+  }, [isLoading, navigate, session?.access_token, toast, user]);
+
+  useEffect(() => subscribeToGlobalReconnecting((value) => {
+    if (value) return;
+    if (!hadSession.current || isLoading || user || hasStoredSessionToken()) return;
+
+    void waitForRecoveredSession({ timeoutMs: 4000, intervalMs: 200 }).then((restoredSession) => {
+      if (!restoredSession) {
+        hadSession.current = false;
+        toast({ title: "Session ended", description: "Please sign in again to continue.", variant: "destructive" });
+        navigate("/auth", { replace: true });
+      }
     });
-
-    const safeRedirect = (title: string, description: string) => {
-      // If a refresh is in flight, give it a beat. Re-check after the typical
-      // refresh window — if still no session, then it's terminal.
-      if (isGloballyReconnecting()) {
-        setTimeout(() => {
-          if (isGloballyReconnecting()) return; // still trying — let it finish
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            if (!session) {
-              hadSession.current = false;
-              toast({ title, description, variant: "destructive" });
-              navigate("/auth", { replace: true });
-            }
-          });
-        }, 2500);
-        return;
-      }
-      hadSession.current = false;
-      toast({ title, description, variant: "destructive" });
-      navigate("/auth", { replace: true });
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "INITIAL_SESSION") {
-          if (session) hadSession.current = true;
-          return;
-        }
-
-        if (event === "SIGNED_OUT" && hadSession.current) {
-          // Only treat SIGNED_OUT as terminal if there's truly no persisted
-          // session left in storage. Some flows (token refresh races, tab
-          // restores) can emit a transient SIGNED_OUT even though the
-          // session is still valid in storage.
-          supabase.auth.getSession().then(({ data: { session: s } }) => {
-            if (s) {
-              hadSession.current = true;
-              return;
-            }
-            safeRedirect("Session ended", "Please sign in again to continue.");
-          });
-          return;
-        }
-
-        if (!session && event !== "SIGNED_OUT") {
-          supabase.auth.getSession().then(({ data: { session: s } }) => {
-            if (s) {
-              hadSession.current = true;
-            }
-          });
-          return;
-        }
-
-        if (session) {
-          hadSession.current = true;
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+  }), [isLoading, navigate, toast, user]);
 
   return null;
 };

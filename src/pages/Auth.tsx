@@ -16,6 +16,7 @@ import { parseUserAgent } from "@/hooks/useSessionManagement";
 import { SportType } from "@/lib/sportTypes";
 import { lovable } from "@/integrations/lovable";
 import vaultLogo from "@/assets/vault-logo-new.webp";
+import { waitForRecoveredSession } from "@/lib/authSession";
 
 const authSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -160,20 +161,31 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        // Hard 15s cap on the sign-in network call so the spinner can NEVER hang forever.
         const signInResult = await withTimeout(
           Promise.resolve(supabase.auth.signInWithPassword({ email, password })),
-          15000,
+          8000,
           "signInWithPassword"
         );
 
         if (!signInResult) {
+          const recoveredSession = await waitForRecoveredSession({ timeoutMs: 8000, intervalMs: 200, refresh: true });
+          if (recoveredSession?.user?.id) {
+            recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
+            toast({ title: "Welcome back!", description: "You're signed in." });
+            routeByRole(recoveredSession.user.id);
+            return;
+          }
+
           throw new Error("Sign-in is taking longer than expected. Please check your connection and try again.");
         }
         const { data, error } = signInResult as any;
         if (error) throw error;
 
-        const userId = data?.user?.id;
+        const hydratedSession = data?.session?.access_token
+          ? data.session
+          : await waitForRecoveredSession({ timeoutMs: 4000, intervalMs: 200 });
+
+        const userId = data?.user?.id ?? hydratedSession?.user?.id;
         if (!userId) {
           throw new Error("Sign-in completed but no user was returned. Please try again.");
         }
@@ -182,23 +194,21 @@ const Auth = () => {
         recordSession().catch((e) => console.warn("[auth] recordSession failed:", e));
         toast({ title: "Welcome back!", description: "You're signed in." });
 
-        // Kick off MFA check in parallel — if a verified factor exists, prompt for it.
-        // Tight 1.5s budget so a stalled GoTrue call cannot delay anything visible.
-        withTimeout(
+        const factorsRes = await withTimeout(
           Promise.resolve(supabase.auth.mfa.listFactors()),
           1500,
           "mfa.listFactors"
-        ).then((factorsRes: any) => {
-          const verifiedFactors =
-            factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
-          if (verifiedFactors.length > 0) {
-            setMfaRequired(true);
-            setMfaFactorId(verifiedFactors[0].id);
-            setMfaUserId(userId);
-          }
-        });
+        );
 
-        // Navigate IMMEDIATELY — routeByRole is synchronous now.
+        const verifiedFactors =
+          factorsRes?.data?.totp?.filter((f: any) => f.status === "verified") || [];
+        if (verifiedFactors.length > 0) {
+          setMfaRequired(true);
+          setMfaFactorId(verifiedFactors[0].id);
+          setMfaUserId(userId);
+          return;
+        }
+
         routeByRole(userId);
       } else {
 
