@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef, useCallback, Re
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { setGlobalReconnecting } from "@/hooks/useAuth";
+import { hasStoredSessionToken, setGlobalReconnecting, waitForRecoveredSession } from "@/lib/authSession";
 
 type SubscriptionTier = "basic" | "performance" | "elite" | null;
 
@@ -52,22 +52,6 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     setSubscriptionTier(null);
     setSubscriptionEnd(null);
     setHasTeamAccess(false);
-  }, []);
-
-  const hasStoredSessionToken = useCallback(() => {
-    try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith("sb-") && key.endsWith("-auth-token")) {
-          const value = localStorage.getItem(key);
-          if (value && value.length > 10) return true;
-        }
-      }
-    } catch {
-      // ignore storage access issues
-    }
-
-    return false;
   }, []);
 
   const checkTeamAccess = useCallback(async (email: string | undefined) => {
@@ -153,20 +137,13 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       setGlobalReconnecting(true);
       setIsLoading(true);
 
-      const startedAt = Date.now();
-      const maxWaitMs = 4000;
+      const verified = await waitForRecoveredSession({ timeoutMs: 6000, intervalMs: 200, refresh: reason.includes("pageshow") || reason.includes("visibility") || reason.includes("TOKEN_REFRESHED") });
 
-      while (active && attemptId === restoreAttemptRef.current && Date.now() - startedAt < maxWaitMs) {
-        const { data: { session: verified } } = await supabase.auth.getSession();
+      if (!active || attemptId !== restoreAttemptRef.current) return;
 
-        if (!active || attemptId !== restoreAttemptRef.current) return;
-
-        if (verified?.access_token) {
-          await syncSessionState(verified);
-          return;
-        }
-
-        await new Promise((resolve) => window.setTimeout(resolve, 200));
+      if (verified?.access_token) {
+        await syncSessionState(verified);
+        return;
       }
 
 
