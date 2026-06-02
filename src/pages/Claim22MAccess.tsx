@@ -5,6 +5,7 @@ import { Loader2, CheckCircle, XCircle, Trophy, Zap, Video, BarChart3, Users } f
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { isGloballyReconnecting } from "@/hooks/useAuth";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
@@ -26,26 +27,29 @@ const Claim22MAccess = () => {
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const inviteToken = searchParams.get("invite");
+  const { user: authedUser, isLoading: authLoading } = useSubscription();
 
   const { data: tokenData, isLoading: tokenLoading, error: tokenError } = useValidate22MToken(inviteToken);
   const activateTrial = useActivate22MTrial();
 
   useEffect(() => {
-    const safetyTimeout = setTimeout(() => {
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
+
+    if (!authedUser) {
       setLoading(false);
-    }, 5000);
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        if (isGloballyReconnecting()) return;
-        navigate("/auth", {
-          state: { from: { pathname: `/claim-22m${inviteToken ? `?invite=${inviteToken}` : ""}` } },
-        });
-        return;
-      }
-      setUser(session.user);
-      setLoading(false);
-    });
-  }, [navigate, inviteToken]);
+      if (isGloballyReconnecting()) return;
+      navigate("/auth", {
+        state: { from: { pathname: `/claim-22m${inviteToken ? `?invite=${inviteToken}` : ""}` } },
+      });
+      return;
+    }
+
+    setUser(authedUser);
+    setLoading(false);
+  }, [authLoading, authedUser?.id, inviteToken, navigate]);
 
   const handleActivateTrial = async () => {
     if (!user || !tokenData) return;
