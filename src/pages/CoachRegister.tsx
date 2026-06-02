@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { isGloballyReconnecting } from "@/hooks/useAuth";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachApplicationForm from "@/components/coach-register/CoachApplicationForm";
@@ -37,29 +38,31 @@ const CoachRegister = () => {
   const [inviteTokenId, setInviteTokenId] = useState<string | null>(null);
   const [defaultName, setDefaultName] = useState("");
   const [defaultEmail, setDefaultEmail] = useState("");
+  const { user: authedUser, isLoading: authLoading } = useSubscription();
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const inviteToken = searchParams.get("invite");
 
   useEffect(() => {
-    const safetyTimeout = setTimeout(() => {
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
+
+    if (!authedUser) {
       setLoading(false);
-    }, 5000);
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        // Don't bounce mid session-refresh (iOS BFCache, tab restore).
-        if (isGloballyReconnecting()) return;
-        navigate("/auth", {
-          state: { from: { pathname: `/coach-register${inviteToken ? `?invite=${inviteToken}` : ""}` } },
-        });
-        return;
-      }
-      setUser(session.user);
-      setDefaultEmail(session.user.email || "");
-      init(session.user.id);
-    });
-  }, [navigate]);
+      if (isGloballyReconnecting()) return;
+      navigate("/auth", {
+        state: { from: { pathname: `/coach-register${inviteToken ? `?invite=${inviteToken}` : ""}` } },
+      });
+      return;
+    }
+
+    setUser(authedUser);
+    setDefaultEmail(authedUser.email || "");
+    void init(authedUser.id);
+  }, [authLoading, authedUser?.id, inviteToken, navigate]);
 
   const init = async (userId: string) => {
     try {
