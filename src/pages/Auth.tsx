@@ -105,17 +105,31 @@ const Auth = () => {
       ),
     ]);
 
+  /** Same-origin relative redirect target from ?next=, if valid. */
+  const nextParam = (() => {
+    const raw = new URLSearchParams(location.search).get("next");
+    if (!raw) return null;
+    return raw.startsWith("/") && !raw.startsWith("//") ? raw : null;
+  })();
+
   /** Route user to the correct dashboard based on their role.
    *  Navigation is INSTANT — we hop to /dashboard right away and let a
    *  background role lookup refine the destination if needed. This guarantees
    *  the sign-in UI never blocks on a DB query.
    */
   const routeByRole = (userId: string) => {
+    // An explicit ?next= target (e.g. an OAuth consent request) always wins.
+    if (nextParam) {
+      navigate(nextParam, { replace: true });
+      return;
+    }
+
     const from = (location.state as any)?.from?.pathname;
     const safeDefault = from && from !== "/auth" ? from : "/dashboard";
 
     // Navigate immediately — no awaits, no spinners.
     navigate(safeDefault, { replace: true });
+
 
     // Best-effort role refinement in the background. If we get a faster
     // answer back, hop to the role-specific dashboard. Destination pages
