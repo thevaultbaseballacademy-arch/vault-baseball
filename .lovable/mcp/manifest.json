@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://hhvdxkxaiauzikavtpuj.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "vault-os",
+      "version": "0.1.0",
+      "title": "VAULT OS"
+    },
+    "tools": [
+      {
+        "name": "list_upcoming_tryouts",
+        "title": "List upcoming tryouts",
+        "description": "List published Vault tryout events that have not started yet, with date, age group, location and price.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of events to return (default 20)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_camps",
+        "title": "List camps",
+        "description": "List Vault camps with pricing and registration windows.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of camps to return (default 20)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_my_profile",
+        "title": "Get my athlete profile",
+        "description": "Get the signed-in user's Vault athlete profile: position, class year, physical measurables, sport and recruiting targets.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_my_profile",
+        "title": "Update my athlete profile",
+        "description": "Update fields on the signed-in user's Vault athlete profile. Only the fields provided are changed.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "position": {
+              "type": "string",
+              "description": "Primary position."
+            },
+            "graduation_year": {
+              "type": "integer",
+              "description": "High school graduation year."
+            },
+            "height_inches": {
+              "type": "integer"
+            },
+            "weight_lbs": {
+              "type": "integer"
+            },
+            "throwing_arm": {
+              "type": "string",
+              "description": "R or L."
+            },
+            "batting_side": {
+              "type": "string",
+              "description": "R, L or S."
+            },
+            "academic_gpa": {
+              "type": "number"
+            },
+            "intended_major": {
+              "type": "string"
+            },
+            "division_target": {
+              "type": "string",
+              "description": "Target level, e.g. D1, D2, D3, NAIA, JUCO."
+            },
+            "target_schools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of target school names."
+            },
+            "bio": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_team_registrations",
+        "title": "List my team registrations",
+        "description": "List Vault team registrations tied to the signed-in user's email, including team level, payment plan and payment status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
