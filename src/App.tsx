@@ -40,6 +40,8 @@ const PageLoader = () => (
 
 // Lazy load everything else
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
+
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Account = lazy(() => import("./pages/Account"));
 const Schedule = lazy(() => import("./pages/Schedule"));
@@ -302,6 +304,8 @@ const App = () => (
             <Route path="/register/summer-camp" element={<SummerCamp />} />
             <Route path="/payment/bank-instructions/:orderId" element={<BankInstructions />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
             <Route path="/schedule" element={<AuthGuard><Schedule /></AuthGuard>} />

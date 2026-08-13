@@ -105,17 +105,31 @@ const Auth = () => {
       ),
     ]);
 
+  /** Same-origin relative redirect target from ?next=, if valid. */
+  const nextParam = (() => {
+    const raw = new URLSearchParams(location.search).get("next");
+    if (!raw) return null;
+    return raw.startsWith("/") && !raw.startsWith("//") ? raw : null;
+  })();
+
   /** Route user to the correct dashboard based on their role.
    *  Navigation is INSTANT — we hop to /dashboard right away and let a
    *  background role lookup refine the destination if needed. This guarantees
    *  the sign-in UI never blocks on a DB query.
    */
   const routeByRole = (userId: string) => {
+    // An explicit ?next= target (e.g. an OAuth consent request) always wins.
+    if (nextParam) {
+      navigate(nextParam, { replace: true });
+      return;
+    }
+
     const from = (location.state as any)?.from?.pathname;
     const safeDefault = from && from !== "/auth" ? from : "/dashboard";
 
     // Navigate immediately — no awaits, no spinners.
     navigate(safeDefault, { replace: true });
+
 
     // Best-effort role refinement in the background. If we get a faster
     // answer back, hop to the role-specific dashboard. Destination pages
@@ -216,7 +230,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/auth/callback${nextParam ? `?next=${encodeURIComponent(nextParam)}` : ""}`,
             data: { full_name: name, display_name: name, signup_role: role, sport_type: sportType },
           },
         });
@@ -478,7 +492,8 @@ const Auth = () => {
               setLoading(true);
               try {
                 const result = await lovable.auth.signInWithOAuth("google", {
-                  redirect_uri: window.location.origin,
+                  redirect_uri: `${window.location.origin}/auth/callback${nextParam ? `?next=${encodeURIComponent(nextParam)}` : ""}`,
+
                 });
                 if (result.redirected) return;
                 if (result.error) throw result.error;
@@ -507,7 +522,7 @@ const Auth = () => {
               setLoading(true);
               try {
                 const result = await lovable.auth.signInWithOAuth("apple", {
-                  redirect_uri: window.location.origin,
+                  redirect_uri: `${window.location.origin}/auth/callback${nextParam ? `?next=${encodeURIComponent(nextParam)}` : ""}`,
                 });
                 if (result.redirected) return;
                 if (result.error) throw result.error;
