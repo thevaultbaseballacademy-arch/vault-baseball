@@ -40,6 +40,8 @@ const PageLoader = () => (
 
 // Lazy load everything else
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
+
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Account = lazy(() => import("./pages/Account"));
 const Schedule = lazy(() => import("./pages/Schedule"));
