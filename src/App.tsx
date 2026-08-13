@@ -304,6 +304,8 @@ const App = () => (
             <Route path="/register/summer-camp" element={<SummerCamp />} />
             <Route path="/payment/bank-instructions/:orderId" element={<BankInstructions />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/account" element={<AuthGuard><Account /></AuthGuard>} />
             <Route path="/schedule" element={<AuthGuard><Schedule /></AuthGuard>} />
